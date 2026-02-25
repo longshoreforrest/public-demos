@@ -173,6 +173,7 @@
         <span class="badge badge-amber">Esivalmistelu</span>
         <span class="badge badge-emerald" id="badgeStatus">0 / 5 valmis</span>
       </div>
+      <button class="btn-guide" id="btnGuide" title="Ohje">?</button>
     </div>
 
     <!-- Process stepper -->
@@ -394,6 +395,320 @@
 
     </div>
   </main>
+</div>
+
+<!-- ═══ OHJE-MODAALI ═══ -->
+<div class="guide-overlay" id="guideOverlay">
+  <div class="guide-modal">
+    <div class="guide-header">
+      <div class="guide-header-left">
+        <div class="sidebar-logo" style="width:32px;height:32px;font-size:12px;">VM</div>
+        <div>
+          <div class="guide-modal-title">Ohje — Miten sovellus toimii</div>
+          <div class="guide-modal-subtitle">Säädösvalmistelun AI-agentti</div>
+        </div>
+      </div>
+      <button class="guide-close" id="guideClose">&times;</button>
+    </div>
+
+    <div class="guide-body">
+
+      <!-- ── Yleiskuvaus ── -->
+      <div class="guide-section open" id="guideSection0">
+        <button class="guide-section-toggle" data-section="0">
+          <span class="guide-section-icon">&#9662;</span>
+          Yleiskuvaus
+        </button>
+        <div class="guide-section-content">
+          <p>Tämä sovellus on <strong>Valtiovarainministeriön demo</strong>, joka havainnollistaa miten tekoälyagentit voivat tukea säädösvalmistelua. Kolme erikoistunutta AI-agenttia työskentelee yhdessä ja tuottavat kokonaisvaltaisen analyysin valittavasta säädöshankkeesta.</p>
+          <div class="guide-highlight">
+            <strong>Esimerkkitapaus:</strong> EU AI Act -asetuksen (2024/1689) kansallinen täytäntöönpano Suomessa. Sovellus kerää 12 lähdettä, tunnistaa 5 ristiriitaa, luonnostelee 8 pykälän säädösluonnoksen, arvioi vaikutukset ja seuraa lähteiden tuoreutta.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Agentit ── -->
+      <div class="guide-section" id="guideSection1">
+        <button class="guide-section-toggle" data-section="1">
+          <span class="guide-section-icon">&#9656;</span>
+          Kolme AI-agenttia
+        </button>
+        <div class="guide-section-content">
+          <div class="guide-agent-cards">
+            <div class="guide-agent-card">
+              <div class="guide-agent-avatar va">VA</div>
+              <div>
+                <div class="guide-agent-name">Valmisteluagentti</div>
+                <div class="guide-agent-desc">Kerää ja analysoi lähteitä EU-tasolta, kansainvälisistä vertailumaista ja kotimaisesta lainsäädännöstä. Tunnistaa ristiriidat olemassa olevan lainsäädännön ja uusien vaatimusten välillä. Tuottaa säädösluonnoksen muutosseurannalla.</div>
+                <div class="guide-agent-phases">Vaiheet 1–3: Lähteet, Ristiriidat, Luonnos</div>
+              </div>
+            </div>
+            <div class="guide-agent-card">
+              <div class="guide-agent-avatar vaa">VaA</div>
+              <div>
+                <div class="guide-agent-name">Vaikutusarvioagentti</div>
+                <div class="guide-agent-desc">Analysoi säädösluonnoksen fiskaaliset vaikutukset (kustannukset ja säästöt), arvioi sääntelytaakan sektoreittain, tekee sidosryhmäanalyysin ja tarkistaa EU-yhteensopivuusaikataulun.</div>
+                <div class="guide-agent-phases">Vaihe 4: Vaikutusarviointi</div>
+              </div>
+            </div>
+            <div class="guide-agent-card">
+              <div class="guide-agent-avatar vam">VaM</div>
+              <div>
+                <div class="guide-agent-name">Vanhenemismonitoriagentti</div>
+                <div class="guide-agent-desc">Tarkistaa kaikkien lähteiden tuoreuden, tunnistaa muutokset ja hälyttää kun lähteen sisältö on vanhentunut tai päivittynyt. Ratkaisee ongelman, jossa sääntelyympäristö muuttuu nopeasti.</div>
+                <div class="guide-agent-phases">Vaihe 5: Vanhenemismonitori</div>
+              </div>
+            </div>
+          </div>
+          <div class="guide-info-box">
+            <strong>Handoff-mekanismi:</strong> Agentit siirtävät työn toisilleen automaattisesti. Valmisteluagentti siirtää tuotoksensa vaikutusarvioagentille, joka puolestaan siirtää työn vanhenemismonitorille. Jokainen handoff näkyy animoituna viestinä feedissä.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tyonkulku ── -->
+      <div class="guide-section" id="guideSection2">
+        <button class="guide-section-toggle" data-section="2">
+          <span class="guide-section-icon">&#9656;</span>
+          5-vaiheinen työnkulku
+        </button>
+        <div class="guide-section-content">
+          <div class="guide-workflow">
+            <div class="guide-workflow-step">
+              <div class="guide-step-num">1</div>
+              <div>
+                <div class="guide-step-title">Lähteiden analyysi</div>
+                <div class="guide-step-desc">Valmisteluagentti kerää 12 lähdettä kolmesta kategoriasta: EU-sääntely (4), kansainväliset vertailut (3) ja kotimainen lainsäädäntö (5). Jokainen lähde saa relevanttius-arvosanan.</div>
+              </div>
+            </div>
+            <div class="guide-workflow-connector"></div>
+            <div class="guide-workflow-step">
+              <div class="guide-step-num">2</div>
+              <div>
+                <div class="guide-step-title">Ristiriita-analyysi</div>
+                <div class="guide-step-desc">Agentti vertailee lähteiden sisältöjä ja tunnistaa 5 ristiriitaa. Kukin saa vakavuusluokituksen: kriittinen, merkittävä tai lievä. Jokaiseen liittyy toimintasuositus.</div>
+              </div>
+            </div>
+            <div class="guide-workflow-connector"></div>
+            <div class="guide-workflow-step">
+              <div class="guide-step-num">3</div>
+              <div>
+                <div class="guide-step-title">Säädösluonnos</div>
+                <div class="guide-step-desc">Agentti luonnostelee 8 pykälän säädöksen muutosseurannalla. Vihreät rivit ovat lisäyksiä, punaiset poistoja. Käyttäjä voi hyväksyä tai hylätä yksittäiset pykälät.</div>
+              </div>
+            </div>
+            <div class="guide-workflow-connector"></div>
+            <div class="guide-workflow-step">
+              <div class="guide-step-num">4</div>
+              <div>
+                <div class="guide-step-title">Vaikutusarviointi</div>
+                <div class="guide-step-desc">Vaikutusarvioagentti tuottaa neljä analyysiä: fiskaaliset vaikutukset (pylväskaavio), sääntelytaakka sektoreittain (vaakapalkit), sidosryhmäanalyysi (tutkakaavio) ja EU-aikajana.</div>
+              </div>
+            </div>
+            <div class="guide-workflow-connector"></div>
+            <div class="guide-workflow-step">
+              <div class="guide-step-num">5</div>
+              <div>
+                <div class="guide-step-title">Vanhenemismonitori</div>
+                <div class="guide-step-desc">Vanhenemismonitoriagentti tarkistaa jokaisen lähteen tuoreuden. Vihreä = ajantasainen, keltainen = huomioitava, punainen = kriittinen muutos. Hälytykset näyttävät mitä säädösluonnoksessa pitää tarkistaa.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Kayttoliittyma ── -->
+      <div class="guide-section" id="guideSection3">
+        <button class="guide-section-toggle" data-section="3">
+          <span class="guide-section-icon">&#9656;</span>
+          Käyttöliittymän osat
+        </button>
+        <div class="guide-section-content">
+          <div class="guide-ui-grid">
+            <div class="guide-ui-item">
+              <div class="guide-ui-label">Sivupalkki (vasen)</div>
+              <div class="guide-ui-desc">
+                <strong>Hankevalitsin</strong> — valitse kolmesta esimerkkihankkeesta.<br>
+                <strong>Agenttikortit</strong> — näyttävät kunkin agentin tilan reaaliajassa: Odottaa, Työskentelee (vilkkuva) tai Valmis.<br>
+                <strong>Ohjausparametrit</strong> — painopistealue ja lähteiden laajuus (demodataa).<br>
+                <strong>Puheselostus</strong> — kytke puheen kieli, nopeus ja voimakkuus.<br>
+                <strong>Agenttiloki</strong> — reaaliaikainen tapahtumaloki.
+              </div>
+            </div>
+            <div class="guide-ui-item">
+              <div class="guide-ui-label">Etenemispalkki (yläosa)</div>
+              <div class="guide-ui-desc">Viisivaiheinen numeropalkki, joka näyttää edistymisen. Aktiivinen vaihe korostuu sinisenä, valmiit vaiheet vihreänä. Voit klikata vaiheita siirtyäksesi suoraan niiden välilehtiin.</div>
+            </div>
+            <div class="guide-ui-item">
+              <div class="guide-ui-label">Välilehdet</div>
+              <div class="guide-ui-desc">Viisi välilehteä: Lähteiden analyysi, Ristiriita-analyysi, Säädösluonnos, Vaikutusarviointi ja Vanhenemismonitori. Jokainen avautuu automaattisesti kun agentti siirtyy vastaavaan vaiheeseen.</div>
+            </div>
+            <div class="guide-ui-item">
+              <div class="guide-ui-label">Agenttien feed (keskialue)</div>
+              <div class="guide-ui-desc">Jokaisella välilehdellä on agenttien keskustelunäkymä. Agentin viestit kirjoitetaan merkki kerrallaan kirjoitusanimaatiolla. Kursorin väri vastaa agenttia: teal (VA), vihreä (VaA), amber (VaM).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Painikkeet ── -->
+      <div class="guide-section" id="guideSection4">
+        <button class="guide-section-toggle" data-section="4">
+          <span class="guide-section-icon">&#9656;</span>
+          Toiminnot ja painikkeet
+        </button>
+        <div class="guide-section-content">
+          <div class="guide-actions-list">
+            <div class="guide-action">
+              <span class="guide-action-btn primary">&#9654; Aloita analyysi</span>
+              <span>Käynnistää kolmen agentin työnkulun. Prosessi etenee automaattisesti vaiheiden 1–5 läpi. Kesto noin 2–3 minuuttia kirjoitusanimaation vuoksi.</span>
+            </div>
+            <div class="guide-action">
+              <span class="guide-action-btn secondary">&#8635; Tarkista vanheneminen</span>
+              <span>Siirtyy suoraan Vanhenemismonitori-välilehdelle ja näyttää kaikkien lähteiden tuoreustilan kerralla. Voidaan käyttää milloin tahansa ilman koko analyysiä.</span>
+            </div>
+            <div class="guide-action">
+              <span class="guide-action-btn danger">&#8634; Aloita alusta</span>
+              <span>Nollaa kaiken: pysäyttää agentit, tyhjentää tulokset ja puheen. Sovellus palaa alkutilaan.</span>
+            </div>
+            <div class="guide-action">
+              <span class="guide-action-btn intro">&#9655; Puhu ääneen</span>
+              <span>Lukee esittelytekstin ääneen valitulla kielellä. Aktivoi puheselostuksen automaattisesti.</span>
+            </div>
+          </div>
+          <div class="guide-info-box" style="margin-top: 16px;">
+            <strong>Säädösluonnoksen toiminnot:</strong> Jokaisessa pykäläluonnoksessa on kolme painiketta: <em>Hyväksy</em> (vihreä), <em>Hylkää</em> (punainen) ja <em>Pyydä lisätietoa</em> (sininen). Näiden tila näkyy pykälän oikeassa yläkulmassa ja kirjautuu agenttilokiin.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Puheselostus ── -->
+      <div class="guide-section" id="guideSection5">
+        <button class="guide-section-toggle" data-section="5">
+          <span class="guide-section-icon">&#9656;</span>
+          Puheselostus
+        </button>
+        <div class="guide-section-content">
+          <p>Sovellus kertoo ääneen mitä agentit tekevät juuri nyt. Puheselostus käyttää selaimen sisäänrakennettua <strong>Web Speech API</strong>:a, joten se toimii ilman ulkoisia palveluja.</p>
+          <div class="guide-ui-grid" style="margin-top: 12px;">
+            <div class="guide-ui-item">
+              <div class="guide-ui-label">Kielivalinta</div>
+              <div class="guide-ui-desc"><strong>Suomi</strong>, <strong>English</strong> tai <strong>Svenska</strong>. Kielen vaihtaminen kesken analyysin vaikuttaa välittömästi seuraaviin viesteihin.</div>
+            </div>
+            <div class="guide-ui-item">
+              <div class="guide-ui-label">Äänenvoimakkuus ja nopeus</div>
+              <div class="guide-ui-desc">Liukusäätimillä voit hienosäätää voimakkuutta (0–100 %) ja puhenopeutta (0,5x – 2x). Oletusarvot ovat 80 % ja 1x.</div>
+            </div>
+          </div>
+          <div class="guide-info-box" style="margin-top: 12px;">
+            <strong>Vinkki:</strong> Puheviestit ovat lyhyempiä kuin ruudulla näkyvä teksti, jotta puhe kuulostaa luontevalta. "Ajattelu"-vaiheita ei lueta ääneen — vain valmiit viestit ja vaiheiden vaihdot.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Visualisoinnit ── -->
+      <div class="guide-section" id="guideSection6">
+        <button class="guide-section-toggle" data-section="6">
+          <span class="guide-section-icon">&#9656;</span>
+          Kaaviot ja visualisoinnit
+        </button>
+        <div class="guide-section-content">
+          <p>Vaikutusarviointi-välilehdellä näkyy neljä kaaviota, jotka piirretään progressiivisesti analyysin edetessä:</p>
+          <div class="guide-chart-list">
+            <div class="guide-chart-item">
+              <div class="guide-chart-icon">&#128202;</div>
+              <div>
+                <strong>Fiskaaliset vaikutukset</strong> — pinottu pylväskaavio + viivakuvaaja. Näyttää kustannukset (punainen), säästöt (vihreä) ja nettovaikutuksen (sininen viiva) vuosille 2026–2031.
+              </div>
+            </div>
+            <div class="guide-chart-item">
+              <div class="guide-chart-icon">&#128203;</div>
+              <div>
+                <strong>Sääntelytaakka sektoreittain</strong> — vaakapalkkikaavio. 6 sektoria asteikolla 0–100. Punainen = suuri taakka, vihreä = pieni.
+              </div>
+            </div>
+            <div class="guide-chart-item">
+              <div class="guide-chart-icon">&#128160;</div>
+              <div>
+                <strong>Sidosryhmäanalyysi</strong> — tutkakaavio. Kolme ryhmää (yritykset, julkishallinto, kansalaiset) kuudella akselilla: taloudellinen vaikutus, hallinnollinen taakka, innovaatiovaikutus, perusoikeudet, kilpailukyky ja julkinen luottamus.
+              </div>
+            </div>
+            <div class="guide-chart-item">
+              <div class="guide-chart-icon">&#128197;</div>
+              <div>
+                <strong>EU-yhteensopivuusaikajana</strong> — EU AI Actin portaittainen voimaantuloaikataulu. Vihreä = toteutunut, punainen = myöhässä, amber = käynnissä, harmaa = tulossa.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tuoreusseuranta ── -->
+      <div class="guide-section" id="guideSection7">
+        <button class="guide-section-toggle" data-section="7">
+          <span class="guide-section-icon">&#9656;</span>
+          Tuoreusseuranta
+        </button>
+        <div class="guide-section-content">
+          <p>Vanhenemismonitori seuraa 8 lähteen tuoreustilaa. Jokainen lähde saa tilaindikaattorin:</p>
+          <div class="guide-freshness-legend">
+            <div class="guide-freshness-item">
+              <span class="freshness-dot green"></span>
+              <div><strong>Vihreä</strong> — lähde on ajantasainen, ei toimenpiteitä.</div>
+            </div>
+            <div class="guide-freshness-item">
+              <span class="freshness-dot yellow"></span>
+              <div><strong>Keltainen</strong> — lähteessä on tapahtunut muutos. Hälytys kertoo mitä pitää tarkistaa.</div>
+            </div>
+            <div class="guide-freshness-item">
+              <span class="freshness-dot red"></span>
+              <div><strong>Punainen</strong> — kriittinen muutos joka vaikuttaa suoraan säädösluonnokseen. Vaatii välitöntä huomiota.</div>
+            </div>
+          </div>
+          <div class="guide-info-box" style="margin-top: 12px;">
+            <strong>Miksi tämä on tärkeää?</strong> Sääntelyympäristö muuttuu jatkuvasti. EU-komission delegoidut asetukset, kansallisten lakien muutokset ja kansainväliset vertailupäätökset voivat tehdä säädösluonnoksen sisällöstä vanhentunutta viikkojen sisällä. Vanhenemismonitori ratkaisee tämän ongelman seuraamalla lähteiden tilaa aktiivisesti.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tekninen toteutus ── -->
+      <div class="guide-section" id="guideSection8">
+        <button class="guide-section-toggle" data-section="8">
+          <span class="guide-section-icon">&#9656;</span>
+          Tekninen toteutus
+        </button>
+        <div class="guide-section-content">
+          <p>Sovellus on toteutettu puhtaasti selainpohjaisena ilman palvelinriippuvuuksia.</p>
+          <div class="guide-tech-grid">
+            <div class="guide-tech-item">
+              <div class="guide-tech-label">Teknologia</div>
+              <div class="guide-tech-desc">HTML, CSS, JavaScript (vanilla). Ainoa ulkoinen riippuvuus: Chart.js (CDN).</div>
+            </div>
+            <div class="guide-tech-item">
+              <div class="guide-tech-label">Puhesynteesi</div>
+              <div class="guide-tech-desc">Web Speech API (SpeechSynthesis). Toimii Chrome, Safari, Edge. Firefox-tuki vaihteleva.</div>
+            </div>
+            <div class="guide-tech-item">
+              <div class="guide-tech-label">Arkkitehtuuri</div>
+              <div class="guide-tech-desc">Callback-pohjainen: AgentEngine (simulaatiomoottori) ei manipuloi DOM:ia suoraan, vaan ilmoittaa tapahtumista pääcontrollerille (app.js), joka päivittää käyttöliittymää.</div>
+            </div>
+            <div class="guide-tech-item">
+              <div class="guide-tech-label">Tiedostot</div>
+              <div class="guide-tech-desc">
+                <code>data.js</code> — sisältödata ja kieliversiot<br>
+                <code>agents.js</code> — simulaatiomoottori<br>
+                <code>charts.js</code> — Chart.js-kaaviot<br>
+                <code>app.js</code> — pääcontrolleri ja puhe<br>
+                <code>style.css</code> — tyylit<br>
+                <code>index.html</code> — rakenne
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>

@@ -749,4 +749,56 @@
     });
   }
 
+  // ── Guide Modal ───────────────────────────────────────────────
+  const guideOverlay = document.getElementById('guideOverlay');
+  const btnGuide = document.getElementById('btnGuide');
+  const guideClose = document.getElementById('guideClose');
+
+  if (btnGuide && guideOverlay) {
+    btnGuide.addEventListener('click', () => {
+      guideOverlay.classList.add('visible');
+    });
+
+    guideClose.addEventListener('click', () => {
+      guideOverlay.classList.remove('visible');
+    });
+
+    guideOverlay.addEventListener('click', (e) => {
+      if (e.target === guideOverlay) {
+        guideOverlay.classList.remove('visible');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && guideOverlay.classList.contains('visible')) {
+        guideOverlay.classList.remove('visible');
+      }
+    });
+
+    // Accordion toggles
+    document.querySelectorAll('.guide-section-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sectionId = btn.dataset.section;
+        const section = document.getElementById('guideSection' + sectionId);
+        if (!section) return;
+
+        const isOpen = section.classList.contains('open');
+
+        // Close all sections
+        document.querySelectorAll('.guide-section').forEach(s => {
+          s.classList.remove('open');
+          const icon = s.querySelector('.guide-section-icon');
+          if (icon) icon.innerHTML = '&#9656;';
+        });
+
+        // Open clicked if it was closed
+        if (!isOpen) {
+          section.classList.add('open');
+          const icon = section.querySelector('.guide-section-icon');
+          if (icon) icon.innerHTML = '&#9662;';
+        }
+      });
+    });
+  }
+
 })();
