@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Säädösvalmistelun AI-agentti — VM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">VM</div>
+        <div>
+          <div class="sidebar-title">Säädösvalmistelun AI-agentti</div>
+          <div class="sidebar-subtitle">Valtiovarainministeriö</div>
+        </div>
+      </div>
+      <div class="param-group" style="margin-bottom: 12px;">
+        <label class="param-label" for="projectSelect">Valitse hanke</label>
+        <select class="param-select" id="projectSelect">
+          <option value="0">EU AI Act — Täytäntöönpano</option>
+          <option value="1">Digitaalinen euro — Kansallinen valmistelu</option>
+          <option value="2">Julkisten hankintojen AI-velvoitteet</option>
+        </select>
+      </div>
+      <dl class="project-info">
+        <dt>Hanke</dt>
+        <dd id="projectTitle">EU AI Act — Täytäntöönpano</dd>
+        <dt>Tunnus</dt>
+        <dd id="projectCode">VM/2025/142</dd>
+        <dt>Vaihe</dt>
+        <dd id="projectPhase">Esivalmistelu</dd>
+        <dt>Takaraja</dt>
+        <dd id="projectDeadline">31.12.2026</dd>
+      </dl>
+    </div>
+
+    <div class="sidebar-content">
+      <!-- Agent statuses -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Agentit</div>
+        <div class="agent-status" id="agentStatusVA">
+          <div class="agent-avatar va">VA</div>
+          <div class="agent-info">
+            <div class="agent-name">Valmisteluagentti</div>
+            <div class="agent-role">Lähteet, ristiriidat, luonnos</div>
+          </div>
+          <span class="agent-state idle" id="agentStateVA">Odottaa</span>
+        </div>
+        <div class="agent-status" id="agentStatusVaA">
+          <div class="agent-avatar vaa">VaA</div>
+          <div class="agent-info">
+            <div class="agent-name">Vaikutusarvioagentti</div>
+            <div class="agent-role">Fiskaalinen, sääntely, sidosryhmät</div>
+          </div>
+          <span class="agent-state idle" id="agentStateVaA">Odottaa</span>
+        </div>
+        <div class="agent-status" id="agentStatusVaM">
+          <div class="agent-avatar vam">VaM</div>
+          <div class="agent-info">
+            <div class="agent-name">Vanhenemismonitoriagentti</div>
+            <div class="agent-role">Tuoreus, muutokset, hälytykset</div>
+          </div>
+          <span class="agent-state idle" id="agentStateVaM">Odottaa</span>
+        </div>
+      </div>
+
+      <!-- Parameters -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Ohjausparametrit</div>
+        <div class="param-group">
+          <label class="param-label" for="paramFocus">Painopistealue</label>
+          <select class="param-select" id="paramFocus">
+            <option value="all">Kaikki osa-alueet</option>
+            <option value="supervision">Markkinavalvonta</option>
+            <option value="sanctions">Seuraamusjärjestelmä</option>
+            <option value="public">Julkishallinnon velvoitteet</option>
+          </select>
+        </div>
+        <div class="param-group">
+          <label class="param-label" for="paramScope">Lähteiden laajuus</label>
+          <select class="param-select" id="paramScope">
+            <option value="full">Laaja (EU + kansainvälinen + kotimainen)</option>
+            <option value="eu-domestic">EU + kotimainen</option>
+            <option value="domestic">Vain kotimainen</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Speech controls -->
+      <div class="sidebar-section" id="speechSection">
+        <div class="sidebar-section-title">Puheselostus</div>
+        <div class="speech-toggle-row">
+          <label class="toggle-switch">
+            <input type="checkbox" id="speechToggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="speech-toggle-label" id="speechToggleLabel">Päällä</span>
+        </div>
+        <div class="speech-controls visible" id="speechControls">
+          <div class="param-group">
+            <label class="param-label" for="speechLang">Puheen kieli</label>
+            <select class="param-select" id="speechLang">
+              <option value="fi">Suomi</option>
+              <option value="en">English</option>
+              <option value="sv">Svenska</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <label class="param-label" for="speechVolume">Äänenvoimakkuus</label>
+            <input type="range" class="speech-range" id="speechVolume" min="0" max="1" step="0.1" value="0.8">
+          </div>
+          <div class="param-group">
+            <label class="param-label" for="speechRate">Puhenopeus</label>
+            <input type="range" class="speech-range" id="speechRate" min="0.5" max="2" step="0.1" value="1">
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent log -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Agenttiloki</div>
+        <div class="agent-log" id="agentLog">
+          <div class="log-entry">
+            <span class="log-agent va">VA</span>
+            <span class="log-text">Valmis aloittamaan.</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-agent vaa">VaA</span>
+            <span class="log-text">Valmis aloittamaan.</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-agent vam">VaM</span>
+            <span class="log-text">Valmis aloittamaan.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="sidebar-actions">
+      <button class="btn btn-primary" id="btnStart">
+        <span>&#9654;</span> Aloita analyysi
+      </button>
+      <button class="btn btn-secondary" id="btnFreshness">
+        <span>&#8635;</span> Tarkista vanheneminen
+      </button>
+      <button class="btn btn-danger" id="btnReset">
+        <span>&#8634;</span> Aloita alusta
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="header">
+      <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+      <div class="header-title">EU AI Act — Kansallinen täytäntöönpano</div>
+      <div class="header-badges">
+        <span class="badge badge-indigo">AI Act 2024/1689</span>
+        <span class="badge badge-amber">Esivalmistelu</span>
+        <span class="badge badge-emerald" id="badgeStatus">0 / 5 valmis</span>
+      </div>
+    </div>
+
+    <!-- Process stepper -->
+    <div class="process-stepper" id="processStepper">
+      <div class="process-step active" data-phase="sources">
+        <div class="step-number">1</div>
+        <div class="step-label">Lähteet</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="process-step" data-phase="conflicts">
+        <div class="step-number">2</div>
+        <div class="step-label">Ristiriidat</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="process-step" data-phase="draft">
+        <div class="step-number">3</div>
+        <div class="step-label">Luonnos</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="process-step" data-phase="impact">
+        <div class="step-number">4</div>
+        <div class="step-label">Vaikutusarvio</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="process-step" data-phase="freshness">
+        <div class="step-number">5</div>
+        <div class="step-label">Monitori</div>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="sources">
+        Lähteiden analyysi
+        <span class="tab-badge" id="badgeSources"></span>
+      </button>
+      <button class="tab-btn" data-tab="conflicts">
+        Ristiriita-analyysi
+        <span class="tab-badge" id="badgeConflicts"></span>
+      </button>
+      <button class="tab-btn" data-tab="draft">
+        Säädösluonnos
+        <span class="tab-badge" id="badgeDraft"></span>
+      </button>
+      <button class="tab-btn" data-tab="impact">
+        Vaikutusarviointi
+        <span class="tab-badge" id="badgeImpact"></span>
+      </button>
+      <button class="tab-btn" data-tab="freshness">
+        Vanhenemismonitori
+        <span class="tab-badge" id="badgeFreshness"></span>
+      </button>
+    </div>
+
+    <!-- Tab content -->
+    <div class="tab-content">
+
+      <!-- ── TAB 1: Lähteiden analyysi ── -->
+      <div class="tab-panel active" id="panel-sources">
+        <div class="panel-header">
+          <div class="panel-title">Lähteiden analyysi</div>
+          <div class="panel-description">Valmisteluagentti kerää ja analysoi relevantit lähteet EU-tasolta, kansainvälisistä vertailumaista ja kotimaisesta lainsäädännöstä.</div>
+        </div>
+
+        <div class="agent-feed" id="feedSources"></div>
+
+        <div class="source-stats" id="sourceStats" style="display:none;">
+          <div class="stat-card">
+            <div class="stat-value" id="statSourceCount">0</div>
+            <div class="stat-label">Lähdettä analysoitu</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statAvgRelevance">0 %</div>
+            <div class="stat-label">Keskimääräinen relevanttius</div>
+          </div>
+        </div>
+
+        <div class="chart-container" id="sourceChartContainer" style="display:none;">
+          <div class="chart-title">Lähdejakauma</div>
+          <div class="chart-wrapper">
+            <canvas id="chartSourceDistribution"></canvas>
+          </div>
+        </div>
+
+        <div id="sourceCardsEU" class="source-cards"></div>
+        <div id="sourceCardsInt" class="source-cards"></div>
+        <div id="sourceCardsDom" class="source-cards"></div>
+
+        <div class="empty-state" id="emptyStateSources">
+          <div class="intro-card">
+            <div class="intro-title">Miten tämä demo toimii?</div>
+            <div class="intro-text">
+              <p>Valtiovarainministeriö valmistelee jatkuvasti lainsäädäntöä ja ohjaavia dokumentteja. Tämä demo havainnollistaa, miten AI-agentit voivat tukea säädösvalmistelua automaattisesti:</p>
+              <ol>
+                <li><strong>Valmisteluagentti</strong> kerää ja analysoi taustamateriaalia useista lähteistä — EU-sääntely, kansainväliset vertailumaat, kotimainen lainsäädäntö — tunnistaa ristiriitoja ja puutteita, ja tuottaa säädösluonnoksen ihmisen ohjaamana.</li>
+                <li><strong>Vaikutusarvioagentti</strong> ajaa fiskaalisen vaikutusarvioinnin ja sääntelytaakka-analyysin luonnosta vasten, sekä arvioi sidosryhmävaikutukset.</li>
+                <li><strong>Vanhenemismonitoriagentti</strong> tarkistaa lähteiden tuoreuden, tunnistaa muutokset ja ilmoittaa, kun dokumentin sisältö alkaa vanhentua — ratkaisee ongelman, jossa julkaisut ja ohjaavat dokumentit vanhenevat nopeasti muuttuvassa sääntelyympäristössä.</li>
+              </ol>
+              <p>Esimerkkitapauksena käytetään <strong>EU AI Act -asetuksen kansallista täytäntöönpanoa</strong>.</p>
+            </div>
+          </div>
+          <div style="margin-top: 20px; text-align: center;">
+            <button class="btn btn-primary" id="btnSpeakIntro" style="display: inline-flex;">&#9655; Puhu ääneen</button>
+          </div>
+          <div class="empty-state-hint" style="margin-top:12px;">tai paina "Aloita analyysi" käynnistääksesi agentit</div>
+        </div>
+      </div>
+
+      <!-- ── TAB 2: Säädösluonnos ── -->
+      <div class="tab-panel" id="panel-draft">
+        <div class="panel-header">
+          <div class="panel-title">Säädösluonnos</div>
+          <div class="panel-description">Valmisteluagentin tuottama luonnos muutosseurannalla. Vihreä = lisäys, punainen = poisto. Voit hyväksyä tai hylätä yksittäisiä pykäliä.</div>
+        </div>
+
+        <div class="agent-feed" id="feedDraft"></div>
+        <div class="draft-articles" id="draftArticles"></div>
+
+        <div class="empty-state" id="emptyStateDraft">
+          <div class="empty-state-icon">&#128220;</div>
+          <div class="empty-state-text">Säädösluonnos ei ole vielä valmis</div>
+          <div class="empty-state-hint">Valmisteluagentti tuottaa luonnoksen analyysin perusteella</div>
+        </div>
+      </div>
+
+      <!-- ── TAB 3: Vaikutusarviointi ── -->
+      <div class="tab-panel" id="panel-impact">
+        <div class="panel-header">
+          <div class="panel-title">Vaikutusarviointi</div>
+          <div class="panel-description">Vaikutusarvioagentin tuottama kokonaisarvio: fiskaaliset vaikutukset, sääntelytaakka, sidosryhmäanalyysi ja EU-yhteensopivuusaikajana.</div>
+        </div>
+
+        <div class="agent-feed" id="feedImpact"></div>
+
+        <div class="impact-grid" id="impactGrid" style="display:none;">
+          <!-- Fiscal chart -->
+          <div class="chart-container full-width">
+            <div class="chart-title">Fiskaaliset vaikutukset 2026–2031 (milj. €)</div>
+            <div class="chart-wrapper tall">
+              <canvas id="chartFiscal"></canvas>
+            </div>
+          </div>
+
+          <!-- Regulatory burden chart -->
+          <div class="chart-container">
+            <div class="chart-title">Sääntelytaakka sektoreittain</div>
+            <div class="chart-wrapper">
+              <canvas id="chartBurden"></canvas>
+            </div>
+          </div>
+
+          <!-- Stakeholder radar chart -->
+          <div class="chart-container">
+            <div class="chart-title">Sidosryhmäanalyysi</div>
+            <div class="chart-wrapper">
+              <canvas id="chartStakeholders"></canvas>
+            </div>
+          </div>
+
+          <!-- EU Timeline -->
+          <div class="chart-container full-width">
+            <div class="chart-title">EU-yhteensopivuusaikajana</div>
+            <div class="timeline" id="euTimeline"></div>
+          </div>
+        </div>
+
+        <div class="empty-state" id="emptyStateImpact">
+          <div class="empty-state-icon">&#128200;</div>
+          <div class="empty-state-text">Vaikutusarviointi ei ole vielä käynnistynyt</div>
+          <div class="empty-state-hint">Vaikutusarvioagentti aloittaa valmisteluagentin jälkeen</div>
+        </div>
+      </div>
+
+      <!-- ── TAB 4: Ristiriita-analyysi ── -->
+      <div class="tab-panel" id="panel-conflicts">
+        <div class="panel-header">
+          <div class="panel-title">Ristiriita-analyysi</div>
+          <div class="panel-description">Valmisteluagentti tunnistaa ristiriidat olemassa olevan lainsäädännön ja EU AI Act -vaatimusten välillä.</div>
+        </div>
+
+        <div class="agent-feed" id="feedConflicts"></div>
+        <div class="conflict-cards" id="conflictCards"></div>
+
+        <div class="empty-state" id="emptyStateConflicts">
+          <div class="empty-state-icon">&#9888;</div>
+          <div class="empty-state-text">Ristiriita-analyysi ei ole vielä käynnistynyt</div>
+          <div class="empty-state-hint">Valmisteluagentti analysoi ristiriidat lähdeanalyysin jälkeen</div>
+        </div>
+      </div>
+
+      <!-- ── TAB 5: Vanhenemismonitori ── -->
+      <div class="tab-panel" id="panel-freshness">
+        <div class="panel-header">
+          <div class="panel-title">Vanhenemismonitori</div>
+          <div class="panel-description">Vanhenemismonitoriagentti tarkistaa lähteiden tuoreuden ja ilmoittaa muutoksista.</div>
+        </div>
+
+        <div class="agent-feed" id="feedFreshness"></div>
+
+        <table class="freshness-table" id="freshnessTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>Tila</th>
+              <th>Lähde</th>
+              <th>Viimeisin päivitys</th>
+              <th>Tarkistettu</th>
+              <th>Huomiot</th>
+            </tr>
+          </thead>
+          <tbody id="freshnessBody"></tbody>
+        </table>
+
+        <div class="empty-state" id="emptyStateFreshness">
+          <div class="empty-state-icon">&#8635;</div>
+          <div class="empty-state-text">Tuoreustarkistus ei ole vielä käynnistynyt</div>
+          <div class="empty-state-hint">Vanhenemismonitoriagentti aloittaa vaikutusarvioinnin jälkeen</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script src="agents.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
