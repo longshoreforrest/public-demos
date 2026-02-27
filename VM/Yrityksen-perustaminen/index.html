@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yrityksen Perustaminen – Byrokratiasta AI-agentteihin</title>
+  <meta name="description" content="Demo: Suomessa hukataan 3,5 miljoonaa tuntia vuodessa yrityksen perustamisen byrokratiaan. AI-agentit ratkaisevat ongelman.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.4/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.4/dist/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="main-nav" class="nav" aria-label="Päävalikko">
+    <div class="nav-logo">YP<span class="nav-logo-dot">.</span>demo</div>
+    <div class="nav-links">
+      <button class="nav-link active" data-section="hero">Alku</button>
+      <button class="nav-link" data-section="old-world">Vanha maailma</button>
+      <button class="nav-link" data-section="new-world">Uusi maailma</button>
+      <button class="nav-link" data-section="business-case">Liiketoiminta</button>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section id="hero" class="section section--hero active">
+    <div class="hero-split">
+      <!-- Left: Old world preview -->
+      <div class="hero-side hero-side--old">
+        <div class="hero-side-bg"></div>
+        <div class="hero-side-content">
+          <div class="hero-icon-stack">
+            <div class="paper-icon">&#128196;</div>
+            <div class="paper-icon">&#128196;</div>
+            <div class="paper-icon">&#128196;</div>
+          </div>
+          <h2 class="hero-side-title">Vanha maailma</h2>
+          <p class="hero-side-stat"><span class="stat-number" data-target="137">0</span> tuntia</p>
+          <p class="hero-side-desc">byrokratiaa per yritys</p>
+          <button class="btn btn--old" data-navigate="old-world">
+            <span class="btn-icon">&#9888;&#65039;</span>
+            Katso kipu
+          </button>
+        </div>
+      </div>
+
+      <!-- Center: Main message -->
+      <div class="hero-center">
+        <div class="hero-badge">DEMO</div>
+        <h1 class="hero-title">
+          <span class="hero-title-line hero-title-line--accent" id="hero-counter">3 500 000</span>
+          <span class="hero-title-line">tuntia hukkaan</span>
+          <span class="hero-title-line hero-title-line--sub">joka vuosi</span>
+        </h1>
+        <p class="hero-description">
+          Suomessa perustetaan <strong>~35 000 yritystä</strong> vuodessa.
+          Jokainen perustaja hukkaa <strong>~100 tuntia</strong> byrokratiaan.
+        </p>
+        <a href="#" class="hero-link" id="why-link">Miksi tämä demo? &#8595;</a>
+        <div class="hero-why" id="hero-why">
+          <div class="hero-why-content">
+            <p class="hero-why-intro">
+              Vuosi 2026. Suomi on virallisesti "maailman digitalisoitunein valtio",
+              mutta yrityksen perustaminen on edelleen kuin yrittäisi uida siirapissa vastavirtaan.
+            </p>
+
+            <h3 class="hero-why-heading">Kaikki häviävät</h3>
+
+            <div class="hero-why-card">
+              <div class="hero-why-card-icon">&#128104;&#8205;&#128187;</div>
+              <div>
+                <h4>Perustaja: Järjestelmän koekaniini</h4>
+                <p>Jokaista innovaatioon käytettyä tuntia kohden kuluu kaksi tuntia
+                sen selvittämiseen, katkeaako puolison kotihoidontuki tai meneekö
+                oma asuntolaina perintään, jos YEL-työtulo on 100&nbsp;€ "väärin".</p>
+              </div>
+            </div>
+
+            <div class="hero-why-card">
+              <div class="hero-why-card-icon">&#127963;&#65039;</div>
+              <div>
+                <h4>Viranomainen: Hukkumassa manuaaliseen suohon</h4>
+                <p>80&nbsp;% ajasta kuluu virheiden korjaamiseen, joita ei pitäisi edes tapahtua.
+                Puutteelliset hakemukset, ristiriitaiset tiedot ja "vapaamuotoiset selvitykset"
+                jumittavat jonot. Inhimillinen tarkastus on pakollista, koska laki vaatii "harkintaa"
+                – vaikka kyse olisi vain nimen kirjoitusasusta.</p>
+              </div>
+            </div>
+
+            <div class="hero-why-card">
+              <div class="hero-why-card-icon">&#127974;</div>
+              <div>
+                <h4>Pankki: Algoritminen pelkuri</h4>
+                <p>KYC-tiimi hylkää hakemuksia "varmuuden vuoksi", koska sääntely on niin tiukkaa,
+                että on halvempaa sanoa "ei" kuin tutkia asiaa kunnolla.</p>
+              </div>
+            </div>
+
+            <div class="hero-why-card">
+              <div class="hero-why-card-icon">&#127467;&#127470;</div>
+              <div>
+                <h4>Kansantalous: Miljoonien tuntien vuoto</h4>
+                <p>35&nbsp;000 yritystä &times; 100 tuntia = <strong>3,5 miljoonaa tuntia</strong>
+                hukattua innovaatiopotentiaalia. Kymmeniä tuhansia työpäiviä, jotka voitaisiin
+                käyttää vientiin, myyntiin tai tuotekehitykseen.</p>
+              </div>
+            </div>
+
+            <h3 class="hero-why-heading hero-why-heading--green">AI-vallankumous: Kone hoitaa pykälähelvetin</h3>
+
+            <div class="hero-why-card hero-why-card--green">
+              <div class="hero-why-card-icon">&#127963;&#65039;&#8594;&#129302;</div>
+              <div>
+                <h4>Viranomaiselle: Automaattinen oikeellisuus</h4>
+                <p>AI-agentti vertaa hakemusta reaaliajassa kaikkiin tietokantoihin, lakeihin
+                ja ennakkotapauksiin. Jos ehdot täyttyvät, hyväksyntä sekunneissa.
+                Virkamiehen rooli muuttuu monimutkaisten erityistapausten asiantuntijaksi.</p>
+              </div>
+            </div>
+
+            <div class="hero-why-card hero-why-card--green">
+              <div class="hero-why-card-icon">&#128104;&#8205;&#128187;&#8594;&#9889;</div>
+              <div>
+                <h4>Perustajalle: Sähköinen apupilotti</h4>
+                <p>Alusta ei anna tehdä virhettä. Se laskee YEL-vaikutukset, ennakkoverot
+                ja ALV-vastuut dynaamisesti. Pankki saa kerralla kaiken tarvitsemansa
+                standardoidussa muodossa.</p>
+              </div>
+            </div>
+
+            <div class="hero-why-card hero-why-card--green">
+              <div class="hero-why-card-icon">&#127974;&#8594;&#128279;</div>
+              <div>
+                <h4>Pankille: Strukturoitu data</h4>
+                <p>Agentit toimittavat KYC-tiedot valmiiksi tarkistettuna ja standardoituna.
+                Ei enää manuaalista tietojen kaivamista – automaattinen luottamus korvaa
+                "varmuuden vuoksi" -hylkäykset.</p>
+              </div>
+            </div>
+
+            <h3 class="hero-why-heading hero-why-heading--amber">Suuri säästöpotentiaali</h3>
+
+            <div class="hero-why-table">
+              <div class="hero-why-table-row hero-why-table-row--header">
+                <span>Kohde</span>
+                <span>Nykytila</span>
+                <span>AI-tulevaisuus</span>
+              </div>
+              <div class="hero-why-table-row">
+                <span>Käsittelyajat</span>
+                <span class="hero-why-old">Viikkoja</span>
+                <span class="hero-why-new">Minuutteja</span>
+              </div>
+              <div class="hero-why-table-row">
+                <span>Työtunnit</span>
+                <span class="hero-why-old">3,5 milj. h/v</span>
+                <span class="hero-why-new">&lt; 0,5 milj. h/v</span>
+              </div>
+              <div class="hero-why-table-row">
+                <span>Viranomaiskulut</span>
+                <span class="hero-why-old">Massiiviset tiimit</span>
+                <span class="hero-why-new">Pienet asiantuntijatiimit</span>
+              </div>
+              <div class="hero-why-table-row">
+                <span>Inhimillinen pääoma</span>
+                <span class="hero-why-old">Burnout</span>
+                <span class="hero-why-new">Luovuus ja kasvu</span>
+              </div>
+            </div>
+
+            <p class="hero-why-conclusion">
+              <strong>Suomi ei pelastu täyttämällä lomakkeita paremmin</strong> – vaan
+              lopettamalla niiden täyttämisen kokonaan ja antamalla AI:n hoitaa
+              konepellin alainen sähkötyö. Ihmisille jää aikaa verkostoitua,
+              innovoida ja myydä.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: New world preview -->
+      <div class="hero-side hero-side--new">
+        <div class="hero-side-bg"></div>
+        <div class="hero-side-content">
+          <div class="hero-icon-stack">
+            <div class="orb-icon orb-icon--1"></div>
+            <div class="orb-icon orb-icon--2"></div>
+            <div class="orb-icon orb-icon--3"></div>
+          </div>
+          <h2 class="hero-side-title">Uusi maailma</h2>
+          <p class="hero-side-stat"><span class="stat-number" data-target="4">0</span> minuuttia</p>
+          <p class="hero-side-desc">AI-agentit hoitavat</p>
+          <button class="btn btn--new" data-navigate="new-world">
+            <span class="btn-icon">&#9889;</span>
+            Näe ratkaisu
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== VANHA MAAILMA ========== -->
+  <section id="old-world" class="section section--old-world">
+    <div class="section-header">
+      <span class="section-tag section-tag--old">Nykytila</span>
+      <h2 class="section-title">Vanha maailma: Byrokratiahelvetin 5 vaihetta</h2>
+      <p class="section-subtitle">Jokainen vaihe vie päiviä tai viikkoja. Virheet pakottavat aloittamaan alusta.</p>
+    </div>
+
+    <!-- 3D Canvas (Three.js) -->
+    <div class="old-world-canvas-wrap">
+      <canvas id="old-world-canvas"></canvas>
+    </div>
+
+    <!-- Timeline container -->
+    <div class="old-world-timeline" id="old-world-timeline">
+      <!-- Phase 1: PRH -->
+      <div class="ow-phase" id="ow-phase-1" data-phase="1">
+        <div class="ow-phase-header">
+          <div class="ow-phase-number">1</div>
+          <div class="ow-phase-info">
+            <h3>PRH-rekisteröinti</h3>
+            <span class="ow-phase-time">2–3 viikkoa</span>
+          </div>
+          <div class="ow-phase-status"></div>
+        </div>
+        <div class="ow-phase-content">
+          <div class="ow-paper-stack" id="ow-papers-1"></div>
+          <div class="ow-phase-details">
+            <p>Perustamisilmoitus Y1, yhtiöjärjestys, osakassopimus, perustamiskokouksen pöytäkirja...</p>
+            <div class="ow-stamp ow-stamp--rejected" id="ow-stamp-1">PUUTTEELLINEN</div>
+          </div>
+          <div class="ow-wait-indicator">
+            <div class="ow-clock" id="ow-clock-1">&#128336;</div>
+            <span>Odotetaan käsittelyä...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Vero -->
+      <div class="ow-phase" id="ow-phase-2" data-phase="2">
+        <div class="ow-phase-header">
+          <div class="ow-phase-number">2</div>
+          <div class="ow-phase-info">
+            <h3>Verorekisterit</h3>
+            <span class="ow-phase-time">1–2 viikkoa</span>
+          </div>
+          <div class="ow-phase-status"></div>
+        </div>
+        <div class="ow-phase-content">
+          <div class="ow-form-stack" id="ow-forms-2">
+            <div class="ow-form">ALV-rekisteri</div>
+            <div class="ow-form">Ennakkoperintärekisteri</div>
+            <div class="ow-form">Työnantajarekisteri</div>
+          </div>
+          <div class="ow-phase-details">
+            <p>Kolme eri rekisteriä, ristiriitaiset vaatimukset, eri käsittelyajat...</p>
+            <div class="ow-conflict-indicator" id="ow-conflict-2">
+              <span>&#9888;&#65039; Ristiriitainen tieto lomakkeilla</span>
+            </div>
+          </div>
+          <div class="ow-wait-indicator">
+            <div class="ow-clock" id="ow-clock-2">&#128336;</div>
+            <span>Kello tikittää...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: Pankki -->
+      <div class="ow-phase" id="ow-phase-3" data-phase="3">
+        <div class="ow-phase-header">
+          <div class="ow-phase-number">3</div>
+          <div class="ow-phase-info">
+            <h3>Pankkitili & KYC</h3>
+            <span class="ow-phase-time">1–4 viikkoa</span>
+          </div>
+          <div class="ow-phase-status"></div>
+        </div>
+        <div class="ow-phase-content">
+          <div class="ow-vault" id="ow-vault-3">
+            <div class="ow-vault-door">
+              <div class="ow-vault-handle"></div>
+            </div>
+          </div>
+          <div class="ow-phase-details">
+            <p>Tunnistautuminen, omistajaselvitys, liiketoimintasuunnitelma, rahojen alkuperä...</p>
+            <div class="ow-stamp ow-stamp--rejected" id="ow-stamp-3">HYLÄTTY</div>
+          </div>
+          <div class="ow-docs-scan" id="ow-docs-3">
+            <div class="ow-scan-line"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4: YEL -->
+      <div class="ow-phase" id="ow-phase-4" data-phase="4">
+        <div class="ow-phase-header">
+          <div class="ow-phase-number">4</div>
+          <div class="ow-phase-info">
+            <h3>YEL-vakuutus</h3>
+            <span class="ow-phase-time">1–2 viikkoa</span>
+          </div>
+          <div class="ow-phase-status"></div>
+        </div>
+        <div class="ow-phase-content">
+          <div class="ow-calculator" id="ow-calc-4">
+            <div class="ow-calc-display">
+              <span class="ow-calc-value" id="ow-calc-value">0 €/kk</span>
+            </div>
+            <div class="ow-calc-slider">
+              <div class="ow-calc-track">
+                <div class="ow-calc-fill" id="ow-calc-fill"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ow-phase-details">
+            <p>Työtulo pitää arvioida ennen kuin tietää paljonko tienaa. Catch-22.</p>
+            <div class="ow-catch22" id="ow-catch22">
+              <div class="ow-catch22-arrow ow-catch22-arrow--left">Tarvitset työtulon &#8594;</div>
+              <div class="ow-catch22-arrow ow-catch22-arrow--right">&#8592; Et tiedä tulojasi</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 5: Lopputulos -->
+      <div class="ow-phase" id="ow-phase-5" data-phase="5">
+        <div class="ow-phase-header">
+          <div class="ow-phase-number">5</div>
+          <div class="ow-phase-info">
+            <h3>Lopputulos</h3>
+            <span class="ow-phase-time">Yhteensä: 6 viikkoa</span>
+          </div>
+          <div class="ow-phase-status"></div>
+        </div>
+        <div class="ow-phase-content ow-phase-content--result">
+          <div class="ow-result-avatar" id="ow-avatar">
+            <div class="ow-avatar-face">&#128553;</div>
+          </div>
+          <div class="ow-result-stats">
+            <div class="ow-result-stat">
+              <span class="ow-result-number" id="ow-result-hours">0</span>
+              <span class="ow-result-label">tuntia byrokratiaa</span>
+            </div>
+            <div class="ow-result-stat">
+              <span class="ow-result-number" id="ow-result-weeks">0</span>
+              <span class="ow-result-label">viikkoa odotusta</span>
+            </div>
+          </div>
+          <div class="ow-national-impact" id="ow-national">
+            <p>&#215; <span id="ow-national-count">35 000</span> perustajaa vuodessa</p>
+            <div class="ow-national-total">
+              = <span id="ow-national-hours">3 500 000</span> hukkaan heitettyä tuntia
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ow-controls">
+      <button class="btn btn--old btn--large" id="ow-start-btn">
+        &#9654; Käynnistä ketju
+      </button>
+      <button class="btn btn--ghost" id="ow-reset-btn" style="display:none;">
+        &#8634; Aloita alusta
+      </button>
+    </div>
+
+    <div class="ow-progress">
+      <div class="ow-progress-bar" id="ow-progress-bar"></div>
+      <div class="ow-progress-labels">
+        <span>Vaihe 1</span><span>Vaihe 2</span><span>Vaihe 3</span><span>Vaihe 4</span><span>Vaihe 5</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== UUSI MAAILMA ========== -->
+  <section id="new-world" class="section section--new-world">
+    <div class="section-header">
+      <span class="section-tag section-tag--new">Tulevaisuus</span>
+      <h2 class="section-title">Uusi maailma: AI-agentit hoitavat</h2>
+      <p class="section-subtitle">Kerro ideasi. Agentit hoitavat byrokratian rinnakkaisesti.</p>
+    </div>
+
+    <div class="nw-controls nw-controls--top">
+      <button class="btn btn--new btn--large" id="nw-start-btn">
+        &#9889; Käynnistä agentit
+      </button>
+      <button class="btn btn--ghost" id="nw-reset-btn" style="display:none;">
+        &#8634; Aloita alusta
+      </button>
+    </div>
+
+    <!-- Step 1: Agent Architecture -->
+    <div class="nw-step" id="nw-step-1">
+      <h3 class="nw-step-title">Agenttiarkkitehtuuri</h3>
+      <div class="nw-arch-layout">
+        <!-- Human on the left -->
+        <div class="nw-human" id="nw-human">
+          <div class="nw-human-avatar">&#128526;</div>
+          <span class="nw-human-label">Perustaja</span>
+          <span class="nw-human-status" id="nw-human-status">"Haluan perustaa yrityksen"</span>
+        </div>
+        <!-- Arrow from human to agents -->
+        <div class="nw-human-arrow">
+          <svg viewBox="0 0 60 24" class="nw-human-arrow-svg">
+            <path d="M0,12 L48,12" stroke="currentColor" stroke-width="2" stroke-dasharray="6 3" fill="none" />
+            <path d="M44,6 L54,12 L44,18" stroke="currentColor" stroke-width="2" fill="none" />
+          </svg>
+          <span class="nw-human-arrow-label">yksi pyyntö</span>
+        </div>
+        <!-- Agents -->
+        <div class="nw-agents-display">
+          <div class="nw-agent-orb" data-agent="foundation">
+            <div class="nw-orb nw-orb--blue"></div>
+            <span class="nw-agent-label">Perustamis&shy;agentti</span>
+            <span class="nw-agent-desc">PRH, yhtiöjärjestys, osakkeet</span>
+          </div>
+          <div class="nw-agent-connections">
+            <svg class="nw-connections-svg" viewBox="0 0 200 100" preserveAspectRatio="none">
+              <path class="nw-conn-line" d="M0,50 C50,50 50,10 100,10" />
+              <path class="nw-conn-line" d="M0,50 C50,50 50,50 100,50" />
+              <path class="nw-conn-line" d="M0,50 C50,50 50,90 100,90" />
+            </svg>
+          </div>
+          <div class="nw-agent-orb" data-agent="authority">
+            <div class="nw-orb nw-orb--green"></div>
+            <span class="nw-agent-label">Viranomais&shy;agentti</span>
+            <span class="nw-agent-desc">Vero, ALV, ennakkoperintä</span>
+          </div>
+          <div class="nw-agent-orb" data-agent="finance">
+            <div class="nw-orb nw-orb--purple"></div>
+            <span class="nw-agent-label">Rahoitus&shy;agentti</span>
+            <span class="nw-agent-desc">Pankki, YEL, KYC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Chat UI -->
+    <div class="nw-step" id="nw-step-2">
+      <h3 class="nw-step-title">Kerro vain ideasi</h3>
+      <div class="nw-chat" id="nw-chat">
+        <div class="nw-chat-messages" id="nw-chat-messages">
+          <!-- Messages added dynamically -->
+        </div>
+        <div class="nw-chat-input">
+          <div class="nw-chat-input-field" id="nw-chat-input">
+            "Haluan perustaa teknologia-konsultointiyrityksen..."
+          </div>
+          <button class="nw-chat-send" id="nw-chat-send">&#10148;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Parallel Work -->
+    <div class="nw-step" id="nw-step-3">
+      <h3 class="nw-step-title">Rinnakkaistyöskentely</h3>
+
+      <!-- Human chilling while agents work -->
+      <div class="nw-human-lounge" id="nw-human-lounge">
+        <div class="nw-lounge-avatar" id="nw-lounge-avatar">&#9749;</div>
+        <div class="nw-lounge-info">
+          <span class="nw-lounge-name">Perustaja</span>
+          <span class="nw-lounge-activity" id="nw-lounge-activity">Juo kahvia rauhassa...</span>
+        </div>
+        <div class="nw-lounge-ticker" id="nw-lounge-ticker"></div>
+      </div>
+
+      <div class="nw-parallel" id="nw-parallel">
+        <div class="nw-parallel-col" data-col="prh">
+          <div class="nw-col-header nw-col-header--blue">
+            <div class="nw-col-orb"></div>
+            <span>PRH-rekisteröinti</span>
+          </div>
+          <div class="nw-col-tasks" id="nw-tasks-prh">
+            <!-- Tasks added dynamically -->
+          </div>
+          <div class="nw-col-progress">
+            <div class="nw-col-progress-bar" id="nw-progress-prh"></div>
+          </div>
+        </div>
+        <div class="nw-parallel-col" data-col="vero">
+          <div class="nw-col-header nw-col-header--green">
+            <div class="nw-col-orb"></div>
+            <span>Verorekisterit</span>
+          </div>
+          <div class="nw-col-tasks" id="nw-tasks-vero">
+            <!-- Tasks added dynamically -->
+          </div>
+          <div class="nw-col-progress">
+            <div class="nw-col-progress-bar" id="nw-progress-vero"></div>
+          </div>
+        </div>
+        <div class="nw-parallel-col" data-col="pankki">
+          <div class="nw-col-header nw-col-header--purple">
+            <div class="nw-col-orb"></div>
+            <span>Pankki & YEL</span>
+          </div>
+          <div class="nw-col-tasks" id="nw-tasks-pankki">
+            <!-- Tasks added dynamically -->
+          </div>
+          <div class="nw-col-progress">
+            <div class="nw-col-progress-bar" id="nw-progress-pankki"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Handoff -->
+    <div class="nw-step" id="nw-step-4">
+      <h3 class="nw-step-title">Agenttien välinen kommunikaatio</h3>
+      <div class="nw-handoff" id="nw-handoff">
+        <div class="nw-handoff-visual">
+          <svg class="nw-handoff-svg" id="nw-handoff-svg" viewBox="0 0 600 200">
+            <!-- Agent nodes -->
+            <circle class="nw-h-node nw-h-node--blue" cx="100" cy="100" r="40" />
+            <text class="nw-h-label" x="100" y="105" text-anchor="middle">Perustamis</text>
+            <circle class="nw-h-node nw-h-node--green" cx="300" cy="100" r="40" />
+            <text class="nw-h-label" x="300" y="105" text-anchor="middle">Viranomais</text>
+            <circle class="nw-h-node nw-h-node--purple" cx="500" cy="100" r="40" />
+            <text class="nw-h-label" x="500" y="105" text-anchor="middle">Rahoitus</text>
+            <!-- Connection lines -->
+            <line class="nw-h-line" x1="140" y1="100" x2="260" y2="100" />
+            <line class="nw-h-line" x1="340" y1="100" x2="460" y2="100" />
+            <line class="nw-h-line nw-h-line--arc" x1="140" y1="80" x2="460" y2="80" />
+            <!-- Data packets (animated) -->
+            <circle class="nw-h-packet nw-h-packet--1" r="6" cx="140" cy="100" />
+            <circle class="nw-h-packet nw-h-packet--2" r="6" cx="340" cy="100" />
+            <circle class="nw-h-packet nw-h-packet--3" r="6" cx="140" cy="80" />
+          </svg>
+          <div class="nw-handoff-labels">
+            <span class="nw-h-protocol">A2A Protocol</span>
+            <span class="nw-h-protocol">MCP Tools</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Result -->
+    <div class="nw-step" id="nw-step-5">
+      <h3 class="nw-step-title">Valmis!</h3>
+      <div class="nw-result" id="nw-result">
+        <div class="nw-result-cards">
+          <div class="nw-result-card nw-result-card--done">
+            <div class="nw-result-check">&#10003;</div>
+            <span>Y-tunnus</span>
+            <span class="nw-result-detail">1234567-8</span>
+          </div>
+          <div class="nw-result-card nw-result-card--done">
+            <div class="nw-result-check">&#10003;</div>
+            <span>Verorekisterit</span>
+            <span class="nw-result-detail">ALV, EP, TA</span>
+          </div>
+          <div class="nw-result-card nw-result-card--done">
+            <div class="nw-result-check">&#10003;</div>
+            <span>Pankkitili</span>
+            <span class="nw-result-detail">FI12 3456 7890</span>
+          </div>
+          <div class="nw-result-card nw-result-card--done">
+            <div class="nw-result-check">&#10003;</div>
+            <span>YEL-vakuutus</span>
+            <span class="nw-result-detail">Aktiivinen</span>
+          </div>
+        </div>
+        <div class="nw-result-time">
+          <span class="nw-result-time-number" id="nw-result-minutes">4</span>
+          <span class="nw-result-time-label">minuuttia</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6: National Impact -->
+    <div class="nw-step" id="nw-step-6">
+      <h3 class="nw-step-title">Kansantaloudellinen vaikutus</h3>
+      <div class="nw-impact" id="nw-impact">
+        <div class="nw-impact-number">
+          <span id="nw-impact-hours">0</span>
+        </div>
+        <p class="nw-impact-label">tuntia palautettu innovaatioon</p>
+        <div class="nw-impact-equivalents">
+          <div class="nw-impact-eq">
+            <span class="nw-impact-eq-num">1 750</span>
+            <span class="nw-impact-eq-label">henkilötyövuotta</span>
+          </div>
+          <div class="nw-impact-eq">
+            <span class="nw-impact-eq-num">87,5 M€</span>
+            <span class="nw-impact-eq-label">arvioitu tuottavuushyöty</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nw-controls nw-controls--bottom" id="nw-controls-bottom" style="display:none;">
+      <button class="btn btn--new btn--large" id="nw-restart-btn">
+        &#8634; Käynnistä uudelleen
+      </button>
+    </div>
+  </section>
+
+  <!-- ========== LIIKETOIMINTAPERUSTE ========== -->
+  <section id="business-case" class="section section--business-case">
+    <div class="section-header">
+      <span class="section-tag section-tag--biz">Analyysi</span>
+      <h2 class="section-title">Liiketoimintaperuste</h2>
+      <p class="section-subtitle">Miksi tämä kannattaa ratkaista – ja kenelle.</p>
+    </div>
+
+    <!-- Problem in numbers -->
+    <div class="bc-numbers" id="bc-numbers">
+      <div class="bc-number-card">
+        <span class="bc-number" data-target="35000" data-suffix="">0</span>
+        <span class="bc-number-label">uutta yritystä / vuosi</span>
+      </div>
+      <div class="bc-number-card">
+        <span class="bc-number" data-target="100" data-suffix=" h">0</span>
+        <span class="bc-number-label">byrokratiaa / perustaja</span>
+      </div>
+      <div class="bc-number-card">
+        <span class="bc-number" data-target="3500000" data-suffix=" h">0</span>
+        <span class="bc-number-label">kansallista hukkaa / vuosi</span>
+      </div>
+      <div class="bc-number-card">
+        <span class="bc-number" data-target="6" data-suffix=" vk">0</span>
+        <span class="bc-number-label">keskimääräinen kesto</span>
+      </div>
+    </div>
+
+    <!-- Stakeholder cards -->
+    <div class="bc-stakeholders" id="bc-stakeholders">
+      <div class="bc-card" data-stakeholder="founder">
+        <div class="bc-card-inner">
+          <div class="bc-card-front">
+            <div class="bc-card-icon">&#128104;&#8205;&#128187;</div>
+            <h3>Perustaja</h3>
+            <p>Haluaa keskittyä liikeideaan, ei lomakkeisiin</p>
+          </div>
+          <div class="bc-card-back">
+            <h4>Hyöty</h4>
+            <ul>
+              <li>100h &#8594; 4min byrokratiaa</li>
+              <li>6vk &#8594; 1pvä markkinoille</li>
+              <li>Ei virheitä lomakkeissa</li>
+              <li>Fokus liiketoimintaan</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="bc-card" data-stakeholder="authority">
+        <div class="bc-card-inner">
+          <div class="bc-card-front">
+            <div class="bc-card-icon">&#127963;&#65039;</div>
+            <h3>Viranomainen</h3>
+            <p>Käsittelee tuhansia hakemuksia manuaalisesti</p>
+          </div>
+          <div class="bc-card-back">
+            <h4>Hyöty</h4>
+            <ul>
+              <li>Automaattinen esitarkastus</li>
+              <li>Vähemmän puutteellisia hakemuksia</li>
+              <li>Sähköinen käsittely</li>
+              <li>Resurssit vaativampiin tehtäviin</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="bc-card" data-stakeholder="bank">
+        <div class="bc-card-inner">
+          <div class="bc-card-front">
+            <div class="bc-card-icon">&#127974;</div>
+            <h3>Pankki</h3>
+            <p>KYC-vaatimukset hidastavat tilin avaamista</p>
+          </div>
+          <div class="bc-card-back">
+            <h4>Hyöty</h4>
+            <ul>
+              <li>Strukturoitu data agenteilta</li>
+              <li>Automaattinen KYC-tarkistus</li>
+              <li>Nopeampi asiakashankinta</li>
+              <li>Vähemmän manuaalista työtä</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="bc-card" data-stakeholder="economy">
+        <div class="bc-card-inner">
+          <div class="bc-card-front">
+            <div class="bc-card-icon">&#127467;&#127470;</div>
+            <h3>Kansantalous</h3>
+            <p>3,5 miljoonaa tuntia hukkaan vuosittain</p>
+          </div>
+          <div class="bc-card-back">
+            <h4>Hyöty</h4>
+            <ul>
+              <li>1 750 henkilötyövuotta vapautuu</li>
+              <li>87,5 M€ tuottavuushyöty</li>
+              <li>Nopeampi innovaatiosykli</li>
+              <li>Kilpailukykyisempi Suomi</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technology explanation -->
+    <div class="bc-tech" id="bc-tech">
+      <h3 class="bc-tech-title">Miten se toimii?</h3>
+      <div class="bc-tech-cards">
+        <div class="bc-tech-card">
+          <div class="bc-tech-icon">&#129302;</div>
+          <h4>AI-agentit</h4>
+          <p>Itsenäisiä ohjelmia, jotka osaavat täyttää lomakkeita, tarkistaa tietoja ja kommunikoida viranomaisten kanssa – kuin digitaalinen avustaja.</p>
+        </div>
+        <div class="bc-tech-card">
+          <div class="bc-tech-icon">&#128279;</div>
+          <h4>MCP (Model Context Protocol)</h4>
+          <p>Standardi tapa, jolla AI-agentit käyttävät työkaluja – kuten pankkiverkkoa tai PRH:n rajapintaa. Kuin USB-liitin ohjelmistoille.</p>
+        </div>
+        <div class="bc-tech-card">
+          <div class="bc-tech-icon">&#128172;</div>
+          <h4>A2A (Agent-to-Agent)</h4>
+          <p>Protokolla, jolla agentit keskustelevat keskenään. Perustamisagentti voi pyytää rahoitusagentilta pankkitilin avaamista.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Before/After comparison -->
+    <div class="bc-comparison" id="bc-comparison">
+      <h3 class="bc-comparison-title">Ennen ja jälkeen</h3>
+      <div class="bc-comparison-table">
+        <div class="bc-comp-row bc-comp-row--header">
+          <span></span>
+          <span class="bc-comp-old">Vanha maailma</span>
+          <span class="bc-comp-new">Uusi maailma</span>
+        </div>
+        <div class="bc-comp-row">
+          <span class="bc-comp-label">Kesto</span>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--old" data-width="95">6 viikkoa</div>
+          </div>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--new" data-width="5">4 minuuttia</div>
+          </div>
+        </div>
+        <div class="bc-comp-row">
+          <span class="bc-comp-label">Lomakkeet</span>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--old" data-width="80">15+ käsin</div>
+          </div>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--new" data-width="8">0 käsin</div>
+          </div>
+        </div>
+        <div class="bc-comp-row">
+          <span class="bc-comp-label">Virheet</span>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--old" data-width="60">~40%</div>
+          </div>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--new" data-width="3">~0%</div>
+          </div>
+        </div>
+        <div class="bc-comp-row">
+          <span class="bc-comp-label">Kustannus</span>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--old" data-width="70">2 000–5 000€</div>
+          </div>
+          <div class="bc-comp-bar-wrap">
+            <div class="bc-comp-bar bc-comp-bar--new" data-width="10">~50€</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Demo: Yrityksen Perustaminen – Byrokratiasta AI-agentteihin</p>
+    <p class="footer-sub">Antigravity / Rapid Prototypes 2026</p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
