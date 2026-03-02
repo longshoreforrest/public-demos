@@ -135,10 +135,10 @@
 
 @keyframes glowPulse {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(5,150,105,0.3);
+    box-shadow: 0 0 20px rgba(255,225,0,0.3);
   }
   50% {
-    box-shadow: 0 0 40px rgba(5,150,105,0.6);
+    box-shadow: 0 0 40px rgba(255,225,0,0.5);
   }
 }
 
