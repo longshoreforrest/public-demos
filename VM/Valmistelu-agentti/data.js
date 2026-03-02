@@ -58,7 +58,7 @@ const DATA = {
       id: "va",
       name: "Valmisteluagentti",
       abbr: "VA",
-      color: "#006475",
+      color: "#ffe100",
       role: "Kerää lähteet, analysoi ristiriidat, luonnostelee pykälät",
       avatar: "VA"
     },
@@ -66,7 +66,7 @@ const DATA = {
       id: "vaa",
       name: "Vaikutusarvioagentti",
       abbr: "VaA",
-      color: "#10b981",
+      color: "#22c55e",
       role: "Fiskaalinen analyysi, sääntelytaakka, sidosryhmäarviot",
       avatar: "VaA"
     },
@@ -420,12 +420,12 @@ const DATA = {
         {
           name: "Yritykset",
           values: [72, 68, 55, 40, 62, 50],
-          color: "#006475"
+          color: "#ffe100"
         },
         {
           name: "Julkishallinto",
           values: [58, 75, 65, 70, 45, 72],
-          color: "#10b981"
+          color: "#22c55e"
         },
         {
           name: "Kansalaiset",

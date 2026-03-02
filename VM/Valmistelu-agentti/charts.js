@@ -10,13 +10,13 @@ class ChartManager {
   }
 
   _setDefaults() {
-    Chart.defaults.color = '#475569';
+    Chart.defaults.color = '#555555';
     Chart.defaults.font.family = "'Inter', 'Segoe UI', system-ui, sans-serif";
     Chart.defaults.font.size = 12;
-    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(30, 41, 59, 0.92)';
-    Chart.defaults.plugins.tooltip.titleColor = '#f1f5f9';
-    Chart.defaults.plugins.tooltip.bodyColor = '#e2e8f0';
-    Chart.defaults.plugins.tooltip.borderColor = 'rgba(148, 163, 184, 0.3)';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(26, 26, 26, 0.92)';
+    Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.bodyColor = '#e0e0e0';
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(0, 0, 0, 0.15)';
     Chart.defaults.plugins.tooltip.borderWidth = 1;
     Chart.defaults.plugins.tooltip.cornerRadius = 8;
     Chart.defaults.plugins.tooltip.padding = 10;
@@ -51,14 +51,14 @@ class ChartManager {
             DATA.sources.domestic.length
           ],
           backgroundColor: [
-            'rgba(0, 100, 117, 0.7)',
-            'rgba(14, 165, 233, 0.7)',
-            'rgba(245, 158, 11, 0.7)'
+            'rgba(200, 160, 0, 0.75)',
+            'rgba(2, 132, 199, 0.75)',
+            'rgba(217, 119, 6, 0.75)'
           ],
           borderColor: [
-            'rgba(0, 100, 117, 1)',
-            'rgba(14, 165, 233, 1)',
-            'rgba(245, 158, 11, 1)'
+            'rgba(200, 160, 0, 1)',
+            'rgba(2, 132, 199, 1)',
+            'rgba(217, 119, 6, 1)'
           ],
           borderWidth: 2,
           hoverOffset: 8
@@ -117,10 +117,10 @@ class ChartManager {
             label: 'Nettovaikutus',
             data: fiscal.net,
             type: 'line',
-            borderColor: 'rgba(0, 100, 117, 1)',
-            backgroundColor: 'rgba(0, 100, 117, 0.1)',
+            borderColor: 'rgba(26, 26, 26, 1)',
+            backgroundColor: 'rgba(26, 26, 26, 0.1)',
             borderWidth: 2,
-            pointBackgroundColor: 'rgba(0, 100, 117, 1)',
+            pointBackgroundColor: 'rgba(26, 26, 26, 1)',
             pointRadius: 5,
             fill: false,
             tension: 0.3
@@ -133,11 +133,11 @@ class ChartManager {
         interaction: { mode: 'index', intersect: false },
         scales: {
           x: {
-            grid: { color: 'rgba(148, 163, 184, 0.2)' },
+            grid: { color: 'rgba(0, 0, 0, 0.08)' },
             ticks: { font: { weight: 600 } }
           },
           y: {
-            grid: { color: 'rgba(148, 163, 184, 0.2)' },
+            grid: { color: 'rgba(0, 0, 0, 0.08)' },
             ticks: {
               callback: (v) => v + ' M€'
             },
@@ -200,7 +200,7 @@ class ChartManager {
         scales: {
           x: {
             max: 100,
-            grid: { color: 'rgba(148, 163, 184, 0.2)' },
+            grid: { color: 'rgba(0, 0, 0, 0.08)' },
             ticks: { callback: (v) => v + '/100' }
           },
           y: {
@@ -259,8 +259,8 @@ class ChartManager {
               backdropColor: 'transparent',
               font: { size: 10 }
             },
-            grid: { color: 'rgba(148, 163, 184, 0.2)' },
-            angleLines: { color: 'rgba(148, 163, 184, 0.2)' },
+            grid: { color: 'rgba(0, 0, 0, 0.08)' },
+            angleLines: { color: 'rgba(0, 0, 0, 0.08)' },
             pointLabels: { font: { size: 11 } }
           }
         },
