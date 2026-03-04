@@ -19,11 +19,11 @@ export const PROCESS_DATA = {
           'Osakkeiden merkintälista'
         ],
         painPoints: [
-          'Lomakkeen täyttövirheet aiheuttavat palautuksia',
-          'Epäselvät ohjeistukset',
-          'Käsittelyajan arvaamattomuus'
+          'Lomakkeiden täyttäminen vaatii erityisosaamista',
+          'Ohjeistukset hajallaan eri lähteissä',
+          'Käsittelyaika vaihtelee'
         ],
-        stamp: 'PUUTTEELLINEN'
+        stamp: 'TÄYDENNETTÄVÄ'
       },
       {
         id: 2,
@@ -36,9 +36,9 @@ export const PROCESS_DATA = {
           'Työnantajarekisteri'
         ],
         painPoints: [
-          'Kolme eri rekisteriä, eri logiikka',
-          'Ristiriitaiset tietovaatimukset',
-          'Eri käsittelyajat'
+          'Kolme erillistä rekisteriä, omat vaatimuksensa',
+          'Tietojen yhdenmukaistaminen vaatii tarkkuutta',
+          'Käsittelyajat vaihtelevat rekistereittäin'
         ]
       },
       {
@@ -54,11 +54,11 @@ export const PROCESS_DATA = {
           'Toimialakohtaiset lisäselvitykset'
         ],
         painPoints: [
-          'Pankki voi hylätä hakemuksen ilman selkeää syytä',
-          'Dokumenttien skannaus ja lähetys manuaalisesti',
-          'Viikkojen odotus päätökseen'
+          'Lisäselvityksiä voidaan pyytää useaan kertaan',
+          'Dokumenttien toimittaminen usein manuaalista',
+          'Käsittelyaika voi venyä viikkoihin'
         ],
-        stamp: 'HYLÄTTY'
+        stamp: 'LISÄSELVITYS'
       },
       {
         id: 4,
@@ -66,10 +66,10 @@ export const PROCESS_DATA = {
         duration: '1–2 viikkoa',
         hours: 20,
         painPoints: [
-          'Työtulo pitää arvioida ennen tietoa tuloista',
-          'Monimutkainen laskentakaava',
-          'Aliarviointi → liian pieni eläke',
-          'Yliarviointi → liian suuret maksut'
+          'Työtulo pitää arvioida ennen kuin tulot ovat tiedossa',
+          'Laskentakaava vaatii perehtymistä',
+          'Aliarviointi voi johtaa pienempään eläkkeeseen',
+          'Yliarviointi voi johtaa tarpeettoman suuriin maksuihin'
         ],
         catch22: {
           left: 'Tarvitset työtulon →',
@@ -175,8 +175,8 @@ export const PROCESS_DATA = {
   businessCase: {
     numbers: [
       { target: 35000, suffix: '', label: 'uutta yritystä / vuosi' },
-      { target: 100, suffix: ' h', label: 'byrokratiaa / perustaja' },
-      { target: 3500000, suffix: ' h', label: 'kansallista hukkaa / vuosi' },
+      { target: 100, suffix: ' h', label: 'hallinnollista työtä / perustaja' },
+      { target: 3500000, suffix: ' h', label: 'hallinnollista työtä / vuosi' },
       { target: 6, suffix: ' vk', label: 'keskimääräinen kesto' }
     ],
     comparison: [
