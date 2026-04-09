@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oulu2026 Tapahtumat - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1a3a5c 0%, #2a5a8c 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #ff8c42; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #e8491d; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #e8491d; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #1a3a5c; }
+        .feature-card .tag {
+            display: inline-block; background: #fff7ed; color: #c2410c;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #e8491d; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .categories {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0;
+        }
+        .cat-badge {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.3rem 0.7rem; border-radius: 100px; font-size: 0.78rem; font-weight: 500;
+        }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #e8491d; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Oulu2026 Tapahtumat - Käyttöohje</h1>
+        <p class="subtitle">Kulttuuripääkaupunkivuoden tapahtumaopas</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Oulu on Euroopan kulttuuripääkaupunki vuonna 2026, ja vuoden aikana järjestetään yli 560 tapahtumaa eri puolilla Pohjois-Suomea. Tapahtumat ovat hajallaan eri lähteissä ja kanavissa. Tämä sovellus kokoaa ne yhteen paikkaan &mdash; kartalle, kalenteriin ja listaksi &mdash; jotta löydät juuri sinua kiinnostavat tapahtumat helposti.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>karttanäkymään</strong> jossa näet kaikki tapahtumat kartalla.</li>
+            <li>Käytä <strong>vasemman sivupalkin hakukenttää</strong> ja <strong>kategoriasuodattimia</strong> rajataksesi tapahtumia.</li>
+            <li>Vaihda näkymää <strong>yläosan välilehdillä</strong>: Kartta, Lista, Kalenteri, Reitti tai Dashboard.</li>
+            <li>Klikkaa mitä tahansa tapahtumaa avataksesi sen <strong>tietokortin</strong>.</li>
+        </ol>
+
+        <h2>Viisi näkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 1</span>
+            <h3>Kartta</h3>
+            <p>Tapahtumat värikoodattuina merkkeinä kartalla. Sivupalkissa tapahtumakortit.</p>
+            <ul>
+                <li>Klikkaa <strong>karttamerkkiä</strong> &rarr; näet tapahtuman nimen, päivämäärän ja sijainnin.</li>
+                <li>Klikkaa <strong>sivupalkin korttia</strong> &rarr; kartta zoomaa tapahtuman kohdalle ja avaa tietokortin.</li>
+                <li>Suodata kategorioilla ja kuukausivalikolla.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 2</span>
+            <h3>Lista</h3>
+            <p>Taulukkonäkymä kaikista tapahtumista kuukausittain ryhmiteltynä.</p>
+            <ul>
+                <li>Sarakkeet: tapahtuman nimi, ajankohta, paikka, kategoria ja linkki.</li>
+                <li><strong>"Avaa"</strong> -painike vie tapahtuman omalle sivulle.</li>
+                <li>Klikkaa tapahtuman nimeä avataksesi tietokortin.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 3</span>
+            <h3>Kalenteri</h3>
+            <p>Kuukausinäkymässä näet tapahtumat sijoitettuna päiviin.</p>
+            <ul>
+                <li>Navigoi kuukausien välillä <strong>nuolipainikkeilla</strong>.</li>
+                <li>Jokaisessa päivässä näkyy 1&ndash;3 tapahtumaa väribadgeina. Jos päivässä on enemmän, näkyy "+N lisää" -teksti.</li>
+                <li>Tämän päivän ruutu korostettu sinisellä taustalla.</li>
+                <li>Kuukausivalikon valinta siirtää kalenterin suoraan valittuun kuukauteen.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 4</span>
+            <h3>Reittisuunnittelija</h3>
+            <p>Etsi tapahtumia matkareitin varrelta. Loistava työkalu reissun suunnitteluun!</p>
+            <ol>
+                <li>Valitse <strong>lähtöpaikka</strong> ja <strong>määränpää</strong> pudotusvalikoista (tai kirjoita oma).</li>
+                <li>Säädä <strong>hakusädettä</strong> liukusäätimellä (5&ndash;100 km reitistä).</li>
+                <li>Klikkaa <strong>"Etsi tapahtumat reitin varrelta"</strong>.</li>
+                <li>Näet reitin kartalla ja tapahtumat järjestyksessä lähtöpisteestä määränpäähän.</li>
+                <li>Suodata tuloksia kategorialla, kuukaudella tai hakusanalla.</li>
+                <li>Tulosta matkasuunnitelma <strong>"Tulosta suunnitelma"</strong> -painikkeella.</li>
+            </ol>
+            <p>Reitti lasketaan oikeaa tieverkostoa pitkin (OSRM), joten etäisyydet ovat realistisia.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 5</span>
+            <h3>Dashboard</h3>
+            <p>Analytiikka ja tilastot koko kulttuuripääkaupunkivuodesta.</p>
+            <ul>
+                <li><strong>Yhteenvetokortit:</strong> tapahtumien määrä, kategoriat, suurin kategoria, ilmaiset tapahtumat, paikkakunnat.</li>
+                <li><strong>Neljä interaktiivista kaaviota:</strong> kategoriat, kuukaudet, paikkakunnat ja hintajakauma.</li>
+                <li>Klikkaa kaavion osaa &rarr; <strong>porautumisnäkymä</strong> avautuu tarkemman tason listauksen kanssa.</li>
+                <li>Porautuneessa näkymässä voit edelleen suodattaa tuloksia.</li>
+            </ul>
+        </div>
+
+        <h2>Haku ja suodatus</h2>
+        <p>Sivupalkin hakukenttä ja suodattimet ovat käytettävissä kartta-, lista- ja kalenterinäkymissä:</p>
+        <ul>
+            <li><strong>Tekstihaku:</strong> etsii tapahtuman nimestä, sijainnista, kuvauksesta ja kategorian nimestä.</li>
+            <li><strong>Kategoriasuodatin:</strong> klikkaa kategoriapainiketta nähdäksesi vain kyseisen kategorian tapahtumat. Voit valita yhden tai useamman.</li>
+            <li><strong>Kuukausisuodatin:</strong> rajaa tapahtumat tietylle kuukaudelle.</li>
+        </ul>
+
+        <h2>Tapahtumakategoriat</h2>
+        <div class="categories">
+            <span class="cat-badge" style="background:#dbeafe;color:#1e40af">&#127925; Musiikki</span>
+            <span class="cat-badge" style="background:#fce7f3;color:#9d174d">&#127917; Teatteri</span>
+            <span class="cat-badge" style="background:#d1fae5;color:#065f46">&#127912; Kuvataide</span>
+            <span class="cat-badge" style="background:#fef3c7;color:#78350f">&#127869; Ruokakulttuuri</span>
+            <span class="cat-badge" style="background:#ede9fe;color:#5b21b6">&#127914; Festivaali</span>
+            <span class="cat-badge" style="background:#fee2e2;color:#991b1b">&#127916; Elokuva</span>
+            <span class="cat-badge" style="background:#e0e7ff;color:#3730a3">&#128218; Kirjallisuus</span>
+            <span class="cat-badge" style="background:#cffafe;color:#0f766e">&#128161; Taide &amp; Teknologia</span>
+            <span class="cat-badge" style="background:#fef9c3;color:#78350f">&#128118; Lastenkulttuuri</span>
+            <span class="cat-badge" style="background:#f3e8ff;color:#6b21a8">&#127963; Perintökulttuuri</span>
+            <span class="cat-badge" style="background:#ffedd5;color:#c2410c">&#129337; Sirkus</span>
+            <span class="cat-badge" style="background:#ecfccb;color:#3f6212">&#9832; Sauna</span>
+            <span class="cat-badge" style="background:#f0fdf4;color:#166534">&#129309; Yhteisö</span>
+            <span class="cat-badge" style="background:#f0f9ff;color:#1e40af">&#128300; Tiede</span>
+            <span class="cat-badge" style="background:#fdf2f8;color:#9d174d">&#128131; Tanssi</span>
+            <span class="cat-badge" style="background:#fef2f2;color:#991b1b">&#127941; Urheilu</span>
+        </div>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Oululainen asukas</div>
+            <h3>"Mitä tapahtumia on tällä viikolla?"</h3>
+            <p>Avaa <strong>Kalenteri</strong>-näkymä &rarr; katso kuluva viikko &rarr; klikkaa kiinnostavia tapahtumia. Tai avaa <strong>Kartta</strong> ja suodata kuluvan kuukauden tapahtumiin nähdäksesi mitä on lähellä.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Matkailija</div>
+            <h3>"Suunnittelen matkan Oulun seudulle"</h3>
+            <p>Avaa <strong>Reittisuunnittelija</strong> &rarr; valitse esim. Helsinki lähtöpaikaksi ja Oulu määränpääksi &rarr; säädä hakusäde &rarr; näet tapahtumat matkan varrella järjestyksessä. Tulosta suunnitelma mukaan.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Lapsiperhe</div>
+            <h3>"Mitä lapsille sopivaa on tarjolla?"</h3>
+            <p>Klikkaa sivupalkin kategoriasuodattimesta <strong>"Lastenkulttuuri"</strong> &rarr; näet kaikki lapsille suunnatut tapahtumat. Tarkista myös "Sirkus" ja "Festivaali" -kategoriat.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Kulttuurin ammattilainen</div>
+            <h3>"Millainen kulttuurivuodesta on tulossa?"</h3>
+            <p>Avaa <strong>Dashboard</strong> &rarr; näet tilastot ja kaaviot tapahtumien jakautumisesta kategorioittain, kuukausittain ja paikkakunnittain. Klikkaa kaavion osaa porautuaksesi tarkempiin tietoihin.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Roadtrip-suunnittelija</div>
+            <h3>"Ajetaan Oulusta Rovaniemelle &mdash; mitä reitillä tapahtuu?"</h3>
+            <p>Avaa <strong>Reittisuunnittelija</strong> &rarr; lähtöpaikka Oulu, määränpää Rovaniemi, hakusäde 30 km &rarr; näet kaikki tapahtumat tien varrella. Suodata esim. "Ruokakulttuuri" ja "Festivaali" täydellistä reissua varten.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Ilmaistapahtumien etsijä</div>
+            <h3>"Mitä voi tehdä ilmaiseksi?"</h3>
+            <p>Avaa <strong>Dashboard</strong> &rarr; katso "Ilmaiset tapahtumat" -luku yhteenvetokortista &rarr; klikkaa hintajakauma-kaavion vihreää "Ilmainen"-osuutta &rarr; näet listan kaikista ilmaisista tapahtumista.</p>
+        </div>
+
+        <h2>Tietokortti (modal)</h2>
+        <p>Klikkaamalla mitä tahansa tapahtumaa avautuu tietokortti joka sisältää:</p>
+        <ul>
+            <li>Tapahtuman nimi ja kategoria väribadgena</li>
+            <li>Ajankohta ja sijainti</li>
+            <li>Hintatiedot (jos saatavilla)</li>
+            <li>Linkki tapahtuman kotisivuille</li>
+            <li>Kuvaus tapahtumasta</li>
+        </ul>
+        <p>Sulje tietokortti klikkaamalla ruksista, taustaa tai painamalla ESC.</p>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Reittisuunnittelija tukee myös vapaasti syötettäviä sijainteja &mdash; valitse "Muu..." ja kirjoita koordinaatit tai paikkakunnan nimi, niin voit suunnitella reitin mistä tahansa.
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Tapahtumia on yhteensä <strong>yli 560</strong>, kerättynä Oulu2026:n Bubster-tietokannasta ja täydennettynä 20 lippulaivatapahtumalla.</li>
+            <li>Tapahtumat kattavat koko vuoden 2026 tammikuusta joulukuuhun.</li>
+            <li>Maantieteellinen kattavuus ulottuu Oulusta ympäristökuntiin: Kajaani, Kemi, Tornio, Kuusamo, Raahe, Vaasa ja muualle Pohjois-Suomeen.</li>
+            <li>Sivupalkki näyttää kerrallaan enintään 200 tapahtumaa suorituskykysyistä &mdash; käytä suodattimia tarkentaaksesi hakua.</li>
+            <li>Kaikki ulkoiset linkit aukeavat uuteen välilehteen.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

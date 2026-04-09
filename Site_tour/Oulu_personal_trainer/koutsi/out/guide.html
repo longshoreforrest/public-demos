@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koutsi - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .koutsi { color: #34d399; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #34d399; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #10b981; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #059669; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #0f172a; }
+        .feature-card .tag {
+            display: inline-block; background: #ecfdf5; color: #047857;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #059669; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .tip {
+            background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #065f46;
+        }
+        .tip strong { color: #064e3b; }
+
+        .nav-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .nav-table th, .nav-table td {
+            text-align: left; padding: 0.65rem 0.8rem; font-size: 0.88rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .nav-table th { color: #64748b; font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .nav-table .route { font-family: monospace; background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.82rem; }
+
+        .color-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.5rem; margin: 1rem 0;
+        }
+        .color-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 0.75rem; background: #fff; border: 1px solid #e2e8f0;
+            border-radius: 0.5rem; font-size: 0.82rem;
+        }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1><span class="koutsi">Koutsi</span> - Käyttöohje</h1>
+        <p class="subtitle">Kokonaisvaltainen hyvinvointivalmentaja ruuhkavuosiin</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Ruuhkavuosien aikana treeniohjelman ylläpito tuntuu mahdottomalta: työpalaverit, lasten harrastukset ja arki vievät ajan. Koutsi korvaa jääkaapin oveen liimatut treenilaput kokoamalla tavoitteet, kalenterin, hyvinvointimetriikat ja treenikaverit yhteen paikkaan &mdash; ja ymmärtää, ettei treeni ole aina päivän tärkein asia.</p>
+        </div>
+
+        <h2>Navigointi</h2>
+        <table class="nav-table">
+            <tr><th>Sivu</th><th>Polku</th><th>Sisältö</th></tr>
+            <tr><td><strong>Dashboard</strong></td><td><span class="route">/</span></td><td>Päivän yhteenveto, hyvinvointi, tavoitteet, pikatreeni, kaverit</td></tr>
+            <tr><td><strong>Kalenteri</strong></td><td><span class="route">/kalenteri</span></td><td>Viikkonäkymässä työ, perhe ja treeni rinnakkain</td></tr>
+            <tr><td><strong>Tavoitteet</strong></td><td><span class="route">/tavoitteet</span></td><td>Kaikki tavoitteet ja niiden treeniohjelmat</td></tr>
+            <tr><td><strong>Kamut</strong></td><td><span class="route">/kamut</span></td><td>Treenikaverit, streak-tilastot, aktiviteettisyöte</td></tr>
+        </table>
+
+        <h2>Dashboard &mdash; päivän komentokeskus</h2>
+
+        <div class="feature-card">
+            <span class="tag">Vasen sarake</span>
+            <h3>Päivän ohjelma</h3>
+            <p>Näyttää tänään olevat tapahtumat aikajärjestyksessä. Tapahtumat ovat värikoodattuja:</p>
+            <div class="color-grid">
+                <div class="color-item"><span class="color-dot" style="background:#3b82f6"></span> Työ</div>
+                <div class="color-item"><span class="color-dot" style="background:#f59e0b"></span> Perhe</div>
+                <div class="color-item"><span class="color-dot" style="background:#10b981"></span> Treeni</div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Vasen sarake</span>
+            <h3>Pikatreeni-optimoija</h3>
+            <p>Kiireisiin päiviin: valitse kuinka paljon aikaa sinulla on (10&ndash;60 min) ja saat treenisuositukset jotka mahtuvat aikaasi. Jokainen treeni kertoo minkä tavoitteen se edistää.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Vasen sarake</span>
+            <h3>Aktiiviset tavoitteet</h3>
+            <p>Korttinäkymässä näet jokaisen tavoitteen edistymisen prosentteina ja edistymispalkkina. Klikkaa korttia avataksesi sen treenivaiheiden yksityiskohdat suoraan dashboardilla.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Oikea sarake</span>
+            <h3>Hyvinvointi-metriikat</h3>
+            <p>Neljää avainmittaria yhdellä silmäyksellä:</p>
+            <ul>
+                <li><strong>Uni</strong> &mdash; nukutut tunnit ja minuutit</li>
+                <li><strong>Askeleet</strong> &mdash; päivän askelmittari</li>
+                <li><strong>Treeniviikko</strong> &mdash; kuinka monta viikon treenitavoitteista on tehty</li>
+                <li><strong>Stressi</strong> &mdash; stressitason arvio (Matala / Kohtalainen / Korkea)</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Oikea sarake</span>
+            <h3>Treenikamut-esikatselu</h3>
+            <p>Näet ketkä kavereistasi ovat paikalla tai treenaamassa juuri nyt. "Näytä kaikki" -linkki vie Kamut-sivulle.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Oikea sarake</span>
+            <h3>"LAISKOTTAA!" -painike</h3>
+            <p>Tämän päivän erikoisuus! Jos sohva kutsuu, klikkaa painiketta. Sovellus:</p>
+            <ol>
+                <li>Generoi absurdin <strong>tekosyyn</strong> miksi et voi treenata (esim. "NASA:n tutkimus osoittaa, että tänään on optimaalinen päivä tehdä ei-mitään")</li>
+                <li>Jos valitset sohvan, näyttää <strong>realistiset seuraukset</strong> &mdash; miten yhden treenin skippaaminen vaikuttaa konkreettisesti johonkin tavoitteeseesi</li>
+                <li>Päätöksen jälkeen ei tuomita &mdash; kumpikin valinta on OK</li>
+            </ol>
+        </div>
+
+        <h2>Tavoitejärjestelmä</h2>
+        <p>Jokainen tavoite sisältää automaattisesti luodun <strong>progressiivisen treeniohjelman</strong>:</p>
+        <ul>
+            <li><strong>Vaiheet</strong> (3&ndash;4 kpl): suuret kokonaisuudet aikajaksoineen (esim. "Peruskunto", "Kestävyys", "Maratonvauhti")</li>
+            <li><strong>Askeleet</strong> (2&ndash;3 per vaihe): konkreettiset treenitehtävät joita voi merkitä tehdyiksi</li>
+            <li>Edistyminen päivittyy automaattisesti kun merkitset askeleita valmiiksi</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Navigointivinkki:</strong> Voit liikkua tavoitteen ja sen askelten välillä monella tavalla: klikkaa tavoitekorttia dashboardilla, avaa tavoitesivu navigaatiopalkista, tai klikkaa yksittäistä askelta avataksesi sivupaneelin jossa näet tarkat ohjeet.
+        </div>
+
+        <h3>Esimerkkitavoitteet sovelluksessa</h3>
+        <ul>
+            <li><strong>Maraton syksyllä 2026</strong> (Kuntoilu) &mdash; 12 askelta 5km-lenkeistä maratoniin asti, 4 vaihetta</li>
+            <li><strong>Nuku paremmin</strong> (Palautuminen) &mdash; 8 askelta unihygienian parantamisesta säännölliseen unirytmiin</li>
+            <li><strong>Ensimmäinen leuanveto</strong> (Kuntoilu) &mdash; 7 askelta avustetuista leuanvedoista puhtaaseen suoritukseen</li>
+            <li><strong>Stressinhallinta</strong> (Hyvinvointi) &mdash; 6 askelta meditaation perusteista päivittäiseen rutiiniin</li>
+        </ul>
+
+        <h2>Kalenteri</h2>
+        <p>Viikkonäkymässä näet työt, perhetapahtumat ja treenit rinnakkain värikoodattuina. Tämän päivän sarake on korostettu vihreällä.</p>
+        <ul>
+            <li>Navigoi viikkojen välillä <strong>nuolipainikkeilla</strong>. "Tänään"-painike palaa kuluvaan viikkoon.</li>
+            <li><strong>Raahaa tapahtumia</strong> toiseen päivään siirtääksesi niitä &mdash; kun työpalaveri vie treeniajan, raahaa treeni seuraavalle päivälle.</li>
+            <li>Suodata näkymä kategorioilla: Kaikki, Työ, Perhe tai Treeni.</li>
+        </ul>
+
+        <h2>Treenikaverit</h2>
+        <p>Kamut-sivulla näet treenikaveriesi tilanteen:</p>
+        <ul>
+            <li><strong>Tila</strong>: vihreä pallo = paikalla, oranssi sykkivä pallo = treenaa juuri nyt, harmaa = offline</li>
+            <li><strong>Streak</strong>: kuinka monta päivää putkeen kaveri on treenannut</li>
+            <li>Klikkaa kaveria laajentaaksesi kortin &rarr; näet motton, yhteiset tavoitteet ja toimintopainikkeet</li>
+            <li><strong>"Liity treeniin!"</strong> -painike kun kaveri treenaa, <strong>"Haasta treeniin"</strong> kun kaveri on offline</li>
+        </ul>
+        <p>Oikeassa sivupalkissa näet <strong>streak-tilaston</strong> (kuka on treenannut pisimmän putken) ja <strong>aktiviteettisyötteen</strong> (mitä kaverit ovat tehneet viime aikoina).</p>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Maratoonari</div>
+            <h3>"Haluan juosta maratonin syksyllä"</h3>
+            <p>Luo maratontavoite &rarr; saat progressiivisen 4-vaiheisen ohjelman 5km:sta 42km:iin. Seuraa edistymistä dashboardilta, käytä pikatreeni-optimoijaa kiireisinä päivinä ja näet miten jokainen skipattu treeni vaikuttaa aikatauluun.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Kiireinen vanhempi</div>
+            <h3>"Työt ja lasten harrastukset täytyy sovittaa treenien kanssa"</h3>
+            <p>Kalenterin värikoodaus näyttää yhdellä silmäyksellä mihin päiviin treeni mahtuu. Kun työpalaveri tulee yllättäen, raahaa treeni toiseen päivään. Pikatreeni-optimoija ehdottaa 10&ndash;15 minuutin harjoituksia kun aikaa on vähän.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Aloittelija</div>
+            <h3>"Haluaisin oppia tekemään leuanvedon"</h3>
+            <p>Leuanvetotavoite pilkkoo kunnianhimoisen tavoitteen pieniin askeleisiin: avustetut vedot &rarr; lapaluiden hallinta &rarr; negatiiviset vedot &rarr; ensimmäinen puhdas leuanveto. Näet tarkat ohjeet jokaiselle askeleelle StepPanel-näkymässä.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Stressaantunut työntekijä</div>
+            <h3>"Pitäisi oppia rentoutumaan"</h3>
+            <p>Stressinhallinta- ja unitavoitteet kattavat meditaation, hengitysharjoitukset ja unirutiinit. Pikatreeni-optimoija ehdottaa 10&ndash;15 min hengitys- ja meditaatiosessioita. Hyvinvointi-metriikat näyttävät stressitason ja unitiedot.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Sosiaalinen treenaaja</div>
+            <h3>"Treenaan mieluummin yhdessä"</h3>
+            <p>Kamut-sivulta näet ketkä treenaavat juuri nyt ja voit liittyä mukaan yhdellä klikkauksella. Streak-tilasto luo tervettä kilpailua, ja aktiviteettisyöte pitää yhteyttä kavereiden treeniarkeen.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus on suunniteltu kokonaisvaltaiseksi &mdash; pelkän treenin sijaan se seuraa myös unta, stressiä ja palautumista.</li>
+            <li>"Laiskottaa"-painike ei ole vitsi vaan tietoinen designvalinta: se tunnustaa että motivaatio vaihtelee ja tarjoaa huumorilla höystetyn tavan käsitellä asiaa.</li>
+            <li>Tavoiteohjelmat ovat progressiivisia &mdash; jokainen askel rakentuu edellisen päälle.</li>
+            <li>Kalenterin drag-and-drop toimii hiirellä: tartu kiinni ja raahaa toiseen päivään.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

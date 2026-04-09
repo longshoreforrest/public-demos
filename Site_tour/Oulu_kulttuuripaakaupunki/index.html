@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oulu kulttuuripääkaupunki 2026</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a5c;
+            --primary-light: #2a5a8c;
+            --accent: #e8491d;
+            --accent-hover: #ff5a2e;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-light: #6b7280;
+            --border: #e2e8f0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --radius: 12px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+        header { background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%); color:white; padding:0.75rem 1.5rem; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 12px rgba(0,0,0,0.15); position:sticky; top:0; z-index:1000; }
+        header h1 { font-size:1.3rem; font-weight:700; }
+        header h1 span { color:var(--accent); }
+        header p { font-size:0.8rem; opacity:0.8; }
+        .header-left { display:flex; align-items:center; gap:0.75rem; }
+        .header-logo { font-size:1.5rem; }
+        .nav-tabs { display:flex; gap:0.25rem; background:rgba(255,255,255,0.1); border-radius:8px; padding:3px; }
+        .nav-tab { padding:0.4rem 0.8rem; border:none; background:transparent; color:rgba(255,255,255,0.7); cursor:pointer; border-radius:6px; font-size:0.8rem; font-weight:500; transition:all 0.2s; font-family:inherit; }
+        .nav-tab:hover { color:white; background:rgba(255,255,255,0.1); }
+        .nav-tab.active { background:rgba(255,255,255,0.2); color:white; }
+
+        .app-container { display:flex; height:calc(100vh - 52px); }
+        .sidebar { width:360px; background:var(--card-bg); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; }
+        .search-section { padding:0.75rem; border-bottom:1px solid var(--border); }
+        .search-box { position:relative; margin-bottom:0.5rem; }
+        .search-box input { width:100%; padding:0.5rem 0.8rem 0.5rem 2.2rem; border:2px solid var(--border); border-radius:8px; font-size:0.85rem; font-family:inherit; outline:none; }
+        .search-box input:focus { border-color:var(--primary-light); }
+        .search-box::before { content:"🔍"; position:absolute; left:0.6rem; top:50%; transform:translateY(-50%); font-size:0.8rem; }
+        .filters { display:flex; flex-wrap:wrap; gap:0.3rem; }
+        .filter-btn { padding:0.2rem 0.5rem; border:1.5px solid var(--border); border-radius:16px; background:white; cursor:pointer; font-size:0.7rem; font-weight:500; color:var(--text-light); transition:all 0.2s; font-family:inherit; white-space:nowrap; }
+        .filter-btn:hover { border-color:var(--primary-light); color:var(--primary); }
+        .filter-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
+        .month-filter { padding:0.5rem 0.75rem; border-bottom:1px solid var(--border); display:flex; gap:0.5rem; align-items:center; }
+        .month-filter label { font-size:0.7rem; font-weight:600; text-transform:uppercase; color:var(--text-light); white-space:nowrap; }
+        .month-filter select { flex:1; padding:0.3rem; border:2px solid var(--border); border-radius:6px; font-size:0.8rem; font-family:inherit; outline:none; }
+        .event-count { padding:0.4rem 0.75rem; font-size:0.75rem; color:var(--text-light); font-weight:500; }
+        .event-list { flex:1; overflow-y:auto; padding:0.4rem; }
+        .event-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:0.75rem; margin-bottom:0.4rem; cursor:pointer; transition:all 0.2s; }
+        .event-card:hover { box-shadow:var(--shadow-hover); border-color:var(--primary-light); }
+        .event-card.highlighted { border-color:var(--accent); box-shadow:0 0 0 2px rgba(232,73,29,0.2); }
+        .event-card h3 { font-size:0.85rem; font-weight:600; line-height:1.3; margin-bottom:0.3rem; }
+        .event-category-badge { display:inline-block; padding:0.1rem 0.4rem; border-radius:10px; font-size:0.65rem; font-weight:600; white-space:nowrap; }
+        .event-card-meta { display:flex; flex-direction:column; gap:0.15rem; font-size:0.75rem; color:var(--text-light); }
+        .event-card-desc { margin-top:0.3rem; font-size:0.75rem; color:var(--text-light); line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .main-content { flex:1; position:relative; }
+        #map, #routeMap { width:100%; height:100%; }
+
+        /* Calendar */
+        .calendar-view, .list-view, .route-view { display:none; padding:1.5rem; height:100%; overflow-y:auto; }
+        .calendar-header, .list-view-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+        .calendar-header h2, .list-view-header h2 { font-size:1.2rem; font-weight:600; }
+        .calendar-nav button { padding:0.3rem 0.6rem; border:2px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-size:0.8rem; font-family:inherit; font-weight:500; }
+        .calendar-nav button:hover { border-color:var(--primary-light); }
+        .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:var(--border); border-radius:var(--radius); overflow:hidden; }
+        .calendar-day-header { background:var(--primary); color:white; padding:0.4rem; text-align:center; font-size:0.7rem; font-weight:600; }
+        .calendar-day { background:white; min-height:90px; padding:0.3rem; }
+        .calendar-day.other-month { background:#f9fafb; color:#ccc; }
+        .calendar-day.today { background:#eff6ff; }
+        .calendar-day-number { font-size:0.75rem; font-weight:600; margin-bottom:0.2rem; }
+        .calendar-event { font-size:0.6rem; padding:0.1rem 0.3rem; border-radius:3px; margin-bottom:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; font-weight:500; }
+
+        /* List view */
+        .list-table { width:100%; border-collapse:separate; border-spacing:0; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+        .list-table thead th { background:var(--primary); color:white; padding:0.6rem 0.75rem; text-align:left; font-size:0.7rem; font-weight:600; text-transform:uppercase; position:sticky; top:0; white-space:nowrap; }
+        .list-table tbody tr { transition:background 0.15s; }
+        .list-table tbody tr:hover { background:#f0f4ff; }
+        .list-table tbody tr:not(:last-child) td { border-bottom:1px solid var(--border); }
+        .list-table td { padding:0.5rem 0.75rem; font-size:0.8rem; vertical-align:top; }
+        .list-link { display:inline-flex; align-items:center; gap:0.2rem; padding:0.25rem 0.5rem; background:var(--primary); color:white; text-decoration:none; border-radius:5px; font-size:0.7rem; font-weight:500; transition:background 0.2s; white-space:nowrap; }
+        .list-link:hover { background:var(--accent); }
+        .list-month-group { font-size:1rem; font-weight:700; color:var(--primary); padding:1.2rem 0 0.4rem; }
+        .list-month-group:first-child { padding-top:0; }
+
+        /* Route planner */
+        .route-sidebar { display:none; }
+        .route-sidebar.visible { display:flex; flex-direction:column; }
+        .route-config { padding:0.75rem; border-bottom:1px solid var(--border); }
+        .route-config h3 { font-size:0.9rem; font-weight:600; margin-bottom:0.5rem; }
+        .route-input-group { margin-bottom:0.5rem; }
+        .route-input-group label { display:block; font-size:0.7rem; font-weight:600; text-transform:uppercase; color:var(--text-light); margin-bottom:0.2rem; }
+        .route-input-group input, .route-input-group select { width:100%; padding:0.4rem 0.6rem; border:2px solid var(--border); border-radius:6px; font-size:0.8rem; font-family:inherit; outline:none; }
+        .route-input-group input:focus, .route-input-group select:focus { border-color:var(--primary-light); }
+        .route-btn { width:100%; padding:0.5rem; background:var(--accent); color:white; border:none; border-radius:8px; cursor:pointer; font-size:0.85rem; font-weight:600; font-family:inherit; transition:background 0.2s; margin-top:0.5rem; }
+        .route-btn:hover { background:var(--accent-hover); }
+        .route-radius { display:flex; align-items:center; gap:0.5rem; }
+        .route-radius input[type=range] { flex:1; }
+        .route-radius-val { font-size:0.8rem; font-weight:600; min-width:3rem; }
+        .route-results { flex:1; overflow-y:auto; padding:0.4rem; }
+        .route-results-count { padding:0.4rem 0.75rem; font-size:0.75rem; color:var(--text-light); font-weight:500; }
+        .route-print-btn { padding:0.25rem 0.6rem; border:1.5px solid var(--primary); border-radius:6px; background:white; color:var(--primary); cursor:pointer; font-size:0.7rem; font-weight:600; font-family:inherit; transition:all 0.2s; white-space:nowrap; }
+        .route-print-btn:hover { background:var(--primary); color:white; }
+        .route-info { padding:0.75rem; background:#eff6ff; border-radius:8px; margin:0.5rem; font-size:0.8rem; line-height:1.5; color:var(--primary); }
+        .route-waypoint { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; }
+        .route-waypoint-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+        .route-waypoint-dot.start { background:#22c55e; }
+        .route-waypoint-dot.end { background:#ef4444; }
+
+        /* Dashboard */
+        .dashboard-view { display:none; height:100%; overflow-y:auto; background:var(--bg); }
+        .dashboard-container { max-width:1400px; margin:0 auto; padding:1.5rem; }
+        .dashboard-header { margin-bottom:1.5rem; }
+        .dashboard-header h2 { font-size:1.4rem; font-weight:700; }
+        .dashboard-header p { font-size:0.85rem; color:var(--text-light); }
+        .dashboard-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .stat-card { background:white; border-radius:var(--radius); padding:1rem; box-shadow:var(--shadow); text-align:center; }
+        .stat-card .stat-num { font-size:2rem; font-weight:700; color:var(--primary); }
+        .stat-card .stat-label { font-size:0.75rem; color:var(--text-light); text-transform:uppercase; font-weight:600; letter-spacing:0.03em; }
+        .dashboard-charts { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+        .chart-card { background:white; border-radius:var(--radius); padding:1.25rem; box-shadow:var(--shadow); }
+        .chart-card h3 { font-size:0.95rem; font-weight:600; margin-bottom:1rem; }
+        .chart-card canvas { cursor:pointer; }
+        .chart-card.wide { grid-column:1/-1; }
+        .dashboard-drilldown { background:white; border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:1.5rem; overflow:hidden; }
+        .drilldown-header { padding:1rem 1.25rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+        .drilldown-header h3 { font-size:0.95rem; font-weight:600; }
+        .drilldown-close { background:none; border:1px solid var(--border); border-radius:6px; padding:0.25rem 0.6rem; cursor:pointer; font-size:0.8rem; font-family:inherit; color:var(--text-light); }
+        .drilldown-close:hover { background:var(--bg); color:var(--text); }
+        .drilldown-filters { padding:0.75rem 1.25rem; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; gap:0.4rem; align-items:center; }
+        .drilldown-filters label { font-size:0.7rem; font-weight:600; text-transform:uppercase; color:var(--text-light); margin-right:0.3rem; }
+        .drilldown-body { max-height:400px; overflow-y:auto; }
+        .drilldown-body table { width:100%; border-collapse:collapse; }
+        .drilldown-body th { background:var(--bg); padding:0.5rem 0.75rem; text-align:left; font-size:0.7rem; font-weight:600; text-transform:uppercase; color:var(--text-light); position:sticky; top:0; }
+        .drilldown-body td { padding:0.5rem 0.75rem; font-size:0.8rem; border-top:1px solid var(--border); }
+        .drilldown-body tr:hover { background:#f8faff; }
+        .drilldown-body tr { cursor:pointer; }
+        @media (max-width:900px) { .dashboard-charts { grid-template-columns:1fr; } }
+
+        /* Modal */
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+        .modal-overlay.show { display:flex; }
+        .modal { background:white; border-radius:16px; max-width:520px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { padding:1.25rem 1.25rem 0; display:flex; justify-content:space-between; align-items:flex-start; }
+        .modal-close { background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-light); }
+        .modal-body { padding:0.75rem 1.25rem 1.25rem; }
+        .modal-body h2 { font-size:1.2rem; font-weight:700; margin-bottom:0.5rem; }
+        .modal-info { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:0.75rem; }
+        .modal-info-row { display:flex; align-items:flex-start; gap:0.5rem; font-size:0.85rem; }
+        .modal-info-row .icon { flex-shrink:0; width:1.3rem; text-align:center; }
+        .modal-description { font-size:0.85rem; line-height:1.6; padding-top:0.75rem; border-top:1px solid var(--border); }
+
+        /* Category colors */
+        .cat-music { background:#dbeafe; color:#1e40af; }
+        .cat-theatre { background:#fce7f3; color:#9d174d; }
+        .cat-visual { background:#d1fae5; color:#065f46; }
+        .cat-food { background:#fef3c7; color:#92400e; }
+        .cat-festival { background:#ede9fe; color:#5b21b6; }
+        .cat-film { background:#fee2e2; color:#991b1b; }
+        .cat-literature { background:#e0e7ff; color:#3730a3; }
+        .cat-tech { background:#cffafe; color:#155e75; }
+        .cat-children { background:#fef9c3; color:#854d0e; }
+        .cat-heritage { background:#f3e8ff; color:#6b21a8; }
+        .cat-circus { background:#ffedd5; color:#9a3412; }
+        .cat-sauna { background:#ecfccb; color:#3f6212; }
+        .cat-community { background:#f0fdf4; color:#166534; }
+        .cat-science { background:#f0f9ff; color:#0c4a6e; }
+        .cat-dance { background:#fdf2f8; color:#831843; }
+        .cat-sports { background:#fef2f2; color:#7f1d1d; }
+
+        .leaflet-popup-content-wrapper { border-radius:var(--radius) !important; }
+        .leaflet-popup-content { margin:0.6rem 0.8rem !important; font-family:'Inter',sans-serif !important; }
+        .popup-title { font-weight:600; font-size:0.85rem; margin-bottom:0.3rem; }
+        .popup-meta { font-size:0.75rem; color:var(--text-light); line-height:1.4; }
+
+        @media (max-width:768px) {
+            header { flex-direction:column; gap:0.5rem; }
+            .app-container { flex-direction:column; height:auto; }
+            .sidebar { width:100%; max-height:45vh; }
+            .main-content { height:55vh; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="header-logo">🌌</div>
+        <div><h1>Oulu kulttuuripääkaupunki <span>2026</span></h1><p>Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana</p></div>
+    </div>
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-view="map">Kartta</button>
+        <button class="nav-tab" data-view="list">Lista</button>
+        <button class="nav-tab" data-view="calendar">Kalenteri</button>
+        <button class="nav-tab" data-view="route">Reitti</button>
+        <button class="nav-tab" data-view="dashboard">Dashboard</button>
+    </nav>
+    <a href="guide.html" style="color:#ff8c42;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;flex-shrink:0">Käyttöohje &rarr;</a>
+</header>
+
+<div class="app-container">
+    <!-- Normal sidebar -->
+    <aside class="sidebar" id="normalSidebar">
+        <div class="search-section">
+            <div class="search-box"><input type="text" id="searchInput" placeholder="Hae tapahtumia..."></div>
+            <div class="filters" id="categoryFilters"></div>
+        </div>
+        <div class="month-filter">
+            <label>Kuukausi</label>
+            <select id="monthFilter">
+                <option value="">Kaikki</option>
+                <option value="1">Tammi</option><option value="2">Helmi</option><option value="3">Maalis</option>
+                <option value="4">Huhti</option><option value="5">Touko</option><option value="6">Kesä</option>
+                <option value="7">Heinä</option><option value="8">Elo</option><option value="9">Syys</option>
+                <option value="10">Loka</option><option value="11">Marras</option><option value="12">Joulu</option>
+            </select>
+        </div>
+        <div class="event-count" id="eventCount"></div>
+        <div class="event-list" id="eventList"></div>
+    </aside>
+
+    <!-- Route sidebar -->
+    <aside class="sidebar route-sidebar" id="routeSidebar">
+        <div class="route-config">
+            <h3>🗺️ Reittisuunnittelu</h3>
+            <div class="route-input-group">
+                <label>Lähtöpaikka</label>
+                <select id="routeStart">
+                    <option value="65.0125,25.4680">Oulu</option>
+                    <option value="65.0139,25.4633">Oulun kauppatori</option>
+                    <option value="64.2270,27.6780">Kajaani</option>
+                    <option value="65.7350,24.5700">Kemi</option>
+                    <option value="65.8490,24.1460">Tornio</option>
+                    <option value="63.0960,21.6158">Vaasa</option>
+                    <option value="63.8380,23.1300">Kokkola</option>
+                    <option value="61.4978,23.7610">Tampere</option>
+                    <option value="60.1699,24.9384">Helsinki</option>
+                    <option value="custom_start">Muu (kirjoita)</option>
+                </select>
+                <input type="text" id="routeStartCustom" placeholder="Paikka tai koordinaatit" style="display:none;margin-top:0.3rem">
+            </div>
+            <div class="route-input-group">
+                <label>Määränpää</label>
+                <select id="routeEnd">
+                    <option value="66.5039,25.7294">Rovaniemi</option>
+                    <option value="65.0125,25.4680">Oulu</option>
+                    <option value="65.0139,25.4633">Oulun kauppatori</option>
+                    <option value="64.2270,27.6780">Kajaani</option>
+                    <option value="65.9600,29.1700">Kuusamo</option>
+                    <option value="65.7350,24.5700">Kemi</option>
+                    <option value="65.8490,24.1460">Tornio</option>
+                    <option value="63.0960,21.6158">Vaasa</option>
+                    <option value="60.1699,24.9384">Helsinki</option>
+                    <option value="custom_end">Muu (kirjoita)</option>
+                </select>
+                <input type="text" id="routeEndCustom" placeholder="Paikka tai koordinaatit" style="display:none;margin-top:0.3rem">
+            </div>
+            <div class="route-input-group">
+                <label>Etäisyys reitiltä</label>
+                <div class="route-radius">
+                    <input type="range" id="routeRadius" min="5" max="100" value="30" step="5">
+                    <span class="route-radius-val" id="routeRadiusVal">30 km</span>
+                </div>
+            </div>
+            <button class="route-btn" id="routeCalcBtn">Etsi tapahtumat reitin varrelta</button>
+        </div>
+        <div class="search-section" style="border-bottom:1px solid var(--border)">
+            <div class="search-box"><input type="text" id="routeSearchInput" placeholder="Hae reitin tapahtumia..."></div>
+            <div class="filters" id="routeCategoryFilters"></div>
+        </div>
+        <div class="month-filter">
+            <label>Kuukausi</label>
+            <select id="routeMonthFilter">
+                <option value="">Kaikki</option>
+                <option value="1">Tammi</option><option value="2">Helmi</option><option value="3">Maalis</option>
+                <option value="4">Huhti</option><option value="5">Touko</option><option value="6">Kesä</option>
+                <option value="7">Heinä</option><option value="8">Elo</option><option value="9">Syys</option>
+                <option value="10">Loka</option><option value="11">Marras</option><option value="12">Joulu</option>
+            </select>
+        </div>
+        <div class="route-info" id="routeInfo" style="display:none"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0.75rem">
+            <span class="route-results-count" id="routeResultsCount" style="padding:0"></span>
+            <button class="route-print-btn" id="routePrintBtn" style="display:none" onclick="printRoutePlan()">🖨️ Tulosta suunnitelma</button>
+        </div>
+        <div class="route-results" id="routeResults"></div>
+    </aside>
+
+    <div class="main-content">
+        <div id="map"></div>
+        <div id="routeMapContainer" style="display:none;width:100%;height:100%"><div id="routeMap"></div></div>
+        <div class="list-view" id="listView"></div>
+        <div class="calendar-view" id="calendarView"></div>
+        <div class="dashboard-view" id="dashboardView">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h2>Tapahtumat 2026 — Dashboard</h2>
+                    <p>Klikkaa kuvaajan segmenttiä nähdäksesi tapahtumaluettelon</p>
+                </div>
+                <div class="dashboard-stats" id="dashboardStats"></div>
+                <div class="dashboard-charts">
+                    <div class="chart-card"><h3 style="font-size:0.95rem;margin-bottom:0.75rem">Tapahtumat kategorioittain</h3><canvas id="chartCategory"></canvas></div>
+                    <div class="chart-card"><h3 style="font-size:0.95rem;margin-bottom:0.75rem">Tapahtumat kuukausittain</h3><canvas id="chartMonth"></canvas></div>
+                    <div class="chart-card"><h3 style="font-size:0.95rem;margin-bottom:0.75rem">Tapahtumat paikkakunnittain (top 15)</h3><canvas id="chartCity"></canvas></div>
+                    <div class="chart-card"><h3 style="font-size:0.95rem;margin-bottom:0.75rem">Hintajakauma</h3><canvas id="chartPrice"></canvas></div>
+                </div>
+                <div class="dashboard-drilldown" id="dashboardDrilldown" style="display:none">
+                    <div class="drilldown-header">
+                        <span id="drilldownTitle" style="font-weight:600;font-size:0.95rem"></span>
+                        <button onclick="closeDrilldown()" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:var(--text-light)">&times;</button>
+                    </div>
+                    <div class="drilldown-filters" id="drilldownFilters"></div>
+                    <div class="drilldown-body" id="drilldownBody"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="event-category-badge" id="modalCategory"></span>
+            <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+            <h2 id="modalTitle"></h2>
+            <div class="modal-info">
+                <div class="modal-info-row"><span class="icon">📅</span><span id="modalDate"></span></div>
+                <div class="modal-info-row"><span class="icon">📍</span><span id="modalLocation"></span></div>
+                <div class="modal-info-row" id="modalAddressRow"><span class="icon">🏠</span><span id="modalAddress"></span></div>
+                <div class="modal-info-row" id="modalPriceRow"><span class="icon">💰</span><span id="modalPrice"></span></div>
+                <div class="modal-info-row" id="modalUrlRow"><span class="icon">🔗</span><a id="modalUrl" href="#" target="_blank" rel="noopener" class="list-link">Kotisivut →</a></div>
+            </div>
+            <p class="modal-description" id="modalDescription"></p>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="events_data.js"></script>
+<script>
+// ============================================================
+// CURATED EVENTS (hand-picked with rich Finnish descriptions)
+// ============================================================
+const curatedEvents = [
+    { id: 1, name: "Oulu2026 Avajaisfestivaali", nameEn: "Oulu2026 Opening Festival", dates: "16.–18.1.2026", startDate: "2026-01-16", endDate: "2026-01-18", month: 1, location: "Oulun keskusta, 20+ tapahtumapaikkaa", address: "Kauppatori, 90100 Oulu", lat: 65.0139, lng: 25.4633, category: "festival", categoryFi: "Festivaali", price: "Pääosin ilmainen", url: "https://oulu2026.eu/en/programme/culture-programme/oulu2026-opening-festival/", description: "Lähes 200 tapahtumaa yli 20 tapahtumapaikkassa muuttavat kaupungin keskustan festivaalialueeksi." },
+    { id: 2, name: "Ovlla – saamelainen ooppera", nameEn: "Ovlla – Sami Opera", dates: "16.1.2026 alkaen", startDate: "2026-01-16", endDate: "2026-01-31", month: 1, location: "Oulun kaupunginteatteri", address: "Kaarlenväylä 2, 90100 Oulu", lat: 65.0147, lng: 25.4628, category: "theatre", categoryFi: "Teatteri / Ooppera", price: "Pääsylippu", url: "https://oulu2026.eu/en/culture-programme/ovla/", description: "Ensimmäinen Suomessa pohjoissaameksi ensi-iltaan tullut kokopitkä ooppera." },
+    { id: 3, name: "PLAY – Fotografiska x Oulu2026", nameEn: "PLAY – Fotografiska Exhibition", dates: "14.1.–31.12.2026", startDate: "2026-01-14", endDate: "2026-12-31", month: 1, location: "Kauppakortteli Pekuri", address: "Isokatu 23, 90100 Oulu", lat: 65.0128, lng: 25.4717, category: "visual", categoryFi: "Valokuvataide", price: "17 € / 12 €", url: "https://oulu2026.eu/en/programme/culture-programme/fotografiska-tallinn-x-oulu2026/", description: "Suomen ensimmäinen Fotografiska-näyttely. 17 kansainvälisen taiteilijan ryhmänäyttely." },
+    { id: 5, name: "Nallikari Snow Fest", nameEn: "Nallikari Snow Fest", dates: "11.–14.2.2026", startDate: "2026-02-11", endDate: "2026-02-14", month: 2, location: "Nallikarin lomakylä", address: "Leiritie 2, 90510 Oulu", lat: 65.0300, lng: 25.3930, category: "visual", categoryFi: "Lumiveistos", price: "Ilmainen", url: "https://www.nallikarisnowfest.com/", description: "Kansainvälinen lumiveistoskilpailu, 10 joukkuetta 11 maasta." },
+    { id: 7, name: "Frozen People", nameEn: "Frozen People Festival", dates: "28.2.2026", startDate: "2026-02-28", endDate: "2026-02-28", month: 2, location: "Nallikarin ranta (jäätynyt meri)", address: "Nallikarinranta, 90510 Oulu", lat: 65.0300, lng: 25.3950, category: "music", categoryFi: "Elektroninen musiikki", price: "Ulkoalue ilmainen", url: "https://frozenpeople.fi", description: "Kolme lavaa jäätyneellä merellä. Jääsauna ja jatkot Kulttuuritalo Valveella." },
+    { id: 8, name: "The Logos – ääni-installaatio", nameEn: "The Logos – Sound Installation", dates: "5.4.2026 alkaen", startDate: "2026-04-05", endDate: "2026-06-30", month: 4, location: "Oulun tuomiokirkko", address: "Kirkkokatu 3a, 90100 Oulu", lat: 65.0145, lng: 25.4685, category: "tech", categoryFi: "Äänitaide", price: "Ilmainen", url: "https://oulu2026.eu/en/programme/culture-programme/the-logos/", description: "Yli 4 000 kosmista signaalia muunnetaan immersiiviseksi tilaääneksi tuomiokirkon sisällä." },
+    { id: 9, name: "Leonard Bernstein: MASS", nameEn: "Leonard Bernstein: MASS", dates: "17.–21.4.2026", startDate: "2026-04-17", endDate: "2026-04-21", month: 4, location: "Ouluhalli", address: "Ouluhallintie 20, 90250 Oulu", lat: 65.0040, lng: 25.4785, category: "music", categoryFi: "Klassinen musiikki", price: "Pääsylippu", url: "https://oulusinfonia.fi/en/konsertit/mass/", description: "MASS esitetään ensimmäistä kertaa Suomessa. Lähes 300 esiintyjää." },
+    { id: 10, name: "Pikipop", nameEn: "Pikipop", dates: "6.6.2026", startDate: "2026-06-06", endDate: "2026-06-06", month: 6, location: "Pikisaari", address: "Pikisaari, 90100 Oulu", lat: 65.0195, lng: 25.4555, category: "music", categoryFi: "Musiikkifestivaali", price: "37,40 €", url: "https://pikipop.fi/", description: "Indie-, elektro-, rock-, jazz- ja kokeellisen musiikin festivaali." },
+    { id: 11, name: "Varjo Festival", nameEn: "Varjo Festival", dates: "12.–13.6.2026", startDate: "2026-06-12", endDate: "2026-06-13", month: 6, location: "Kuusisaari", address: "Kuusisaari, 90100 Oulu", lat: 65.0090, lng: 25.4395, category: "music", categoryFi: "Musiikkifestivaali", price: "99,90 €", url: "https://www.varjofestivaali.fi/", description: "Suomen huippuartisteja väljällä festivaalialueella." },
+    { id: 16, name: "Qstock", nameEn: "Qstock Music Festival", dates: "24.–25.7.2026", startDate: "2026-07-23", endDate: "2026-07-25", month: 7, location: "Kuusisaari ja Raatti", address: "Kuusisaari, 90100 Oulu", lat: 65.0090, lng: 25.4395, category: "music", categoryFi: "Musiikkifestivaali", price: "Pääsylippu", url: "https://qstock.fi/en/", description: "40 000 kävijää kahdessa päivässä. Suomen suurimpia festivaaleja." },
+    { id: 17, name: "Elojazz", nameEn: "Elojazz", dates: "30.7.–1.8.2026", startDate: "2026-07-30", endDate: "2026-08-01", month: 8, location: "Oulun keskusta", address: "Oulun keskusta, 90100 Oulu", lat: 65.0125, lng: 25.4680, category: "music", categoryFi: "Jazz", price: "Pääsylippu", url: "https://www.oulunjuhlaviikot.fi/en/main-event/elojazz-eng/", description: "New Orleans -tyylinen jazz-katu saapuu Ouluun." },
+    { id: 19, name: "Kesäillan kattaus", nameEn: "Summer Night's Dinner", dates: "15.8.2026", startDate: "2026-08-15", endDate: "2026-08-15", month: 8, location: "Hallituskatu, keskusta", address: "Hallituskatu, 90100 Oulu", lat: 65.0130, lng: 25.4700, category: "food", categoryFi: "Ruokakulttuuri", price: "Ilmainen", url: "https://arcticfoodlab.fi/en/programme/summer-night-dinner/", description: "Kilometrin pituinen yhteinen ruokapöytä halki keskustan." },
+    { id: 22, name: "Delta Life & Ilmakitaran MM", nameEn: "Air Guitar World Championships", dates: "26.–29.8.2026", startDate: "2026-08-26", endDate: "2026-08-29", month: 8, location: "Oulujoen suisto", address: "Oulujoen suisto, 90100 Oulu", lat: 65.0155, lng: 25.4620, category: "music", categoryFi: "Musiikki / Kilpailu", price: "Ilmainen", url: "https://airguitarworldchampionships.com/en/home/", description: "Delta Life -show ja ilmakitaran MM-kilpailu vesitasolavalla." },
+    { id: 29, name: "Museo- ja tiedekeskus Tiima", nameEn: "Museum and Science Centre Tiima", dates: "Syksy 2026", startDate: "2026-10-01", endDate: "2026-12-31", month: 10, location: "Myllytulli, Oulu", address: "Myllytulli, 90100 Oulu", lat: 65.0110, lng: 25.4750, category: "science", categoryFi: "Museo / Tiedekeskus", price: "Pääsylippu", url: "https://oulunmuseojatiedekeskus.fi/en/", description: "36,1 milj. € kulttuurisijoitus: VISIO, Tietomaa ja Oulun museo saman katon alla." },
+    { id: 31, name: "Lumo Art & Tech Festival", nameEn: "Lumo Art & Tech Festival", dates: "13.–22.11.2026", startDate: "2026-11-13", endDate: "2026-11-22", month: 11, location: "Oulun keskusta", address: "Oulun keskusta, 90100 Oulu", lat: 65.0125, lng: 25.4680, category: "tech", categoryFi: "Valofestivaali", price: "Pääosin ilmainen", url: "https://oulu2026.eu/en/programme/culture-programme/lumo-art-tech/", description: "Kansainvälistä digitaalitaidetta ja valoinstallaatioita." },
+    { id: 33, name: "Snowball – musikaali", nameEn: "Snowball – Musical", dates: "Joulukuu 2026", startDate: "2026-12-01", endDate: "2026-12-31", month: 12, location: "Ouluhalli", address: "Ouluhallintie 20, 90250 Oulu", lat: 65.0040, lng: 25.4785, category: "theatre", categoryFi: "Musikaali", price: "Pääsylippu", url: "https://oulu2026.eu/en/snowball-musical/", description: "Maailmanensi-ilta perhemusikaali revontulten maassa." },
+    { id: 39, name: "Talviuinnin MM 2026", nameEn: "Winter Swimming World Championships", dates: "2.–8.3.2026", startDate: "2026-03-02", endDate: "2026-03-08", month: 3, location: "Nallikari", address: "Nallikari, 90510 Oulu", lat: 65.0300, lng: 25.3930, category: "sports", categoryFi: "Talviuinti", price: "Vaihtelee", url: "https://wswc2026.fi/", description: "Yli 2 000 osallistujaa 45 maasta. Maailman suurin jääsauna." },
+    { id: 49, name: "Solstice Festival", nameEn: "Solstice Festival", dates: "18.–20.6.2026", startDate: "2026-06-18", endDate: "2026-06-20", month: 6, location: "Rukatunturi, Kuusamo", address: "Rukatunturi, 93825 Kuusamo", lat: 66.1670, lng: 29.1545, category: "music", categoryFi: "Elektroninen musiikki", price: "Pääsylippu", url: "https://solsticefestival.fi", description: "Elektronisen musiikin festivaali Rukan huipulla keskikesän yöttömässä yössä." },
+    { id: 51, name: "Kuhmon Kamarimusiikki", nameEn: "Kuhmo Chamber Music", dates: "12.–25.7.2026", startDate: "2026-07-12", endDate: "2026-07-25", month: 7, location: "Kuhmo", address: "Kuhmo", lat: 64.1300, lng: 29.5200, category: "music", categoryFi: "Kamarimusiikki", price: "Pääsylippu", url: "https://kuhmofestival.fi/en/", description: "60 konserttia, yli 100 kansainvälistä taiteilijaa." },
+];
+
+// ============================================================
+// CATEGORY CONFIG
+// ============================================================
+const categories = {
+    music: { fi: "Musiikki", class: "cat-music", icon: "🎵" },
+    theatre: { fi: "Teatteri", class: "cat-theatre", icon: "🎭" },
+    visual: { fi: "Kuvataide", class: "cat-visual", icon: "🎨" },
+    food: { fi: "Ruokakulttuuri", class: "cat-food", icon: "🍽️" },
+    festival: { fi: "Festivaali", class: "cat-festival", icon: "🎪" },
+    film: { fi: "Elokuva", class: "cat-film", icon: "🎬" },
+    literature: { fi: "Kirjallisuus", class: "cat-literature", icon: "📚" },
+    tech: { fi: "Taide & Teknologia", class: "cat-tech", icon: "💡" },
+    children: { fi: "Lastenkulttuuri", class: "cat-children", icon: "👶" },
+    heritage: { fi: "Perintökulttuuri", class: "cat-heritage", icon: "🏛️" },
+    circus: { fi: "Sirkus", class: "cat-circus", icon: "🤹" },
+    sauna: { fi: "Sauna", class: "cat-sauna", icon: "♨️" },
+    community: { fi: "Yhteisö", class: "cat-community", icon: "🤝" },
+    science: { fi: "Tiede", class: "cat-science", icon: "🔬" },
+    dance: { fi: "Tanssi", class: "cat-dance", icon: "💃" },
+    sports: { fi: "Urheilu", class: "cat-sports", icon: "🏅" },
+};
+
+// ============================================================
+// MERGE EVENTS: curated + API data (curated take priority by name)
+// ============================================================
+const curatedNames = new Set(curatedEvents.map(e => e.name.toLowerCase()));
+const apiFiltered = (typeof eventsFromAPI !== 'undefined' ? eventsFromAPI : [])
+    .filter(e => !curatedNames.has(e.name.toLowerCase()));
+const events = [...curatedEvents, ...apiFiltered];
+
+// ============================================================
+// APP STATE
+// ============================================================
+let activeCategories = new Set();
+let searchQuery = "";
+let selectedMonth = "";
+let currentView = "map";
+let calendarMonth = 3; // April (current)
+let map, markers = [], markerCluster;
+let routeMap, routeMarkers = [], routeLine;
+let routeActiveCategories = new Set();
+let routeSearchQuery = "";
+let routeSelectedMonth = "";
+let lastRouteNearby = []; // cached unfiltered route results
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+    initMap();
+    renderCategoryFilters();
+    renderEventList();
+    setupEventListeners();
+});
+
+function initMap() {
+    map = L.map("map", { maxZoom: 18 }).setView([65.012, 25.465], 11);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 19, subdomains: "abcd"
+    }).addTo(map);
+    updateMapMarkers();
+}
+
+// ============================================================
+// FILTERING
+// ============================================================
+function getFilteredEvents() {
+    return events.filter(ev => {
+        if (activeCategories.size > 0 && !activeCategories.has(ev.category)) return false;
+        if (selectedMonth) {
+            const m = parseInt(selectedMonth);
+            if (ev.month === 0) return true;
+            if (ev.month !== m) {
+                const start = new Date(ev.startDate), end = new Date(ev.endDate);
+                const check = new Date(2026, m - 1, 15);
+                if (check < start || check > end) return false;
+            }
+        }
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            return ev.name.toLowerCase().includes(q) || (ev.nameEn||"").toLowerCase().includes(q) ||
+                   ev.location.toLowerCase().includes(q) || ev.description.toLowerCase().includes(q) ||
+                   ev.categoryFi.toLowerCase().includes(q);
+        }
+        return true;
+    });
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderCategoryFilters() {
+    const c = document.getElementById("categoryFilters");
+    c.innerHTML = "";
+    const allBtn = document.createElement("button");
+    allBtn.className = "filter-btn" + (activeCategories.size === 0 ? " active" : "");
+    allBtn.textContent = "Kaikki";
+    allBtn.onclick = () => { activeCategories.clear(); update(); };
+    c.appendChild(allBtn);
+    for (const [key, cat] of Object.entries(categories)) {
+        const count = events.filter(e => e.category === key).length;
+        if (!count) continue;
+        const btn = document.createElement("button");
+        btn.className = "filter-btn" + (activeCategories.has(key) ? " active" : "");
+        btn.textContent = `${cat.icon} ${cat.fi} (${count})`;
+        btn.onclick = () => { activeCategories.has(key) ? activeCategories.delete(key) : activeCategories.add(key); update(); };
+        c.appendChild(btn);
+    }
+}
+
+function renderEventList() {
+    const container = document.getElementById("eventList");
+    const filtered = getFilteredEvents().sort((a, b) => a.startDate.localeCompare(b.startDate));
+    document.getElementById("eventCount").textContent = `${filtered.length} tapahtumaa`;
+    container.innerHTML = "";
+    // Show max 200 in sidebar for performance
+    filtered.slice(0, 200).forEach(ev => {
+        const cat = categories[ev.category] || categories.community;
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.innerHTML = `<h3>${ev.name}</h3>
+            <div class="event-card-meta">
+                <span><span class="event-category-badge ${cat.class}">${cat.icon} ${cat.fi}</span> · ${ev.dates}</span>
+                <span>📍 ${ev.location}</span>
+            </div>
+            <p class="event-card-desc">${ev.description}</p>`;
+        card.onclick = () => { openModal(ev); if(currentView==="map"){map.setView([ev.lat,ev.lng],15);} };
+        container.appendChild(card);
+    });
+    if (filtered.length > 200) {
+        container.innerHTML += `<div style="padding:0.5rem;text-align:center;color:var(--text-light);font-size:0.8rem">+ ${filtered.length - 200} lisää tapahtumaa. Käytä hakua tai suodattimia.</div>`;
+    }
+}
+
+function createMarkerIcon(cat) {
+    return L.divIcon({
+        className: "custom-marker",
+        html: `<div style="background:white;border:2px solid #1a3a5c;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.3);cursor:pointer">${cat.icon}</div>`,
+        iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -16]
+    });
+}
+
+function updateMapMarkers() {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+    const filtered = getFilteredEvents();
+    filtered.forEach(ev => {
+        const cat = categories[ev.category] || categories.community;
+        const marker = L.marker([ev.lat, ev.lng], { icon: createMarkerIcon(cat) })
+            .addTo(map)
+            .bindPopup(`<div class="popup-title">${ev.name}</div><div class="popup-meta">📅 ${ev.dates}<br>📍 ${ev.location}</div>`);
+        marker.on("click", () => openModal(ev));
+        markers.push(marker);
+    });
+}
+
+// ============================================================
+// CALENDAR
+// ============================================================
+function renderCalendar() {
+    const c = document.getElementById("calendarView");
+    const year = 2026, month = calendarMonth;
+    const mNames = ["Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu","Heinäkuu","Elokuu","Syyskuu","Lokakuu","Marraskuu","Joulukuu"];
+    const dNames = ["Ma","Ti","Ke","To","Pe","La","Su"];
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    let startDow = (firstDay.getDay() + 6) % 7;
+    const filtered = getFilteredEvents();
+    let h = `<div class="calendar-header"><h2>${mNames[month]} ${year}</h2><div class="calendar-nav"><button onclick="changeMonth(-1)" ${month===0?"disabled":""}>&larr;</button><button onclick="changeMonth(1)" ${month===11?"disabled":""}>&rarr;</button></div></div><div class="calendar-grid">`;
+    dNames.forEach(d => { h += `<div class="calendar-day-header">${d}</div>`; });
+    for (let i = 0; i < startDow; i++) { const d = new Date(year, month, -startDow+i+1); h += `<div class="calendar-day other-month"><div class="calendar-day-number">${d.getDate()}</div></div>`; }
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const ds = `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+        const isToday = ds === new Date().toISOString().split("T")[0];
+        const dayEvts = filtered.filter(ev => ev.startDate <= ds && ev.endDate >= ds);
+        h += `<div class="calendar-day${isToday?" today":""}"><div class="calendar-day-number">${day}</div>`;
+        dayEvts.slice(0,3).forEach(ev => { const cat = categories[ev.category]||categories.community; h += `<div class="calendar-event ${cat.class}" onclick="openModal(events.find(e=>e.id===${ev.id}))" title="${ev.name}">${ev.name}</div>`; });
+        if (dayEvts.length > 3) h += `<div style="font-size:0.55rem;color:var(--text-light)">+${dayEvts.length-3}</div>`;
+        h += `</div>`;
+    }
+    const total = startDow + lastDay.getDate(), rem = (7 - (total%7))%7;
+    for (let i = 1; i <= rem; i++) h += `<div class="calendar-day other-month"><div class="calendar-day-number">${i}</div></div>`;
+    h += `</div>`;
+    c.innerHTML = h;
+}
+function changeMonth(d) { calendarMonth = Math.max(0,Math.min(11,calendarMonth+d)); renderCalendar(); }
+
+// ============================================================
+// LIST VIEW
+// ============================================================
+function renderListView() {
+    const c = document.getElementById("listView");
+    const filtered = getFilteredEvents().sort((a,b) => a.startDate.localeCompare(b.startDate));
+    const mNames = ["","Tammikuu","Helmikuu","Maaliskuu","Huhtikuu","Toukokuu","Kesäkuu","Heinäkuu","Elokuu","Syyskuu","Lokakuu","Marraskuu","Joulukuu"];
+    const groups = {}, yearRound = [];
+    filtered.forEach(ev => { if(ev.month===0) yearRound.push(ev); else { if(!groups[ev.month]) groups[ev.month]=[]; groups[ev.month].push(ev); }});
+    let h = `<div class="list-view-header"><h2>Tapahtumaluettelo 2026</h2><span>${filtered.length} tapahtumaa</span></div>`;
+    if (yearRound.length) { h += `<div class="list-month-group">Ympärivuotiset</div>` + buildTable(yearRound); }
+    for (let m=1;m<=12;m++) { if(!groups[m]) continue; h += `<div class="list-month-group">${mNames[m]}</div>` + buildTable(groups[m]); }
+    c.innerHTML = h;
+}
+function buildTable(evts) {
+    let h = `<table class="list-table"><thead><tr><th>Tapahtuma</th><th>Ajankohta</th><th>Paikka</th><th>Kategoria</th><th>Linkki</th></tr></thead><tbody>`;
+    evts.forEach(ev => { const cat = categories[ev.category]||categories.community;
+        h += `<tr style="cursor:pointer" onclick="openModal(events.find(e=>e.id===${ev.id}))"><td style="font-weight:600">${ev.name}</td><td style="white-space:nowrap">${ev.dates}</td><td>${ev.location}</td><td><span class="event-category-badge ${cat.class}">${cat.icon} ${cat.fi}</span></td><td>${ev.url?`<a href="${ev.url}" target="_blank" rel="noopener" class="list-link" onclick="event.stopPropagation()">Avaa →</a>`:"–"}</td></tr>`;
+    });
+    return h + `</tbody></table>`;
+}
+
+// ============================================================
+// ROUTE PLANNER
+// ============================================================
+function initRouteMap() {
+    if (routeMap) return;
+    routeMap = L.map("routeMap", { maxZoom: 18 }).setView([65.5, 26.0], 7);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; OSM &copy; CARTO', maxZoom: 19, subdomains: "abcd"
+    }).addTo(routeMap);
+}
+
+function getRouteCoords(selectId, customId) {
+    const sel = document.getElementById(selectId);
+    const val = sel.value;
+    if (val.startsWith("custom")) {
+        const custom = document.getElementById(customId).value.trim();
+        const m = custom.match(/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
+        if (m) return [parseFloat(m[1]), parseFloat(m[2])];
+        return null;
+    }
+    const parts = val.split(",");
+    return [parseFloat(parts[0]), parseFloat(parts[1])];
+}
+
+function distToSegment(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    if (dx === 0 && dy === 0) return Math.sqrt((px-x1)**2 + (py-y1)**2);
+    let t = ((px-x1)*dx + (py-y1)*dy) / (dx*dx + dy*dy);
+    t = Math.max(0, Math.min(1, t));
+    const cx = x1 + t*dx, cy = y1 + t*dy;
+    return Math.sqrt((px-cx)**2 + (py-cy)**2);
+}
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function distToRouteKm(ev, routePoints) {
+    let minDist = Infinity;
+    for (let i = 0; i < routePoints.length - 1; i++) {
+        const p1 = routePoints[i], p2 = routePoints[i+1];
+        // Approximate: project onto segment then haversine
+        const dx = p2[1]-p1[1], dy = p2[0]-p1[0];
+        let t = 0;
+        if (dx !== 0 || dy !== 0) {
+            t = ((ev.lng-p1[1])*dx + (ev.lat-p1[0])*dy) / (dx*dx + dy*dy);
+            t = Math.max(0, Math.min(1, t));
+        }
+        const clat = p1[0]+t*dy, clng = p1[1]+t*dx;
+        const d = haversineKm(ev.lat, ev.lng, clat, clng);
+        if (d < minDist) minDist = d;
+    }
+    return minDist;
+}
+
+async function calculateRoute() {
+    const start = getRouteCoords("routeStart", "routeStartCustom");
+    const end = getRouteCoords("routeEnd", "routeEndCustom");
+    if (!start || !end) { alert("Tarkista lähtö- ja määränpää."); return; }
+
+    const radius = parseInt(document.getElementById("routeRadius").value);
+    const btn = document.getElementById("routeCalcBtn");
+    btn.textContent = "Haetaan reittiä...";
+    btn.disabled = true;
+
+    let routePoints;
+    let totalDist;
+
+    try {
+        // Fetch real road route from OSRM
+        const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+            // OSRM returns [lng, lat], convert to [lat, lng] for Leaflet
+            routePoints = route.geometry.coordinates.map(c => [c[1], c[0]]);
+            totalDist = Math.round(route.distance / 1000); // meters to km
+
+            // Simplify route for performance (keep every Nth point)
+            if (routePoints.length > 500) {
+                const step = Math.ceil(routePoints.length / 500);
+                const simplified = [routePoints[0]];
+                for (let i = step; i < routePoints.length - 1; i += step) {
+                    simplified.push(routePoints[i]);
+                }
+                simplified.push(routePoints[routePoints.length - 1]);
+                routePoints = simplified;
+            }
+        } else {
+            throw new Error("Reititys epäonnistui");
+        }
+    } catch (err) {
+        // Fallback to straight line if OSRM fails
+        console.warn("OSRM failed, using straight line:", err);
+        const numPoints = 30;
+        routePoints = [];
+        for (let i = 0; i <= numPoints; i++) {
+            const t = i / numPoints;
+            routePoints.push([start[0] + t*(end[0]-start[0]), start[1] + t*(end[1]-start[1])]);
+        }
+        totalDist = Math.round(haversineKm(start[0], start[1], end[0], end[1]));
+    }
+
+    btn.textContent = "Etsi tapahtumat reitin varrelta";
+    btn.disabled = false;
+
+    // Find events within radius of route
+    const nearby = [];
+    const filtered = getFilteredEvents();
+    filtered.forEach(ev => {
+        const dist = distToRouteKm(ev, routePoints);
+        if (dist <= radius) {
+            nearby.push({ ...ev, routeDist: Math.round(dist), routeProgress: projectOnRoute(ev, routePoints) });
+        }
+    });
+
+    // Sort by position along route
+    nearby.sort((a, b) => a.routeProgress - b.routeProgress);
+
+    // Clear old route
+    routeMarkers.forEach(m => routeMap.removeLayer(m));
+    routeMarkers = [];
+    if (routeLine) routeMap.removeLayer(routeLine);
+
+    // Draw route line
+    routeLine = L.polyline(routePoints, { color: "#1a3a5c", weight: 5, opacity: 0.8 }).addTo(routeMap);
+
+    // Start and end markers
+    const startIcon = L.divIcon({ className:"", html:`<div style="background:#22c55e;border:3px solid white;border-radius:50%;width:18px;height:18px;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>`, iconSize:[18,18], iconAnchor:[9,9] });
+    const endIcon = L.divIcon({ className:"", html:`<div style="background:#ef4444;border:3px solid white;border-radius:50%;width:18px;height:18px;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>`, iconSize:[18,18], iconAnchor:[9,9] });
+
+    routeMarkers.push(L.marker(start, { icon: startIcon }).addTo(routeMap).bindPopup("Lähtö"));
+    routeMarkers.push(L.marker(end, { icon: endIcon }).addTo(routeMap).bindPopup("Määränpää"));
+
+    // Event markers on route map
+    nearby.forEach(ev => {
+        const cat = categories[ev.category] || categories.community;
+        const marker = L.marker([ev.lat, ev.lng], { icon: createMarkerIcon(cat) })
+            .addTo(routeMap)
+            .bindPopup(`<div class="popup-title">${ev.name}</div><div class="popup-meta">📅 ${ev.dates}<br>📍 ${ev.location}<br>📏 ${ev.routeDist} km reitiltä</div>`);
+        marker.on("click", () => openModal(ev));
+        routeMarkers.push(marker);
+    });
+
+    // Fit bounds
+    routeMap.fitBounds(routePoints, { padding: [40, 40] });
+
+    // Estimate driving time (assume avg 80 km/h)
+    const hours = Math.floor(totalDist / 80);
+    const mins = Math.round((totalDist / 80 - hours) * 60);
+    const timeStr = hours > 0 ? `~${hours} h ${mins} min` : `~${mins} min`;
+
+    // Show info
+    const info = document.getElementById("routeInfo");
+    info.style.display = "block";
+    const startName = document.getElementById("routeStart").options[document.getElementById("routeStart").selectedIndex].text;
+    const endName = document.getElementById("routeEnd").options[document.getElementById("routeEnd").selectedIndex].text;
+    info.innerHTML = `<div class="route-waypoint"><div class="route-waypoint-dot start"></div><strong>${startName}</strong></div>
+        <div style="border-left:2px dashed var(--border);margin-left:5px;padding-left:12px;font-size:0.75rem;color:var(--text-light)">🚗 ${totalDist} km · ${timeStr}</div>
+        <div class="route-waypoint"><div class="route-waypoint-dot end"></div><strong>${endName}</strong></div>`;
+
+    // Cache unfiltered results and render
+    lastRouteNearby = nearby;
+    renderRouteCategoryFilters();
+    renderRouteResults();
+}
+
+function getFilteredRouteEvents() {
+    return lastRouteNearby.filter(ev => {
+        if (routeActiveCategories.size > 0 && !routeActiveCategories.has(ev.category)) return false;
+        if (routeSelectedMonth) {
+            const m = parseInt(routeSelectedMonth);
+            if (ev.month === 0) return true;
+            if (ev.month !== m) {
+                const start = new Date(ev.startDate), end = new Date(ev.endDate);
+                const check = new Date(2026, m - 1, 15);
+                if (check < start || check > end) return false;
+            }
+        }
+        if (routeSearchQuery) {
+            const q = routeSearchQuery.toLowerCase();
+            return ev.name.toLowerCase().includes(q) || (ev.nameEn||"").toLowerCase().includes(q) ||
+                   ev.location.toLowerCase().includes(q) || ev.description.toLowerCase().includes(q) ||
+                   ev.categoryFi.toLowerCase().includes(q);
+        }
+        return true;
+    });
+}
+
+function renderRouteCategoryFilters() {
+    const c = document.getElementById("routeCategoryFilters");
+    c.innerHTML = "";
+    const allBtn = document.createElement("button");
+    allBtn.className = "filter-btn" + (routeActiveCategories.size === 0 ? " active" : "");
+    allBtn.textContent = "Kaikki";
+    allBtn.onclick = () => { routeActiveCategories.clear(); renderRouteResults(); renderRouteCategoryFilters(); updateRouteMapMarkers(); };
+    c.appendChild(allBtn);
+    // Only show categories that exist in route results
+    const catsInRoute = {};
+    lastRouteNearby.forEach(e => { catsInRoute[e.category] = (catsInRoute[e.category]||0) + 1; });
+    for (const [key, cat] of Object.entries(categories)) {
+        if (!catsInRoute[key]) continue;
+        const btn = document.createElement("button");
+        btn.className = "filter-btn" + (routeActiveCategories.has(key) ? " active" : "");
+        btn.textContent = `${cat.icon} ${cat.fi} (${catsInRoute[key]})`;
+        btn.onclick = () => { routeActiveCategories.has(key) ? routeActiveCategories.delete(key) : routeActiveCategories.add(key); renderRouteResults(); renderRouteCategoryFilters(); updateRouteMapMarkers(); };
+        c.appendChild(btn);
+    }
+}
+
+function updateRouteMapMarkers() {
+    // Remove only event markers (keep route line and start/end markers, which are first 2+line)
+    const keep = routeMarkers.slice(0, 2);
+    routeMarkers.slice(2).forEach(m => routeMap.removeLayer(m));
+    routeMarkers = keep;
+    const filtered = getFilteredRouteEvents();
+    filtered.forEach(ev => {
+        const cat = categories[ev.category] || categories.community;
+        const marker = L.marker([ev.lat, ev.lng], { icon: createMarkerIcon(cat) })
+            .addTo(routeMap)
+            .bindPopup(`<div class="popup-title">${ev.name}</div><div class="popup-meta">📅 ${ev.dates}<br>📍 ${ev.location}<br>📏 ${ev.routeDist} km reitiltä</div>`);
+        marker.on("click", () => openModal(ev));
+        routeMarkers.push(marker);
+    });
+}
+
+function renderRouteResults() {
+    const filtered = getFilteredRouteEvents();
+    document.getElementById("routeResultsCount").textContent = `${filtered.length} tapahtumaa` + (lastRouteNearby.length !== filtered.length ? ` (${lastRouteNearby.length} reitillä)` : "");
+    document.getElementById("routePrintBtn").style.display = filtered.length > 0 ? "inline-block" : "none";
+    const rc = document.getElementById("routeResults");
+    rc.innerHTML = "";
+    filtered.forEach(ev => {
+        const cat = categories[ev.category] || categories.community;
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.innerHTML = `<h3>${ev.name}</h3>
+            <div class="event-card-meta">
+                <span><span class="event-category-badge ${cat.class}">${cat.icon} ${cat.fi}</span> · ${ev.dates}</span>
+                <span>📍 ${ev.location} · 📏 ${ev.routeDist} km reitiltä</span>
+            </div>
+            <p class="event-card-desc">${ev.description}</p>`;
+        card.onclick = () => { openModal(ev); routeMap.setView([ev.lat, ev.lng], 13); };
+        rc.appendChild(card);
+    });
+}
+
+function printRoutePlan() {
+    const filtered = getFilteredRouteEvents().sort((a,b) => a.routeProgress - b.routeProgress);
+    if (!filtered.length) return;
+
+    const startName = document.getElementById("routeStart").options[document.getElementById("routeStart").selectedIndex].text;
+    const endName = document.getElementById("routeEnd").options[document.getElementById("routeEnd").selectedIndex].text;
+    const infoEl = document.getElementById("routeInfo");
+    const radius = document.getElementById("routeRadius").value;
+
+    // Group by location along route
+    let currentCity = "";
+    let html = `<!DOCTYPE html><html lang="fi"><head><meta charset="UTF-8"><title>Reittisuunnitelma – ${startName} → ${endName}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:#1a1a2e;line-height:1.6;max-width:800px;margin:0 auto;padding:2rem}
+h1{font-size:1.4rem;font-weight:700;color:#1a3a5c;margin-bottom:0.25rem}
+.subtitle{font-size:0.85rem;color:#6b7280;margin-bottom:1.5rem}
+.route-summary{background:#eff6ff;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.85rem;color:#1a3a5c}
+.route-summary strong{font-weight:600}
+.stop{border-left:3px solid #1a3a5c;margin-left:8px;padding:0 0 1.5rem 1.25rem;position:relative}
+.stop:last-child{border-left-color:transparent;padding-bottom:0}
+.stop::before{content:'';position:absolute;left:-7px;top:2px;width:11px;height:11px;border-radius:50%;background:#1a3a5c;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.stop-name{font-size:1rem;font-weight:600;margin-bottom:0.15rem}
+.stop-meta{font-size:0.8rem;color:#6b7280;margin-bottom:0.3rem}
+.stop-desc{font-size:0.8rem;color:#374151;margin-bottom:0.2rem}
+.stop-link{font-size:0.75rem;color:#2563eb;text-decoration:none}
+.stop-link:hover{text-decoration:underline}
+.stop-badge{display:inline-block;font-size:0.65rem;padding:0.1rem 0.4rem;border-radius:10px;font-weight:500;margin-right:0.3rem}
+.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #e2e8f0;font-size:0.7rem;color:#9ca3af;text-align:center}
+@media print{body{padding:1rem}@page{margin:1.5cm}}
+</style></head><body>
+<h1>Reittisuunnitelma: ${startName} → ${endName}</h1>
+<div class="subtitle">${filtered.length} tapahtumaa reitin varrella (max ${radius} km reitiltä)</div>
+<div class="route-summary">
+<strong>Reitti:</strong> ${startName} → ${endName}<br>
+<strong>Tapahtumia:</strong> ${filtered.length} kpl
+</div>
+<div style="padding-top:0.5rem">`;
+
+    filtered.forEach((ev, i) => {
+        const cat = categories[ev.category] || categories.community;
+        html += `<div class="stop">
+<div class="stop-name">${i+1}. ${ev.name}</div>
+<div class="stop-meta">
+<span class="stop-badge" style="background:#dbeafe;color:#1e40af">${cat.icon} ${cat.fi}</span>
+📅 ${ev.dates} · 📍 ${ev.location} · 📏 ${ev.routeDist} km reitiltä
+</div>
+<div class="stop-desc">${ev.description}</div>
+${ev.url ? `<a class="stop-link" href="${ev.url}" target="_blank">${ev.url}</a>` : ""}
+</div>`;
+    });
+
+    html += `</div>
+<div class="footer">Oulu kulttuuripääkaupunki 2026 · Reittisuunnitelma luotu ${new Date().toLocaleDateString("fi-FI")}</div>
+</body></html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+}
+
+function projectOnRoute(ev, routePoints) {
+    let minDist = Infinity, minT = 0;
+    for (let i = 0; i < routePoints.length - 1; i++) {
+        const p1 = routePoints[i], p2 = routePoints[i+1];
+        const dx = p2[1]-p1[1], dy = p2[0]-p1[0];
+        let t = 0;
+        if (dx !== 0 || dy !== 0) {
+            t = ((ev.lng-p1[1])*dx + (ev.lat-p1[0])*dy) / (dx*dx + dy*dy);
+            t = Math.max(0, Math.min(1, t));
+        }
+        const clat = p1[0]+t*dy, clng = p1[1]+t*dx;
+        const d = haversineKm(ev.lat, ev.lng, clat, clng);
+        if (d < minDist) { minDist = d; minT = i + t; }
+    }
+    return minT;
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(ev) {
+    const cat = categories[ev.category] || categories.community;
+    document.getElementById("modalCategory").className = `event-category-badge ${cat.class}`;
+    document.getElementById("modalCategory").textContent = `${cat.icon} ${cat.fi}`;
+    document.getElementById("modalTitle").textContent = ev.name;
+    document.getElementById("modalDate").textContent = ev.dates;
+    document.getElementById("modalLocation").textContent = ev.location;
+    document.getElementById("modalAddress").textContent = ev.address || ev.location;
+    document.getElementById("modalDescription").textContent = ev.description;
+    document.getElementById("modalPriceRow").style.display = ev.price ? "flex" : "none";
+    if (ev.price) document.getElementById("modalPrice").textContent = ev.price;
+    document.getElementById("modalUrlRow").style.display = ev.url ? "flex" : "none";
+    if (ev.url) document.getElementById("modalUrl").href = ev.url;
+    document.getElementById("modalOverlay").classList.add("show");
+}
+function closeModal() { document.getElementById("modalOverlay").classList.remove("show"); }
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+const chartColors = {
+    music:"#3b82f6", theatre:"#ec4899", visual:"#10b981", food:"#f59e0b",
+    festival:"#8b5cf6", film:"#ef4444", literature:"#6366f1", tech:"#06b6d4",
+    children:"#eab308", heritage:"#a855f7", circus:"#f97316", sauna:"#84cc16",
+    community:"#22c55e", science:"#0ea5e9", dance:"#d946ef", sports:"#dc2626"
+};
+const monthNames = ["Tammi","Helmi","Maalis","Huhti","Touko","Kesä","Heinä","Elo","Syys","Loka","Marras","Joulu"];
+let dashCharts = {};
+let drilldownActiveFilters = new Set();
+let drilldownDimension = "";
+let drilldownValue = "";
+
+function renderDashboard() {
+    // Stats
+    const stats = document.getElementById("dashboardStats");
+    const catCounts = {}, monthCounts = {}, cityCounts = {};
+    let freeCount = 0;
+    events.forEach(ev => {
+        catCounts[ev.category] = (catCounts[ev.category]||0) + 1;
+        const m = ev.month || 0;
+        monthCounts[m] = (monthCounts[m]||0) + 1;
+        const city = extractCity(ev);
+        cityCounts[city] = (cityCounts[city]||0) + 1;
+        if (ev.price && /ilmainen|free|vapaa/i.test(ev.price)) freeCount++;
+    });
+    const topCat = Object.entries(catCounts).sort((a,b)=>b[1]-a[1])[0];
+    const topCatFi = topCat ? (categories[topCat[0]]||{fi:topCat[0]}).fi : "-";
+    stats.innerHTML = `
+        <div class="stat-card"><div class="stat-num">${events.length}</div><div class="stat-label">Tapahtumaa yhteensä</div></div>
+        <div class="stat-card"><div class="stat-num">${Object.keys(catCounts).length}</div><div class="stat-label">Kategoriaa</div></div>
+        <div class="stat-card"><div class="stat-num">${topCatFi}</div><div class="stat-label">Suurin kategoria (${topCat?topCat[1]:0})</div></div>
+        <div class="stat-card"><div class="stat-num">${freeCount}</div><div class="stat-label">Ilmaista tapahtumaa</div></div>
+        <div class="stat-card"><div class="stat-num">${Object.keys(cityCounts).length}</div><div class="stat-label">Paikkakuntaa</div></div>
+    `;
+
+    // Destroy old charts
+    Object.values(dashCharts).forEach(c => c.destroy());
+    dashCharts = {};
+
+    // Category chart (horizontal bar)
+    const catKeys = Object.keys(categories);
+    const catData = catKeys.map(k => catCounts[k]||0);
+    const catLabels = catKeys.map(k => categories[k].fi);
+    const catBg = catKeys.map(k => chartColors[k]);
+    dashCharts.category = new Chart(document.getElementById("chartCategory"), {
+        type: "bar",
+        data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: catBg, borderRadius: 4 }] },
+        options: {
+            indexAxis: "y", responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+            onClick: (e, els) => { if (els.length) drillDown("category", catKeys[els[0].index], catLabels[els[0].index]); }
+        }
+    });
+
+    // Month chart
+    const mKeys = Array.from({length:12},(_,i)=>i+1);
+    const mData = mKeys.map(m => monthCounts[m]||0);
+    const ympVuot = monthCounts[0]||0;
+    dashCharts.month = new Chart(document.getElementById("chartMonth"), {
+        type: "bar",
+        data: { labels: [...monthNames, ympVuot?"Ympärivuot.":""].filter(Boolean), datasets: [{ data: ympVuot?[...mData,ympVuot]:mData, backgroundColor: "#3b82f6", borderRadius: 4 }] },
+        options: {
+            responsive: true, plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+            onClick: (e, els) => {
+                if (!els.length) return;
+                const idx = els[0].index;
+                if (idx < 12) drillDown("month", String(idx+1), monthNames[idx]);
+                else drillDown("month", "0", "Ympärivuotiset");
+            }
+        }
+    });
+
+    // City chart (top 15)
+    const cityEntries = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]).slice(0,15);
+    dashCharts.city = new Chart(document.getElementById("chartCity"), {
+        type: "bar",
+        data: { labels: cityEntries.map(e=>e[0]), datasets: [{ data: cityEntries.map(e=>e[1]), backgroundColor: "#8b5cf6", borderRadius: 4 }] },
+        options: {
+            indexAxis: "y", responsive: true, plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+            onClick: (e, els) => { if (els.length) drillDown("city", cityEntries[els[0].index][0], cityEntries[els[0].index][0]); }
+        }
+    });
+
+    // Price chart (donut)
+    const paidCount = events.length - freeCount;
+    dashCharts.price = new Chart(document.getElementById("chartPrice"), {
+        type: "doughnut",
+        data: { labels: ["Ilmainen","Maksullinen / ei tietoa"], datasets: [{ data: [freeCount, paidCount], backgroundColor: ["#10b981","#f59e0b"] }] },
+        options: {
+            responsive: true, plugins: { legend: { position: "bottom" } },
+            onClick: (e, els) => {
+                if (!els.length) return;
+                drillDown("price", els[0].index === 0 ? "free" : "paid", els[0].index === 0 ? "Ilmaiset tapahtumat" : "Maksulliset tapahtumat");
+            }
+        }
+    });
+
+    closeDrilldown();
+}
+
+function extractCity(ev) {
+    const loc = (ev.location || ev.address || "").toLowerCase();
+    if (/oulu/i.test(loc)) return "Oulu";
+    const addr = ev.address || "";
+    const zipMatch = addr.match(/\d{5}\s+([A-ZÄÖÅa-zäöå]+(?:\s+[A-ZÄÖÅa-zäöå]+)?)\s*$/);
+    if (zipMatch) return zipMatch[1].charAt(0).toUpperCase() + zipMatch[1].slice(1).toLowerCase();
+    const parts = loc.split(",");
+    if (parts.length > 1) { const last = parts[parts.length-1].trim(); if (last.length > 2) return last.charAt(0).toUpperCase() + last.slice(1); }
+    return loc.length > 30 ? loc.substring(0,25) + "…" : loc || "Tuntematon";
+}
+
+function drillDown(dimension, value, label) {
+    drilldownDimension = dimension;
+    drilldownValue = value;
+    drilldownActiveFilters = new Set();
+    const dd = document.getElementById("dashboardDrilldown");
+    dd.style.display = "block";
+    document.getElementById("drilldownTitle").textContent = label + " — tapahtumat";
+    renderDrilldownFilters();
+    renderDrilldownList();
+    dd.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function closeDrilldown() {
+    document.getElementById("dashboardDrilldown").style.display = "none";
+    drilldownDimension = "";
+    drilldownValue = "";
+    drilldownActiveFilters = new Set();
+}
+
+function getDrilldownEvents() {
+    let filtered = events.filter(ev => {
+        if (drilldownDimension === "category") return ev.category === drilldownValue;
+        if (drilldownDimension === "month") return String(ev.month) === drilldownValue;
+        if (drilldownDimension === "city") return extractCity(ev) === drilldownValue;
+        if (drilldownDimension === "price") {
+            const isFree = ev.price && /ilmainen|free|vapaa/i.test(ev.price);
+            return drilldownValue === "free" ? isFree : !isFree;
+        }
+        return true;
+    });
+    if (drilldownActiveFilters.size > 0) {
+        filtered = filtered.filter(ev => {
+            if (drilldownDimension === "category") return drilldownActiveFilters.has(String(ev.month));
+            if (drilldownDimension === "month") return drilldownActiveFilters.has(ev.category);
+            if (drilldownDimension === "city") return drilldownActiveFilters.has(ev.category);
+            if (drilldownDimension === "price") return drilldownActiveFilters.has(ev.category);
+            return true;
+        });
+    }
+    return filtered;
+}
+
+function renderDrilldownFilters() {
+    const fc = document.getElementById("drilldownFilters");
+    fc.innerHTML = "";
+    const baseEvents = events.filter(ev => {
+        if (drilldownDimension === "category") return ev.category === drilldownValue;
+        if (drilldownDimension === "month") return String(ev.month) === drilldownValue;
+        if (drilldownDimension === "city") return extractCity(ev) === drilldownValue;
+        if (drilldownDimension === "price") {
+            const isFree = ev.price && /ilmainen|free|vapaa/i.test(ev.price);
+            return drilldownValue === "free" ? isFree : !isFree;
+        }
+        return true;
+    });
+
+    // All button
+    const allBtn = document.createElement("button");
+    allBtn.className = "filter-btn" + (drilldownActiveFilters.size === 0 ? " active" : "");
+    allBtn.textContent = `Kaikki (${baseEvents.length})`;
+    allBtn.onclick = () => { drilldownActiveFilters.clear(); renderDrilldownFilters(); renderDrilldownList(); };
+    fc.appendChild(allBtn);
+
+    if (drilldownDimension === "category") {
+        // Filter by month
+        const months = {};
+        baseEvents.forEach(ev => { months[ev.month] = (months[ev.month]||0)+1; });
+        const mLabels = {0:"Ympärivuot.",...Object.fromEntries(monthNames.map((n,i)=>[i+1,n]))};
+        Object.entries(months).sort((a,b)=>Number(a[0])-Number(b[0])).forEach(([m,cnt]) => {
+            const btn = document.createElement("button");
+            btn.className = "filter-btn" + (drilldownActiveFilters.has(m) ? " active" : "");
+            btn.textContent = `${mLabels[m]||m} (${cnt})`;
+            btn.onclick = () => { drilldownActiveFilters.has(m)?drilldownActiveFilters.delete(m):drilldownActiveFilters.add(m); renderDrilldownFilters(); renderDrilldownList(); };
+            fc.appendChild(btn);
+        });
+    } else {
+        // Filter by category
+        const cats = {};
+        baseEvents.forEach(ev => { cats[ev.category] = (cats[ev.category]||0)+1; });
+        Object.entries(cats).sort((a,b)=>b[1]-a[1]).forEach(([key,cnt]) => {
+            const cat = categories[key]||categories.community;
+            const btn = document.createElement("button");
+            btn.className = "filter-btn" + (drilldownActiveFilters.has(key) ? " active" : "");
+            btn.textContent = `${cat.icon} ${cat.fi} (${cnt})`;
+            btn.onclick = () => { drilldownActiveFilters.has(key)?drilldownActiveFilters.delete(key):drilldownActiveFilters.add(key); renderDrilldownFilters(); renderDrilldownList(); };
+            fc.appendChild(btn);
+        });
+    }
+}
+
+function renderDrilldownList() {
+    const filtered = getDrilldownEvents().sort((a,b)=>a.startDate.localeCompare(b.startDate));
+    const body = document.getElementById("drilldownBody");
+    let h = `<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
+        <thead><tr style="background:var(--bg);position:sticky;top:0"><th style="padding:0.5rem 0.75rem;text-align:left">Nimi</th><th style="padding:0.5rem 0.75rem;text-align:left">Ajankohta</th><th style="padding:0.5rem 0.75rem;text-align:left">Paikka</th><th style="padding:0.5rem 0.75rem;text-align:left">Kategoria</th><th style="padding:0.5rem 0.75rem;text-align:left">Linkki</th></tr></thead><tbody>`;
+    filtered.forEach(ev => {
+        const cat = categories[ev.category]||categories.community;
+        h += `<tr style="cursor:pointer;border-bottom:1px solid var(--border)" onclick="openModal(events.find(e=>e.id===${ev.id}))">
+            <td style="padding:0.5rem 0.75rem;font-weight:600">${ev.name}</td>
+            <td style="padding:0.5rem 0.75rem;white-space:nowrap">${ev.dates}</td>
+            <td style="padding:0.5rem 0.75rem">${ev.location}</td>
+            <td style="padding:0.5rem 0.75rem"><span class="event-category-badge ${cat.class}">${cat.icon} ${cat.fi}</span></td>
+            <td style="padding:0.5rem 0.75rem">${ev.url?`<a href="${ev.url}" target="_blank" rel="noopener" class="list-link" onclick="event.stopPropagation()">Avaa →</a>`:"–"}</td>
+        </tr>`;
+    });
+    h += `</tbody></table>`;
+    if (filtered.length === 0) h = `<div style="padding:2rem;text-align:center;color:var(--text-light)">Ei tapahtumia valituilla suodattimilla</div>`;
+    body.innerHTML = `<div style="padding:0.5rem 0.75rem;font-size:0.8rem;color:var(--text-light);border-bottom:1px solid var(--border)">${filtered.length} tapahtumaa</div>` + h;
+}
+
+// ============================================================
+// VIEW SWITCHING
+// ============================================================
+function switchView(view) {
+    currentView = view;
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.view === view));
+
+    document.getElementById("map").style.display = "none";
+    document.getElementById("routeMapContainer").style.display = "none";
+    document.getElementById("listView").style.display = "none";
+    document.getElementById("calendarView").style.display = "none";
+    document.getElementById("dashboardView").style.display = "none";
+    const showSidebar = view !== "route" && view !== "dashboard";
+    document.getElementById("normalSidebar").style.display = showSidebar ? "flex" : "none";
+    document.getElementById("routeSidebar").className = "sidebar route-sidebar" + (view === "route" ? " visible" : "");
+
+    if (view === "map") { document.getElementById("map").style.display = "block"; setTimeout(() => map.invalidateSize(), 100); }
+    else if (view === "list") { document.getElementById("listView").style.display = "block"; renderListView(); }
+    else if (view === "calendar") { document.getElementById("calendarView").style.display = "block"; renderCalendar(); }
+    else if (view === "route") {
+        document.getElementById("routeMapContainer").style.display = "block";
+        initRouteMap();
+        setTimeout(() => routeMap.invalidateSize(), 100);
+    }
+    else if (view === "dashboard") { document.getElementById("dashboardView").style.display = "block"; renderDashboard(); }
+}
+
+// ============================================================
+// UPDATE & EVENTS
+// ============================================================
+function update() {
+    renderCategoryFilters();
+    renderEventList();
+    updateMapMarkers();
+    if (currentView === "calendar") renderCalendar();
+    if (currentView === "list") renderListView();
+}
+
+function setupEventListeners() {
+    document.getElementById("searchInput").addEventListener("input", e => { searchQuery = e.target.value; update(); });
+    document.getElementById("monthFilter").addEventListener("change", e => {
+        selectedMonth = e.target.value;
+        if (selectedMonth && currentView === "calendar") calendarMonth = parseInt(selectedMonth) - 1;
+        update();
+    });
+    document.querySelectorAll(".nav-tab").forEach(tab => tab.addEventListener("click", () => switchView(tab.dataset.view)));
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    document.getElementById("modalOverlay").addEventListener("click", e => { if(e.target===e.currentTarget) closeModal(); });
+    document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
+
+    // Route planner
+    document.getElementById("routeRadius").addEventListener("input", e => {
+        document.getElementById("routeRadiusVal").textContent = e.target.value + " km";
+    });
+    document.getElementById("routeCalcBtn").addEventListener("click", calculateRoute);
+    document.getElementById("routeStart").addEventListener("change", e => {
+        document.getElementById("routeStartCustom").style.display = e.target.value.startsWith("custom") ? "block" : "none";
+    });
+    document.getElementById("routeEnd").addEventListener("change", e => {
+        document.getElementById("routeEndCustom").style.display = e.target.value.startsWith("custom") ? "block" : "none";
+    });
+    document.getElementById("routeSearchInput").addEventListener("input", e => {
+        routeSearchQuery = e.target.value;
+        renderRouteResults();
+        renderRouteCategoryFilters();
+        updateRouteMapMarkers();
+    });
+    document.getElementById("routeMonthFilter").addEventListener("change", e => {
+        routeSelectedMonth = e.target.value;
+        renderRouteResults();
+        renderRouteCategoryFilters();
+        updateRouteMapMarkers();
+    });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siili Lounas - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #e63946; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #e63946; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #e63946; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #1a1a2e; }
+        .feature-card .tag {
+            display: inline-block; background: #fef2f2; color: #b91c1c;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #e63946; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .shortcut-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .shortcut-table th, .shortcut-table td {
+            text-align: left; padding: 0.6rem 0.8rem; font-size: 0.88rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .shortcut-table th { color: #64748b; font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Siili Lounas - Käyttöohje</h1>
+        <p class="subtitle">Lounasravintolahaku Ruoholahdessa ja Kampissa</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Siili Solutionsin toimiston ympäristössä on kymmeniä lounasravintoloita, mutta kukaan ei jaksa selata jokaisen ravintolan sivuja erikseen. Siili Lounas kokoaa 33 ravintolan sijainnit, viikon ruokalistat ja hinnat yhteen paikkaan &mdash; niin lounaalle lähteminen ei vaadi 15 minuutin tutkimustyötä.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol>
+            <li>Sovellus avautuu <strong>karttanäkymään</strong>, jossa näet kaikki ravintolat kartalla Siili Solutionsin toimiston ympäristössä.</li>
+            <li>Vaihda näkymää yläosan <strong>välilehdillä</strong>: Kartta, Ravintolat tai Päivän lounas.</li>
+            <li>Käytä <strong>hakukenttää</strong> etsiäksesi ravintolaa nimellä, osoitteella tai ruokalajilla.</li>
+            <li>Käytä <strong>suodatinpainikkeita</strong> rajataksesi näkymää tiettyihin ravintoloihin.</li>
+        </ol>
+
+        <h2>Näkymät</h2>
+
+        <div class="feature-card">
+            <span class="tag">Välilehti 1</span>
+            <h3>Kartta</h3>
+            <p>Interaktiivinen kartta, jossa jokainen ravintola on merkitty punaisella nastalla. Siili Solutionsin toimisto näkyy sinisenä merkkinä katkoviivaisella ympyrällä.</p>
+            <ul>
+                <li><strong>Klikkaa nastaa</strong> &rarr; näet ravintolan nimen, osoitteen, aukioloajan, hintatason ja <em>tänään tarjolla olevan ruokalistan</em>.</li>
+                <li><strong>"Kotisivu"</strong> -linkki avaa ravintolan oman sivun uudessa välilehdessä.</li>
+                <li>Voit zoomata ja panoroida karttaa vapaasti.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Välilehti 2</span>
+            <h3>Ravintolat</h3>
+            <p>Kaikki 33 ravintolaa korttinäkymänä. Jokainen kortti sisältää:</p>
+            <ul>
+                <li>Ravintolan nimi, osoite, aukioloajat ja hintataso</li>
+                <li>Lyhyt kuvaus ravintolasta</li>
+                <li><strong>Koko viikon ruokalista</strong> maanantaista perjantaihin</li>
+                <li>Tämän päivän menu korostettu <strong>punaisella</strong> ja nuolimerkillä</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Välilehti 3</span>
+            <h3>Päivän lounas</h3>
+            <p>Vertailunäkymässä näet kaikkien ravintoloiden tarjontaa <strong>yhdelle päivälle kerrallaan</strong>.</p>
+            <ul>
+                <li>Valitse päivä <strong>päiväpainikkeilla</strong> (ma&ndash;pe). Tämän päivän painike on merkitty "(tänään)".</li>
+                <li>Jokainen ravintola näkyy rivillä: nimi, osoite, ruokalista ja hinta.</li>
+                <li>Ravintolat joilla ei ole menua valitulle päivälle näkyvät himmennettyinä.</li>
+            </ul>
+        </div>
+
+        <h2>Haku ja suodatus</h2>
+        <p>Jokainen näkymä sisältää hakukentän ja ravintolasuodattimen:</p>
+        <table class="shortcut-table">
+            <tr><th>Toiminto</th><th>Miten</th></tr>
+            <tr><td>Etsi ruokalajia</td><td>Kirjoita hakukenttään esim. "kana", "pasta" tai "kasvis"</td></tr>
+            <tr><td>Etsi ravintolaa</td><td>Kirjoita ravintolan nimi tai osoite</td></tr>
+            <tr><td>Näytä vain tietyt ravintolat</td><td>Klikkaa suodatinpainikkeista ravintoloiden nimiä</td></tr>
+            <tr><td>Näytä kaikki ravintolat</td><td>Klikkaa "Kaikki"-painiketta</td></tr>
+        </table>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Haku toimii reaaliaikaisesti &mdash; tulokset suodattuvat heti kirjoittaessasi. "Päivän lounas" -näkymässä haku käyttää myös ruokalistan sisältöä, joten voit etsiä esim. "lohi" löytääksesi kaikki ravintolat jotka tarjoavat lohta valittuna päivänä.
+        </div>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Kiireinen toimistotyöntekijä</div>
+            <h3>"Mitä tänään syötäisiin?"</h3>
+            <p>Avaa sovellus &rarr; siirry <strong>Päivän lounas</strong> -välilehdelle &rarr; näet kaikkien ravintoloiden tämän päivän menut yhdellä silmäyksellä. Valitse mieluisin ja lähde lounaalle.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Uusi työntekijä</div>
+            <h3>"Missä on lähimmät ravintolat?"</h3>
+            <p>Avaa <strong>Kartta</strong>-näkymä &rarr; näet kaikki ravintolat sijoitettuna kartalle toimiston ympäristössä. Klikkaa nastoja tutustuaksesi ravintoloihin ja lue kuvaustekstit.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Ruoka-allergikko tai kasvissyöjä</div>
+            <h3>"Onko kasvisruokaa tarjolla?"</h3>
+            <p>Käytä hakukenttää sanoilla kuten "kasvis", "vegan", "tofu" tai "gluteeniton" &rarr; näet kaikki ravintolat jotka tarjoavat sopivia vaihtoehtoja.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Lounassuunnittelija</div>
+            <h3>"Mitä viikolla on tarjolla?"</h3>
+            <p>Siirry <strong>Ravintolat</strong>-välilehdelle &rarr; selaa lempiravintoloidesi koko viikon menuja. Tai käytä <strong>Päivän lounas</strong> -näkymää ja klikkaa eri päiviä (ma&ndash;pe) suunnitellaksesi viikon lounaat etukäteen.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Porukalla lounaalle lähtijä</div>
+            <h3>"Mistä löytyy jotain joka sopii kaikille?"</h3>
+            <p>Avaa <strong>Päivän lounas</strong> &rarr; selaa kaikkien ravintoloiden menut läpi &rarr; löydä ravintola jossa on monipuolinen valikoima. Tai hae useilla eri hakusanoilla vertaillaksesi tarjontaa.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li><strong>Hinnat</strong> näkyvät punaisena jokaisessa kortissa ja kartan popup-ikkunassa.</li>
+            <li><strong>Aukioloajat</strong> ovat tyypillisesti arkipäivisin klo 10:30&ndash;14:00.</li>
+            <li><strong>Ravintola-alueet:</strong> 18 ravintolaa Ruoholahdessa (lähempänä toimistoa) ja 15 Kampissa.</li>
+            <li>Viikonloppuisin sovellus näyttää oletuksena maanantain menun.</li>
+            <li>Kaikki linkit aukeavat uuteen välilehteen.</li>
+        </ul>
+
+    </div>
+</body>
+</html>
