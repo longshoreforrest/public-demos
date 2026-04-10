@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tampereen Golf-apuri</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">&#9971;</span>
+        <div>
+          <h1>Tampereen Golf-apuri</h1>
+          <p class="subtitle">Ei tarvitse selata jokaisen kentän kalenteria erikseen — sovita peliaika kaveriporukalle yhdessä paikassa</p>
+        </div>
+      </div>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-view="poll">
+          <span class="tab-icon">&#9889;</span> Kaveriäänestys
+        </button>
+        <button class="nav-tab" data-view="calendar">
+          <span class="tab-icon">&#128197;</span> Kalenteri
+        </button>
+        <button class="nav-tab" data-view="map">
+          <span class="tab-icon">&#128506;</span> Kartta
+        </button>
+      </nav>
+      <a href="guide.html" style="margin-left:12px;color:rgba(255,255,255,0.9);font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;flex-shrink:0">Käyttöohje &rarr;</a>
+    </div>
+  </header>
+
+  <!-- Pääsisältö -->
+  <main class="main-content">
+
+    <!-- Kalenterinäkymä -->
+    <section id="calendar-view" class="view">
+      <div class="calendar-layout">
+
+        <!-- Sivupaneeli: kenttälista -->
+        <aside class="course-sidebar">
+          <h2>Golf-kentät</h2>
+          <div class="course-filter">
+            <label class="filter-all">
+              <input type="checkbox" id="select-all-courses" checked> Valitse kaikki
+            </label>
+          </div>
+          <ul id="course-list" class="course-list"></ul>
+          <div class="legend">
+            <h3>Viikkonäkymä</h3>
+            <div class="legend-item"><span class="legend-color avail-high"></span> Monta kenttää vapaana</div>
+            <div class="legend-item"><span class="legend-color avail-medium"></span> Muutama kenttä vapaana</div>
+            <div class="legend-item"><span class="legend-color avail-low"></span> 1 kenttä vapaana</div>
+            <div class="legend-item"><span class="legend-color avail-none"></span> Ei mahdu</div>
+            <div class="legend-hint">Klikkaa solua nähdäksesi mitkä kentät</div>
+          </div>
+        </aside>
+
+        <!-- Kalenterialue -->
+        <div class="calendar-area">
+          <!-- Pelaajamäärä-slider -->
+          <div class="player-slider-bar">
+            <label class="player-slider-label" for="player-count">Pelaajia:</label>
+            <input type="range" id="player-count" min="1" max="20" value="4" class="player-slider">
+            <span id="player-count-display" class="player-count-display">4</span>
+            <span class="player-count-hint">Näytä kentät joihin mahtuu koko porukka</span>
+          </div>
+
+          <div class="calendar-controls">
+            <div class="calendar-nav">
+              <button id="prev-period" class="btn btn-nav">&larr; Edellinen</button>
+              <h2 id="calendar-title" class="calendar-title"></h2>
+              <button id="next-period" class="btn btn-nav">Seuraava &rarr;</button>
+            </div>
+            <div class="view-toggle">
+              <button class="btn btn-view active" data-calendar="week">Viikko</button>
+              <button class="btn btn-view" data-calendar="month">Kuukausi</button>
+            </div>
+            <button id="today-btn" class="btn btn-today">Tänään</button>
+          </div>
+
+          <div id="calendar-container" class="calendar-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kaveriäänestys -->
+    <section id="poll-view" class="view active">
+      <div class="poll-layout">
+
+        <!-- Vasemmalla: kaveriryhmät ja kaverilista -->
+        <aside class="poll-sidebar">
+          <h2>Kaveriryhmät</h2>
+          <div id="buddy-group-selector" class="buddy-group-selector"></div>
+          <button id="add-group-btn" class="btn-add-group" onclick="showNewGroupForm()">+ Uusi ryhmä</button>
+
+          <!-- Uuden ryhmän lomake -->
+          <div id="new-group-form" class="new-group-form hidden">
+            <input type="text" id="new-group-name" class="buddy-input" placeholder="Ryhmän nimi...">
+            <div id="icon-picker" class="icon-picker"></div>
+            <div class="new-group-actions">
+              <button class="btn btn-today" onclick="createNewGroup()">Luo</button>
+              <button class="btn btn-nav" onclick="hideNewGroupForm()">Peruuta</button>
+            </div>
+          </div>
+
+          <!-- Ryhmän muokkaus -->
+          <div id="group-edit-bar" class="group-edit-bar"></div>
+
+          <h2 style="margin-top:16px">Golfkaverit</h2>
+          <ul id="buddy-list" class="buddy-list"></ul>
+          <div class="buddy-add">
+            <input type="text" id="buddy-name-input" placeholder="Lisää kaveri..." class="buddy-input">
+            <button id="buddy-add-btn" class="btn btn-today">+</button>
+          </div>
+        </aside>
+
+        <!-- Oikealla: aikaehdotukset -->
+        <div class="poll-main">
+          <div class="poll-header">
+            <div class="poll-header-row">
+              <div>
+                <h2>Aikaehdotukset</h2>
+                <p class="poll-desc">Lisää ehdotuksia tai merkitse ketkä kaverit pääsevät mihinkin aikaan.</p>
+              </div>
+              <div class="poll-view-toggle">
+                <button class="btn btn-view active" data-poll-view="matrix" onclick="switchPollSubView('matrix')">Matriisi</button>
+                <button class="btn btn-view" data-poll-view="calendar" onclick="switchPollSubView('calendar')">Kalenteri</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ehdotusten lisäys -->
+          <div class="poll-add-slot">
+            <label>Päivä:</label>
+            <input type="date" id="poll-date" class="poll-input">
+            <label>Klo:</label>
+            <select id="poll-time" class="poll-input poll-time-select"></select>
+            <label>Kenttä:</label>
+            <select id="poll-course" class="poll-input poll-course-select"></select>
+            <button id="poll-add-btn" class="btn btn-today">Lisää ehdotus</button>
+          </div>
+
+          <!-- Kenttäfiltterit -->
+          <div class="poll-filters">
+            <span class="poll-filters-label">Suodata kentän mukaan:</span>
+            <div id="poll-course-filters" class="poll-filter-chips"></div>
+          </div>
+
+          <!-- Äänestysmatriisi -->
+          <div id="poll-matrix-view" class="poll-sub-view active">
+            <div id="poll-matrix" class="poll-matrix"></div>
+            <!-- Päivädetaljinäkymä -->
+            <div id="poll-day-detail" class="poll-day-detail hidden"></div>
+          </div>
+
+          <!-- Kalenterinäkymä ehdotuksista -->
+          <div id="poll-calendar-view" class="poll-sub-view">
+            <div id="poll-mini-calendar" class="poll-mini-calendar"></div>
+          </div>
+
+          <!-- Yhteenveto -->
+          <div id="poll-summary" class="poll-summary"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Karttanäkymä -->
+    <section id="map-view" class="view">
+      <div id="map" class="map-container"></div>
+    </section>
+
+  </main>
+
+  <!-- Aikaslot-popup -->
+  <div id="slot-popup" class="slot-popup hidden">
+    <div class="slot-popup-overlay"></div>
+    <div class="slot-popup-content">
+      <button class="slot-popup-close">&times;</button>
+      <h3 id="popup-title"></h3>
+      <div id="popup-body"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

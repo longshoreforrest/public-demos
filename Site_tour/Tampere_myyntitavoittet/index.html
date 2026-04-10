@@ -1,0 +1,3769 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortera Oyj – Myyntitavoitteet 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg: #1a1f36;
+            --sidebar-hover: #252b48;
+            --sidebar-active: #2d3561;
+            --primary: #4f6ef7;
+            --primary-light: #eef1fe;
+            --success: #22c55e;
+            --success-bg: #f0fdf4;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: #fff;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header .subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: var(--sidebar-active);
+            color: #fff;
+            border-left-color: var(--primary);
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Main content */
+        #main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .topbar-date {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 24px 32px;
+        }
+
+        /* Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .kpi-card[onclick], .gap-item[onclick], .progress-row[onclick], .card[onclick] {
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+        }
+
+        .kpi-card[onclick]:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .kpi-card[onclick]:active {
+            transform: translateY(0);
+        }
+
+        .gap-item[onclick] {
+            padding: 12px;
+            border-radius: 8px;
+            margin: -12px;
+            margin-bottom: -12px;
+        }
+
+        .gap-item[onclick]:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .progress-row[onclick]:hover {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 8px;
+            margin: -8px;
+            margin-bottom: 8px;
+        }
+
+        .card[onclick]:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .click-hint {
+            font-size: 11px;
+            color: var(--text-light);
+            opacity: 0;
+            transition: opacity 0.15s;
+            margin-top: 4px;
+        }
+
+        .kpi-card[onclick]:hover .click-hint,
+        .gap-item[onclick]:hover .click-hint,
+        .card[onclick]:hover .click-hint {
+            opacity: 1;
+        }
+
+        .drilldown-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .drilldown-kpi {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .drilldown-kpi .value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .drilldown-kpi .label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .drilldown-section {
+            margin-bottom: 20px;
+        }
+
+        .drilldown-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bl-mini-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bl-mini-bar:last-child { border-bottom: none; }
+
+        .bl-mini-bar .bar-label {
+            width: 160px;
+            font-size: 13px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .bl-mini-bar .bar-track {
+            flex: 1;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bl-mini-bar .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .bl-mini-bar .bar-value {
+            width: 100px;
+            text-align: right;
+            font-size: 13px;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+
+        .kpi-card .kpi-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .kpi-card .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .kpi-card .kpi-sub {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .kpi-card .kpi-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .badge-green { background: var(--success-bg); color: var(--success); }
+        .badge-yellow { background: var(--warning-bg); color: var(--warning); }
+        .badge-red { background: var(--danger-bg); color: var(--danger); }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        /* Progress bars */
+        .progress-row {
+            margin-bottom: 16px;
+        }
+
+        .progress-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .progress-label .name {
+            font-weight: 500;
+        }
+
+        .progress-bar-bg {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .progress-bar-target {
+            position: absolute;
+            top: -3px;
+            width: 2px;
+            height: 16px;
+            background: #333;
+            border-radius: 1px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .data-table th:hover {
+            color: var(--primary);
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status badges */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-green { background: var(--success); }
+        .status-yellow { background: var(--warning); }
+        .status-red { background: var(--danger); }
+        .status-blue { background: var(--primary); }
+        .status-gray { background: #94a3b8; }
+
+        .pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .pill-won { background: #dcfce7; color: #16a34a; }
+        .pill-contract { background: #dbeafe; color: #2563eb; }
+        .pill-negotiation { background: #fef3c7; color: #d97706; }
+        .pill-proposal { background: #fce7f3; color: #db2777; }
+        .pill-qualification { background: #f3e8ff; color: #9333ea; }
+        .pill-lead { background: #f1f5f9; color: #64748b; }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .filter-input {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            background: #fff;
+        }
+
+        .filter-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,110,247,0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            color: var(--text-light);
+            transition: all 0.15s ease;
+            font-family: inherit;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(79,110,247,0.25);
+        }
+
+        .filter-chip.active:hover {
+            background: #3d5bd9;
+            border-color: #3d5bd9;
+        }
+
+        .filter-chip .chip-count {
+            display: inline-block;
+            background: rgba(0,0,0,0.1);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        .filter-chip.active .chip-count {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .filter-chip-colored {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            color: var(--text-light);
+            transition: all 0.15s ease;
+            font-family: inherit;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .filter-chip-colored:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-chip-colored.active {
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* BL Cards */
+        .bl-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bl-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .bl-card .bl-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .bl-card .bl-leader {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+        }
+
+        .bl-card .bl-revenue {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .bl-card .bl-target-info {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .bl-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .bl-detail-stat {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .bl-detail-stat .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .bl-detail-stat .stat-label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            z-index: 1;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg);
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            transition: all 0.15s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Project edit form */
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .edit-form-grid.full { grid-template-columns: 1fr; }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-field select,
+        .form-field input {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .form-field select:focus,
+        .form-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79,110,247,0.15);
+        }
+
+        .form-field .field-hint {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .prob-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .prob-display input[type="range"] {
+            flex: 1;
+            padding: 0;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border);
+            border-radius: 3px;
+            border: none;
+        }
+
+        .prob-display input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        .prob-display .prob-value {
+            font-size: 20px;
+            font-weight: 700;
+            min-width: 60px;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #3d5bd9;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .edit-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+
+        .edit-icon-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .stage-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .stage-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .stage-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(79,110,247,0.2);
+        }
+
+        .stage-option .stage-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .stage-option .stage-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .stage-option .stage-prob {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-left: auto;
+        }
+
+        .edit-before-after {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .edit-before-after .arrow {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .edit-ba-col {
+            text-align: center;
+        }
+
+        .edit-ba-col .ba-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .edit-ba-col .ba-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Gap analysis */
+        .gap-analysis {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .gap-analysis h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 16px;
+        }
+
+        .gap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .gap-item .gap-value {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .gap-item .gap-label {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        /* Target editor */
+        .target-row {
+            display: grid;
+            grid-template-columns: 200px repeat(5, 1fr) 120px;
+            gap: 8px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .target-row.header {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .target-input {
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: right;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .target-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Forecast summary */
+        .forecast-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .forecast-card {
+            padding: 16px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .forecast-card {
+            transition: all 0.15s ease;
+        }
+
+        .forecast-card[data-fc-filter]:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .forecast-card .fc-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .forecast-card .fc-label {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        /* Scrollable table wrapper */
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        /* Tooltip style chart */
+        .chart-container {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Quarter tabs */
+        .quarter-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .quarter-tab {
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-light);
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .quarter-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .quarter-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar { transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); }
+            #main { margin-left: 0; }
+            .content { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Print */
+        @media print {
+            #sidebar { display: none; }
+            #main { margin-left: 0; }
+            .topbar { position: static; }
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .font-mono { font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace; }
+        .text-sm { font-size: 12px; }
+        .text-muted { color: var(--text-light); }
+        .mt-16 { margin-top: 16px; }
+        .mb-16 { margin-bottom: 16px; }
+        .fw-600 { font-weight: 600; }
+        .clickable { cursor: pointer; }
+        .clickable:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <h1>Fortera Oyj</h1>
+        <div class="subtitle">Tiedä reaaliajassa ollaanko tavoitteessa — liikevaihto, pipeline ja ennusteet yhdessä paikassa</div>
+    </div>
+    <div class="sidebar-nav">
+        <div class="nav-item active" data-view="dashboard">
+            <i class="fas fa-chart-line"></i> Yleiskatsaus
+        </div>
+        <div class="nav-item" data-view="businesslines">
+            <i class="fas fa-sitemap"></i> Business Linet
+        </div>
+        <div class="nav-item" data-view="customers">
+            <i class="fas fa-building"></i> Asiakkuudet
+        </div>
+        <div class="nav-item" data-view="pipeline">
+            <i class="fas fa-filter"></i> Pipeline & Ennuste
+        </div>
+        <div class="nav-item" data-view="targets">
+            <i class="fas fa-bullseye"></i> Tavoitteet
+        </div>
+    </div>
+    <div class="sidebar-footer">
+        Nasdaq Helsinki: FORT<br>
+        Tilikausi 2026
+    </div>
+</nav>
+
+<div id="main">
+    <div class="topbar">
+        <div class="topbar-title" id="view-title">Yleiskatsaus</div>
+        <div class="topbar-right">
+            <a href="guide.html" style="color:#4f6ef7;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+            <span class="topbar-date"><i class="far fa-calendar"></i>&nbsp; 10.4.2026</span>
+            <span>Q2 / 2026</span>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <!-- Rendered by JS -->
+    </div>
+</div>
+
+<script>
+// ===== SEEDED PRNG =====
+function mulberry32(a) {
+    return function() {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        var t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+}
+const rng = mulberry32(42);
+function rand(min, max) { return min + rng() * (max - min); }
+function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
+function pick(arr) { return arr[randInt(0, arr.length - 1)]; }
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// ===== FORMATTING =====
+const fmt = (n) => new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+const fmtK = (n) => {
+    if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(1).replace('.', ',') + ' M€';
+    if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(0) + ' k€';
+    return fmt(n);
+};
+const fmtM = (n) => (n / 1e6).toFixed(1).replace('.', ',') + ' M€';
+const fmtPct = (n) => (n * 100).toFixed(1).replace('.', ',') + ' %';
+
+// ===== DATA GENERATION =====
+
+const TODAY = new Date(2026, 3, 10); // April 10, 2026
+const YEAR_START = new Date(2026, 0, 1);
+const DAY_OF_YEAR = Math.floor((TODAY - YEAR_START) / 86400000) + 1; // ~100
+const YEAR_PROGRESS = DAY_OF_YEAR / 365;
+const CURRENT_QUARTER = 2;
+const MONTHS_ELAPSED = 3 + 10/30; // ~3.33 months
+
+// Business Lines
+const businessLines = [
+    { id: 'cloud', name: 'Cloud & Infrastructure', leader: 'Mikko Lahtinen', color: '#4f6ef7', targetAnnual: 38000000, quarterTargets: [8500000, 9500000, 10000000, 10000000] },
+    { id: 'data', name: 'Data & Analytics', leader: 'Anna Virtanen', color: '#8b5cf6', targetAnnual: 30000000, quarterTargets: [6500000, 7500000, 8000000, 8000000] },
+    { id: 'cyber', name: 'Kyberturvallisuus', leader: 'Jari Korhonen', color: '#06b6d4', targetAnnual: 24000000, quarterTargets: [5000000, 6000000, 6500000, 6500000] },
+    { id: 'digital', name: 'Digitaaliset palvelut', leader: 'Sanna Mäkelä', color: '#f59e0b', targetAnnual: 28000000, quarterTargets: [6000000, 7000000, 7500000, 7500000] },
+    { id: 'iot', name: 'IoT & Älykäs teollisuus', leader: 'Timo Hämäläinen', color: '#22c55e', targetAnnual: 15000000, quarterTargets: [3200000, 3800000, 4000000, 4000000] },
+];
+
+const TOTAL_TARGET = businessLines.reduce((s, bl) => s + bl.targetAnnual, 0);
+
+// Account managers
+const accountManagers = [
+    { id: 'am1', name: 'Petri Nieminen', bl: 'cloud' },
+    { id: 'am2', name: 'Laura Järvinen', bl: 'cloud' },
+    { id: 'am3', name: 'Markus Salonen', bl: 'data' },
+    { id: 'am4', name: 'Elina Koskinen', bl: 'data' },
+    { id: 'am5', name: 'Juha Tuominen', bl: 'cyber' },
+    { id: 'am6', name: 'Minna Lehtonen', bl: 'cyber' },
+    { id: 'am7', name: 'Antti Heikkinen', bl: 'digital' },
+    { id: 'am8', name: 'Riikka Laine', bl: 'digital' },
+    { id: 'am9', name: 'Samuli Rantanen', bl: 'iot' },
+    { id: 'am10', name: 'Katja Aaltonen', bl: 'iot' },
+    { id: 'am11', name: 'Ville Saarinen', bl: 'cloud' },
+    { id: 'am12', name: 'Henna Nurmi', bl: 'digital' },
+];
+
+// Generate ~100 customers
+const prefixes = ['Nord','Finn','Pohja','Keski','Elo','Valo','Terä','Novo','Proto','Aava','Aura','Verso','Delta','Sigma','Nexus','Arvo','Alva','Kaira','Solita','Helmi','Kielo','Rusko','Taika','Otso','Sisu','Lumia','Virta','Pinja','Rauha','Aatos','Toivo','Onni','Meri','Kallio','Lahti','Tammi','Kuura','Sade','Ilma','Neva','Juuri','Louhi','Sampo','Kide','Tuuli','Hiisi','Aalto','Piha','Vaara','Korpi'];
+const suffixes = ['tech','soft','systems','works','media','data','cloud','net','lab','group','solutions','digital','dynamics','intelligence','innovations','analytics','engineering','consulting','services','platforms'];
+
+function generateCustomers() {
+    const customers = [];
+    const blDistribution = { cloud: 25, data: 22, cyber: 18, digital: 20, iot: 15 };
+    let id = 1;
+
+    for (const bl of businessLines) {
+        const count = blDistribution[bl.id];
+        const blManagers = accountManagers.filter(am => am.bl === bl.id);
+
+        for (let i = 0; i < count; i++) {
+            // Size distribution within BL
+            let annualValue;
+            const sizeRoll = rng();
+            if (sizeRoll < 0.05) annualValue = rand(5000000, 10000000);       // Top 5%
+            else if (sizeRoll < 0.20) annualValue = rand(2000000, 5000000);   // Next 15%
+            else if (sizeRoll < 0.50) annualValue = rand(500000, 2000000);    // Middle 30%
+            else if (sizeRoll < 0.80) annualValue = rand(100000, 500000);     // Next 30%
+            else annualValue = rand(20000, 100000);                            // Bottom 20%
+
+            annualValue = Math.round(annualValue / 1000) * 1000;
+
+            const name = pick(prefixes) + pick(suffixes).charAt(0).toUpperCase() + pick(suffixes).slice(1) + ' Oy';
+            const manager = pick(blManagers);
+
+            customers.push({
+                id: id++,
+                name: name,
+                bl: bl.id,
+                blName: bl.name,
+                manager: manager.name,
+                managerId: manager.id,
+                annualValue: annualValue,
+                monthlyValue: annualValue / 12,
+                // Variation factor: some customers pay more/less than average
+                varianceFactor: rand(0.85, 1.15),
+            });
+        }
+    }
+
+    return customers;
+}
+
+const customers = generateCustomers();
+
+// Generate invoices (Jan - Apr 10, 2026)
+function generateInvoices() {
+    const invoices = [];
+    let invId = 10001;
+
+    for (const cust of customers) {
+        // Generate invoices for Jan, Feb, Mar (complete months) and partial April
+        for (let month = 0; month < 4; month++) {
+            // Skip some April invoices (only ~30% have invoiced in early April)
+            if (month === 3 && rng() > 0.30) continue;
+
+            const baseAmount = cust.monthlyValue * cust.varianceFactor;
+            // Add monthly variance
+            const variance = rand(0.80, 1.20);
+            const amount = Math.round(baseAmount * variance);
+
+            // Invoice date within the month
+            let day;
+            if (month === 3) {
+                day = randInt(1, 10); // Early April
+            } else {
+                day = randInt(1, 28);
+            }
+
+            invoices.push({
+                id: invId++,
+                customerId: cust.id,
+                customerName: cust.name,
+                bl: cust.bl,
+                amount: amount,
+                date: new Date(2026, month, day),
+                month: month,
+                description: `Palvelusopimus ${['tammikuu','helmikuu','maaliskuu','huhtikuu'][month]} 2026`,
+            });
+        }
+    }
+
+    return invoices;
+}
+
+const invoices = generateInvoices();
+
+// Generate pipeline/forecast projects
+const projectTypes = [
+    'Pilvisiirtymä', 'Tietoturva-auditointi', 'Data-analytiikka-alusta', 'IoT-ratkaisu',
+    'Digitaalinen asiakaskokemus', 'Pilvipalvelun laajennus', 'Kyberturvallisuusratkaisu',
+    'Tekoälyprojekti', 'Prosessiautomaatio', 'DevOps-transformaatio', 'Datalakehouse',
+    'API-hallintaratkaisu', 'Identiteetinhallinta', 'Cloud-native kehitys',
+    'Liiketoiminta-analytiikka', 'Älytehdas-pilotti', 'Hybridipilviratkaisu',
+    'Tunkeutumistestaus', 'Dataintegraatio', 'Digitaalinen kaksonen',
+];
+
+const pipelineStages = [
+    { id: 'won', name: 'Voitettu', probability: 1.0, color: '#22c55e' },
+    { id: 'contract', name: 'Sopimus', probability: 0.90, color: '#3b82f6' },
+    { id: 'negotiation', name: 'Neuvottelu', probability: 0.60, color: '#f59e0b' },
+    { id: 'proposal', name: 'Tarjous', probability: 0.40, color: '#ec4899' },
+    { id: 'qualification', name: 'Kvalifiointi', probability: 0.25, color: '#8b5cf6' },
+    { id: 'lead', name: 'Liidi', probability: 0.10, color: '#94a3b8' },
+];
+
+function generatePipeline() {
+    const projects = [];
+    let pId = 1;
+
+    // Select ~50 customers to have pipeline projects
+    const pipelineCustomers = shuffle(customers).slice(0, 55);
+
+    for (const cust of pipelineCustomers) {
+        const numProjects = randInt(1, 3);
+        for (let i = 0; i < numProjects; i++) {
+            const stageIdx = randInt(0, pipelineStages.length - 1);
+            const stage = pipelineStages[stageIdx];
+            const value = Math.round(rand(50000, cust.annualValue * 0.4) / 1000) * 1000;
+
+            // Expected close date
+            const closeMonth = stageIdx <= 1 ? randInt(3, 5) : randInt(4, 11);
+            const closeDate = new Date(2026, closeMonth, randInt(1, 28));
+
+            projects.push({
+                id: pId++,
+                customerId: cust.id,
+                customerName: cust.name,
+                bl: cust.bl,
+                blName: cust.blName,
+                manager: cust.manager,
+                name: pick(projectTypes) + (numProjects > 1 ? ` (${i + 1})` : ''),
+                value: value,
+                stageId: stage.id,
+                stageName: stage.name,
+                probability: stage.probability,
+                weightedValue: Math.round(value * stage.probability),
+                expectedClose: closeDate,
+            });
+        }
+    }
+
+    return projects;
+}
+
+const pipeline = generatePipeline();
+
+// ===== COMPUTED DATA =====
+
+function computeData() {
+    // Revenue by BL
+    const revenueByBL = {};
+    const revenueByMonth = {};
+    const revenueByBLMonth = {};
+    const revenueByCustomer = {};
+
+    for (const bl of businessLines) {
+        revenueByBL[bl.id] = 0;
+        revenueByBLMonth[bl.id] = [0, 0, 0, 0];
+    }
+    for (let m = 0; m < 4; m++) revenueByMonth[m] = 0;
+
+    for (const inv of invoices) {
+        revenueByBL[inv.bl] += inv.amount;
+        revenueByMonth[inv.month] += inv.amount;
+        revenueByBLMonth[inv.bl][inv.month] += inv.amount;
+
+        if (!revenueByCustomer[inv.customerId]) revenueByCustomer[inv.customerId] = 0;
+        revenueByCustomer[inv.customerId] += inv.amount;
+    }
+
+    const totalRevenue = Object.values(revenueByBL).reduce((s, v) => s + v, 0);
+    const targetYTD = TOTAL_TARGET * YEAR_PROGRESS;
+    const variance = totalRevenue - targetYTD;
+    const variancePct = variance / targetYTD;
+
+    // Remaining required
+    const remainingTarget = TOTAL_TARGET - totalRevenue;
+    const remainingMonths = 12 - MONTHS_ELAPSED;
+    const requiredMonthlyRate = remainingTarget / remainingMonths;
+    const currentMonthlyRate = totalRevenue / MONTHS_ELAPSED;
+
+    // Pipeline totals
+    const pipelineTotal = pipeline.reduce((s, p) => s + p.value, 0);
+    const pipelineWeighted = pipeline.reduce((s, p) => s + p.weightedValue, 0);
+    const pipelineByStage = {};
+    for (const stage of pipelineStages) {
+        pipelineByStage[stage.id] = pipeline.filter(p => p.stageId === stage.id);
+    }
+
+    // Pipeline by BL
+    const pipelineByBL = {};
+    for (const bl of businessLines) {
+        pipelineByBL[bl.id] = pipeline.filter(p => p.bl === bl.id);
+    }
+
+    return {
+        revenueByBL, revenueByMonth, revenueByBLMonth, revenueByCustomer,
+        totalRevenue, targetYTD, variance, variancePct,
+        remainingTarget, remainingMonths, requiredMonthlyRate, currentMonthlyRate,
+        pipelineTotal, pipelineWeighted, pipelineByStage, pipelineByBL,
+    };
+}
+
+let data = computeData();
+
+function recomputeAndRefresh() {
+    data = computeData();
+    renderView();
+}
+
+// ===== STATE =====
+let currentView = 'dashboard';
+let charts = {};
+
+// ===== NAVIGATION =====
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        currentView = item.dataset.view;
+        const titles = {
+            dashboard: 'Yleiskatsaus',
+            businesslines: 'Business Linet',
+            customers: 'Asiakkuudet',
+            pipeline: 'Pipeline & Ennuste',
+            targets: 'Tavoitteet',
+        };
+        document.getElementById('view-title').textContent = titles[currentView];
+        renderView();
+    });
+});
+
+function renderView() {
+    // Destroy existing charts
+    Object.values(charts).forEach(c => c.destroy());
+    charts = {};
+
+    const el = document.getElementById('content');
+    switch (currentView) {
+        case 'dashboard': renderDashboard(el); break;
+        case 'businesslines': renderBusinessLines(el); break;
+        case 'customers': renderCustomers(el); break;
+        case 'pipeline': renderPipeline(el); break;
+        case 'targets': renderTargets(el); break;
+    }
+}
+
+// ===== DASHBOARD VIEW =====
+function renderDashboard(el) {
+    const statusClass = data.variancePct >= 0 ? 'badge-green' : data.variancePct >= -0.05 ? 'badge-yellow' : 'badge-red';
+    const statusText = data.variancePct >= 0 ? 'Edellä tavoitetta' : data.variancePct >= -0.05 ? 'Lähellä tavoitetta' : 'Jäljessä tavoitetta';
+    const arrow = data.variance >= 0 ? '▲' : '▼';
+
+    el.innerHTML = `
+        <div class="animate-in">
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card" onclick="showRevenueDrilldown()">
+                    <div class="kpi-label">Liikevaihto YTD</div>
+                    <div class="kpi-value">${fmtM(data.totalRevenue)}</div>
+                    <div class="kpi-sub">Tavoite YTD: ${fmtM(data.targetYTD)}</div>
+                    <div class="kpi-badge ${statusClass}">${arrow} ${statusText}</div>
+                    <div class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</div>
+                </div>
+                <div class="kpi-card" onclick="showVarianceDrilldown()">
+                    <div class="kpi-label">Ero tavoitteeseen</div>
+                    <div class="kpi-value" style="color: ${data.variance >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                        ${data.variance >= 0 ? '+' : ''}${fmtM(data.variance)}
+                    </div>
+                    <div class="kpi-sub">${fmtPct(Math.abs(data.variancePct))} ${data.variance >= 0 ? 'edellä' : 'jäljessä'}</div>
+                    <div class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</div>
+                </div>
+                <div class="kpi-card" onclick="showTargetDrilldown()">
+                    <div class="kpi-label">Vuositavoite</div>
+                    <div class="kpi-value">${fmtM(TOTAL_TARGET)}</div>
+                    <div class="kpi-sub">Jäljellä: ${fmtM(data.remainingTarget)}</div>
+                    <div class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</div>
+                </div>
+                <div class="kpi-card" onclick="showPipelineOverviewDrilldown()">
+                    <div class="kpi-label">Pipeline (painotettu)</div>
+                    <div class="kpi-value">${fmtM(data.pipelineWeighted)}</div>
+                    <div class="kpi-sub">Kokonaisarvo: ${fmtM(data.pipelineTotal)}</div>
+                    <div class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</div>
+                </div>
+                <div class="kpi-card" onclick="showRateDrilldown()">
+                    <div class="kpi-label">Vaadittava kuukausitahti</div>
+                    <div class="kpi-value">${fmtM(data.requiredMonthlyRate)}</div>
+                    <div class="kpi-sub">Nykyinen tahti: ${fmtM(data.currentMonthlyRate)}</div>
+                    <div class="kpi-badge ${data.requiredMonthlyRate <= data.currentMonthlyRate * 1.05 ? 'badge-green' : data.requiredMonthlyRate <= data.currentMonthlyRate * 1.15 ? 'badge-yellow' : 'badge-red'}">
+                        ${data.requiredMonthlyRate <= data.currentMonthlyRate * 1.05 ? 'Hyvässä tahdissa' : data.requiredMonthlyRate <= data.currentMonthlyRate * 1.15 ? 'Kiihdytettävä hieman' : 'Kiihdytettävä merkittävästi'}
+                    </div>
+                    <div class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</div>
+                </div>
+            </div>
+
+            <!-- Gap Analysis -->
+            <div class="gap-analysis">
+                <h3><i class="fas fa-chart-bar"></i>&nbsp; Tavoite-eroanalyysi</h3>
+                <div class="gap-grid">
+                    <div class="gap-item" onclick="showTargetDrilldown()">
+                        <div class="gap-value">${fmtPct(YEAR_PROGRESS)}</div>
+                        <div class="gap-label">Vuodesta kulunut</div>
+                        <div class="click-hint" style="color:rgba(255,255,255,0.5)"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                    <div class="gap-item" onclick="showRevenueDrilldown()">
+                        <div class="gap-value">${fmtPct(data.totalRevenue / TOTAL_TARGET)}</div>
+                        <div class="gap-label">Tavoitteesta saavutettu</div>
+                        <div class="click-hint" style="color:rgba(255,255,255,0.5)"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                    <div class="gap-item" onclick="showVarianceDrilldown()">
+                        <div class="gap-value">${fmtM(data.remainingTarget)}</div>
+                        <div class="gap-label">Myyntiä tarvitaan vielä</div>
+                        <div class="click-hint" style="color:rgba(255,255,255,0.5)"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                    <div class="gap-item" onclick="showRateDrilldown()">
+                        <div class="gap-value">${(data.remainingMonths).toFixed(1).replace('.', ',')} kk</div>
+                        <div class="gap-label">Kuukausia jäljellä</div>
+                        <div class="click-hint" style="color:rgba(255,255,255,0.5)"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                    <div class="gap-item" onclick="showRateDrilldown()">
+                        <div class="gap-value">${fmtM(data.requiredMonthlyRate - data.currentMonthlyRate)}</div>
+                        <div class="gap-label">${data.requiredMonthlyRate > data.currentMonthlyRate ? 'Lisämyyntiä/kk tarvitaan' : 'Liikkumavaraa/kk'}</div>
+                        <div class="click-hint" style="color:rgba(255,255,255,0.5)"><i class="fas fa-search-plus"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts row -->
+            <div class="grid-2">
+                <div class="card" onclick="showMonthlyDrilldown()" style="cursor:pointer">
+                    <div class="card-header">
+                        <h3>Kuukausittainen liikevaihto vs. tavoite</h3>
+                        <span class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container"><canvas id="chart-monthly"></canvas></div>
+                    </div>
+                </div>
+                <div class="card" onclick="showCumulativeDrilldown()" style="cursor:pointer">
+                    <div class="card-header">
+                        <h3>Kumulatiivinen kehitys</h3>
+                        <span class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container"><canvas id="chart-cumulative"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BL Progress -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Business Line -kohtainen eteneminen</h3>
+                    <span class="text-sm text-muted">Klikkaa business linea porautuaksesi</span>
+                </div>
+                <div class="card-body">
+                    ${businessLines.map(bl => {
+                        const rev = data.revenueByBL[bl.id];
+                        const targetYTD = bl.targetAnnual * YEAR_PROGRESS;
+                        const pct = rev / bl.targetAnnual;
+                        const pctOfYTD = rev / targetYTD;
+                        const statusColor = pctOfYTD >= 1.0 ? 'var(--success)' : pctOfYTD >= 0.95 ? 'var(--warning)' : 'var(--danger)';
+                        return `
+                        <div class="progress-row" onclick="showBLDrilldown('${bl.id}')" style="cursor:pointer">
+                            <div class="progress-label">
+                                <span class="name">
+                                    <span class="status-dot" style="background:${statusColor}"></span>
+                                    ${bl.name} <span class="text-muted text-sm">(${bl.leader})</span>
+                                </span>
+                                <span class="font-mono">${fmtM(rev)} / ${fmtM(bl.targetAnnual)} <span class="text-muted">(${fmtPct(pct)})</span></span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width:${Math.min(pct * 100, 100)}%;background:${bl.color}"></div>
+                                <div class="progress-bar-target" style="left:${YEAR_PROGRESS * 100}%" title="Lineaarinen tavoite tänään"></div>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>
+
+            <!-- Top customers & Pipeline summary -->
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Top 10 asiakkuudet (YTD)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>#</th><th>Asiakas</th><th>Business Line</th><th class="text-right">YTD</th></tr></thead>
+                            <tbody>
+                                ${customers
+                                    .map(c => ({ ...c, ytd: data.revenueByCustomer[c.id] || 0 }))
+                                    .sort((a, b) => b.ytd - a.ytd)
+                                    .slice(0, 10)
+                                    .map((c, i) => `
+                                    <tr class="clickable" onclick="showCustomerModal(${c.id})">
+                                        <td>${i + 1}</td>
+                                        <td>${c.name}</td>
+                                        <td>${c.blName}</td>
+                                        <td class="text-right font-mono">${fmtK(c.ytd)}</td>
+                                    </tr>`).join('')}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" onclick="showPipelineOverviewDrilldown()" style="cursor:pointer">
+                    <div class="card-header">
+                        <h3>Pipeline-yhteenveto</h3>
+                        <span class="click-hint"><i class="fas fa-search-plus"></i> Poraudu</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container"><canvas id="chart-pipeline-summary"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Render charts
+    renderMonthlyChart();
+    renderCumulativeChart();
+    renderPipelineSummaryChart();
+}
+
+function renderMonthlyChart() {
+    const monthLabels = ['Tammi', 'Helmi', 'Maalis', 'Huhti', 'Touko', 'Kesä', 'Heinä', 'Elo', 'Syys', 'Loka', 'Marras', 'Joulu'];
+    const monthlyTarget = TOTAL_TARGET / 12;
+
+    // Actual data (only months we have)
+    const actualData = [data.revenueByMonth[0], data.revenueByMonth[1], data.revenueByMonth[2], data.revenueByMonth[3]];
+    // Pad with nulls for future months
+    while (actualData.length < 12) actualData.push(null);
+
+    const targetData = Array(12).fill(monthlyTarget);
+
+    charts.monthly = new Chart(document.getElementById('chart-monthly'), {
+        type: 'bar',
+        data: {
+            labels: monthLabels,
+            datasets: [
+                {
+                    label: 'Toteutunut',
+                    data: actualData,
+                    backgroundColor: '#4f6ef7',
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                },
+                {
+                    label: 'Kuukausitavoite',
+                    data: targetData,
+                    type: 'line',
+                    borderColor: '#ef4444',
+                    borderWidth: 2,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtK(ctx.parsed.y) } },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtM(v) },
+                    grid: { color: '#f0f0f0' },
+                },
+                x: { grid: { display: false } },
+            },
+        },
+    });
+}
+
+function renderCumulativeChart() {
+    const monthLabels = ['Tammi', 'Helmi', 'Maalis', 'Huhti', 'Touko', 'Kesä', 'Heinä', 'Elo', 'Syys', 'Loka', 'Marras', 'Joulu'];
+    const monthlyTarget = TOTAL_TARGET / 12;
+
+    let cumActual = 0;
+    const actualData = [];
+    for (let m = 0; m < 4; m++) {
+        cumActual += (data.revenueByMonth[m] || 0);
+        actualData.push(cumActual);
+    }
+    while (actualData.length < 12) actualData.push(null);
+
+    const targetData = [];
+    let cumTarget = 0;
+    for (let m = 0; m < 12; m++) {
+        cumTarget += monthlyTarget;
+        targetData.push(cumTarget);
+    }
+
+    // Forecast line (from current point, using required rate)
+    const forecastData = Array(4).fill(null);
+    forecastData[3] = cumActual;
+    let cumForecast = cumActual;
+    for (let m = 4; m < 12; m++) {
+        cumForecast += data.currentMonthlyRate;
+        forecastData.push(cumForecast);
+    }
+
+    charts.cumulative = new Chart(document.getElementById('chart-cumulative'), {
+        type: 'line',
+        data: {
+            labels: monthLabels,
+            datasets: [
+                {
+                    label: 'Toteutunut',
+                    data: actualData,
+                    borderColor: '#4f6ef7',
+                    backgroundColor: 'rgba(79,110,247,0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                },
+                {
+                    label: 'Tavoite',
+                    data: targetData,
+                    borderColor: '#ef4444',
+                    borderWidth: 2,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false,
+                },
+                {
+                    label: 'Ennuste (nykyinen tahti)',
+                    data: forecastData,
+                    borderColor: '#22c55e',
+                    borderWidth: 2,
+                    borderDash: [4, 4],
+                    pointRadius: 0,
+                    fill: false,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.8,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtM(ctx.parsed.y) } },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtM(v) },
+                    grid: { color: '#f0f0f0' },
+                },
+                x: { grid: { display: false } },
+            },
+        },
+    });
+}
+
+function renderPipelineSummaryChart() {
+    const stageData = pipelineStages.map(s => ({
+        label: s.name,
+        value: data.pipelineByStage[s.id]?.reduce((sum, p) => sum + p.value, 0) || 0,
+        weighted: data.pipelineByStage[s.id]?.reduce((sum, p) => sum + p.weightedValue, 0) || 0,
+        color: s.color,
+        count: data.pipelineByStage[s.id]?.length || 0,
+    }));
+
+    charts.pipelineSummary = new Chart(document.getElementById('chart-pipeline-summary'), {
+        type: 'bar',
+        data: {
+            labels: stageData.map(s => s.label),
+            datasets: [
+                {
+                    label: 'Kokonaisarvo',
+                    data: stageData.map(s => s.value),
+                    backgroundColor: stageData.map(s => s.color + '60'),
+                    borderColor: stageData.map(s => s.color),
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Painotettu arvo',
+                    data: stageData.map(s => s.weighted),
+                    backgroundColor: stageData.map(s => s.color),
+                    borderRadius: 4,
+                },
+            ],
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.4,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtK(ctx.parsed.x) } },
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { callback: v => fmtM(v) },
+                    grid: { color: '#f0f0f0' },
+                },
+                y: { grid: { display: false } },
+            },
+        },
+    });
+}
+
+// ===== DASHBOARD DRILLDOWN MODALS =====
+
+function createDrilldownModal(title, contentHTML) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    overlay.innerHTML = `
+    <div class="modal">
+        <div class="modal-header">
+            <h2>${title}</h2>
+            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+        </div>
+        <div class="modal-body">${contentHTML}</div>
+    </div>`;
+    document.body.appendChild(overlay);
+}
+
+// --- Project edit modal ---
+window.showProjectEditModal = function(projectId, onSaveCallback) {
+    const proj = pipeline.find(p => p.id === projectId);
+    if (!proj) return;
+
+    const currentStage = pipelineStages.find(s => s.id === proj.stageId);
+    const cust = customers.find(c => c.id === proj.customerId);
+
+    // State for the edit form
+    let editStageId = proj.stageId;
+    let editProbability = proj.probability;
+    let editValue = proj.value;
+    let editCloseDate = proj.expectedClose.toISOString().split('T')[0];
+    let useCustomProb = false;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    function renderEditForm() {
+        const selectedStage = pipelineStages.find(s => s.id === editStageId);
+        const defaultProb = selectedStage ? selectedStage.probability : editProbability;
+        const effectiveProb = useCustomProb ? editProbability : defaultProb;
+        const newWeighted = Math.round(editValue * effectiveProb);
+        const oldWeighted = proj.weightedValue;
+        const weightedDiff = newWeighted - oldWeighted;
+
+        overlay.innerHTML = `
+        <div class="modal" style="max-width:700px">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit" style="color:var(--primary)"></i>&nbsp; Muokkaa projektia</h2>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom:20px;padding:12px 16px;background:var(--bg);border-radius:8px;display:flex;gap:20px;flex-wrap:wrap">
+                    <div>
+                        <div class="text-sm text-muted">Projekti</div>
+                        <div class="fw-600">${proj.name}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">Asiakas</div>
+                        <div class="fw-600">${proj.customerName}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">Business Line</div>
+                        <div class="fw-600">${proj.blName}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-muted">Vastuuhenkilö</div>
+                        <div class="fw-600">${proj.manager}</div>
+                    </div>
+                </div>
+
+                <div class="drilldown-section">
+                    <h4><i class="fas fa-tasks" style="color:var(--primary)"></i> Myyntivaihe</h4>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="stage-selector">
+                        ${pipelineStages.map(s => `
+                        <div class="stage-option ${editStageId === s.id ? 'selected' : ''}" data-stage-id="${s.id}">
+                            <div class="stage-dot" style="background:${s.color}"></div>
+                            <div class="stage-name">${s.name}</div>
+                            <div class="stage-prob">${Math.round(s.probability * 100)}%</div>
+                        </div>`).join('')}
+                    </div>
+                </div>
+
+                <div class="edit-form-grid">
+                    <div class="form-field">
+                        <label>Todennäköisyys</label>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                            <label style="font-size:13px;font-weight:normal;text-transform:none;letter-spacing:0;display:flex;align-items:center;gap:6px;cursor:pointer">
+                                <input type="checkbox" id="edit-custom-prob" ${useCustomProb ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer">
+                                Mukautettu todennäköisyys
+                            </label>
+                            <span class="text-sm text-muted">(oletus: ${Math.round(defaultProb * 100)}%)</span>
+                        </div>
+                        <div class="prob-display">
+                            <input type="range" id="edit-prob-slider" min="0" max="100" value="${Math.round(effectiveProb * 100)}" ${!useCustomProb ? 'disabled style="opacity:0.4"' : ''}>
+                            <div class="prob-value" id="edit-prob-value">${Math.round(effectiveProb * 100)}%</div>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Arvo (€)</label>
+                        <input type="number" id="edit-value" value="${editValue}" min="0" step="1000">
+                        <div class="field-hint">Nykyinen: ${fmtK(proj.value)}</div>
+                    </div>
+                </div>
+
+                <div class="edit-form-grid">
+                    <div class="form-field">
+                        <label>Arvioitu sulkeutumispäivä</label>
+                        <input type="date" id="edit-close-date" value="${editCloseDate}">
+                    </div>
+                </div>
+
+                <div class="edit-before-after">
+                    <div class="edit-ba-col">
+                        <div class="ba-label">Ennen</div>
+                        <div class="ba-value">${fmtK(oldWeighted)}</div>
+                        <div class="text-sm text-muted">${proj.stageName} (${Math.round(proj.probability * 100)}%)</div>
+                    </div>
+                    <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="edit-ba-col">
+                        <div class="ba-label">Jälkeen</div>
+                        <div class="ba-value" id="edit-preview-weighted" style="color:${weightedDiff >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmtK(newWeighted)}</div>
+                        <div class="text-sm" id="edit-preview-stage" style="color:${selectedStage.color}">${selectedStage.name} (${Math.round(effectiveProb * 100)}%)</div>
+                        <div class="text-sm" id="edit-preview-diff" style="color:${weightedDiff >= 0 ? 'var(--success)' : 'var(--danger)'}">${weightedDiff >= 0 ? '+' : ''}${fmtK(weightedDiff)}</div>
+                    </div>
+                </div>
+
+                <div class="edit-actions">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Peruuta</button>
+                    <button class="btn btn-primary" id="edit-save-btn"><i class="fas fa-save"></i>&nbsp; Tallenna muutokset</button>
+                </div>
+            </div>
+        </div>`;
+
+        // Bind events
+        overlay.querySelectorAll('.stage-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                editStageId = opt.dataset.stageId;
+                if (!useCustomProb) {
+                    const newStage = pipelineStages.find(s => s.id === editStageId);
+                    editProbability = newStage.probability;
+                }
+                renderEditForm();
+            });
+        });
+
+        const customProbCheck = overlay.querySelector('#edit-custom-prob');
+        if (customProbCheck) {
+            customProbCheck.addEventListener('change', () => {
+                useCustomProb = customProbCheck.checked;
+                if (!useCustomProb) {
+                    const selectedStage = pipelineStages.find(s => s.id === editStageId);
+                    editProbability = selectedStage.probability;
+                }
+                renderEditForm();
+            });
+        }
+
+        const probSlider = overlay.querySelector('#edit-prob-slider');
+        if (probSlider) {
+            probSlider.addEventListener('input', () => {
+                editProbability = parseInt(probSlider.value) / 100;
+                updatePreview();
+            });
+        }
+
+        const valueInput = overlay.querySelector('#edit-value');
+        if (valueInput) {
+            valueInput.addEventListener('input', () => {
+                editValue = parseInt(valueInput.value) || 0;
+                updatePreview();
+            });
+        }
+
+        const dateInput = overlay.querySelector('#edit-close-date');
+        if (dateInput) {
+            dateInput.addEventListener('input', () => {
+                editCloseDate = dateInput.value;
+            });
+        }
+
+        const saveBtn = overlay.querySelector('#edit-save-btn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                // Apply changes to the pipeline project
+                const newStage = pipelineStages.find(s => s.id === editStageId);
+                proj.stageId = newStage.id;
+                proj.stageName = newStage.name;
+                proj.probability = useCustomProb ? editProbability : newStage.probability;
+                proj.weightedValue = Math.round(editValue * proj.probability);
+                proj.value = editValue;
+                proj.expectedClose = new Date(editCloseDate);
+
+                overlay.remove();
+
+                // Recompute and refresh
+                recomputeAndRefresh();
+
+                // Call optional callback (e.g., to re-open a customer modal)
+                if (onSaveCallback) onSaveCallback();
+            });
+        }
+
+        function updatePreview() {
+            const selectedStage = pipelineStages.find(s => s.id === editStageId);
+            const effectiveProb = useCustomProb ? editProbability : selectedStage.probability;
+            const newWeighted = Math.round(editValue * effectiveProb);
+            const weightedDiff = newWeighted - oldWeighted;
+
+            const probVal = overlay.querySelector('#edit-prob-value');
+            if (probVal) probVal.textContent = Math.round(effectiveProb * 100) + '%';
+
+            const previewWeighted = overlay.querySelector('#edit-preview-weighted');
+            if (previewWeighted) {
+                previewWeighted.textContent = fmtK(newWeighted);
+                previewWeighted.style.color = weightedDiff >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+
+            const previewStage = overlay.querySelector('#edit-preview-stage');
+            if (previewStage) {
+                previewStage.textContent = selectedStage.name + ' (' + Math.round(effectiveProb * 100) + '%)';
+                previewStage.style.color = selectedStage.color;
+            }
+
+            const previewDiff = overlay.querySelector('#edit-preview-diff');
+            if (previewDiff) {
+                previewDiff.textContent = (weightedDiff >= 0 ? '+' : '') + fmtK(weightedDiff);
+                previewDiff.style.color = weightedDiff >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+        }
+    }
+
+    renderEditForm();
+    document.body.appendChild(overlay);
+};
+
+// --- Liikevaihto YTD drilldown ---
+window.showRevenueDrilldown = function() {
+    const monthNames = ['Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu'];
+    const monthlyTarget = TOTAL_TARGET / 12;
+
+    const blRows = businessLines.map(bl => {
+        const rev = data.revenueByBL[bl.id];
+        const tgt = bl.targetAnnual * YEAR_PROGRESS;
+        const pct = rev / tgt;
+        const color = pct >= 1 ? 'var(--success)' : pct >= 0.95 ? 'var(--warning)' : 'var(--danger)';
+        return `<div class="bl-mini-bar">
+            <div class="bar-label" style="color:${bl.color}">${bl.name}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.min(pct * 100, 100)}%;background:${bl.color}"></div></div>
+            <div class="bar-value" style="color:${color}">${fmtM(rev)} <span class="text-muted">(${fmtPct(pct - 1 > 0 ? pct - 1 : pct - 1)})</span></div>
+        </div>`;
+    }).join('');
+
+    const monthRows = [0, 1, 2, 3].map(m => {
+        const rev = data.revenueByMonth[m] || 0;
+        const pct = rev / monthlyTarget;
+        const diff = rev - monthlyTarget;
+        return `<tr>
+            <td style="font-weight:500">${monthNames[m]}</td>
+            <td class="text-right font-mono">${fmtK(rev)}</td>
+            <td class="text-right font-mono">${fmtK(monthlyTarget)}</td>
+            <td class="text-right font-mono" style="color:${diff >= 0 ? 'var(--success)' : 'var(--danger)'}">${diff >= 0 ? '+' : ''}${fmtK(diff)}</td>
+            <td class="text-right font-mono">${fmtPct(pct)}</td>
+        </tr>`;
+    }).join('');
+
+    const topCustomers = customers
+        .map(c => ({ ...c, ytd: data.revenueByCustomer[c.id] || 0 }))
+        .sort((a, b) => b.ytd - a.ytd)
+        .slice(0, 10);
+
+    const custRows = topCustomers.map((c, i) => {
+        const bl = businessLines.find(b => b.id === c.bl);
+        return `<tr class="clickable" onclick="document.querySelector('.modal-overlay').remove(); showCustomerModal(${c.id})">
+            <td>${i + 1}</td>
+            <td>${c.name}</td>
+            <td><span style="color:${bl.color}">${bl.name}</span></td>
+            <td class="text-right font-mono">${fmtK(c.ytd)}</td>
+        </tr>`;
+    }).join('');
+
+    createDrilldownModal('Liikevaihto YTD – Porautuminen', `
+        <div class="drilldown-kpi-grid">
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.totalRevenue)}</div>
+                <div class="label">Toteutunut YTD</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.targetYTD)}</div>
+                <div class="label">Tavoite YTD</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:${data.variance >= 0 ? 'var(--success)' : 'var(--danger)'}">${data.variance >= 0 ? '+' : ''}${fmtM(data.variance)}</div>
+                <div class="label">Ero</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtPct(data.totalRevenue / TOTAL_TARGET)}</div>
+                <div class="label">Vuositavoitteesta</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-building" style="color:var(--primary)"></i> Business Line -jakauma</h4>
+            ${blRows}
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-calendar-alt" style="color:var(--primary)"></i> Kuukausikohtainen erittely</h4>
+            <table class="data-table">
+                <thead><tr><th>Kuukausi</th><th class="text-right">Toteutunut</th><th class="text-right">Tavoite</th><th class="text-right">Ero</th><th class="text-right">%</th></tr></thead>
+                <tbody>${monthRows}</tbody>
+            </table>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-trophy" style="color:var(--warning)"></i> Top 10 asiakkuudet</h4>
+            <table class="data-table">
+                <thead><tr><th>#</th><th>Asiakas</th><th>Business Line</th><th class="text-right">YTD</th></tr></thead>
+                <tbody>${custRows}</tbody>
+            </table>
+        </div>
+    `);
+};
+
+// --- Ero tavoitteeseen drilldown ---
+window.showVarianceDrilldown = function() {
+    const blVariance = businessLines.map(bl => {
+        const rev = data.revenueByBL[bl.id];
+        const tgt = bl.targetAnnual * YEAR_PROGRESS;
+        const diff = rev - tgt;
+        const pct = diff / tgt;
+        return { ...bl, rev, tgt, diff, pct };
+    }).sort((a, b) => a.diff - b.diff);
+
+    const blTable = blVariance.map(bl => `<tr>
+        <td style="font-weight:500;color:${bl.color}">${bl.name}</td>
+        <td>${bl.leader}</td>
+        <td class="text-right font-mono">${fmtM(bl.rev)}</td>
+        <td class="text-right font-mono">${fmtM(bl.tgt)}</td>
+        <td class="text-right font-mono" style="color:${bl.diff >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:600">${bl.diff >= 0 ? '+' : ''}${fmtK(bl.diff)}</td>
+        <td class="text-right font-mono" style="color:${bl.pct >= 0 ? 'var(--success)' : 'var(--danger)'};">${bl.pct >= 0 ? '+' : ''}${fmtPct(bl.pct)}</td>
+    </tr>`).join('');
+
+    // Customers contributing most to gap (worst performers relative to their target)
+    const custGap = customers
+        .map(c => {
+            const ytd = data.revenueByCustomer[c.id] || 0;
+            const tgt = c.annualValue * YEAR_PROGRESS;
+            return { ...c, ytd, tgt, diff: ytd - tgt, pct: tgt > 0 ? (ytd - tgt) / tgt : 0 };
+        })
+        .sort((a, b) => a.diff - b.diff);
+
+    const worstCusts = custGap.slice(0, 8);
+    const bestCusts = custGap.slice(-8).reverse();
+
+    const renderCustTable = (custs) => custs.map(c => {
+        const bl = businessLines.find(b => b.id === c.bl);
+        return `<tr class="clickable" onclick="document.querySelector('.modal-overlay').remove(); showCustomerModal(${c.id})">
+            <td>${c.name}</td>
+            <td style="color:${bl.color}">${bl.name}</td>
+            <td class="text-right font-mono" style="color:${c.diff >= 0 ? 'var(--success)' : 'var(--danger)'}">${c.diff >= 0 ? '+' : ''}${fmtK(c.diff)}</td>
+        </tr>`;
+    }).join('');
+
+    const ahead = blVariance.filter(bl => bl.diff >= 0);
+    const behind = blVariance.filter(bl => bl.diff < 0);
+
+    createDrilldownModal('Tavoite-ero – Porautuminen', `
+        <div class="drilldown-kpi-grid">
+            <div class="drilldown-kpi">
+                <div class="value" style="color:${data.variance >= 0 ? 'var(--success)' : 'var(--danger)'}; font-size:24px">${data.variance >= 0 ? '+' : ''}${fmtM(data.variance)}</div>
+                <div class="label">Kokonaisero</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:var(--success)">${ahead.length}</div>
+                <div class="label">BL edellä</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:var(--danger)">${behind.length}</div>
+                <div class="label">BL jäljessä</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-building" style="color:var(--primary)"></i> Business Line -kohtainen ero</h4>
+            <table class="data-table">
+                <thead><tr><th>Business Line</th><th>Vetäjä</th><th class="text-right">Toteutunut</th><th class="text-right">Tavoite YTD</th><th class="text-right">Ero (€)</th><th class="text-right">Ero (%)</th></tr></thead>
+                <tbody>${blTable}</tbody>
+            </table>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div class="drilldown-section">
+                <h4><i class="fas fa-arrow-down" style="color:var(--danger)"></i> Eniten jäljessä tavoitetta</h4>
+                <table class="data-table">
+                    <thead><tr><th>Asiakas</th><th>BL</th><th class="text-right">Ero</th></tr></thead>
+                    <tbody>${renderCustTable(worstCusts)}</tbody>
+                </table>
+            </div>
+            <div class="drilldown-section">
+                <h4><i class="fas fa-arrow-up" style="color:var(--success)"></i> Eniten edellä tavoitetta</h4>
+                <table class="data-table">
+                    <thead><tr><th>Asiakas</th><th>BL</th><th class="text-right">Ero</th></tr></thead>
+                    <tbody>${renderCustTable(bestCusts)}</tbody>
+                </table>
+            </div>
+        </div>
+    `);
+};
+
+// --- Vuositavoite drilldown ---
+window.showTargetDrilldown = function() {
+    const quarterNames = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+    const blTargetRows = businessLines.map(bl => {
+        const rev = data.revenueByBL[bl.id];
+        const pct = rev / bl.targetAnnual;
+        return `<tr>
+            <td style="font-weight:500;color:${bl.color}">${bl.name}</td>
+            <td class="text-right font-mono">${fmtM(bl.targetAnnual)}</td>
+            ${bl.quarterTargets.map(q => `<td class="text-right font-mono">${fmtK(q)}</td>`).join('')}
+            <td class="text-right font-mono">${fmtM(rev)}</td>
+            <td class="text-right font-mono">${fmtPct(pct)}</td>
+        </tr>`;
+    }).join('');
+
+    const totalQ = [0, 1, 2, 3].map(q => businessLines.reduce((s, bl) => s + bl.quarterTargets[q], 0));
+
+    createDrilldownModal('Vuositavoite – Rakenne', `
+        <div class="drilldown-kpi-grid">
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(TOTAL_TARGET)}</div>
+                <div class="label">Vuositavoite yhteensä</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.totalRevenue)}</div>
+                <div class="label">Toteutunut</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.remainingTarget)}</div>
+                <div class="label">Jäljellä</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtPct(data.totalRevenue / TOTAL_TARGET)}</div>
+                <div class="label">Saavutettu</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-table" style="color:var(--primary)"></i> Tavoitteet Business Line ja kvartaali</h4>
+            <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Business Line</th><th class="text-right">Vuositavoite</th>${quarterNames.map(q => `<th class="text-right">${q}</th>`).join('')}<th class="text-right">Toteutunut</th><th class="text-right">%</th></tr></thead>
+                <tbody>
+                    ${blTargetRows}
+                    <tr style="font-weight:700;border-top:2px solid var(--border)">
+                        <td>Yhteensä</td>
+                        <td class="text-right font-mono">${fmtM(TOTAL_TARGET)}</td>
+                        ${totalQ.map(q => `<td class="text-right font-mono">${fmtM(q)}</td>`).join('')}
+                        <td class="text-right font-mono">${fmtM(data.totalRevenue)}</td>
+                        <td class="text-right font-mono">${fmtPct(data.totalRevenue / TOTAL_TARGET)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-chart-pie" style="color:var(--primary)"></i> Tavoitteiden jakautuminen</h4>
+            ${businessLines.map(bl => {
+                const share = bl.targetAnnual / TOTAL_TARGET;
+                return `<div class="bl-mini-bar">
+                    <div class="bar-label" style="color:${bl.color}">${bl.name}</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:${share * 100}%;background:${bl.color}"></div></div>
+                    <div class="bar-value">${fmtM(bl.targetAnnual)} (${fmtPct(share)})</div>
+                </div>`;
+            }).join('')}
+        </div>
+    `);
+};
+
+// --- Pipeline (painotettu) drilldown ---
+window.showPipelineOverviewDrilldown = function() {
+    const stageRows = pipelineStages.map(s => {
+        const projects = data.pipelineByStage[s.id] || [];
+        const total = projects.reduce((sum, p) => sum + p.value, 0);
+        const weighted = projects.reduce((sum, p) => sum + p.weightedValue, 0);
+        return `<tr>
+            <td><span class="pill pill-${s.id}" style="background:${s.color}20;color:${s.color};padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600">${s.name}</span></td>
+            <td class="text-right font-mono">${projects.length}</td>
+            <td class="text-right font-mono">${fmtK(total)}</td>
+            <td class="text-right font-mono">${fmtPct(s.probability)}</td>
+            <td class="text-right font-mono" style="font-weight:600">${fmtK(weighted)}</td>
+        </tr>`;
+    }).join('');
+
+    const topDeals = [...pipeline].sort((a, b) => b.weightedValue - a.weightedValue).slice(0, 12);
+    const dealRows = topDeals.map((p, i) => `<tr class="clickable" onclick="document.querySelector('.modal-overlay').remove(); showCustomerModal(${p.customerId})">
+        <td>${i + 1}</td>
+        <td>${p.name}</td>
+        <td>${p.customerName}</td>
+        <td><span style="font-size:12px;padding:2px 6px;border-radius:8px;background:${pipelineStages.find(s => s.id === p.stageId).color}20;color:${pipelineStages.find(s => s.id === p.stageId).color}">${p.stageName}</span></td>
+        <td class="text-right font-mono">${fmtK(p.value)}</td>
+        <td class="text-right font-mono" style="font-weight:600">${fmtK(p.weightedValue)}</td>
+        <td>${p.expectedClose.toLocaleDateString('fi-FI')}</td>
+    </tr>`).join('');
+
+    const blPipeline = businessLines.map(bl => {
+        const projects = pipeline.filter(p => p.bl === bl.id);
+        const total = projects.reduce((s, p) => s + p.value, 0);
+        const weighted = projects.reduce((s, p) => s + p.weightedValue, 0);
+        return { ...bl, projects: projects.length, total, weighted };
+    });
+
+    createDrilldownModal('Pipeline – Porautuminen', `
+        <div class="drilldown-kpi-grid">
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.pipelineTotal)}</div>
+                <div class="label">Kokonaisarvo</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:var(--primary)">${fmtM(data.pipelineWeighted)}</div>
+                <div class="label">Painotettu arvo</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${pipeline.length}</div>
+                <div class="label">Projekteja</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.pipelineWeighted + data.totalRevenue)}</div>
+                <div class="label">Toteutunut + Pipeline</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-funnel-dollar" style="color:var(--primary)"></i> Myyntivaiheittain</h4>
+            <table class="data-table">
+                <thead><tr><th>Vaihe</th><th class="text-right">Kpl</th><th class="text-right">Arvo</th><th class="text-right">Todennäk.</th><th class="text-right">Painotettu</th></tr></thead>
+                <tbody>${stageRows}</tbody>
+            </table>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-building" style="color:var(--primary)"></i> Business Line -jakauma</h4>
+            ${blPipeline.map(bl => `<div class="bl-mini-bar">
+                <div class="bar-label" style="color:${bl.color}">${bl.name}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${data.pipelineTotal > 0 ? (bl.total / data.pipelineTotal * 100) : 0}%;background:${bl.color}"></div></div>
+                <div class="bar-value">${fmtK(bl.weighted)} (${bl.projects} kpl)</div>
+            </div>`).join('')}
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-star" style="color:var(--warning)"></i> Top 12 mahdollisuudet (painotettu)</h4>
+            <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>#</th><th>Projekti</th><th>Asiakas</th><th>Vaihe</th><th class="text-right">Arvo</th><th class="text-right">Painotettu</th><th>Sulkeutuu</th></tr></thead>
+                <tbody>${dealRows}</tbody>
+            </table>
+            </div>
+        </div>
+    `);
+};
+
+// --- Vaadittava kuukausitahti drilldown ---
+window.showRateDrilldown = function() {
+    const blRates = businessLines.map(bl => {
+        const rev = data.revenueByBL[bl.id];
+        const remaining = bl.targetAnnual - rev;
+        const remainingMonths = (365 - DAY_OF_YEAR) / 30;
+        const required = remaining / remainingMonths;
+        const current = rev / MONTHS_ELAPSED;
+        const gap = required - current;
+        const status = gap <= 0 ? 'success' : gap / current < 0.15 ? 'warning' : 'danger';
+        return { ...bl, rev, remaining, required, current, gap, status };
+    });
+
+    const blRows = blRates.map(bl => `<tr>
+        <td style="font-weight:500;color:${bl.color}">${bl.name}</td>
+        <td class="text-right font-mono">${fmtK(bl.current)}</td>
+        <td class="text-right font-mono">${fmtK(bl.required)}</td>
+        <td class="text-right font-mono" style="color:var(--${bl.status});font-weight:600">${bl.gap >= 0 ? '+' : ''}${fmtK(bl.gap)}</td>
+        <td class="text-right font-mono">${fmtM(bl.remaining)}</td>
+        <td class="text-right">
+            <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--${bl.status}-bg);color:var(--${bl.status});font-weight:600">
+                ${bl.status === 'success' ? 'Hyvä tahti' : bl.status === 'warning' ? 'Kiihdytettävä' : 'Huomioitava'}
+            </span>
+        </td>
+    </tr>`).join('');
+
+    const scenarioBase = data.currentMonthlyRate;
+    const scenarios = [
+        { name: 'Nykyinen tahti', rate: scenarioBase, color: 'var(--primary)' },
+        { name: '+10% kasvu', rate: scenarioBase * 1.10, color: 'var(--success)' },
+        { name: '+20% kasvu', rate: scenarioBase * 1.20, color: '#22c55e' },
+        { name: '-10% lasku', rate: scenarioBase * 0.90, color: 'var(--warning)' },
+    ];
+
+    const scenarioRows = scenarios.map(s => {
+        const yearEnd = data.totalRevenue + s.rate * (12 - MONTHS_ELAPSED);
+        const pctTarget = yearEnd / TOTAL_TARGET;
+        return `<tr>
+            <td style="font-weight:500;color:${s.color}">${s.name}</td>
+            <td class="text-right font-mono">${fmtK(s.rate)}/kk</td>
+            <td class="text-right font-mono">${fmtM(yearEnd)}</td>
+            <td class="text-right font-mono" style="color:${pctTarget >= 1 ? 'var(--success)' : 'var(--danger)'};font-weight:600">${fmtPct(pctTarget)}</td>
+            <td class="text-right">${pctTarget >= 1 ? '<span style="color:var(--success)">&#10003; Tavoite saavutetaan</span>' : '<span style="color:var(--danger)">&#10007; Tavoite ei täyty</span>'}</td>
+        </tr>`;
+    }).join('');
+
+    createDrilldownModal('Kuukausitahti – Analyysi', `
+        <div class="drilldown-kpi-grid">
+            <div class="drilldown-kpi">
+                <div class="value">${fmtK(data.currentMonthlyRate)}</div>
+                <div class="label">Nykyinen tahti/kk</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:var(--primary)">${fmtK(data.requiredMonthlyRate)}</div>
+                <div class="label">Vaadittu tahti/kk</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:${data.requiredMonthlyRate <= data.currentMonthlyRate ? 'var(--success)' : 'var(--danger)'}">${data.requiredMonthlyRate <= data.currentMonthlyRate ? '' : '+'}${fmtK(data.requiredMonthlyRate - data.currentMonthlyRate)}</div>
+                <div class="label">Ero/kk</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${data.remainingMonths.toFixed(1).replace('.', ',')} kk</div>
+                <div class="label">Kuukausia jäljellä</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-building" style="color:var(--primary)"></i> Business Line -kohtainen tahti</h4>
+            <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Business Line</th><th class="text-right">Nykyinen/kk</th><th class="text-right">Vaadittu/kk</th><th class="text-right">Ero/kk</th><th class="text-right">Jäljellä</th><th class="text-right">Tila</th></tr></thead>
+                <tbody>${blRows}</tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-chart-line" style="color:var(--primary)"></i> Skenaariot vuoden loppuun</h4>
+            <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Skenaario</th><th class="text-right">Tahti</th><th class="text-right">Vuoden loppu</th><th class="text-right">% tavoitteesta</th><th class="text-right">Tulos</th></tr></thead>
+                <tbody>${scenarioRows}</tbody>
+            </table>
+            </div>
+        </div>
+    `);
+};
+
+// --- BL progress drilldown (from dashboard) ---
+window.showBLDrilldown = function(blId) {
+    const bl = businessLines.find(b => b.id === blId);
+    if (!bl) return;
+
+    const rev = data.revenueByBL[bl.id];
+    const targetYTD = bl.targetAnnual * YEAR_PROGRESS;
+    const pct = rev / targetYTD;
+    const remaining = bl.targetAnnual - rev;
+    const remainingMonths = (365 - DAY_OF_YEAR) / 30;
+    const requiredRate = remaining / remainingMonths;
+    const currentRate = rev / MONTHS_ELAPSED;
+    const monthlyData = data.revenueByBLMonth[bl.id];
+    const monthNames = ['Tammi', 'Helmi', 'Maalis', 'Huhti'];
+
+    const blCustomers = customers.filter(c => c.bl === bl.id)
+        .map(c => ({ ...c, ytd: data.revenueByCustomer[c.id] || 0, pipelineProjects: pipeline.filter(p => p.customerId === c.id) }))
+        .sort((a, b) => b.ytd - a.ytd);
+
+    const blPipeline = pipeline.filter(p => p.bl === bl.id);
+    const pipelineTotal = blPipeline.reduce((s, p) => s + p.value, 0);
+    const pipelineWeighted = blPipeline.reduce((s, p) => s + p.weightedValue, 0);
+
+    // Account managers
+    const amData = accountManagers.filter(am => am.bl === bl.id).map(am => {
+        const amCustomers = blCustomers.filter(c => c.managerId === am.id);
+        const amRevenue = amCustomers.reduce((s, c) => s + c.ytd, 0);
+        return { ...am, customers: amCustomers.length, revenue: amRevenue };
+    }).sort((a, b) => b.revenue - a.revenue);
+
+    createDrilldownModal(`${bl.name}`, `
+        <div style="margin-bottom:16px;display:flex;align-items:center;gap:12px">
+            <div style="width:12px;height:12px;border-radius:50%;background:${bl.color}"></div>
+            <span class="text-muted">Vetäjä: <strong>${bl.leader}</strong></span>
+        </div>
+
+        <div class="drilldown-kpi-grid" style="grid-template-columns:repeat(5,1fr)">
+            <div class="drilldown-kpi">
+                <div class="value" style="font-size:18px">${fmtM(rev)}</div>
+                <div class="label">Toteutunut</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="font-size:18px">${fmtM(targetYTD)}</div>
+                <div class="label">Tavoite YTD</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="font-size:18px;color:${pct >= 1 ? 'var(--success)' : 'var(--danger)'}">${fmtPct(pct)}</div>
+                <div class="label">YTD-tila</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="font-size:18px">${fmtK(pipelineWeighted)}</div>
+                <div class="label">Pipeline (pain.)</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="font-size:18px">${fmtM(remaining)}</div>
+                <div class="label">Jäljellä</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-calendar" style="color:${bl.color}"></i> Kuukausikehitys</h4>
+            <table class="data-table">
+                <thead><tr><th>Kuukausi</th><th class="text-right">Liikevaihto</th><th class="text-right">Kum. tavoite</th></tr></thead>
+                <tbody>${[0,1,2,3].map((m, i) => {
+                    const cumRev = monthlyData.slice(0, i + 1).reduce((s, v) => s + v, 0);
+                    const cumTarget = bl.targetAnnual / 12 * (i + 1);
+                    return `<tr>
+                        <td>${monthNames[m]}</td>
+                        <td class="text-right font-mono">${fmtK(monthlyData[m])}</td>
+                        <td class="text-right font-mono" style="color:${cumRev >= cumTarget ? 'var(--success)' : 'var(--danger)'}">${fmtK(cumRev)} / ${fmtK(cumTarget)}</td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-user-tie" style="color:${bl.color}"></i> Vastuuhenkilöt</h4>
+            <table class="data-table">
+                <thead><tr><th>Nimi</th><th class="text-right">Asiakkaita</th><th class="text-right">Liikevaihto YTD</th></tr></thead>
+                <tbody>${amData.map(am => `<tr>
+                    <td style="font-weight:500">${am.name}</td>
+                    <td class="text-right">${am.customers}</td>
+                    <td class="text-right font-mono">${fmtK(am.revenue)}</td>
+                </tr>`).join('')}</tbody>
+            </table>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-users" style="color:${bl.color}"></i> Asiakkuudet (${blCustomers.length} kpl)</h4>
+            <div class="table-wrap" style="max-height:300px;overflow-y:auto">
+            <table class="data-table">
+                <thead><tr><th>Asiakas</th><th>Vastuuhenkilö</th><th class="text-right">YTD</th><th class="text-right">Pipeline</th></tr></thead>
+                <tbody>${blCustomers.slice(0, 15).map(c => `<tr class="clickable" onclick="document.querySelector('.modal-overlay').remove(); showCustomerModal(${c.id})">
+                    <td>${c.name}</td>
+                    <td>${c.manager}</td>
+                    <td class="text-right font-mono">${fmtK(c.ytd)}</td>
+                    <td class="text-right font-mono">${c.pipelineProjects.length > 0 ? fmtK(c.pipelineProjects.reduce((s, p) => s + p.weightedValue, 0)) : '-'}</td>
+                </tr>`).join('')}</tbody>
+            </table>
+            </div>
+        </div>
+    `);
+};
+
+// --- Monthly chart drilldown ---
+window.showMonthlyDrilldown = function() {
+    const monthNames = ['Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu'];
+    const monthlyTarget = TOTAL_TARGET / 12;
+
+    const monthDetails = [0, 1, 2, 3].map(m => {
+        const blBreakdown = businessLines.map(bl => ({
+            name: bl.name,
+            color: bl.color,
+            revenue: data.revenueByBLMonth[bl.id][m],
+            target: bl.targetAnnual / 12,
+        }));
+        return { month: monthNames[m], total: data.revenueByMonth[m], target: monthlyTarget, blBreakdown };
+    });
+
+    const content = monthDetails.map(md => {
+        const diff = md.total - md.target;
+        return `
+        <div class="drilldown-section" style="background:var(--bg);border-radius:8px;padding:16px;margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <h4 style="margin:0"><i class="fas fa-calendar-day" style="color:var(--primary)"></i> ${md.month}</h4>
+                <div>
+                    <span class="font-mono" style="font-size:16px;font-weight:700">${fmtK(md.total)}</span>
+                    <span class="font-mono text-muted"> / ${fmtK(md.target)}</span>
+                    <span class="font-mono" style="color:${diff >= 0 ? 'var(--success)' : 'var(--danger)'}; margin-left:8px">${diff >= 0 ? '+' : ''}${fmtK(diff)}</span>
+                </div>
+            </div>
+            ${md.blBreakdown.map(bl => `<div class="bl-mini-bar">
+                <div class="bar-label" style="color:${bl.color};font-size:12px">${bl.name}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${Math.min(bl.revenue / bl.target * 100, 100)}%;background:${bl.color}"></div></div>
+                <div class="bar-value" style="font-size:12px">${fmtK(bl.revenue)}</div>
+            </div>`).join('')}
+        </div>`;
+    }).join('');
+
+    createDrilldownModal('Kuukausikohtainen erittely', content);
+};
+
+// --- Cumulative chart drilldown ---
+window.showCumulativeDrilldown = function() {
+    const monthlyTarget = TOTAL_TARGET / 12;
+    let cumActual = 0, cumTarget = 0;
+
+    const rows = [0, 1, 2, 3].map(m => {
+        cumActual += (data.revenueByMonth[m] || 0);
+        cumTarget += monthlyTarget;
+        const diff = cumActual - cumTarget;
+        const pct = cumActual / cumTarget;
+        return `<tr>
+            <td style="font-weight:500">${['Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu'][m]}</td>
+            <td class="text-right font-mono">${fmtK(data.revenueByMonth[m])}</td>
+            <td class="text-right font-mono">${fmtM(cumActual)}</td>
+            <td class="text-right font-mono">${fmtM(cumTarget)}</td>
+            <td class="text-right font-mono" style="color:${diff >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight:600">${diff >= 0 ? '+' : ''}${fmtK(diff)}</td>
+            <td class="text-right font-mono">${fmtPct(pct)}</td>
+        </tr>`;
+    }).join('');
+
+    // Forecast scenarios
+    const forecastMonths = ['Toukokuu', 'Kesäkuu', 'Heinäkuu', 'Elokuu', 'Syyskuu', 'Lokakuu', 'Marraskuu', 'Joulukuu'];
+    let fcActual = cumActual;
+    const forecastRows = forecastMonths.map((name, i) => {
+        fcActual += data.currentMonthlyRate;
+        cumTarget += monthlyTarget;
+        const diff = fcActual - cumTarget;
+        return `<tr style="opacity:0.7">
+            <td style="font-weight:500">${name} <span class="text-muted">(ennuste)</span></td>
+            <td class="text-right font-mono text-muted">${fmtK(data.currentMonthlyRate)}</td>
+            <td class="text-right font-mono">${fmtM(fcActual)}</td>
+            <td class="text-right font-mono">${fmtM(cumTarget)}</td>
+            <td class="text-right font-mono" style="color:${diff >= 0 ? 'var(--success)' : 'var(--danger)'}">${diff >= 0 ? '+' : ''}${fmtK(diff)}</td>
+            <td class="text-right font-mono">${fmtPct(fcActual / cumTarget)}</td>
+        </tr>`;
+    }).join('');
+
+    createDrilldownModal('Kumulatiivinen kehitys – Erittely', `
+        <div class="drilldown-kpi-grid">
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(data.totalRevenue)}</div>
+                <div class="label">Kumulatiivinen YTD</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value">${fmtM(TOTAL_TARGET * YEAR_PROGRESS)}</div>
+                <div class="label">Kum. tavoite</div>
+            </div>
+            <div class="drilldown-kpi">
+                <div class="value" style="color:${data.totalRevenue + data.currentMonthlyRate * (12 - MONTHS_ELAPSED) >= TOTAL_TARGET ? 'var(--success)' : 'var(--danger)'}">${fmtM(data.totalRevenue + data.currentMonthlyRate * (12 - MONTHS_ELAPSED))}</div>
+                <div class="label">Ennuste vuoden lopussa</div>
+            </div>
+        </div>
+
+        <div class="drilldown-section">
+            <h4><i class="fas fa-table" style="color:var(--primary)"></i> Kuukausikohtainen kumulatiivinen kehitys</h4>
+            <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Kuukausi</th><th class="text-right">Kk-liikevaihto</th><th class="text-right">Kumulatiivinen</th><th class="text-right">Kum. tavoite</th><th class="text-right">Ero</th><th class="text-right">%</th></tr></thead>
+                <tbody>
+                    ${rows}
+                    <tr style="border-top:2px solid var(--border)"><td colspan="6" style="font-weight:600;color:var(--text-light);padding-top:12px">Ennuste (nykyisellä tahdilla)</td></tr>
+                    ${forecastRows}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    `);
+};
+
+// ===== BUSINESS LINES VIEW =====
+function renderBusinessLines(el) {
+    let selectedBL = null;
+
+    function render() {
+        el.innerHTML = `
+        <div class="animate-in">
+            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                ${businessLines.map(bl => {
+                    const rev = data.revenueByBL[bl.id];
+                    const targetYTD = bl.targetAnnual * YEAR_PROGRESS;
+                    const pctTotal = rev / bl.targetAnnual;
+                    const pctYTD = rev / targetYTD;
+                    const variance = rev - targetYTD;
+                    const statusColor = pctYTD >= 1.0 ? 'var(--success)' : pctYTD >= 0.95 ? 'var(--warning)' : 'var(--danger)';
+                    const statusClass = pctYTD >= 1.0 ? 'badge-green' : pctYTD >= 0.95 ? 'badge-yellow' : 'badge-red';
+                    const custCount = customers.filter(c => c.bl === bl.id).length;
+                    const pipelineVal = data.pipelineByBL[bl.id]?.reduce((s, p) => s + p.weightedValue, 0) || 0;
+
+                    return `
+                    <div class="bl-card ${selectedBL === bl.id ? 'selected' : ''}" onclick="document.blCardClick('${bl.id}')" style="border-left: 4px solid ${bl.color}">
+                        <div class="bl-name">${bl.name}</div>
+                        <div class="bl-leader"><i class="fas fa-user-tie"></i> ${bl.leader}</div>
+                        <div class="bl-revenue" style="color:${bl.color}">${fmtM(rev)}</div>
+                        <div class="bl-target-info">Tavoite: ${fmtM(bl.targetAnnual)} | YTD-tavoite: ${fmtM(targetYTD)}</div>
+                        <div class="bl-detail-grid">
+                            <div class="bl-detail-stat">
+                                <div class="stat-value" style="color:${variance >= 0 ? 'var(--success)' : 'var(--danger)'}">${variance >= 0 ? '+' : ''}${fmtK(variance)}</div>
+                                <div class="stat-label">Ero tavoitteeseen</div>
+                            </div>
+                            <div class="bl-detail-stat">
+                                <div class="stat-value">${custCount}</div>
+                                <div class="stat-label">Asiakkuutta</div>
+                            </div>
+                            <div class="bl-detail-stat">
+                                <div class="stat-value">${fmtK(pipelineVal)}</div>
+                                <div class="stat-label">Pipeline (pain.)</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width:${Math.min(pctTotal * 100, 100)}%;background:${bl.color}"></div>
+                            <div class="progress-bar-target" style="left:${YEAR_PROGRESS * 100}%"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-light)">
+                            <span>${fmtPct(pctTotal)} vuositavoitteesta</span>
+                            <span class="kpi-badge ${statusClass}">${pctYTD >= 1.0 ? 'Edellä' : pctYTD >= 0.95 ? 'Lähellä' : 'Jäljessä'}</span>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+
+            <div id="bl-detail-area"></div>
+        </div>`;
+    }
+
+    document.blCardClick = function(blId) {
+        selectedBL = selectedBL === blId ? null : blId;
+        render();
+        if (selectedBL) {
+            renderBLDetail(selectedBL);
+        }
+    };
+
+    render();
+}
+
+function renderBLDetail(blId) {
+    const bl = businessLines.find(b => b.id === blId);
+    const blCustomers = customers.filter(c => c.bl === blId);
+    const blPipeline = pipeline.filter(p => p.bl === blId);
+    const blInvoices = invoices.filter(i => i.bl === blId);
+    const blManagers = accountManagers.filter(am => am.bl === blId);
+
+    const area = document.getElementById('bl-detail-area');
+    area.innerHTML = `
+        <div class="animate-in">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header"><h3>${bl.name} – Kuukausikehitys</h3></div>
+                    <div class="card-body"><canvas id="chart-bl-monthly"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3>Vastuuhenkilöt</h3></div>
+                    <div class="card-body">
+                        <div style="margin-bottom:12px">
+                            <strong>Business Line -vetäjä:</strong> ${bl.leader}
+                        </div>
+                        <table class="data-table">
+                            <thead><tr><th>Asiakkuuspäällikkö</th><th class="text-right">Asiakkaita</th><th class="text-right">YTD Liikevaihto</th></tr></thead>
+                            <tbody>
+                                ${blManagers.map(am => {
+                                    const amCustomers = blCustomers.filter(c => c.managerId === am.id);
+                                    const amRevenue = amCustomers.reduce((s, c) => s + (data.revenueByCustomer[c.id] || 0), 0);
+                                    return `<tr>
+                                        <td><i class="fas fa-user"></i> ${am.name}</td>
+                                        <td class="text-right">${amCustomers.length}</td>
+                                        <td class="text-right font-mono">${fmtK(amRevenue)}</td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>${bl.name} – Asiakkuudet</h3></div>
+                <div class="card-body">
+                    <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Asiakas</th><th>Vastuuhenkilö</th><th class="text-right">Vuosiarvo</th><th class="text-right">YTD</th><th class="text-right">YTD %</th></tr></thead>
+                        <tbody>
+                            ${blCustomers
+                                .map(c => ({ ...c, ytd: data.revenueByCustomer[c.id] || 0 }))
+                                .sort((a, b) => b.ytd - a.ytd)
+                                .map(c => {
+                                    const pct = c.ytd / (c.annualValue * YEAR_PROGRESS);
+                                    const dotColor = pct >= 1.0 ? 'status-green' : pct >= 0.9 ? 'status-yellow' : 'status-red';
+                                    return `<tr class="clickable" onclick="showCustomerModal(${c.id})">
+                                        <td><span class="status-dot ${dotColor}"></span>${c.name}</td>
+                                        <td>${c.manager}</td>
+                                        <td class="text-right font-mono">${fmtK(c.annualValue)}</td>
+                                        <td class="text-right font-mono">${fmtK(c.ytd)}</td>
+                                        <td class="text-right font-mono">${fmtPct(pct)}</td>
+                                    </tr>`;
+                                }).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+            ${blPipeline.length > 0 ? `
+            <div class="card">
+                <div class="card-header"><h3>${bl.name} – Pipeline</h3></div>
+                <div class="card-body">
+                    <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Projekti</th><th>Asiakas</th><th>Vaihe</th><th class="text-right">Arvo</th><th class="text-right">Painotettu</th><th>Sulkeutuu</th><th></th></tr></thead>
+                        <tbody>
+                            ${blPipeline.sort((a, b) => b.weightedValue - a.weightedValue).map(p => `
+                            <tr>
+                                <td>${p.name}</td>
+                                <td>${p.customerName}</td>
+                                <td><span class="pill pill-${p.stageId}">${p.stageName} (${Math.round(p.probability * 100)}%)</span></td>
+                                <td class="text-right font-mono">${fmtK(p.value)}</td>
+                                <td class="text-right font-mono">${fmtK(p.weightedValue)}</td>
+                                <td>${p.expectedClose.toLocaleDateString('fi-FI')}</td>
+                                <td><button class="edit-icon-btn" onclick="showProjectEditModal(${p.id})" title="Muokkaa projektia"><i class="fas fa-pen"></i></button></td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>` : ''}
+        </div>
+    `;
+
+    // BL monthly chart
+    const monthLabels = ['Tammi', 'Helmi', 'Maalis', 'Huhti'];
+    const monthlyData = data.revenueByBLMonth[blId];
+    const monthlyTarget = bl.targetAnnual / 12;
+
+    charts.blMonthly = new Chart(document.getElementById('chart-bl-monthly'), {
+        type: 'bar',
+        data: {
+            labels: monthLabels,
+            datasets: [
+                { label: 'Toteutunut', data: monthlyData, backgroundColor: bl.color, borderRadius: 4 },
+                { label: 'Kuukausitavoite', data: Array(4).fill(monthlyTarget), type: 'line', borderColor: '#ef4444', borderWidth: 2, borderDash: [6, 4], pointRadius: 0, fill: false },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtK(ctx.parsed.y) } },
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { callback: v => fmtK(v) }, grid: { color: '#f0f0f0' } },
+                x: { grid: { display: false } },
+            },
+        },
+    });
+}
+
+// ===== CUSTOMERS VIEW =====
+function renderCustomers(el) {
+    let filterBL = '';
+    let filterManager = '';
+    let filterSearch = '';
+    let sortField = 'ytd';
+    let sortDir = 'desc';
+
+    function render() {
+        const filtered = customers
+            .map(c => ({ ...c, ytd: data.revenueByCustomer[c.id] || 0, pipelineProjects: pipeline.filter(p => p.customerId === c.id) }))
+            .filter(c => {
+                if (filterBL && c.bl !== filterBL) return false;
+                if (filterManager && c.managerId !== filterManager) return false;
+                if (filterSearch && !c.name.toLowerCase().includes(filterSearch.toLowerCase())) return false;
+                return true;
+            })
+            .sort((a, b) => {
+                let va = a[sortField], vb = b[sortField];
+                if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+                return sortDir === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+            });
+
+        const totalYTD = filtered.reduce((s, c) => s + c.ytd, 0);
+        const totalAnnual = filtered.reduce((s, c) => s + c.annualValue, 0);
+
+        el.innerHTML = `
+        <div class="animate-in">
+            <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="kpi-card">
+                    <div class="kpi-label">Näytettävät asiakkuudet</div>
+                    <div class="kpi-value">${filtered.length}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">YTD Liikevaihto yhteensä</div>
+                    <div class="kpi-value">${fmtM(totalYTD)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Vuotuinen sopimusarvo</div>
+                    <div class="kpi-value">${fmtM(totalAnnual)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Keskimääräinen asiakas</div>
+                    <div class="kpi-value">${filtered.length > 0 ? fmtK(totalAnnual / filtered.length) : '–'}</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Asiakkuudet</h3>
+                    <span class="text-sm text-muted">${filtered.length} / ${customers.length} asiakkuutta</span>
+                </div>
+                <div class="card-body">
+                    <div class="filters" style="flex-direction:column;gap:12px">
+                        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+                            <input type="text" class="filter-input" placeholder="Hae asiakasta..." id="f-search" value="${filterSearch}" style="width:240px">
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-group-label">Business Line</div>
+                            <div class="filter-chips">
+                                <button class="filter-chip ${filterBL === '' ? 'active' : ''}" data-fbl="">Kaikki</button>
+                                ${businessLines.map(bl => {
+                                    const count = customers.filter(c => c.bl === bl.id).length;
+                                    return `<button class="filter-chip-colored ${filterBL === bl.id ? 'active' : ''}" data-fbl="${bl.id}" style="${filterBL === bl.id ? 'background:' + bl.color + ';border-color:' + bl.color : 'border-color:' + bl.color + '40;color:' + bl.color}">${bl.name}<span class="chip-count">${count}</span></button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-group-label">Vastuuhenkilö</div>
+                            <div class="filter-chips">
+                                <button class="filter-chip ${filterManager === '' ? 'active' : ''}" data-fmgr="">Kaikki</button>
+                                ${accountManagers.map(am => {
+                                    const count = customers.filter(c => c.managerId === am.id).length;
+                                    return `<button class="filter-chip ${filterManager === am.id ? 'active' : ''}" data-fmgr="${am.id}">${am.name}<span class="chip-count">${count}</span></button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="name">Asiakas ${sortField === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                                <th data-sort="blName">Business Line ${sortField === 'blName' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                                <th data-sort="manager">Vastuuhenkilö ${sortField === 'manager' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                                <th data-sort="annualValue" class="text-right">Vuosiarvo ${sortField === 'annualValue' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                                <th data-sort="ytd" class="text-right">YTD ${sortField === 'ytd' ? (sortDir === 'asc' ? '▲' : '▼') : ''}</th>
+                                <th class="text-right">Pipeline</th>
+                                <th class="text-center">Tila</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(c => {
+                                const pct = c.ytd / (c.annualValue * YEAR_PROGRESS);
+                                const dotColor = pct >= 1.0 ? 'status-green' : pct >= 0.9 ? 'status-yellow' : 'status-red';
+                                const pipelineVal = c.pipelineProjects.reduce((s, p) => s + p.weightedValue, 0);
+                                return `
+                                <tr class="clickable" onclick="showCustomerModal(${c.id})">
+                                    <td><strong>${c.name}</strong></td>
+                                    <td>${c.blName}</td>
+                                    <td>${c.manager}</td>
+                                    <td class="text-right font-mono">${fmtK(c.annualValue)}</td>
+                                    <td class="text-right font-mono">${fmtK(c.ytd)}</td>
+                                    <td class="text-right font-mono">${pipelineVal > 0 ? fmtK(pipelineVal) : '–'}</td>
+                                    <td class="text-center"><span class="status-dot ${dotColor}"></span>${pct >= 1.0 ? 'Edellä' : pct >= 0.9 ? 'OK' : 'Jäljessä'}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        // Attach filter events
+        document.getElementById('f-search').addEventListener('input', e => { filterSearch = e.target.value; render(); });
+        document.querySelectorAll('[data-fbl]').forEach(btn => {
+            btn.addEventListener('click', () => { filterBL = btn.dataset.fbl; render(); });
+        });
+        document.querySelectorAll('[data-fmgr]').forEach(btn => {
+            btn.addEventListener('click', () => { filterManager = btn.dataset.fmgr; render(); });
+        });
+
+        // Sort headers
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const field = th.dataset.sort;
+                if (sortField === field) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+                else { sortField = field; sortDir = field === 'name' ? 'asc' : 'desc'; }
+                render();
+            });
+        });
+    }
+
+    render();
+}
+
+// ===== CUSTOMER MODAL =====
+window.showCustomerModal = function(custId) {
+    const cust = customers.find(c => c.id === custId);
+    if (!cust) return;
+
+    const custInvoices = invoices.filter(i => i.customerId === custId).sort((a, b) => b.date - a.date);
+    const custPipeline = pipeline.filter(p => p.customerId === custId);
+    const ytd = data.revenueByCustomer[custId] || 0;
+    const targetYTD = cust.annualValue * YEAR_PROGRESS;
+    const pct = ytd / targetYTD;
+    const bl = businessLines.find(b => b.id === cust.bl);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    overlay.innerHTML = `
+    <div class="modal">
+        <div class="modal-header">
+            <h2>${cust.name}</h2>
+            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+                <div>
+                    <div class="text-sm text-muted">Business Line</div>
+                    <div class="fw-600" style="color:${bl.color}">${bl.name}</div>
+                </div>
+                <div>
+                    <div class="text-sm text-muted">Vastuuhenkilö</div>
+                    <div class="fw-600">${cust.manager}</div>
+                </div>
+                <div>
+                    <div class="text-sm text-muted">BL-vetäjä</div>
+                    <div class="fw-600">${bl.leader}</div>
+                </div>
+                <div>
+                    <div class="text-sm text-muted">Vuotuinen sopimusarvo</div>
+                    <div class="fw-600">${fmtK(cust.annualValue)}</div>
+                </div>
+            </div>
+
+            <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+                <div class="kpi-card">
+                    <div class="kpi-label">YTD Liikevaihto</div>
+                    <div class="kpi-value" style="font-size:22px">${fmtK(ytd)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">YTD Tavoite</div>
+                    <div class="kpi-value" style="font-size:22px">${fmtK(targetYTD)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Tila</div>
+                    <div class="kpi-value" style="font-size:22px;color:${pct >= 1 ? 'var(--success)' : pct >= 0.9 ? 'var(--warning)' : 'var(--danger)'}">
+                        ${pct >= 1 ? 'Edellä' : pct >= 0.9 ? 'OK' : 'Jäljessä'}
+                    </div>
+                    <div class="kpi-sub">${fmtPct(pct)} tavoitteesta</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom:12px">Laskut (${custInvoices.length} kpl)</h3>
+            <table class="data-table" style="margin-bottom:24px">
+                <thead><tr><th>Pvm</th><th>Kuvaus</th><th class="text-right">Summa</th></tr></thead>
+                <tbody>
+                    ${custInvoices.map(inv => `
+                    <tr>
+                        <td>${inv.date.toLocaleDateString('fi-FI')}</td>
+                        <td>${inv.description}</td>
+                        <td class="text-right font-mono">${fmtK(inv.amount)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+
+            ${custPipeline.length > 0 ? `
+            <h3 style="margin-bottom:12px">Pipeline-projektit (${custPipeline.length} kpl)</h3>
+            <table class="data-table">
+                <thead><tr><th>Projekti</th><th>Vaihe</th><th class="text-right">Arvo</th><th class="text-right">Painotettu</th><th>Sulkeutuu</th><th></th></tr></thead>
+                <tbody>
+                    ${custPipeline.map(p => `
+                    <tr>
+                        <td>${p.name}</td>
+                        <td><span class="pill pill-${p.stageId}">${p.stageName} (${Math.round(p.probability * 100)}%)</span></td>
+                        <td class="text-right font-mono">${fmtK(p.value)}</td>
+                        <td class="text-right font-mono">${fmtK(p.weightedValue)}</td>
+                        <td>${p.expectedClose.toLocaleDateString('fi-FI')}</td>
+                        <td><button class="edit-icon-btn" onclick="event.stopPropagation(); this.closest('.modal-overlay').remove(); showProjectEditModal(${p.id}, function(){ showCustomerModal(${custId}); })" title="Muokkaa projektia"><i class="fas fa-pen"></i></button></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>` : '<p class="text-muted">Ei avoimia pipeline-projekteja.</p>'}
+        </div>
+    </div>`;
+
+    document.body.appendChild(overlay);
+};
+
+// ===== PIPELINE VIEW =====
+function renderPipeline(el) {
+    let filterStage = '';
+    let filterBL = '';
+
+    function render() {
+        const filtered = pipeline.filter(p => {
+            if (filterStage && p.stageId !== filterStage) return false;
+            if (filterBL && p.bl !== filterBL) return false;
+            return true;
+        });
+
+        const totalValue = filtered.reduce((s, p) => s + p.value, 0);
+        const totalWeighted = filtered.reduce((s, p) => s + p.weightedValue, 0);
+        const wonValue = filtered.filter(p => p.stageId === 'won').reduce((s, p) => s + p.value, 0);
+        const committedValue = filtered.filter(p => p.stageId === 'contract' || p.stageId === 'won').reduce((s, p) => s + p.value, 0);
+
+        // Coverage analysis: how much of remaining target is covered by pipeline
+        const remainingGap = data.remainingTarget;
+        const coverageRatio = totalWeighted / remainingGap;
+
+        el.innerHTML = `
+        <div class="animate-in">
+            <div class="forecast-summary">
+                <div class="forecast-card" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;cursor:pointer" data-fc-filter="won" title="Klikkaa nähdäksesi voitetut">
+                    <div class="fc-value">${fmtM(wonValue)}</div>
+                    <div class="fc-label">Voitettu <i class="fas fa-search-plus" style="opacity:0.5"></i></div>
+                </div>
+                <div class="forecast-card" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;cursor:pointer" data-fc-filter="committed" title="Klikkaa nähdäksesi sitoutuneet">
+                    <div class="fc-value">${fmtM(committedValue)}</div>
+                    <div class="fc-label">Sitoutunut (voitettu + sopimus) <i class="fas fa-search-plus" style="opacity:0.5"></i></div>
+                </div>
+                <div class="forecast-card" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;cursor:pointer" data-fc-filter="all" title="Klikkaa nähdäksesi kaikki">
+                    <div class="fc-value">${fmtM(totalWeighted)}</div>
+                    <div class="fc-label">Painotettu pipeline <i class="fas fa-search-plus" style="opacity:0.5"></i></div>
+                </div>
+                <div class="forecast-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;cursor:pointer" data-fc-filter="all" title="Klikkaa nähdäksesi kaikki">
+                    <div class="fc-value">${fmtM(totalValue)}</div>
+                    <div class="fc-label">Kokonaisarvo <i class="fas fa-search-plus" style="opacity:0.5"></i></div>
+                </div>
+                <div class="forecast-card" style="background:linear-gradient(135deg,#1e293b,#475569);color:#fff">
+                    <div class="fc-value">${fmtPct(coverageRatio)}</div>
+                    <div class="fc-label">Pipeline kattaa loppuvuoden tavoitteesta</div>
+                </div>
+            </div>
+
+            <!-- Pipeline by stage visualization -->
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Pipeline vaiheittain</h3>
+                        <span class="text-sm text-muted" style="cursor:default"><i class="fas fa-mouse-pointer"></i> Klikkaa porautuaksesi</span>
+                    </div>
+                    <div class="card-body" style="cursor:pointer"><canvas id="chart-pipeline-stages"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Pipeline Business Lineittain</h3>
+                        <span class="text-sm text-muted" style="cursor:default"><i class="fas fa-mouse-pointer"></i> Klikkaa porautuaksesi</span>
+                    </div>
+                    <div class="card-body" style="cursor:pointer"><canvas id="chart-pipeline-bl"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Drill-down detail area -->
+            <div id="pipeline-drilldown"></div>
+
+            <!-- Gap analysis card -->
+            <div class="gap-analysis">
+                <h3><i class="fas fa-bullseye"></i>&nbsp; Ennuste vs. tavoite</h3>
+                <div class="gap-grid">
+                    <div class="gap-item">
+                        <div class="gap-value">${fmtM(data.totalRevenue)}</div>
+                        <div class="gap-label">Toteutunut YTD</div>
+                    </div>
+                    <div class="gap-item">
+                        <div class="gap-value">${fmtM(totalWeighted)}</div>
+                        <div class="gap-label">Pipeline (painotettu)</div>
+                    </div>
+                    <div class="gap-item">
+                        <div class="gap-value">${fmtM(data.totalRevenue + totalWeighted)}</div>
+                        <div class="gap-label">Ennuste yhteensä</div>
+                    </div>
+                    <div class="gap-item">
+                        <div class="gap-value" style="color:${data.totalRevenue + totalWeighted >= TOTAL_TARGET ? '#22c55e' : '#ef4444'}">${fmtM(TOTAL_TARGET - data.totalRevenue - totalWeighted)}</div>
+                        <div class="gap-label">${data.totalRevenue + totalWeighted >= TOTAL_TARGET ? 'Ylijäämä' : 'Kurottava kiinni'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Pipeline-projektit (${filtered.length} kpl)</h3>
+                </div>
+                <div class="card-body">
+                    <div class="filters" style="flex-direction:column;gap:12px">
+                        <div class="filter-group">
+                            <div class="filter-group-label">Myyntivaihe</div>
+                            <div class="filter-chips">
+                                <button class="filter-chip ${filterStage === '' ? 'active' : ''}" data-pstage="">Kaikki</button>
+                                ${pipelineStages.map(s => {
+                                    const count = pipeline.filter(p => p.stageId === s.id).length;
+                                    return `<button class="filter-chip-colored ${filterStage === s.id ? 'active' : ''}" data-pstage="${s.id}" style="${filterStage === s.id ? 'background:' + s.color + ';border-color:' + s.color : 'border-color:' + s.color + '60;color:' + s.color}">${s.name} (${Math.round(s.probability * 100)}%)<span class="chip-count">${count}</span></button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-group-label">Business Line</div>
+                            <div class="filter-chips">
+                                <button class="filter-chip ${filterBL === '' ? 'active' : ''}" data-pbl="">Kaikki</button>
+                                ${businessLines.map(bl => {
+                                    const count = pipeline.filter(p => p.bl === bl.id).length;
+                                    return `<button class="filter-chip-colored ${filterBL === bl.id ? 'active' : ''}" data-pbl="${bl.id}" style="${filterBL === bl.id ? 'background:' + bl.color + ';border-color:' + bl.color : 'border-color:' + bl.color + '40;color:' + bl.color}">${bl.name}<span class="chip-count">${count}</span></button>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Projekti</th>
+                                <th>Asiakas</th>
+                                <th>Business Line</th>
+                                <th>Vastuuhenkilö</th>
+                                <th>Vaihe</th>
+                                <th class="text-right">Arvo</th>
+                                <th class="text-right">Painotettu</th>
+                                <th>Sulkeutuu</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered
+                                .sort((a, b) => b.weightedValue - a.weightedValue)
+                                .map(p => `
+                                <tr>
+                                    <td><strong>${p.name}</strong></td>
+                                    <td class="clickable" onclick="showCustomerModal(${p.customerId})">${p.customerName}</td>
+                                    <td>${p.blName}</td>
+                                    <td>${p.manager}</td>
+                                    <td><span class="pill pill-${p.stageId}">${p.stageName} (${Math.round(p.probability * 100)}%)</span></td>
+                                    <td class="text-right font-mono">${fmtK(p.value)}</td>
+                                    <td class="text-right font-mono">${fmtK(p.weightedValue)}</td>
+                                    <td>${p.expectedClose.toLocaleDateString('fi-FI')}</td>
+                                    <td><button class="edit-icon-btn" onclick="showProjectEditModal(${p.id})" title="Muokkaa projektia"><i class="fas fa-pen"></i></button></td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        // Filter events
+        document.querySelectorAll('[data-pstage]').forEach(btn => {
+            btn.addEventListener('click', () => { filterStage = btn.dataset.pstage; render(); });
+        });
+        document.querySelectorAll('[data-pbl]').forEach(btn => {
+            btn.addEventListener('click', () => { filterBL = btn.dataset.pbl; render(); });
+        });
+
+        // Forecast card drill-down events
+        document.querySelectorAll('[data-fc-filter]').forEach(card => {
+            card.addEventListener('click', () => {
+                const filterType = card.dataset.fcFilter;
+                let drillProjects, title, color;
+                if (filterType === 'won') {
+                    drillProjects = filtered.filter(p => p.stageId === 'won');
+                    title = 'Voitetut projektit';
+                    color = '#22c55e';
+                } else if (filterType === 'committed') {
+                    drillProjects = filtered.filter(p => p.stageId === 'won' || p.stageId === 'contract');
+                    title = 'Sitoutuneet projektit (voitettu + sopimus)';
+                    color = '#3b82f6';
+                } else {
+                    drillProjects = filtered;
+                    title = 'Kaikki pipeline-projektit';
+                    color = '#8b5cf6';
+                }
+                renderPipelineDrilldown(title, drillProjects, color);
+            });
+        });
+
+        // Charts
+        renderPipelineStagesChart(filtered);
+        renderPipelineBLChart(filtered);
+    }
+
+    render();
+}
+
+function renderPipelineDrilldown(title, projects, color) {
+    const dd = document.getElementById('pipeline-drilldown');
+    if (!dd) return;
+
+    const totalValue = projects.reduce((s, p) => s + p.value, 0);
+    const totalWeighted = projects.reduce((s, p) => s + p.weightedValue, 0);
+
+    // Group by stage for sub-breakdown
+    const byStage = pipelineStages.map(s => ({
+        ...s,
+        projects: projects.filter(p => p.stageId === s.id),
+        value: projects.filter(p => p.stageId === s.id).reduce((sum, p) => sum + p.value, 0),
+        weighted: projects.filter(p => p.stageId === s.id).reduce((sum, p) => sum + p.weightedValue, 0),
+    })).filter(s => s.projects.length > 0);
+
+    // Group by BL for sub-breakdown
+    const byBL = businessLines.map(bl => ({
+        ...bl,
+        projects: projects.filter(p => p.bl === bl.id),
+        value: projects.filter(p => p.bl === bl.id).reduce((sum, p) => sum + p.value, 0),
+        weighted: projects.filter(p => p.bl === bl.id).reduce((sum, p) => sum + p.weightedValue, 0),
+    })).filter(b => b.projects.length > 0);
+
+    dd.innerHTML = `
+    <div class="card animate-in" style="border-left:4px solid ${color}">
+        <div class="card-header">
+            <h3><i class="fas fa-search-plus"></i>&nbsp; ${title} – Porautuminen</h3>
+            <button class="modal-close" onclick="document.getElementById('pipeline-drilldown').innerHTML=''">✕</button>
+        </div>
+        <div class="card-body">
+            <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+                <div class="kpi-card">
+                    <div class="kpi-label">Projekteja</div>
+                    <div class="kpi-value" style="font-size:22px">${projects.length}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Kokonaisarvo</div>
+                    <div class="kpi-value" style="font-size:22px">${fmtM(totalValue)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Painotettu arvo</div>
+                    <div class="kpi-value" style="font-size:22px">${fmtM(totalWeighted)}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Keskim. todennäköisyys</div>
+                    <div class="kpi-value" style="font-size:22px">${projects.length > 0 ? fmtPct(projects.reduce((s,p) => s + p.probability, 0) / projects.length) : '–'}</div>
+                </div>
+            </div>
+
+            ${byStage.length > 1 ? `
+            <div style="margin-bottom:16px">
+                <div class="filter-group-label" style="margin-bottom:8px">Jakauma vaiheittain</div>
+                ${byStage.map(s => `
+                <div class="progress-row">
+                    <div class="progress-label">
+                        <span class="name"><span class="status-dot" style="background:${s.color}"></span>${s.name} (${s.projects.length} kpl)</span>
+                        <span class="font-mono">${fmtK(s.value)} | painotettu ${fmtK(s.weighted)}</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width:${totalValue > 0 ? (s.value / totalValue * 100) : 0}%;background:${s.color}"></div>
+                    </div>
+                </div>`).join('')}
+            </div>` : ''}
+
+            ${byBL.length > 1 ? `
+            <div style="margin-bottom:16px">
+                <div class="filter-group-label" style="margin-bottom:8px">Jakauma Business Lineittain</div>
+                ${byBL.map(b => `
+                <div class="progress-row">
+                    <div class="progress-label">
+                        <span class="name"><span class="status-dot" style="background:${b.color}"></span>${b.name} (${b.projects.length} kpl)</span>
+                        <span class="font-mono">${fmtK(b.value)} | painotettu ${fmtK(b.weighted)}</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width:${totalValue > 0 ? (b.value / totalValue * 100) : 0}%;background:${b.color}"></div>
+                    </div>
+                </div>`).join('')}
+            </div>` : ''}
+
+            <div class="filter-group-label" style="margin-bottom:8px">Kaikki projektit</div>
+            <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr>
+                    <th>Projekti</th><th>Asiakas</th><th>Business Line</th><th>Vastuuhenkilö</th><th>Vaihe</th>
+                    <th class="text-right">Arvo</th><th class="text-right">Painotettu</th><th>Sulkeutuu</th><th></th>
+                </tr></thead>
+                <tbody>
+                    ${projects.sort((a,b) => b.weightedValue - a.weightedValue).map(p => `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td class="clickable" onclick="showCustomerModal(${p.customerId})">${p.customerName}</td>
+                        <td>${p.blName}</td>
+                        <td>${p.manager}</td>
+                        <td><span class="pill pill-${p.stageId}">${p.stageName} (${Math.round(p.probability * 100)}%)</span></td>
+                        <td class="text-right font-mono">${fmtK(p.value)}</td>
+                        <td class="text-right font-mono">${fmtK(p.weightedValue)}</td>
+                        <td>${p.expectedClose.toLocaleDateString('fi-FI')}</td>
+                        <td><button class="edit-icon-btn" onclick="showProjectEditModal(${p.id})" title="Muokkaa projektia"><i class="fas fa-pen"></i></button></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>`;
+
+    dd.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderPipelineStagesChart(filteredPipeline) {
+    const stageData = pipelineStages.map(s => {
+        const projects = filteredPipeline.filter(p => p.stageId === s.id);
+        return {
+            id: s.id,
+            label: s.name,
+            value: projects.reduce((sum, p) => sum + p.value, 0),
+            count: projects.length,
+            color: s.color,
+        };
+    }).filter(s => s.count > 0);
+
+    const canvas = document.getElementById('chart-pipeline-stages');
+    charts.pipelineStages = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: stageData.map(s => `${s.label} (${s.count})`),
+            datasets: [{
+                data: stageData.map(s => s.value),
+                backgroundColor: stageData.map(s => s.color),
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverBorderWidth: 3,
+                hoverOffset: 8,
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } },
+                tooltip: {
+                    callbacks: { label: ctx => ctx.label + ': ' + fmtK(ctx.parsed) + '  (klikkaa)' },
+                },
+            },
+            onClick: (evt, elements) => {
+                if (elements.length > 0) {
+                    const idx = elements[0].index;
+                    const stage = stageData[idx];
+                    const projects = filteredPipeline.filter(p => p.stageId === stage.id);
+                    renderPipelineDrilldown(stage.label, projects, stage.color);
+                }
+            },
+        },
+    });
+}
+
+function renderPipelineBLChart(filteredPipeline) {
+    const blData = businessLines.map(bl => {
+        const projects = filteredPipeline.filter(p => p.bl === bl.id);
+        return {
+            id: bl.id,
+            label: bl.name,
+            value: projects.reduce((sum, p) => sum + p.value, 0),
+            weighted: projects.reduce((sum, p) => sum + p.weightedValue, 0),
+            color: bl.color,
+        };
+    });
+
+    const canvas = document.getElementById('chart-pipeline-bl');
+    charts.pipelineBL = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: blData.map(b => b.label),
+            datasets: [
+                { label: 'Kokonaisarvo', data: blData.map(b => b.value), backgroundColor: blData.map(b => b.color + '60'), borderColor: blData.map(b => b.color), borderWidth: 1, borderRadius: 4 },
+                { label: 'Painotettu', data: blData.map(b => b.weighted), backgroundColor: blData.map(b => b.color), borderRadius: 4 },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } },
+                tooltip: {
+                    callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtK(ctx.parsed.y) + '  (klikkaa)' },
+                },
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { callback: v => fmtK(v) }, grid: { color: '#f0f0f0' } },
+                x: { grid: { display: false } },
+            },
+            onClick: (evt, elements) => {
+                if (elements.length > 0) {
+                    const idx = elements[0].index;
+                    const bl = blData[idx];
+                    const projects = filteredPipeline.filter(p => p.bl === bl.id);
+                    renderPipelineDrilldown(bl.label, projects, bl.color);
+                }
+            },
+        },
+    });
+}
+
+// ===== TARGETS VIEW =====
+function renderTargets(el) {
+    const quarterLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
+    const quarterActuals = [0, 0, 0, 0];
+
+    // Calculate actuals by quarter
+    for (const inv of invoices) {
+        const q = Math.floor(inv.month / 3);
+        quarterActuals[q] += inv.amount;
+    }
+
+    // Q1 actuals per BL
+    const q1ByBL = {};
+    for (const bl of businessLines) q1ByBL[bl.id] = 0;
+    for (const inv of invoices) {
+        if (inv.month < 3) q1ByBL[inv.bl] += inv.amount;
+    }
+
+    el.innerHTML = `
+    <div class="animate-in">
+        <div class="card">
+            <div class="card-header">
+                <h3>Vuositavoitteet 2026 – Business Lineittain</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Business Line</th>
+                            <th>Vetäjä</th>
+                            <th class="text-right">Vuositavoite</th>
+                            ${quarterLabels.map(q => `<th class="text-right">${q} Tavoite</th>`).join('')}
+                            <th class="text-right">Q1 Toteuma</th>
+                            <th class="text-right">Q1 Ero</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${businessLines.map(bl => {
+                            const q1Actual = q1ByBL[bl.id];
+                            const q1Target = bl.quarterTargets[0];
+                            const q1Diff = q1Actual - q1Target;
+                            return `
+                            <tr>
+                                <td><strong>${bl.name}</strong></td>
+                                <td>${bl.leader}</td>
+                                <td class="text-right font-mono fw-600">${fmtM(bl.targetAnnual)}</td>
+                                ${bl.quarterTargets.map(qt => `<td class="text-right font-mono">${fmtM(qt)}</td>`).join('')}
+                                <td class="text-right font-mono">${fmtM(q1Actual)}</td>
+                                <td class="text-right font-mono" style="color:${q1Diff >= 0 ? 'var(--success)' : 'var(--danger)'}">${q1Diff >= 0 ? '+' : ''}${fmtK(q1Diff)}</td>
+                            </tr>`;
+                        }).join('')}
+                        <tr style="font-weight:700;border-top:2px solid var(--border)">
+                            <td>Yhteensä</td>
+                            <td></td>
+                            <td class="text-right font-mono">${fmtM(TOTAL_TARGET)}</td>
+                            ${[0,1,2,3].map(q => `<td class="text-right font-mono">${fmtM(businessLines.reduce((s, bl) => s + bl.quarterTargets[q], 0))}</td>`).join('')}
+                            <td class="text-right font-mono">${fmtM(Object.values(q1ByBL).reduce((s, v) => s + v, 0))}</td>
+                            <td class="text-right font-mono" style="color:${Object.values(q1ByBL).reduce((s, v) => s + v, 0) - businessLines.reduce((s, bl) => s + bl.quarterTargets[0], 0) >= 0 ? 'var(--success)' : 'var(--danger)'}">${(Object.values(q1ByBL).reduce((s, v) => s + v, 0) - businessLines.reduce((s, bl) => s + bl.quarterTargets[0], 0)) >= 0 ? '+' : ''}${fmtK(Object.values(q1ByBL).reduce((s, v) => s + v, 0) - businessLines.reduce((s, bl) => s + bl.quarterTargets[0], 0))}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header"><h3>Kvartaalitavoitteet vs. toteuma</h3></div>
+                <div class="card-body"><canvas id="chart-quarter"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-header"><h3>Vuositavoitteen jakautuminen</h3></div>
+                <div class="card-body"><canvas id="chart-target-split"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Run rate analysis -->
+        <div class="card">
+            <div class="card-header"><h3>Run Rate -analyysi (tavoitteen saavuttamiseksi)</h3></div>
+            <div class="card-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Business Line</th>
+                            <th class="text-right">YTD Toteuma</th>
+                            <th class="text-right">Jäljellä oleva tavoite</th>
+                            <th class="text-right">Nykyinen tahti/kk</th>
+                            <th class="text-right">Vaadittava tahti/kk</th>
+                            <th class="text-right">Erotus/kk</th>
+                            <th class="text-center">Arvio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${businessLines.map(bl => {
+                            const rev = data.revenueByBL[bl.id];
+                            const remaining = bl.targetAnnual - rev;
+                            const currentRate = rev / MONTHS_ELAPSED;
+                            const requiredRate = remaining / data.remainingMonths;
+                            const rateDiff = requiredRate - currentRate;
+                            const ratio = requiredRate / currentRate;
+                            const assessment = ratio <= 1.0 ? 'Saavutettavissa' : ratio <= 1.15 ? 'Haastava' : 'Kriittinen';
+                            const assessColor = ratio <= 1.0 ? 'var(--success)' : ratio <= 1.15 ? 'var(--warning)' : 'var(--danger)';
+                            return `
+                            <tr>
+                                <td><strong>${bl.name}</strong></td>
+                                <td class="text-right font-mono">${fmtM(rev)}</td>
+                                <td class="text-right font-mono">${fmtM(remaining)}</td>
+                                <td class="text-right font-mono">${fmtK(currentRate)}</td>
+                                <td class="text-right font-mono">${fmtK(requiredRate)}</td>
+                                <td class="text-right font-mono" style="color:${rateDiff <= 0 ? 'var(--success)' : 'var(--danger)'}">${rateDiff <= 0 ? '' : '+'}${fmtK(rateDiff)}</td>
+                                <td class="text-center" style="color:${assessColor};font-weight:600">${assessment}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Organisation structure -->
+        <div class="card">
+            <div class="card-header"><h3>Organisaatiorakenne</h3></div>
+            <div class="card-body">
+                <div style="text-align:center;margin-bottom:24px">
+                    <div style="display:inline-block;background:var(--sidebar-bg);color:#fff;padding:12px 24px;border-radius:8px;font-weight:600">
+                        <i class="fas fa-crown"></i> Kari Toivonen – Toimitusjohtaja (CEO)
+                    </div>
+                    <div style="width:2px;height:24px;background:var(--border);margin:0 auto"></div>
+                    <div style="display:inline-block;background:#334155;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px">
+                        <i class="fas fa-chart-pie"></i> Maria Koistinen – Myyntijohtaja (CSO)
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px">
+                    ${businessLines.map(bl => {
+                        const managers = accountManagers.filter(am => am.bl === bl.id);
+                        return `
+                        <div style="border:2px solid ${bl.color};border-radius:8px;padding:16px">
+                            <div style="font-weight:600;color:${bl.color};margin-bottom:4px">${bl.name}</div>
+                            <div style="font-size:13px;margin-bottom:8px"><i class="fas fa-user-tie"></i> ${bl.leader}</div>
+                            <div style="border-top:1px solid var(--border);padding-top:8px;font-size:12px;color:var(--text-light)">
+                                ${managers.map(am => `<div style="margin-bottom:2px"><i class="fas fa-user"></i> ${am.name}</div>`).join('')}
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+    // Quarter chart
+    const q1Target = businessLines.reduce((s, bl) => s + bl.quarterTargets[0], 0);
+    const q2Target = businessLines.reduce((s, bl) => s + bl.quarterTargets[1], 0);
+    const q3Target = businessLines.reduce((s, bl) => s + bl.quarterTargets[2], 0);
+    const q4Target = businessLines.reduce((s, bl) => s + bl.quarterTargets[3], 0);
+
+    charts.quarter = new Chart(document.getElementById('chart-quarter'), {
+        type: 'bar',
+        data: {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+            datasets: [
+                {
+                    label: 'Toteuma',
+                    data: [quarterActuals[0], quarterActuals[1] || null, null, null],
+                    backgroundColor: '#4f6ef7',
+                    borderRadius: 4,
+                    barPercentage: 0.5,
+                },
+                {
+                    label: 'Tavoite',
+                    data: [q1Target, q2Target, q3Target, q4Target],
+                    backgroundColor: '#e2e8f0',
+                    borderRadius: 4,
+                    barPercentage: 0.5,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmtM(ctx.parsed.y) } },
+            },
+            scales: {
+                y: { beginAtZero: true, ticks: { callback: v => fmtM(v) }, grid: { color: '#f0f0f0' } },
+                x: { grid: { display: false } },
+            },
+        },
+    });
+
+    // Target split chart
+    charts.targetSplit = new Chart(document.getElementById('chart-target-split'), {
+        type: 'doughnut',
+        data: {
+            labels: businessLines.map(bl => bl.name),
+            datasets: [{
+                data: businessLines.map(bl => bl.targetAnnual),
+                backgroundColor: businessLines.map(bl => bl.color),
+                borderWidth: 3,
+                borderColor: '#fff',
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } },
+                tooltip: { callbacks: { label: ctx => ctx.label + ': ' + fmtM(ctx.parsed) + ' (' + fmtPct(ctx.parsed / TOTAL_TARGET) + ')' } },
+            },
+        },
+    });
+}
+
+// ===== INIT =====
+renderView();
+
+</script>
+</body>
+</html>

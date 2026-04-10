@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SerttiApuri - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #3b82f6; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #2563eb; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #2563eb; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #0f172a; }
+        .feature-card .tag {
+            display: inline-block; background: #eff6ff; color: #1d4ed8;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #2563eb; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>SerttiApuri - Käyttöohje</h1>
+        <p class="subtitle">Sertifikaattien hallintajärjestelmä AI-teknologiayritykselle</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>AI-teknologiayrityksessä työntekijät suorittavat sertifikaatteja kymmeniltä eri tarjoajilta &mdash; AWS, Azure, Google Cloud, Anthropic, OpenAI ja monet muut. Kenelläkään ei ole kokonaiskuvaa siitä, kuka on suorittanut mitäkin, miten strategiset tavoitteet etenevät (esim. kumppanuusstatukset) tai mitä sertifikaatteja kannattaisi priorisoida. SerttiApuri kokoaa kaiken yhteen: katalogi, tavoitteet, analytiikka ja henkilökohtaiset oppimispolut.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>Dashboard</strong>-näkymään jossa näet yhteenvedon organisaation sertifikaattitilanteesta.</li>
+            <li>Tutustu <strong>Katalogi</strong>-näkymään selataksesi yli 60 sertifikaattia ja suodattaaksesi tarjoajan, tason tai tyypin mukaan.</li>
+            <li>Tarkista <strong>Tavoitteet</strong>-näkymästä yrityksen strategiset sertifikaattitavoitteet ja niiden edistyminen.</li>
+            <li>Etsi kollegoita <strong>Henkilöhaku</strong>-näkymästä tai suunnittele omaa urapolkuasi <strong>Oma polku</strong> -näkymässä.</li>
+        </ol>
+
+        <h2>Yhdeksän näkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Yleisnäkymä</span>
+            <h3>Dashboard</h3>
+            <p>Korkean tason yhteenveto organisaation sertifikaattitilanteesta.</p>
+            <ul>
+                <li><strong>Tilastokortit</strong>: henkilöstömäärä, suoritetut sertifikaatit, katalogissa olevat sertit ja aktiiviset tavoitteet.</li>
+                <li><strong>Kaaviot</strong>: jakaumat tarjoajittain, tasoittain ja tiimeittäin.</li>
+                <li>Nopea yleiskatsaus organisaation osaamistilanteeseen.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Yritys</span>
+            <h3>Tavoitteet</h3>
+            <p>Strategiset sertifikaattitavoitteet ja niiden seuranta.</p>
+            <ul>
+                <li>Yritystason tavoitteet esim. "10 Anthropic Partner -sertifikaattia" tai "80 % devaajista AI-koulutettu".</li>
+                <li><strong>Edistymispalkit</strong> näyttävät kuinka lähellä tavoitetta ollaan.</li>
+                <li>Deadlinet ja vastuuhenkilöt jokaiselle tavoitteelle.</li>
+                <li>Klikkaa "suorittaneet"-lukua nähdäksesi ketkä ovat jo suorittaneet.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Yritys</span>
+            <h3>Analytiikka</h3>
+            <p>Syvällinen analytiikka sertifikaateista koko organisaation tasolla.</p>
+            <ul>
+                <li>Jakauma <strong>tarjoajittain, tasoittain, tiimeittäin</strong> ja kustannuksittain.</li>
+                <li>Porautuminen yksittäisiin sertifikaatteihin ja niiden suorittajiin.</li>
+                <li>Trendit ja kehityssuunnat ajan myötä.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Sertifikaatit</span>
+            <h3>Katalogi</h3>
+            <p>Kattava hakemisto kaikista saatavilla olevista sertifikaateista.</p>
+            <ul>
+                <li>Yli <strong>60 sertifikaattia</strong> tarjoajilta: AWS, Microsoft, Google, Anthropic, OpenAI, NVIDIA, GitHub, Databricks ym.</li>
+                <li><strong>Suodata</strong> tarjoajan, tason (Foundational/Associate/Professional/Expert), tyypin ja hinnan mukaan.</li>
+                <li><strong>Haku</strong> nimellä tai kuvauksella.</li>
+                <li>Jokaisen sertin kohdalla näkyy hinta, kesto, taso ja kuinka moni on suorittanut.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Sertifikaatit</span>
+            <h3>Vinkit &amp; Resurssit</h3>
+            <p>Kollegoiden vinkit sertifikaattien suorittamiseen.</p>
+            <ul>
+                <li>Käytännön vinkit tentistä: vaikeustaso, valmistautumisaika, parhaat materiaalit.</li>
+                <li><strong>Aika-arviot</strong> ja suositellut opiskelustrategiat.</li>
+                <li>Linkit virallisiin resursseihin ja opiskelumateriaaleihin.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Henkilöstö</span>
+            <h3>Henkilöhaku</h3>
+            <p>Etsi kollegoita ja heidän sertifikaattejaan.</p>
+            <ul>
+                <li><strong>Haku</strong> nimellä, tiimillä tai sertifikaatilla.</li>
+                <li>Jokaisen henkilön kohdalla näkyy tiimi, rooli ja suoritetut sertifikaatit.</li>
+                <li>Klikkaa henkilöä nähdäksesi yksityiskohtaisen profiilin.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Henkilöstö</span>
+            <h3>Oma polku</h3>
+            <p>Henkilökohtainen sertifikaattipolku ja suositukset.</p>
+            <ul>
+                <li><strong>Suositellut sertifikaatit</strong> oman roolin ja tiimin perusteella.</li>
+                <li>Arvio <strong>kustannuksista ja ajasta</strong> polun suorittamiseen.</li>
+                <li>Priorisointi strategisten tavoitteiden mukaan.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Henkilöstö</span>
+            <h3>Tulostaulukko</h3>
+            <p>Sertifikaattien suorittajien ranking.</p>
+            <ul>
+                <li>Henkilöstö järjestettynä <strong>suoritettujen sertifikaattien</strong> mukaan.</li>
+                <li>Näyttää sertifikaattien määrän, tason ja viimeisimmän suorituksen.</li>
+                <li>Motivoi ja tuo näkyvyyttä aktiivisille oppijoille.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Henkilöstö</span>
+            <h3>AI-assistentti</h3>
+            <p>Keskustelupohjainen apuri sertifikaattikysymyksiin.</p>
+            <ul>
+                <li>Kysy mitä tahansa sertifikaateista, oppimispoluista tai tavoitteista.</li>
+                <li>Saa <strong>henkilökohtaisia suosituksia</strong> oman tilanteen perusteella.</li>
+                <li>Demo-toteutus joka esittelee millainen AI-avusteinen kokemus voisi olla.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Aloita Katalogi-näkymästä ja suodata tarjoajaksi "Anthropic" &mdash; näet heti mitä sertifikaatteja kumppanuusstatus vaatii ja kuinka moni on jo suorittanut. Tämä auttaa hahmottamaan organisaation edistymisen strategisissa tavoitteissa.
+        </div>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">HR-päällikkö</div>
+            <h3>"Miten sertifikaattitavoitteet etenevät?"</h3>
+            <p>Avaa <strong>Tavoitteet</strong> &rarr; näet yritystason tavoitteet edistymispalkkeineen. Poraudu <strong>Analytiikka</strong>-näkymään nähdäksesi jakauman tiimeittäin ja tunnistaaksesi missä tarvitaan lisäpanostusta.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Kehittäjä</div>
+            <h3>"Mitä sertifikaattia minun kannattaisi suorittaa seuraavaksi?"</h3>
+            <p>Avaa <strong>Oma polku</strong> &rarr; näet suositellut sertifikaatit roolisi ja tiimisi perusteella. Tarkista <strong>Vinkit &amp; Resurssit</strong> kollegoiden kokemuksia varten ennen opiskelun aloittamista.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Tiimin vetäjä</div>
+            <h3>"Kenellä tiimissäni on AWS-osaamista?"</h3>
+            <p>Avaa <strong>Henkilöhaku</strong> &rarr; suodata tarjoajaksi "AWS" &rarr; näet kaikki joilla on AWS-sertifikaatteja. Tai avaa <strong>Analytiikka</strong> ja poraudu tiimitasolle.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">CTO</div>
+            <h3>"Onko meillä tarpeeksi AI-osaamista kumppanuuksia varten?"</h3>
+            <p>Avaa <strong>Tavoitteet</strong> &rarr; katso kumppanuustavoitteiden edistyminen (esim. "Anthropic Partner"). Siirry <strong>Dashboard</strong>-näkymään kokonaiskuvan hahmottamiseksi ja <strong>Analytiikka</strong>-näkymään tarjoajakohtaiseen porautumiseen.</p>
+        </div>
+
+        <h2>Sertifikaattitarjoajat</h2>
+        <p>Sovellus kattaa sertifikaatteja seuraavilta tarjoajilta:</p>
+        <ul>
+            <li><strong>Pilvipalvelut:</strong> AWS, Microsoft Azure, Google Cloud</li>
+            <li><strong>AI-alustat:</strong> Anthropic (Claude), OpenAI, NVIDIA, DeepLearning.AI</li>
+            <li><strong>Kehitystyökalut:</strong> GitHub, Cursor, HashiCorp</li>
+            <li><strong>Data &amp; CRM:</strong> Databricks, Salesforce</li>
+        </ul>
+        <p>Sertifikaattien tasot: <strong>Foundational</strong> (perustaso), <strong>Associate</strong> (keskitaso), <strong>Professional</strong> (ammattitaso) ja <strong>Expert</strong> (asiantuntijataso).</p>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus sisältää <strong>yli 60 sertifikaattia</strong> ja noin <strong>100 henkilön</strong> profiilit demoa varten.</li>
+            <li>Kaikki data on <strong>generoitua</strong> &mdash; henkilöt, suoritukset ja tavoitteet ovat fiktiivisiä.</li>
+            <li>AI-assistentti on demo-toteutus eikä käytä oikeaa tekoälymallia.</li>
+            <li>Sertifikaattien hinnat ja kestot perustuvat todellisiin markkinahintoihin (2024&ndash;2025).</li>
+            <li>Tarjoajien brändivärit (AWS oranssi, Anthropic ruskea jne.) helpottavat visuaalista tunnistamista.</li>
+            <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

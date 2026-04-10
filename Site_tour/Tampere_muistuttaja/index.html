@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lempeä Muistuttaja</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💝</text></svg>">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <span class="header-logo">💝</span>
+        <div>
+          <div class="header-title" data-i18n="appTitle">Lempeä Muistuttaja</div>
+          <div class="header-subtitle" data-i18n="appSubtitle">Kokouksissa sovitut tehtävät eivät enää unohdu — automaattiset muistutukset lempeällä otteella</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-lang" id="langBtn" onclick="handleLangSwitch()">EN</button>
+        <a class="btn-guide" href="guide.html" data-i18n="navGuide">?</a>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nav-tab active" data-view="meeting" data-i18n="navNewMeeting">Uusi kokous</button>
+      <button class="nav-tab" data-view="tasks" data-i18n="navTasks">Tehtävät</button>
+      <button class="nav-tab" data-view="people" data-i18n="navPeople">Henkilöt</button>
+      <button class="nav-tab" data-view="dashboard" data-i18n="navDashboard">Yleiskatsaus</button>
+      <button class="nav-tab" data-view="calendar" data-i18n="navCalendar">Kalenteri</button>
+    </nav>
+  </header>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- 1. New Meeting View -->
+    <div class="view active" id="view-meeting">
+      <div class="view-header">
+        <h2 data-i18n="meetingTitle">Uusi kokous</h2>
+        <p data-i18n="meetingSubtitle">Liitä kokouksen muistiinpanot tai transkripti alle</p>
+      </div>
+
+      <div id="meetingInputArea">
+        <textarea class="meeting-input" id="transcriptInput" data-i18n-placeholder="meetingPlaceholder"></textarea>
+        <div class="meeting-actions">
+          <button class="btn btn-primary" onclick="analyzeTranscript()">
+            <span data-i18n="meetingAnalyze">Analysoi</span>
+          </button>
+          <button class="btn btn-secondary" onclick="showDemoSelector()">
+            <span data-i18n="meetingTryDemo">Kokeile demolla</span>
+          </button>
+          <button class="btn btn-warning" onclick="loadAllDemos()">
+            💝 <span data-i18n="meetingLoadAll">Lataa kaikki esimerkit</span>
+          </button>
+        </div>
+        <div class="demo-selector" id="demoSelector" style="display:none;"></div>
+      </div>
+
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText"></div>
+      </div>
+
+      <div class="results-container" id="resultsContainer">
+        <div class="results-summary" id="resultsSummary"></div>
+        <div id="resultsParticipants"></div>
+        <div class="meeting-actions" style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="confirmMeeting()">
+            <span data-i18n="meetingConfirm">Vahvista ja luo muistutukset</span>
+          </button>
+          <button class="btn btn-secondary" onclick="resetMeetingView()">
+            <span data-i18n="meetingCancel">Peruuta</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Tasks View -->
+    <div class="view" id="view-tasks">
+      <div class="view-header">
+        <h2 data-i18n="tasksTitle">Tehtävät</h2>
+        <p data-i18n="tasksSubtitle">Kaikki sovitut tehtävät yhdessä paikassa</p>
+      </div>
+      <div class="filters" id="taskFilters"></div>
+      <div id="taskList"></div>
+    </div>
+
+    <!-- 3. People View -->
+    <div class="view" id="view-people">
+      <div class="view-header">
+        <h2 data-i18n="peopleTitle">Henkilöt</h2>
+        <p data-i18n="peopleSubtitle">Kuka tekee mitäkin ja miten menee</p>
+      </div>
+      <div class="people-grid" id="peopleGrid"></div>
+      <div class="person-detail" id="personDetail"></div>
+    </div>
+
+    <!-- 4. Dashboard View -->
+    <div class="view" id="view-dashboard">
+      <div class="view-header">
+        <h2 data-i18n="dashTitle">Yleiskatsaus</h2>
+        <p data-i18n="dashSubtitle">Miten hommat edistyvät</p>
+      </div>
+      <div id="dashboardContent"></div>
+    </div>
+
+    <!-- 5. Calendar View -->
+    <div class="view" id="view-calendar">
+      <div class="view-header">
+        <h2 data-i18n="calTitle">Kalenteri</h2>
+        <p data-i18n="calSubtitle">Tehtävät aikajanalla</p>
+      </div>
+      <div id="calendarContent"></div>
+    </div>
+
+  </main>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Confirm modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="i18n.js"></script>
+  <script src="data.js"></script>
+  <script src="calendar.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>

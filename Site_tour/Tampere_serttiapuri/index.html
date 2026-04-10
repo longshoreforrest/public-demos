@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SerttiApuri — Sertifikaattien hallintajärjestelmä</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --sidebar-bg: #0f172a;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #1e3a5f;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --info: #06b6d4;
+  --info-light: #cffafe;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --transition: 0.2s ease;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
+a { color:var(--primary); text-decoration:none; }
+
+/* Sidebar */
+#sidebar { width:260px; background:var(--sidebar-bg); color:#fff; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:100; transition: transform var(--transition); }
+#sidebar .logo { padding:24px 20px; font-size:1.4rem; font-weight:800; letter-spacing:-0.5px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:10px; }
+#sidebar .logo svg { flex-shrink:0; }
+#sidebar nav { flex:1; padding:12px 0; overflow-y:auto; }
+#sidebar nav ul { list-style:none; }
+#sidebar nav li { padding:0 8px; margin-bottom:2px; }
+#sidebar nav li a { display:flex; align-items:center; gap:12px; padding:11px 16px; border-radius:var(--radius-sm); color:rgba(255,255,255,0.65); font-size:0.9rem; font-weight:500; cursor:pointer; transition: all var(--transition); }
+#sidebar nav li a:hover { background:var(--sidebar-hover); color:#fff; }
+#sidebar nav li a.active { background:var(--sidebar-active); color:#fff; }
+#sidebar nav li a svg { flex-shrink:0; opacity:0.7; }
+#sidebar nav li a.active svg { opacity:1; }
+.sidebar-section { padding:8px 24px 6px; font-size:0.7rem; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.3); margin-top:8px; }
+.sidebar-footer { padding:16px 20px; border-top:1px solid rgba(255,255,255,0.08); font-size:0.75rem; color:rgba(255,255,255,0.35); }
+
+/* Main */
+#main { margin-left:260px; flex:1; min-height:100vh; }
+#topbar { background:var(--card); border-bottom:1px solid var(--border); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; }
+#topbar h1 { font-size:1.2rem; font-weight:700; }
+#topbar .user-info { display:flex; align-items:center; gap:10px; font-size:0.85rem; color:var(--text-light); }
+#topbar .avatar { width:36px; height:36px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:0.85rem; }
+#content { padding:28px 32px; max-width:1400px; }
+
+/* Cards */
+.card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px; margin-bottom:20px; }
+.card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.card-header h2 { font-size:1.05rem; font-weight:700; }
+.card-header .badge { font-size:0.75rem; padding:4px 10px; border-radius:20px; font-weight:600; }
+
+/* Stat cards */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:24px; }
+.stat-card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.stat-icon.blue { background:#dbeafe; color:var(--primary); }
+.stat-icon.green { background:var(--success-light); color:var(--success); }
+.stat-icon.orange { background:var(--warning-light); color:var(--warning); }
+.stat-icon.red { background:var(--danger-light); color:var(--danger); }
+.stat-icon.cyan { background:var(--info-light); color:var(--info); }
+.stat-info h3 { font-size:1.6rem; font-weight:800; line-height:1.2; }
+.stat-info p { font-size:0.8rem; color:var(--text-light); margin-top:2px; }
+
+/* Grid layouts */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.grid-3 { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:20px; }
+.grid-4 { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+
+/* Filters */
+.filters { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; align-items:center; }
+.filter-group { display:flex; align-items:center; gap:6px; }
+.filter-group label { font-size:0.8rem; color:var(--text-light); font-weight:600; white-space:nowrap; }
+.search-input { padding:9px 14px 9px 36px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.85rem; background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 10px center no-repeat; min-width:240px; transition: border-color var(--transition); }
+.search-input:focus { outline:none; border-color:var(--primary); }
+select { padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:0.85rem; background:var(--card); cursor:pointer; color:var(--text); }
+select:focus { outline:none; border-color:var(--primary); }
+
+/* Catalog filter chips */
+.filter-section { margin-bottom:16px; }
+.filter-section .filter-label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-muted); margin-bottom:8px; }
+.chip-row { display:flex; flex-wrap:wrap; gap:6px; }
+.filter-chip { padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:600; cursor:pointer; border:2px solid var(--border); background:var(--card); color:var(--text-light); transition: all 0.15s ease; user-select:none; display:inline-flex; align-items:center; gap:5px; }
+.filter-chip:hover { border-color:var(--text-muted); color:var(--text); background:var(--bg); }
+.filter-chip.selected { border-color:var(--primary); background:var(--primary); color:#fff; box-shadow:0 2px 6px rgba(37,99,235,0.25); }
+/* Provider chip brand colors when selected */
+.filter-chip.selected[data-provider="AWS"] { background:#ff9900; border-color:#ff9900; color:#232f3e; }
+.filter-chip.selected[data-provider="Microsoft"] { background:#00a4ef; border-color:#00a4ef; color:#fff; }
+.filter-chip.selected[data-provider="Google"] { background:#4285f4; border-color:#4285f4; color:#fff; }
+.filter-chip.selected[data-provider="Anthropic"] { background:#d4a574; border-color:#d4a574; color:#2d1810; }
+.filter-chip.selected[data-provider="OpenAI"] { background:#10a37f; border-color:#10a37f; color:#fff; }
+.filter-chip.selected[data-provider="NVIDIA"] { background:#76b900; border-color:#76b900; color:#fff; }
+.filter-chip.selected[data-provider="GitHub"] { background:#24292e; border-color:#24292e; color:#fff; }
+.filter-chip.selected[data-provider="Databricks"] { background:#ff3621; border-color:#ff3621; color:#fff; }
+.filter-chip.selected[data-provider="DeepLearning.AI"] { background:#0056d2; border-color:#0056d2; color:#fff; }
+.filter-chip.selected[data-provider="HashiCorp"] { background:#7b42bc; border-color:#7b42bc; color:#fff; }
+.filter-chip.selected[data-provider="Cursor"] { background:#1a1a2e; border-color:#1a1a2e; color:#fff; }
+.filter-chip.selected[data-provider="Salesforce"] { background:#00a1e0; border-color:#00a1e0; color:#fff; }
+/* Level chip colors when selected */
+.filter-chip.selected[data-level="Foundational"] { background:#3b82f6; border-color:#3b82f6; }
+.filter-chip.selected[data-level="Associate"] { background:#10b981; border-color:#10b981; }
+.filter-chip.selected[data-level="Professional"] { background:#f59e0b; border-color:#f59e0b; color:#78350f; }
+.filter-chip.selected[data-level="Expert"] { background:#ef4444; border-color:#ef4444; }
+/* Type chip colors when selected */
+.filter-chip.selected[data-type] { background:var(--primary); border-color:var(--primary); }
+/* Cost chip colors */
+.filter-chip.selected[data-cost="free"] { background:#10b981; border-color:#10b981; }
+.filter-chip.selected[data-cost="low"] { background:#06b6d4; border-color:#06b6d4; }
+.filter-chip.selected[data-cost="mid"] { background:#f59e0b; border-color:#f59e0b; color:#78350f; }
+.filter-chip.selected[data-cost="high"] { background:#ef4444; border-color:#ef4444; }
+.filter-chip .chip-count { font-size:0.68rem; opacity:0.75; font-weight:500; }
+
+/* Goal filter cards */
+.goal-filter-card { transition: all 0.15s ease !important; }
+.goal-filter-card:hover { box-shadow:var(--shadow-md); transform:translateY(-1px); }
+.goal-filter-dimmed { opacity:0.45; }
+.goal-filter-dimmed:hover { opacity:0.75; }
+.goal-filter-active { box-shadow:var(--shadow-md); }
+
+/* Cert cards */
+.cert-card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; cursor:pointer; transition: all var(--transition); border:2px solid transparent; display:flex; flex-direction:column; }
+.cert-card:hover { box-shadow:var(--shadow-md); border-color:var(--primary-light); transform:translateY(-2px); }
+.cert-card .provider-badge { font-size:0.7rem; font-weight:700; padding:3px 8px; border-radius:4px; display:inline-block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+.cert-card h3 { font-size:0.95rem; font-weight:700; margin-bottom:6px; line-height:1.3; }
+.cert-card .cert-meta { font-size:0.78rem; color:var(--text-light); display:flex; flex-wrap:wrap; gap:12px; margin-top:auto; padding-top:10px; }
+.cert-card .cert-meta span { display:flex; align-items:center; gap:4px; }
+.level-badge { font-size:0.7rem; padding:2px 8px; border-radius:4px; font-weight:600; }
+.level-foundational { background:#dbeafe; color:#1e40af; }
+.level-associate { background:#d1fae5; color:#065f46; }
+.level-professional { background:#fef3c7; color:#92400e; }
+.level-expert { background:#fee2e2; color:#991b1b; }
+
+/* Provider colors */
+.provider-aws { background:#ff9900; color:#232f3e; }
+.provider-microsoft { background:#00a4ef; color:#fff; }
+.provider-google { background:#4285f4; color:#fff; }
+.provider-anthropic { background:#d4a574; color:#2d1810; }
+.provider-openai { background:#10a37f; color:#fff; }
+.provider-nvidia { background:#76b900; color:#fff; }
+.provider-github { background:#24292e; color:#fff; }
+.provider-databricks { background:#ff3621; color:#fff; }
+.provider-deeplearningai { background:#0056d2; color:#fff; }
+.provider-hashicorp { background:#7b42bc; color:#fff; }
+.provider-cursor { background:#1a1a2e; color:#fff; }
+.provider-salesforce { background:#00a1e0; color:#fff; }
+
+/* Tables */
+.data-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+.data-table th { text-align:left; padding:10px 14px; border-bottom:2px solid var(--border); font-weight:700; color:var(--text-light); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px; }
+.data-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.data-table tr:hover td { background:rgba(37,99,235,0.03); }
+.data-table .clickable { cursor:pointer; }
+.data-table .clickable:hover td { background:rgba(37,99,235,0.06); }
+
+/* Progress bars */
+.progress-bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+.progress-bar .fill { height:100%; border-radius:4px; transition: width 0.6s ease; }
+.progress-bar .fill.blue { background:var(--primary); }
+.progress-bar .fill.green { background:var(--success); }
+.progress-bar .fill.orange { background:var(--warning); }
+.progress-bar .fill.red { background:var(--danger); }
+.progress-large { height:12px; }
+.progress-label { display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px; }
+.progress-label .value { font-weight:700; }
+
+/* Bar chart */
+.bar-chart { display:flex; align-items:flex-end; gap:8px; height:200px; padding-top:20px; }
+.bar-col { display:flex; flex-direction:column; align-items:center; flex:1; height:100%; justify-content:flex-end; }
+.bar-col .bar { width:100%; max-width:50px; border-radius:6px 6px 0 0; transition: height 0.6s ease; min-height:4px; cursor:pointer; position:relative; }
+.bar-col .bar:hover { opacity:0.85; }
+.bar-col .bar-label { font-size:0.65rem; color:var(--text-light); margin-top:8px; text-align:center; writing-mode:vertical-rl; text-orientation:mixed; max-height:70px; overflow:hidden; }
+.bar-col .bar-value { font-size:0.7rem; font-weight:700; margin-bottom:4px; }
+
+/* Donut chart */
+.donut-container { display:flex; align-items:center; gap:30px; }
+.donut { width:160px; height:160px; border-radius:50%; position:relative; flex-shrink:0; }
+.donut-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:90px; height:90px; background:var(--card); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.donut-center .number { font-size:1.5rem; font-weight:800; }
+.donut-center .label { font-size:0.65rem; color:var(--text-light); }
+.donut-legend { display:flex; flex-direction:column; gap:8px; }
+.donut-legend .item { display:flex; align-items:center; gap:8px; font-size:0.82rem; }
+.donut-legend .dot { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; padding:20px; animation: fadeIn 0.2s ease; }
+.modal-overlay.open { display:flex; }
+.modal-content { background:var(--card); border-radius:var(--radius); max-width:700px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:var(--shadow-lg); animation: slideUp 0.25s ease; }
+.modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--card); border-radius:var(--radius) var(--radius) 0 0; z-index:1; }
+.modal-header h2 { font-size:1.1rem; font-weight:700; }
+.modal-close { width:32px; height:32px; border:none; background:var(--bg); border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-light); font-size:1.2rem; transition: all var(--transition); }
+.modal-close:hover { background:var(--danger-light); color:var(--danger); }
+.modal-body { padding:24px; }
+.modal-body h3 { font-size:0.95rem; font-weight:700; margin:16px 0 8px; }
+.modal-body h3:first-child { margin-top:0; }
+.modal-body p { font-size:0.85rem; color:var(--text-light); line-height:1.6; margin-bottom:8px; }
+.modal-body .detail-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:16px; }
+.modal-body .detail-item { flex:1; min-width:120px; }
+.modal-body .detail-item .label { font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; }
+.modal-body .detail-item .value { font-size:1rem; font-weight:700; margin-top:2px; }
+
+/* Tags */
+.tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.tag { font-size:0.72rem; padding:3px 10px; border-radius:20px; background:var(--bg); color:var(--text-light); font-weight:500; cursor:pointer; transition: all var(--transition); }
+.tag:hover { background:var(--primary); color:#fff; }
+.tag.active { background:var(--primary); color:#fff; }
+
+/* Chat */
+.chat-container { display:flex; flex-direction:column; height:calc(100vh - 140px); max-height:700px; }
+.chat-messages { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; }
+.chat-msg { max-width:80%; display:flex; gap:10px; animation: fadeIn 0.3s ease; }
+.chat-msg.bot { align-self:flex-start; }
+.chat-msg.user { align-self:flex-end; flex-direction:row-reverse; }
+.chat-msg .msg-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; flex-shrink:0; font-weight:700; }
+.chat-msg.bot .msg-avatar { background:var(--primary); color:#fff; }
+.chat-msg.user .msg-avatar { background:var(--success); color:#fff; }
+.chat-msg .msg-bubble { padding:12px 16px; border-radius:16px; font-size:0.88rem; line-height:1.5; }
+.chat-msg.bot .msg-bubble { background:var(--bg); border-bottom-left-radius:4px; }
+.chat-msg.user .msg-bubble { background:var(--primary); color:#fff; border-bottom-right-radius:4px; }
+.chat-msg .msg-bubble .suggestion-chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.chat-msg .msg-bubble .chip { padding:6px 12px; border-radius:20px; background:var(--card); color:var(--primary); font-size:0.78rem; font-weight:600; cursor:pointer; border:1px solid var(--border); transition: all var(--transition); }
+.chat-msg .msg-bubble .chip:hover { background:var(--primary); color:#fff; }
+.chat-input-area { padding:16px 20px; border-top:1px solid var(--border); display:flex; gap:10px; background:var(--card); border-radius:0 0 var(--radius) var(--radius); }
+.chat-input-area input { flex:1; padding:12px 16px; border:1px solid var(--border); border-radius:24px; font-size:0.88rem; transition: border-color var(--transition); }
+.chat-input-area input:focus { outline:none; border-color:var(--primary); }
+.chat-input-area button { padding:12px 20px; background:var(--primary); color:#fff; border:none; border-radius:24px; font-weight:600; font-size:0.85rem; cursor:pointer; transition: background var(--transition); white-space:nowrap; }
+.chat-input-area button:hover { background:var(--primary-dark); }
+.typing-indicator { display:flex; gap:4px; padding:4px 0; }
+.typing-indicator span { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation: typing 1.4s infinite; }
+.typing-indicator span:nth-child(2) { animation-delay:0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay:0.4s; }
+
+/* Path visualization */
+.path-timeline { position:relative; padding-left:30px; }
+.path-timeline::before { content:''; position:absolute; left:11px; top:0; bottom:0; width:2px; background:var(--border); }
+.path-step { position:relative; margin-bottom:20px; padding:16px 20px; background:var(--card); border-radius:var(--radius-sm); border:1px solid var(--border); cursor:pointer; transition: all var(--transition); }
+.path-step:hover { border-color:var(--primary-light); box-shadow:var(--shadow); }
+.path-step::before { content:''; position:absolute; left:-25px; top:20px; width:14px; height:14px; border-radius:50%; background:var(--border); border:3px solid var(--bg); z-index:1; }
+.path-step.completed::before { background:var(--success); }
+.path-step.current::before { background:var(--primary); box-shadow:0 0 0 4px rgba(37,99,235,0.2); }
+.path-step.upcoming::before { background:var(--text-muted); }
+.path-step h4 { font-size:0.9rem; margin-bottom:4px; }
+.path-step .step-meta { font-size:0.78rem; color:var(--text-light); display:flex; gap:16px; }
+.path-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+.path-summary .summary-item { text-align:center; padding:20px; background:var(--bg); border-radius:var(--radius-sm); }
+.path-summary .summary-item .num { font-size:1.8rem; font-weight:800; color:var(--primary); }
+.path-summary .summary-item .lbl { font-size:0.78rem; color:var(--text-light); }
+
+/* Buttons */
+.btn { padding:9px 18px; border-radius:var(--radius-sm); font-size:0.85rem; font-weight:600; cursor:pointer; border:none; transition: all var(--transition); display:inline-flex; align-items:center; gap:6px; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:var(--primary-dark); }
+.btn-secondary { background:var(--bg); color:var(--text); border:1px solid var(--border); }
+.btn-secondary:hover { background:var(--border); }
+.btn-sm { padding:6px 12px; font-size:0.78rem; }
+.btn-success { background:var(--success); color:#fff; }
+
+/* Person card */
+.person-card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; cursor:pointer; transition: all var(--transition); border:2px solid transparent; }
+.person-card:hover { border-color:var(--primary-light); box-shadow:var(--shadow-md); }
+.person-card .person-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.person-card .person-avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; color:#fff; flex-shrink:0; }
+.person-card .person-name { font-weight:700; font-size:0.9rem; }
+.person-card .person-role { font-size:0.75rem; color:var(--text-light); }
+.person-card .person-certs { display:flex; flex-wrap:wrap; gap:4px; }
+.person-card .person-certs .mini-badge { font-size:0.65rem; padding:2px 6px; border-radius:3px; font-weight:600; }
+
+/* Animations */
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes typing { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+/* Goal card */
+.goal-card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; border-left:4px solid var(--primary); }
+.goal-card.on-track { border-left-color:var(--success); }
+.goal-card.at-risk { border-left-color:var(--warning); }
+.goal-card.behind { border-left-color:var(--danger); }
+.goal-card h3 { font-size:0.95rem; margin-bottom:4px; }
+.goal-card .goal-desc { font-size:0.82rem; color:var(--text-light); margin-bottom:12px; }
+.goal-card .goal-progress { margin-bottom:8px; }
+.goal-card .goal-footer { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-light); }
+
+/* Tabs */
+.tabs { display:flex; gap:4px; margin-bottom:20px; background:var(--bg); padding:4px; border-radius:var(--radius-sm); width:fit-content; }
+.tab-btn { padding:8px 18px; border:none; background:none; font-size:0.85rem; font-weight:600; cursor:pointer; border-radius:6px; color:var(--text-light); transition: all var(--transition); }
+.tab-btn.active { background:var(--card); color:var(--text); box-shadow:var(--shadow); }
+.tab-btn:hover:not(.active) { color:var(--text); }
+
+/* Leaderboard */
+.lb-row { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); }
+.lb-row:last-child { border-bottom:none; }
+.lb-rank { font-size:1.1rem; font-weight:800; width:30px; text-align:center; color:var(--text-muted); }
+.lb-rank.gold { color:#f59e0b; }
+.lb-rank.silver { color:#94a3b8; }
+.lb-rank.bronze { color:#d97706; }
+.lb-avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; color:#fff; flex-shrink:0; }
+.lb-info { flex:1; }
+.lb-name { font-weight:700; font-size:0.88rem; }
+.lb-team { font-size:0.75rem; color:var(--text-light); }
+.lb-count { font-size:1.1rem; font-weight:800; color:var(--primary); }
+
+/* Responsive */
+@media(max-width:1024px) { .grid-2{grid-template-columns:1fr} }
+@media(max-width:768px) { #sidebar{transform:translateX(-100%)} #main{margin-left:0} #content{padding:16px} .stats-grid{grid-template-columns:1fr 1fr} }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--text-muted); }
+
+/* Notification badge */
+.notif-dot { width:8px; height:8px; background:var(--danger); border-radius:50%; display:inline-block; margin-left:6px; }
+
+/* Tooltip */
+[data-tooltip] { position:relative; }
+[data-tooltip]:hover::after { content:attr(data-tooltip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); padding:6px 10px; background:var(--sidebar-bg); color:#fff; font-size:0.72rem; border-radius:6px; white-space:nowrap; z-index:10; }
+
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.empty-state svg { margin-bottom:16px; opacity:0.3; }
+.empty-state h3 { font-size:1rem; margin-bottom:6px; color:var(--text-light); }
+.empty-state p { font-size:0.85rem; }
+
+.inline-flex { display:inline-flex; align-items:center; gap:6px; }
+.mt-16 { margin-top:16px; }
+.mb-16 { margin-bottom:16px; }
+.mb-8 { margin-bottom:8px; }
+.text-sm { font-size:0.82rem; }
+.text-muted { color:var(--text-light); }
+.fw-700 { font-weight:700; }
+.flex-between { display:flex; justify-content:space-between; align-items:center; }
+.gap-8 { gap:8px; }
+
+/* Tips */
+.tip-card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; transition:box-shadow 0.2s; }
+.tip-card:hover { box-shadow:var(--shadow-md); }
+.tip-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.tip-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:600; font-size:0.75rem; flex-shrink:0; cursor:pointer; }
+.tip-meta { font-size:0.78rem; color:var(--text-light); }
+.tip-cert { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:4px; background:var(--bg); font-size:0.75rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
+.tip-cert:hover { background:var(--border); }
+.tip-text { font-size:0.88rem; line-height:1.55; margin-bottom:10px; }
+.tip-footer { display:flex; align-items:center; gap:16px; font-size:0.78rem; color:var(--text-light); }
+.tip-rating { display:inline-flex; gap:1px; }
+.tip-time-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:0.72rem; font-weight:600; }
+.tip-time-badge.faster { background:var(--success-light); color:#059669; }
+.tip-time-badge.slower { background:var(--warning-light); color:#d97706; }
+.tip-time-badge.same { background:var(--bg); color:var(--text-light); }
+.resource-link { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg); border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text); text-decoration:none; transition:background 0.15s; border:1px solid var(--border); }
+.resource-link:hover { background:var(--border); }
+.resource-type { font-size:0.7rem; padding:2px 6px; border-radius:4px; background:var(--card); color:var(--text-light); font-weight:600; white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    <div>
+      SerttiApuri
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.45);font-weight:400;margin-top:2px;letter-spacing:0;">Hallitse tiimin sertifikaatit ja oppimispolut yhdessä paikassa</div>
+    </div>
+  </div>
+  <nav>
+    <div class="sidebar-section">Yleisnäkymä</div>
+    <ul>
+      <li><a data-view="dashboard" class="active" onclick="navigate('dashboard')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard</a></li>
+    </ul>
+    <div class="sidebar-section">Yritys</div>
+    <ul>
+      <li><a data-view="goals" onclick="navigate('goals')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Tavoitteet</a></li>
+      <li><a data-view="analytics" onclick="navigate('analytics')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        Analytiikka</a></li>
+    </ul>
+    <div class="sidebar-section">Sertifikaatit</div>
+    <ul>
+      <li><a data-view="catalog" onclick="navigate('catalog')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/></svg>
+        Katalogi</a></li>
+      <li><a data-view="tips" onclick="navigate('tips')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        Vinkit & Resurssit</a></li>
+    </ul>
+    <div class="sidebar-section">Henkilöstö</div>
+    <ul>
+      <li><a data-view="people" onclick="navigate('people')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Henkilöhaku</a></li>
+      <li><a data-view="mypath" onclick="navigate('mypath')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Oma polku</a></li>
+      <li><a data-view="leaderboard" onclick="navigate('leaderboard')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        Tulostaulukko</a></li>
+      <li><a data-view="chat" onclick="navigate('chat')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        AI-assistentti <span class="notif-dot"></span></a></li>
+    </ul>
+  </nav>
+  <div class="sidebar-footer">SerttiApuri v1.0 &copy; 2026<br>AI-teknologiayritys</div>
+</aside>
+
+<div id="main">
+  <header id="topbar">
+    <h1 id="page-title">Dashboard</h1>
+    <div style="display:flex;align-items:center;gap:16px">
+    <a href="guide.html" style="color:#2563eb;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+    <div class="user-info">
+      <span>Milla Korhonen</span>
+      <div class="avatar">MK</div>
+    </div>
+    </div>
+  </header>
+  <div id="content"></div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const CERTS = [
+  // AWS
+  {id:'aws-cp',name:'AWS Cloud Practitioner (CLF-C02)',provider:'AWS',type:'Cloud',level:'Foundational',cost:100,hours:20,url:'https://aws.amazon.com/certification/certified-cloud-practitioner/',desc:'Perustason sertifikaatti, joka kattaa AWS-pilvipalveluiden ydinkonseptit, tietoturvan, hinnoittelun ja arkkitehtuurin perusteet. Sopii kaikille, jotka haluavat ymmärtää pilviteknologian perusteita.',prereqs:[],skills:['AWS-perusteet','Pilvipalvelut','Hinnoittelu','Tietoturva']},
+  {id:'aws-aip',name:'AWS AI Practitioner (AIF-C01)',provider:'AWS',type:'AI/ML',level:'Foundational',cost:75,hours:25,url:'https://aws.amazon.com/certification/certified-ai-practitioner/',desc:'Validoi tekoälyn, koneoppimisen ja generatiivisen AI:n peruskäsitteet ja käyttötapaukset AWS-ympäristössä. Sisältää Amazon Bedrock -palvelun perusteet.',prereqs:[],skills:['AI-perusteet','Koneoppiminen','Amazon Bedrock','Generatiivinen AI']},
+  {id:'aws-mle',name:'AWS ML Engineer Associate (MLA-C01)',provider:'AWS',type:'AI/ML',level:'Associate',cost:150,hours:80,url:'https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/',desc:'Todistaa kyvyn toteuttaa, julkaista ja ylläpitää koneoppimisratkaisuja AWS:ssä. Kattaa SageMakerin, datapipelinet ja MLOps-käytännöt.',prereqs:['aws-aip'],skills:['SageMaker','MLOps','Datapipelinet','Mallin julkaisu']},
+  {id:'aws-genai',name:'AWS GenAI Developer Professional',provider:'AWS',type:'AI/ML',level:'Professional',cost:300,hours:100,url:'https://aws.amazon.com/certification/certified-generative-ai-developer-professional/',desc:'Kehittynyt sertifikaatti generatiivisen AI:n sovelluskehitykseen AWS:ssä. Kattaa Amazon Bedrock AgentCore -palvelun, RAG-arkkitehtuurit ja LLM-sovellusten optimoinnin.',prereqs:['aws-mle'],skills:['Amazon Bedrock','RAG','LLM-optimointi','Agentit']},
+  {id:'aws-sa',name:'AWS Solutions Architect Associate (SAA-C03)',provider:'AWS',type:'Cloud',level:'Associate',cost:150,hours:80,url:'https://aws.amazon.com/certification/certified-solutions-architect-associate/',desc:'Suunnittele ja toteuta hajautettuja järjestelmiä AWS:ssä. Kattaa korkean käytettävyyden, kustannusoptimoinnin ja tietoturvan.',prereqs:['aws-cp'],skills:['Arkkitehtuuri','Korkea käytettävyys','Kustannusoptimointi','Tietoturva']},
+  {id:'aws-dev',name:'AWS Developer Associate (DVA-C02)',provider:'AWS',type:'Cloud',level:'Associate',cost:150,hours:60,url:'https://aws.amazon.com/certification/certified-developer-associate/',desc:'Sovelluskehittäjille suunnattu sertifikaatti. Lambda, API Gateway, DynamoDB ja muut AWS-palvelut sovelluskehityksessä.',prereqs:['aws-cp'],skills:['Lambda','API Gateway','DynamoDB','CI/CD']},
+  {id:'aws-de',name:'AWS Data Engineer Associate (DEA-C01)',provider:'AWS',type:'Data',level:'Associate',cost:150,hours:70,url:'https://aws.amazon.com/certification/certified-data-engineer-associate/',desc:'Data-putkien suunnittelu ja toteutus AWS:ssä. Glue, Redshift, Kinesis ja tietovarastointi.',prereqs:['aws-cp'],skills:['AWS Glue','Redshift','Kinesis','ETL']},
+
+  // Microsoft Azure
+  {id:'az-ai900',name:'Azure AI Fundamentals (AI-900)',provider:'Microsoft',type:'AI/ML',level:'Foundational',cost:99,hours:15,url:'https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/',desc:'Tekoälyn ja koneoppimisen peruskäsitteet Azure-ympäristössä. Kattaa konenäön, NLP:n ja konversationaalisen AI:n perusteet.',prereqs:[],skills:['AI-perusteet','Konenäkö','NLP','Azure AI Services']},
+  {id:'az-ai102',name:'Azure AI Engineer Associate (AI-102)',provider:'Microsoft',type:'AI/ML',level:'Associate',cost:165,hours:60,url:'https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer/',desc:'Azure AI -palveluiden tekninen toteutus: Azure OpenAI Service, Cognitive Services, Bot Framework ja AI-ratkaisujen integrointi.',prereqs:['az-ai900'],skills:['Azure OpenAI','Cognitive Services','Bot Framework','AI-integraatio']},
+  {id:'az-dp100',name:'Azure Data Scientist Associate (DP-100)',provider:'Microsoft',type:'Data',level:'Associate',cost:165,hours:80,url:'https://learn.microsoft.com/en-us/credentials/certifications/azure-data-scientist/',desc:'Koneoppimismallien suunnittelu ja toteutus Azure Machine Learning -palvelussa. AutoML, MLflow ja mallin julkaisu.',prereqs:['az-ai900'],skills:['Azure ML','AutoML','MLflow','Mallinnus']},
+  {id:'az-305',name:'Azure Solutions Architect Expert (AZ-305)',provider:'Microsoft',type:'Cloud',level:'Expert',cost:165,hours:100,url:'https://learn.microsoft.com/en-us/credentials/certifications/azure-solutions-architect/',desc:'Azure-arkkitehtuurin suunnittelu: identiteetti, hallinta, tietoturva, dataratkaisut ja liiketoiminnan jatkuvuus.',prereqs:['az-104'],skills:['Azure-arkkitehtuuri','Identiteetti','Tietoturva','Dataratkaisut']},
+  {id:'az-104',name:'Azure Administrator Associate (AZ-104)',provider:'Microsoft',type:'Cloud',level:'Associate',cost:165,hours:60,url:'https://learn.microsoft.com/en-us/credentials/certifications/azure-administrator/',desc:'Azure-resurssien hallinta, identiteetinhallinta, tallennus, laskenta ja virtuaaliverkot.',prereqs:[],skills:['Azure-hallinta','Identiteetti','Tallennus','Verkot']},
+  {id:'az-204',name:'Azure Developer Associate (AZ-204)',provider:'Microsoft',type:'Cloud',level:'Associate',cost:165,hours:60,url:'https://learn.microsoft.com/en-us/credentials/certifications/azure-developer/',desc:'Pilvisovellusten kehittäminen Azure-alustalla. App Service, Functions, Cosmos DB ja viestintäpalvelut.',prereqs:[],skills:['Azure Functions','App Service','Cosmos DB','Azure SDK']},
+  {id:'az-copilot',name:'Microsoft Copilot Fundamentals (AB-900)',provider:'Microsoft',type:'AI/ML',level:'Foundational',cost:99,hours:12,url:'https://learn.microsoft.com/en-us/credentials/certifications/copilot-and-agent-administration-fundamentals/',desc:'Microsoft Copilot -työkalun tehokas käyttö: promptien muotoilu, tuottavuuden parantaminen ja AI-avusteinen työ.',prereqs:[],skills:['Microsoft Copilot','Tuottavuus','Prompt-suunnittelu','M365']},
+
+  // Google Cloud
+  {id:'gc-cdl',name:'Google Cloud Digital Leader',provider:'Google',type:'Cloud',level:'Foundational',cost:99,hours:20,url:'https://cloud.google.com/learn/certification/cloud-digital-leader',desc:'Google Cloudin peruskonseptit: pilviteknologia, data, tekoäly ja digitaalinen transformaatio.',prereqs:[],skills:['GCP-perusteet','Digitaalinen transformaatio','Data','AI']},
+  {id:'gc-ace',name:'Google Cloud Associate Cloud Engineer',provider:'Google',type:'Cloud',level:'Associate',cost:200,hours:60,url:'https://cloud.google.com/learn/certification/cloud-engineer',desc:'GCP-resurssien käyttöönotto ja hallinta. Compute Engine, Kubernetes Engine, Cloud Storage ja verkotus.',prereqs:['gc-cdl'],skills:['Compute Engine','GKE','Cloud Storage','Verkotus']},
+  {id:'gc-pmle',name:'Google Cloud Professional ML Engineer',provider:'Google',type:'AI/ML',level:'Professional',cost:200,hours:100,url:'https://cloud.google.com/learn/certification/machine-learning-engineer',desc:'ML-ratkaisujen suunnittelu ja tuotantoon vienti Google Cloudissa. Vertex AI, Model Garden, AutoML ja GenAI-integraatio.',prereqs:['gc-ace'],skills:['Vertex AI','Model Garden','AutoML','GenAI']},
+  {id:'gc-pde',name:'Google Cloud Professional Data Engineer',provider:'Google',type:'Data',level:'Professional',cost:200,hours:80,url:'https://cloud.google.com/learn/certification/data-engineer',desc:'Dataputkien suunnittelu ja tiedon käsittely. BigQuery, Dataflow, Pub/Sub ja tietovarastointi.',prereqs:['gc-ace'],skills:['BigQuery','Dataflow','Pub/Sub','Tietovarastointi']},
+  {id:'gc-pca',name:'Google Cloud Professional Cloud Architect',provider:'Google',type:'Cloud',level:'Professional',cost:200,hours:100,url:'https://cloud.google.com/learn/certification/cloud-architect',desc:'GCP-arkkitehtuurin suunnittelu ja toteutus. Skaalautuvuus, tietoturva, luotettavuus ja kustannustehokkuus.',prereqs:['gc-ace'],skills:['GCP-arkkitehtuuri','Skaalautuvuus','Tietoturva','Kustannustehokkuus']},
+  {id:'gc-aie',name:'Google AI Essentials',provider:'Google',type:'AI/ML',level:'Foundational',cost:49,hours:10,url:'https://grow.google/ai-essentials/',desc:'Tekoälyn perusteet Googlen näkökulmasta. Soveltuu kaikille, jotka haluavat ymmärtää AI:n mahdollisuudet.',prereqs:[],skills:['AI-perusteet','Googlen AI-työkalut','Prompt engineering']},
+  {id:'gc-tf',name:'TensorFlow Developer Certificate',provider:'Google',type:'AI/ML',level:'Associate',cost:100,hours:80,url:'https://www.tensorflow.org/certificate',desc:'TensorFlow-kirjaston käyttö koneoppimismallien rakentamisessa. Neuraaliverkot, CNN, RNN ja NLP.',prereqs:[],skills:['TensorFlow','Neuraaliverkot','CNN','NLP']},
+
+  // Anthropic
+  {id:'ant-arch',name:'Claude Certified Architect',provider:'Anthropic',type:'AI/ML',level:'Professional',cost:0,hours:40,url:'https://anthropic.skilljar.com/',desc:'Anthropicin virallinen tekninen sertifikaatti. 60 kysymyksen koe kattaa viisi osa-aluetta: Claude-mallit, API-integraatio, turvallisuus, prompt-suunnittelu ja arkkitehtuuri.',prereqs:['ant-api','ant-prompt'],skills:['Claude-arkkitehtuuri','API-suunnittelu','AI-turvallisuus','Prompt engineering']},
+  {id:'ant-code',name:'Claude Code in Action',provider:'Anthropic',type:'Development',level:'Foundational',cost:0,hours:8,url:'https://anthropic.skilljar.com/claude-code-in-action',desc:'Claude Coden käyttö sovelluskehityksessä. Agenttipohjainen koodaus, MCP-protokolla ja työnkulkujen automatisointi.',prereqs:[],skills:['Claude Code','Agenttikoodaus','MCP','Automatisointi']},
+  {id:'ant-api',name:'Anthropic API Developer',provider:'Anthropic',type:'Development',level:'Associate',cost:0,hours:20,url:'https://anthropic.skilljar.com/claude-with-the-anthropic-api',desc:'Claude API:n integrointi sovelluksiin. Tool use, streaming, vision ja edistyneet API-ominaisuudet.',prereqs:['ant-fluency'],skills:['Claude API','Tool use','Streaming','Vision']},
+  {id:'ant-prompt',name:'Anthropic Prompt Engineering',provider:'Anthropic',type:'AI/ML',level:'Foundational',cost:0,hours:15,url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',desc:'Prompt-suunnittelun perusteet ja edistyneet tekniikat Claude-malleille. Chain-of-thought, few-shot ja system-promptit.',prereqs:[],skills:['Prompt engineering','Chain-of-thought','Few-shot','System prompt']},
+  {id:'ant-safety',name:'Anthropic AI Safety Fundamentals',provider:'Anthropic',type:'AI/ML',level:'Foundational',cost:0,hours:10,url:'https://anthropic.skilljar.com/ai-capabilities-and-limitations',desc:'AI-turvallisuuden perusteet Anthropicin näkökulmasta. Constitutional AI, RLHF ja vastuullinen AI-kehitys.',prereqs:[],skills:['AI-turvallisuus','Constitutional AI','RLHF','Etiikka']},
+  {id:'ant-fluency',name:'Anthropic AI Fluency',provider:'Anthropic',type:'AI/ML',level:'Foundational',cost:0,hours:6,url:'https://anthropic.skilljar.com/ai-fluency-framework-foundations',desc:'Tekoälyn peruskäsitteet ja Claude-mallien mahdollisuudet. Ensimmäinen askel Anthropic-ekosysteemiin.',prereqs:[],skills:['AI-perusteet','Claude-mallit','Käyttötapaukset']},
+  {id:'ant-mcp',name:'Anthropic MCP Developer',provider:'Anthropic',type:'Development',level:'Associate',cost:0,hours:15,url:'https://anthropic.skilljar.com/introduction-to-model-context-protocol',desc:'Model Context Protocol -kehitys. MCP-palvelimien rakentaminen, työkalujen integrointi ja kontekstin hallinta.',prereqs:['ant-code'],skills:['MCP','Palvelinkehitys','Työkalut','Kontekstinhallinta']},
+
+  // OpenAI
+  {id:'oai-found',name:'OpenAI AI Foundations',provider:'OpenAI',type:'AI/ML',level:'Foundational',cost:0,hours:15,url:'https://academy.openai.com/',desc:'AI-työkalujen käyttö työelämässä. Käytännönläheinen koulutus ChatGPT:n ja muiden OpenAI-työkalujen hyödyntämiseen.',prereqs:[],skills:['ChatGPT','AI-työkalut','Tuottavuus','Automatisointi']},
+  {id:'oai-api',name:'OpenAI API Developer',provider:'OpenAI',type:'Development',level:'Associate',cost:49,hours:20,url:'https://academy.openai.com/public/content',desc:'OpenAI API:n käyttö sovelluskehityksessä. GPT-mallit, Assistants API, function calling ja RAG-toteutukset.',prereqs:[],skills:['OpenAI API','Assistants API','Function calling','RAG']},
+  {id:'oai-chatgpt',name:'ChatGPT for Enterprise',provider:'OpenAI',type:'AI/ML',level:'Foundational',cost:49,hours:8,url:'https://openai.com/business/apps/openai-certified/',desc:'ChatGPT:n tehokäyttö yritysympäristössä. Custom GPT:t, tietoturva ja organisaation AI-strategia.',prereqs:[],skills:['ChatGPT Enterprise','Custom GPTs','Tietoturva','AI-strategia']},
+
+  // NVIDIA
+  {id:'nv-genl',name:'NVIDIA Generative AI LLMs (NCP-GENL)',provider:'NVIDIA',type:'AI/ML',level:'Professional',cost:135,hours:40,url:'https://www.nvidia.com/en-us/learn/certification/generative-ai-llm-professional/',desc:'Suurten kielimallien kouluttaminen ja optimointi NVIDIA-laitteistolla. CUDA, TensorRT ja Triton-palvelin.',prereqs:['nv-dl'],skills:['LLM-koulutus','CUDA','TensorRT','Triton']},
+  {id:'nv-aai',name:'NVIDIA Agentic AI (NCP-AAI)',provider:'NVIDIA',type:'AI/ML',level:'Professional',cost:135,hours:35,url:'https://www.nvidia.com/en-us/learn/certification/agentic-ai-professional/',desc:'AI-agenttien rakentaminen ja orkestrointi. NeMo, agenttiframeworkit ja moniagenttijärjestelmät.',prereqs:['nv-dl'],skills:['AI-agentit','NeMo','Orkestrointi','Moniagenttijärjestelmät']},
+  {id:'nv-ads',name:'NVIDIA Accelerated Data Science (NCP-ADS)',provider:'NVIDIA',type:'Data',level:'Professional',cost:135,hours:40,url:'https://www.nvidia.com/en-us/learn/certification/accelerated-data-science-professional/',desc:'GPU-kiihdytetty data science. RAPIDS, cuDF, cuML ja suurten datajoukkojen tehokas käsittely.',prereqs:[],skills:['RAPIDS','cuDF','cuML','GPU-laskenta']},
+  {id:'nv-dl',name:'NVIDIA Deep Learning Fundamentals',provider:'NVIDIA',type:'AI/ML',level:'Foundational',cost:90,hours:30,url:'https://www.nvidia.com/en-us/training/',desc:'Syväoppimisen perusteet NVIDIA DLI -alustan kautta. Neuraaliverkot, CNN-mallit ja GPU-laskenta.',prereqs:[],skills:['Syväoppiminen','Neuraaliverkot','CNN','GPU-laskenta']},
+
+  // GitHub
+  {id:'gh-copilot',name:'GitHub Copilot (GH-300)',provider:'GitHub',type:'Development',level:'Associate',cost:99,hours:20,url:'https://learn.microsoft.com/en-us/credentials/certifications/github-copilot/',desc:'AI-avusteinen koodaus GitHub Copilotilla. Prompt engineering koodauksessa, turvallisuus ja tuottavuuden maksimointi.',prereqs:[],skills:['GitHub Copilot','AI-koodaus','Prompt engineering','Kooditurvallisuus']},
+  {id:'gh-actions',name:'GitHub Actions',provider:'GitHub',type:'DevOps',level:'Associate',cost:99,hours:25,url:'https://learn.microsoft.com/en-us/credentials/certifications/github-actions/',desc:'CI/CD-putkien rakentaminen GitHub Actionsilla. Työnkulkujen automatisointi, testaus ja julkaisu.',prereqs:[],skills:['GitHub Actions','CI/CD','Automatisointi','Testaus']},
+  {id:'gh-admin',name:'GitHub Administration',provider:'GitHub',type:'DevOps',level:'Associate',cost:99,hours:20,url:'https://learn.microsoft.com/en-us/credentials/certifications/github-administration/',desc:'GitHub-organisaation hallinta. Käyttöoikeudet, tietoturva, compliance ja enterprise-ominaisuudet.',prereqs:[],skills:['GitHub-hallinta','Käyttöoikeudet','Tietoturva','Enterprise']},
+
+  // Databricks
+  {id:'db-genai',name:'Databricks GenAI Engineer Associate',provider:'Databricks',type:'AI/ML',level:'Associate',cost:200,hours:50,url:'https://www.databricks.com/learn/certification/genai-engineer-associate',desc:'LLM-ratkaisujen rakentaminen Databricks-alustalla. RAG-sovellukset, Vector Search, Model Serving ja MLflow.',prereqs:[],skills:['Databricks','RAG','Vector Search','Model Serving']},
+  {id:'db-de',name:'Databricks Data Engineer Associate',provider:'Databricks',type:'Data',level:'Associate',cost:200,hours:60,url:'https://www.databricks.com/learn/certification/data-engineer-associate',desc:'Dataputkien rakentaminen Databricksillä. Delta Lake, Spark, datalaadun hallinta ja Unity Catalog.',prereqs:[],skills:['Delta Lake','Spark','Datalaatu','Unity Catalog']},
+  {id:'db-ml',name:'Databricks ML Professional',provider:'Databricks',type:'AI/ML',level:'Professional',cost:200,hours:80,url:'https://www.databricks.com/learn/certification/machine-learning-professional',desc:'ML-mallien tuotantokäyttö Databricks-alustalla. Feature Store, edistynyt MLflow ja mallin monitorointi.',prereqs:['db-genai'],skills:['Feature Store','MLflow','Mallin monitorointi','ML-tuotanto']},
+
+  // DeepLearning.AI
+  {id:'dl-spec',name:'Deep Learning Specialization',provider:'DeepLearning.AI',type:'AI/ML',level:'Associate',cost:49,hours:120,url:'https://www.coursera.org/specializations/deep-learning',desc:'Andrew Ng:n klassinen syväoppimiskurssi. Neuraaliverkot, CNN, RNN, sekvenssimallit ja hyperparametrien viritys.',prereqs:[],skills:['Neuraaliverkot','CNN','RNN','Hyperparametrit']},
+  {id:'dl-genai',name:'Generative AI with LLMs',provider:'DeepLearning.AI',type:'AI/ML',level:'Associate',cost:49,hours:30,url:'https://www.coursera.org/learn/generative-ai-with-llms',desc:'Suurten kielimallien toimintaperiaatteet ja soveltaminen. Transformer-arkkitehtuuri, fine-tuning ja RLHF.',prereqs:[],skills:['LLM-teoria','Transformer','Fine-tuning','RLHF']},
+  {id:'dl-ml',name:'Machine Learning Specialization',provider:'DeepLearning.AI',type:'AI/ML',level:'Foundational',cost:49,hours:80,url:'https://www.coursera.org/specializations/machine-learning-introduction',desc:'Koneoppimisen perusteet. Regressio, luokittelu, klusterointi, suosittelujärjestelmät ja vahvistusoppiminen.',prereqs:[],skills:['Regressio','Luokittelu','Klusterointi','Vahvistusoppiminen']},
+
+  // HashiCorp
+  {id:'hc-tf',name:'Terraform Associate (003)',provider:'HashiCorp',type:'DevOps',level:'Associate',cost:70,hours:40,url:'https://developer.hashicorp.com/certifications/infrastructure-automation',desc:'Infrastructure as Code Terraformilla. Provisionointi, tilanhallinta, moduulit ja pilvi-infrastruktuurin automatisointi.',prereqs:[],skills:['Terraform','IaC','Tilanhallinta','Moduulit']},
+
+  // Cursor
+  {id:'cur-dev',name:'Cursor AI-Assisted Development',provider:'Cursor',type:'Development',level:'Foundational',cost:0,hours:10,url:'https://cursor.com/learn',desc:'Cursor-editorin tehokas käyttö AI-avusteisessa kehityksessä. Composer, inline-chat ja koodikannan kontekstinhallinta.',prereqs:[],skills:['Cursor','AI-koodaus','Composer','Kontekstinhallinta']},
+  {id:'cur-adv',name:'Cursor Advanced Workflows',provider:'Cursor',type:'Development',level:'Associate',cost:0,hours:15,url:'https://cursor.com/learn',desc:'Edistyneet Cursor-työnkulut. Monivaiheinen refaktorointi, testien generointi ja koodikannan analysointi.',prereqs:['cur-dev'],skills:['Refaktorointi','Testigenerointi','Koodianalyysi','Työnkulut']},
+
+  // Salesforce / Agentforce
+  {id:'sf-agentforce',name:'Salesforce Agentforce Specialist (AI-201)',provider:'Salesforce',type:'AI/ML',level:'Associate',cost:200,hours:60,url:'https://trailhead.salesforce.com/credentials/agentforcespecialist',desc:'Validoi kyvyn rakentaa, hallita ja optimoida AI-pohjaisia palveluagentteja Salesforcen Agentforce-alustalla. Kattaa prompt engineeringin, agenttien suunnittelun, Data Cloudin integraation ja Service Cloud -yhteydet.',prereqs:['sf-champion'],skills:['Agentforce','Prompt engineering','Service Cloud','Data Cloud']},
+  {id:'sf-datacloud',name:'Salesforce Data Cloud Consultant',provider:'Salesforce',type:'Data',level:'Professional',cost:200,hours:80,url:'https://trailhead.salesforce.com/credentials/datacloudconsultant',desc:'Enterprise-tason dataratkaisut Salesforcen Data Cloud -alustalla. Tiedon yhdistäminen, segmentointi, aktivointi ja analytiikka.',prereqs:['sf-agentforce'],skills:['Data Cloud','Tiedon yhdistäminen','Segmentointi','Aktivointi']},
+  {id:'sf-champion',name:'Agentblazer Champion 2026',provider:'Salesforce',type:'AI/ML',level:'Foundational',cost:0,hours:15,url:'https://trailhead.salesforce.com/content/learn/trails/become-an-agentblazer-champion-2026',desc:'Agentforce-perusteet ja liiketoiminta-arvo. Trailhead-oppimispolku joka kattaa AI-agentien konseptit ja Salesforce-ekosysteemin perusymmärryksen.',prereqs:[],skills:['Agentforce-perusteet','AI-agentit','Salesforce-ekosysteemi','Liiketoiminta-arvo']},
+  {id:'sf-innovator',name:'Agentblazer Innovator 2026',provider:'Salesforce',type:'AI/ML',level:'Associate',cost:0,hours:30,url:'https://trailhead.salesforce.com/content/learn/trails/become-an-agentblazer-innovator-2026',desc:'Käytännön Agentforce-toteutukset. Liiketoimintahaasteiden ratkaiseminen AI-agenteilla, Einstein Copilotin hyödyntäminen ja agenttien konfigurointi.',prereqs:['sf-champion'],skills:['Einstein Copilot','Agenttien konfigurointi','Käyttötapaukset','Liiketoimintaratkaisut']},
+  {id:'sf-aifound',name:'Salesforce AI Foundations (Trailhead)',provider:'Salesforce',type:'AI/ML',level:'Foundational',cost:0,hours:10,url:'https://trailhead.salesforce.com/content/learn/modules/artificial-intelligence-fundamentals',desc:'Tekoälyn perusteet Salesforce-ekosysteemissä. Einstein AI, luottamuksellinen AI ja generatiivisen AI:n sovellukset CRM-ympäristössä.',prereqs:[],skills:['Einstein AI','Luottamuksellinen AI','GenAI CRM:ssä','Trailhead']},
+];
+
+const PROVIDERS = [...new Set(CERTS.map(c=>c.provider))];
+const TYPES = [...new Set(CERTS.map(c=>c.type))];
+const LEVELS = ['Foundational','Associate','Professional','Expert'];
+
+const TEAMS = ['AI & Data','Cloud & Infra','Tuotekehitys','Konsultointi','Design & UX','Johtoryhmä'];
+const ROLES = ['Senior Developer','Developer','Lead Developer','Data Scientist','ML Engineer','Cloud Architect','DevOps Engineer','UX Designer','Project Manager','Tech Lead','Solution Architect','Konsultti','QA Engineer','Head of AI','VP Engineering','CTO'];
+
+const AVATAR_COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#059669','#0891b2','#4f46e5','#be185d','#0d9488','#6366f1','#c026d3','#dc2626'];
+
+// Generate 100 people
+const FIRST_NAMES_M = ['Mikko','Jari','Timo','Antti','Juha','Matti','Ville','Petri','Sami','Markku','Pekka','Heikki','Janne','Tuomas','Lauri','Eero','Kari','Jussi','Teemu','Olli','Aleksi','Samuli','Kimmo','Harri','Jouni'];
+const FIRST_NAMES_F = ['Anna','Maria','Johanna','Sari','Tiina','Hanna','Minna','Elina','Kaisa','Riikka','Laura','Jenni','Noora','Sanna','Katja','Maija','Heidi','Kirsi','Outi','Päivi','Leena','Emmi','Iida','Saara','Niina'];
+const LAST_NAMES = ['Virtanen','Korhonen','Nieminen','Mäkinen','Hämäläinen','Laine','Heikkinen','Koskinen','Järvinen','Lehtonen','Lehtinen','Saarinen','Salminen','Heinonen','Niemi','Heikkilä','Kinnunen','Salonen','Turunen','Laitinen','Mäkelä','Aaltonen','Rantanen','Karjalainen','Mattila','Jokinen','Toivonen','Lahtinen','Hiltunen','Lindström','Kallio','Ojala','Hakala','Peltonen','Manninen','Savolainen','Laaksonen','Ahonen','Leppänen','Aho'];
+
+function seededRandom(seed) {
+  let s = seed;
+  return function() { s = (s * 16807 + 0) % 2147483647; return (s - 1) / 2147483646; };
+}
+
+function generatePeople() {
+  const rng = seededRandom(42);
+  const pick = arr => arr[Math.floor(rng() * arr.length)];
+  const people = [];
+  const usedNames = new Set();
+
+  // Team distribution
+  const teamDist = [
+    {team:'AI & Data', roles:['Data Scientist','ML Engineer','Senior Developer','Developer','Lead Developer'], count:25},
+    {team:'Cloud & Infra', roles:['Cloud Architect','DevOps Engineer','Senior Developer','Developer'], count:20},
+    {team:'Tuotekehitys', roles:['Senior Developer','Developer','Lead Developer','Tech Lead','QA Engineer'], count:25},
+    {team:'Konsultointi', roles:['Solution Architect','Konsultti','Senior Developer'], count:15},
+    {team:'Design & UX', roles:['UX Designer','Developer','Senior Developer'], count:8},
+    {team:'Johtoryhmä', roles:['Head of AI','VP Engineering','CTO','Project Manager','Tech Lead'], count:7},
+  ];
+
+  // Cert assignment profiles by team
+  const certProfiles = {
+    'AI & Data': {core:['ant-fluency','ant-prompt','oai-found','dl-ml','az-ai900','gc-aie','nv-dl'],mid:['ant-api','ant-code','aws-aip','az-ai102','gc-tf','dl-spec','dl-genai','db-genai','oai-api','ant-mcp','aws-mle','gh-copilot','cur-dev'],adv:['ant-arch','aws-genai','gc-pmle','nv-genl','nv-aai','db-ml','az-dp100']},
+    'Cloud & Infra': {core:['aws-cp','az-104','gc-cdl','hc-tf','gh-actions'],mid:['aws-sa','aws-dev','az-204','gc-ace','gh-admin','aws-de','ant-code','cur-dev','gh-copilot'],adv:['az-305','gc-pca','gc-pde','aws-genai']},
+    'Tuotekehitys': {core:['gh-copilot','cur-dev','ant-code','oai-found','ant-fluency'],mid:['ant-api','oai-api','gh-actions','aws-dev','az-204','ant-prompt','ant-mcp','cur-adv'],adv:['ant-arch','aws-sa','gc-pca']},
+    'Konsultointi': {core:['aws-cp','az-ai900','gc-cdl','oai-found','ant-fluency','oai-chatgpt'],mid:['aws-aip','az-ai102','ant-prompt','gh-copilot','az-copilot','ant-code','cur-dev','sf-aifound'],adv:['ant-arch','aws-sa','az-305','gc-pmle','sf-champion']},
+    'Design & UX': {core:['oai-found','ant-fluency','oai-chatgpt','az-copilot'],mid:['ant-prompt','cur-dev','gh-copilot'],adv:['ant-code']},
+    'Johtoryhmä': {core:['oai-found','ant-fluency','aws-cp','gc-cdl','oai-chatgpt'],mid:['ant-prompt','az-ai900','az-copilot','aws-aip','ant-code'],adv:['ant-arch','aws-sa','gc-pca']},
+  };
+
+  let id = 1;
+  for (const td of teamDist) {
+    for (let i = 0; i < td.count; i++) {
+      let first, last, name;
+      do {
+        first = rng() > 0.5 ? pick(FIRST_NAMES_M) : pick(FIRST_NAMES_F);
+        last = pick(LAST_NAMES);
+        name = `${first} ${last}`;
+      } while (usedNames.has(name));
+      usedNames.add(name);
+
+      const role = pick(td.roles);
+      const profile = certProfiles[td.team];
+
+      // Determine cert count based on role seniority
+      let certCount;
+      const seniorRoles = ['Lead Developer','Tech Lead','Head of AI','VP Engineering','CTO','Solution Architect','Cloud Architect'];
+      const midRoles = ['Senior Developer','Data Scientist','ML Engineer','DevOps Engineer','Konsultti'];
+      if (seniorRoles.includes(role)) {
+        certCount = 4 + Math.floor(rng() * 7);
+      } else if (midRoles.includes(role)) {
+        certCount = 2 + Math.floor(rng() * 6);
+      } else {
+        certCount = Math.floor(rng() * 5);
+      }
+
+      const certs = new Set();
+      // Add core certs first
+      const shuffledCore = [...profile.core].sort(() => rng() - 0.5);
+      for (let j = 0; j < Math.min(certCount, shuffledCore.length); j++) {
+        certs.add(shuffledCore[j]);
+      }
+      // Then mid-level
+      if (certCount > 2) {
+        const shuffledMid = [...profile.mid].sort(() => rng() - 0.5);
+        const midCount = Math.min(Math.floor(certCount * 0.5), shuffledMid.length);
+        for (let j = 0; j < midCount; j++) certs.add(shuffledMid[j]);
+      }
+      // Then advanced
+      if (certCount > 5) {
+        const shuffledAdv = [...profile.adv].sort(() => rng() - 0.5);
+        const advCount = Math.min(Math.floor(certCount * 0.25), shuffledAdv.length);
+        for (let j = 0; j < advCount; j++) certs.add(shuffledAdv[j]);
+      }
+
+      people.push({
+        id: id++,
+        name,
+        team: td.team,
+        role,
+        certs: [...certs],
+        avatar: AVATAR_COLORS[id % AVATAR_COLORS.length],
+      });
+    }
+  }
+  return people;
+}
+
+const PEOPLE = generatePeople();
+
+// Current user
+const CURRENT_USER = PEOPLE.find(p => p.name === 'Milla Korhonen') || PEOPLE[0];
+
+// Company goals
+const GOALS = [
+  {id:1, name:'Anthropic Partner -valmius', desc:'Anthropicin kumppanuus edellyttää vähintään 10 Claude Certified Architect -sertifikaattia yrityksessä.', provider:'Anthropic', requiredCerts:['ant-arch'], targetCount:10, deadline:'2026-09-30', priority:'high'},
+  {id:2, name:'AWS Select Partner', desc:'AWS Select Tier -partneruus vaatii 15 teknistä sertifikaattia (Associate+).', provider:'AWS', requiredCerts:['aws-sa','aws-dev','aws-mle','aws-de','aws-genai'], targetCount:15, deadline:'2026-12-31', priority:'high'},
+  {id:3, name:'Google Cloud Partner', desc:'Google Cloud Partner -ohjelmaan tarvitaan 10 sertifioitua ammattilaista.', provider:'Google', requiredCerts:['gc-ace','gc-pmle','gc-pde','gc-pca'], targetCount:10, deadline:'2026-12-31', priority:'medium'},
+  {id:4, name:'AI-First -organisaatio', desc:'80% kehittäjistä suorittanut vähintään yhden AI-sertifikaatin.', provider:null, requiredCerts:CERTS.filter(c=>c.type==='AI/ML').map(c=>c.id), targetCount:80, deadline:'2026-06-30', priority:'high', isPercentage:true},
+  {id:5, name:'GenAI-huippuosaaminen', desc:'20 henkilöä, joilla on Professional-tason generatiivisen AI:n sertifikaatti.', provider:null, requiredCerts:['aws-genai','nv-genl','nv-aai','gc-pmle','db-ml','ant-arch'], targetCount:20, deadline:'2027-03-31', priority:'medium'},
+  {id:6, name:'DevTools-sertifiointi', desc:'Kaikilla kehittäjillä on vähintään yksi AI-kehitystyökalusertifikaatti (Copilot, Cursor, Claude Code).', provider:null, requiredCerts:['gh-copilot','cur-dev','cur-adv','ant-code','ant-mcp'], targetCount:90, deadline:'2026-09-30', priority:'medium', isPercentage:true},
+  {id:7, name:'Salesforce Agentforce Partner', desc:'Salesforce Agentforce -kumppanuus edellyttää 8 sertifioitua Agentforce Specialist -osaajaa. Kriittinen strateginen tavoite agenttiliiketoiminnan kasvattamiseksi.', provider:'Salesforce', requiredCerts:['sf-agentforce'], targetCount:8, deadline:'2026-08-31', priority:'high'},
+  {id:8, name:'Salesforce AI -osaamispohja', desc:'Vähintään 15 henkilöä, joilla on jokin Salesforce AI/Agentforce -sertifikaatti tai kurssi. Perusta laajemmalle Salesforce-osaamiselle.', provider:'Salesforce', requiredCerts:['sf-agentforce','sf-datacloud','sf-champion','sf-innovator','sf-aifound'], targetCount:15, deadline:'2026-09-30', priority:'high'},
+];
+
+// Certification paths
+const PATHS = [
+  {id:'aws-ai', name:'AWS AI -spesialisti', desc:'Polku AWS:n AI- ja ML-osaamiseen', certs:['aws-cp','aws-aip','aws-mle','aws-genai'], estimatedMonths:8},
+  {id:'aws-cloud', name:'AWS Cloud -arkkitehti', desc:'AWS-pilvipalveluiden hallinta', certs:['aws-cp','aws-dev','aws-sa','aws-de'], estimatedMonths:10},
+  {id:'azure-ai', name:'Azure AI -insinööri', desc:'Microsoftin AI-ekosysteemin hallinta', certs:['az-ai900','az-copilot','az-ai102','az-dp100','az-305'], estimatedMonths:12},
+  {id:'gcp-ml', name:'Google Cloud ML -ammattilainen', desc:'Googlen ML-alustan syvällinen osaaminen', certs:['gc-cdl','gc-aie','gc-ace','gc-pmle'], estimatedMonths:10},
+  {id:'anthropic', name:'Anthropic-spesialisti', desc:'Claude-ekosysteemin kokonaisvaltainen hallinta', certs:['ant-fluency','ant-prompt','ant-safety','ant-code','ant-api','ant-mcp','ant-arch'], estimatedMonths:6},
+  {id:'genai-full', name:'Generatiivinen AI -asiantuntija', desc:'Laaja-alainen GenAI-osaaminen kaikilla alustoilla', certs:['oai-found','ant-fluency','dl-genai','ant-prompt','oai-api','ant-api','nv-genl','ant-arch'], estimatedMonths:12},
+  {id:'devtools', name:'AI-kehitystyökalut', desc:'Modernien AI-avusteisten kehitystyökalujen hallinta', certs:['gh-copilot','cur-dev','ant-code','cur-adv','ant-mcp','gh-actions'], estimatedMonths:4},
+  {id:'data-eng', name:'Data Engineering -ammattilainen', desc:'Data-putkien ja -alustojen erikoisosaaja', certs:['aws-cp','aws-de','db-de','db-genai','gc-pde','hc-tf'], estimatedMonths:10},
+  {id:'salesforce-agent', name:'Salesforce Agentforce -spesialisti', desc:'Salesforcen AI-agenttialustan kokonaisvaltainen hallinta', certs:['sf-aifound','sf-champion','sf-innovator','sf-agentforce','sf-datacloud'], estimatedMonths:8},
+];
+
+// ============================================================
+// TIPS & RESOURCES
+// ============================================================
+const TIPS = [
+  {id:1,certId:'aws-cp',personId:3,date:'2026-03-20',actualHours:18,rating:4,text:'Helpompi kuin odotin! AWS Skill Builderin ilmainen kurssi riitti hyvin. Keskity erityisesti hinnoittelumalleihin — niistä tulee yllättävän monta kysymystä.'},
+  {id:2,certId:'aws-cp',personId:12,date:'2026-01-10',actualHours:25,rating:3,text:'Shared Responsibility Model -osio vaatii tarkkaa lukemista. Suosittelen tekemään paljon harjoituskokeita ennen oikeaa tenttiä.'},
+  {id:3,certId:'aws-mle',personId:7,date:'2026-02-28',actualHours:90,rating:4,text:'SageMaker-pipelinet kannattaa opetella käytännössä, ei vain teoriassa. Labrat auttoivat eniten. Budjetoi aikaa enemmän kuin arvioitu 80h.'},
+  {id:4,certId:'aws-sa',personId:15,date:'2025-11-05',actualHours:85,rating:5,text:'Erittäin hyvä sertifikaatti. Well-Architected Framework on kokeen ydin. Adrian Cantrillin kurssi oli ehdottomasti paras valmistautumismateriaali.'},
+  {id:5,certId:'az-ai900',personId:22,date:'2026-03-01',actualHours:12,rating:5,text:'Todella helppo jos on AI-taustaa. Microsoft Learnin moduulit riittävät, ei tarvita ulkopuolista materiaalia. Suoritin yhdessä viikossa.'},
+  {id:6,certId:'az-ai102',personId:8,date:'2026-01-22',actualHours:70,rating:3,text:'Yllättävän laaja koe. Azure OpenAI Service -osio on uusi ja siitä tulee paljon kysymyksiä. Cognitive Services -rajapinnat pitää osata käytännössä.'},
+  {id:7,certId:'az-305',personId:5,date:'2025-12-15',actualHours:110,rating:4,text:'Vaativa mutta palkitseva. Case study -kysymykset ovat pitkiä — harjoittele ajanhallintaa. Kokeessa on nyt enemmän AI-integraatiota kuin vuosi sitten.'},
+  {id:8,certId:'gc-pmle',personId:18,date:'2026-02-10',actualHours:105,rating:4,text:'Vertex AI -osio on kokeen tärkein osa-alue. Suosittelen Google Cloud Skills Boost -labroja, ne vastaavat kokeen tasoa hyvin.'},
+  {id:9,certId:'gc-ace',personId:25,date:'2025-10-20',actualHours:55,rating:4,text:'Hyvä perussertifikaatti. Komentorivityökalut (gcloud CLI) pitää osata hyvin. Networking-osio oli vaikein osa-alue itselleni.'},
+  {id:10,certId:'ant-arch',personId:2,date:'2026-03-25',actualHours:35,rating:5,text:'Erinomainen koe! Vaatii syvällistä ymmärrystä Claude API:sta ja arkkitehtuuriperiaatteista. Prompt caching ja tool use -osiot olivat haastavimmat.'},
+  {id:11,certId:'ant-prompt',personId:30,date:'2026-03-15',actualHours:12,rating:5,text:'Todella käytännöllinen. Chain-of-thought ja system prompt -osiot olivat parhaita. Suosittelen kokeilemaan kaikkia esimerkkejä itse.'},
+  {id:12,certId:'ant-api',personId:14,date:'2026-02-05',actualHours:22,rating:4,text:'Tool use -osio on laajin. Kannattaa rakentaa oma pieni projekti API:lla ennen koetta — se auttaa enemmän kuin lukeminen.'},
+  {id:13,certId:'ant-code',personId:9,date:'2026-04-01',actualHours:6,rating:5,text:'Nopea ja käytännönläheinen! MCP-kehitys ja agenttipohjaiset työnkulut olivat mielenkiintoisimmat osiot. Suoritin yhden päivän aikana.'},
+  {id:14,certId:'ant-mcp',personId:11,date:'2026-03-10',actualHours:18,rating:4,text:'MCP-palvelimien debuggaus oli vaikein osio. Inspectorin käyttö kannattaa harjoitella. Omat MCP-serverit auttavat ymmärtämään protokollaa.'},
+  {id:15,certId:'oai-api',personId:20,date:'2026-01-30',actualHours:18,rating:3,text:'Assistants API muuttuu nopeasti — tarkista viimeisin dokumentaatio juuri ennen koetta. Function calling -osio oli selkein.'},
+  {id:16,certId:'nv-genl',personId:6,date:'2025-12-01',actualHours:45,rating:4,text:'Vaatii hyvän GPU:n harjoitteluun. CUDA-perusteet pitää osata. TensorRT-optimointi oli kokeen haastavin osio mutta myös opettavaisin.'},
+  {id:17,certId:'gh-copilot',personId:28,date:'2026-02-20',actualHours:15,rating:4,text:'Käytännönläheinen koe. Prompt engineering koodauksessa oli pääpaino. Kannattaa käyttää Copilotia päivittäin viikon ajan ennen koetta.'},
+  {id:18,certId:'db-genai',personId:16,date:'2026-03-05',actualHours:55,rating:3,text:'RAG-toteutukset Databricksillä olivat mielenkiintoisia mutta dokumentaatio oli paikoin puutteellista. Vector Search -osio oli yllättävän laaja.'},
+  {id:19,certId:'db-de',personId:10,date:'2025-09-15',actualHours:65,rating:4,text:'Delta Lake ja Unity Catalog ovat kokeen ydin. Spark-osaamista tarvitaan paljon. Suosittelen Databricksin omaa ilmaista koulutusta.'},
+  {id:20,certId:'hc-tf',personId:33,date:'2026-01-15',actualHours:35,rating:5,text:'Selkeä ja hyvin rakennettu koe. State management ja moduulit ovat tärkeimmät aiheet. HashiCorpin oma Learn-alusta on loistava resurssi.'},
+  {id:21,certId:'dl-genai',personId:19,date:'2025-11-20',actualHours:28,rating:5,text:'Andrew Ng:n paras kurssi! Transformer-arkkitehtuurin selitys oli kristallinkirkas. Fine-tuning ja RLHF -osiot avasivat paljon uutta.'},
+  {id:22,certId:'sf-agentforce',personId:40,date:'2026-03-28',actualHours:70,rating:3,text:'Alusta on vielä aika tuore ja materiaalit kehittyvät. Agentin konfigurointi oli vaikeaa ilman käytännön kokemusta. Trailhead-harjoitukset auttavat.'},
+  {id:23,certId:'sf-aifound',personId:42,date:'2026-02-15',actualHours:8,rating:4,text:'Helppo aloitus Salesforce AI -maailmaan. Einstein-osio oli selkein. Trailhead Badget riittävät valmistautumiseksi.'},
+  {id:24,certId:'cur-dev',personId:35,date:'2026-04-05',actualHours:8,rating:5,text:'Loistava ja nopea! Composer-ominaisuus oli parasta. Käytännössä opin eniten kun tein oman projektin Cursorilla kurssin aikana.'},
+  {id:25,certId:'gc-pde',personId:17,date:'2025-10-10',actualHours:85,rating:4,text:'BigQuery-optimointi ja Dataflow-pipelinet ovat tärkeimmät. Hintamallit tulevat kokeessa usein esille. Suosittelen labroja.'},
+  {id:26,certId:'aws-genai',personId:4,date:'2026-03-30',actualHours:95,rating:4,text:'Bedrockin AgentCore on nyt iso osa koetta. RAG-arkkitehtuurit ja promptien hallinta olivat pääpaino. Käytännön kokemus auttaa paljon.'},
+  {id:27,certId:'ant-safety',personId:23,date:'2026-02-25',actualHours:8,rating:5,text:'Tärkeä kurssi kaikille AI-kehittäjille. Constitutional AI -osio antoi uuden perspektiivin vastuulliseen kehitykseen. Lyhyt mutta sisältörikas.'},
+  {id:28,certId:'az-copilot',personId:45,date:'2026-03-12',actualHours:10,rating:4,text:'Helppo mutta hyödyllinen. M365 Copilot -integraatiot olivat mielenkiintoisimpia. Hyvä aloitus ei-teknisille henkilöille.'},
+  {id:29,certId:'gc-tf',personId:21,date:'2025-08-15',actualHours:90,rating:3,text:'Vaativa koe, erityisesti CNN- ja NLP-osiot. Harjoitusten tekeminen on pakollista. Kokeen aikaraja on tiukka — harjoittele nopeutta.'},
+  {id:30,certId:'aws-dev',personId:13,date:'2026-01-05',actualHours:55,rating:4,text:'Lambda ja DynamoDB ovat kokeen ydin. Serverless-arkkitehtuuri pitää ymmärtää syvällisesti. Hands-on labrat ovat välttämättömiä.'},
+  {id:31,certId:'ant-fluency',personId:50,date:'2026-04-08',actualHours:5,rating:5,text:'Erinomainen aloituspiste. Kurssi on selkeä ja compakti. Claude-mallien erot ja käyttötapaukset selitettiin hyvin.'},
+  {id:32,certId:'nv-aai',personId:6,date:'2026-03-18',actualHours:40,rating:4,text:'Agenttiarkkitehtuurit ovat tulevaisuutta. NeMo-framework oli uusi asia ja sen opettelu vei aikaa. Moniagenttijärjestelmien suunnittelu oli paras osio.'},
+  {id:33,certId:'sf-champion',personId:41,date:'2026-02-01',actualHours:12,rating:4,text:'Trailhead-polku on hyvin suunniteltu. Agentforce-konseptien ymmärtäminen liiketoiminnan näkökulmasta oli arvokkainta.'},
+  {id:34,certId:'gh-actions',personId:29,date:'2025-12-10',actualHours:22,rating:4,text:'CI/CD-putkien rakentaminen on kokeen ydin. Matrix builds ja reusable workflows olivat vaikeimmat osiot. YAML-syntaksi pitää osata ulkoa.'},
+  {id:35,certId:'aws-de',personId:10,date:'2026-02-18',actualHours:75,rating:3,text:'Glue ja Redshift dominoivat koetta. Kinesis Data Streams vs Firehose -erot ovat tärkeät. Lake Formation -oikeudet olivat pienin mutta hankalin osio.'},
+];
+
+const RESOURCES = [
+  {certId:'aws-cp',name:'AWS Skill Builder — CLF-C02',url:'https://skillbuilder.aws/exam-prep/cloud-practitioner',type:'video',lang:'en'},
+  {certId:'aws-cp',name:'freeCodeCamp — AWS CCP kurssi',url:'https://www.youtube.com/watch?v=NhDYbskXRgc',type:'video',lang:'en'},
+  {certId:'aws-sa',name:'Adrian Cantrill — SA Associate',url:'https://learn.cantrill.io/p/aws-certified-solutions-architect-associate-saa-c03',type:'course',lang:'en'},
+  {certId:'aws-sa',name:'Tutorials Dojo — harjoituskokeet',url:'https://tutorialsdojo.com/aws-certified-solutions-architect-associate-saa-c03/',type:'exam',lang:'en'},
+  {certId:'aws-mle',name:'AWS Skill Builder — MLA-C01 Exam Prep',url:'https://skillbuilder.aws/exam-prep/machine-learning-engineer-associate',type:'video',lang:'en'},
+  {certId:'aws-aip',name:'AWS Skill Builder — AIF-C01',url:'https://skillbuilder.aws/exam-prep/ai-practitioner',type:'video',lang:'en'},
+  {certId:'aws-genai',name:'AWS — Bedrock Workshop',url:'https://catalog.workshops.aws/building-with-amazon-bedrock/',type:'lab',lang:'en'},
+  {certId:'aws-dev',name:'AWS Skill Builder — DVA-C02',url:'https://skillbuilder.aws/exam-prep/developer-associate',type:'video',lang:'en'},
+  {certId:'aws-de',name:'AWS Skill Builder — DEA-C01',url:'https://skillbuilder.aws/exam-prep/data-engineer-associate',type:'video',lang:'en'},
+  {certId:'az-ai900',name:'Microsoft Learn — AI-900 polku',url:'https://learn.microsoft.com/en-us/training/paths/get-started-with-artificial-intelligence-on-azure/',type:'course',lang:'en'},
+  {certId:'az-ai102',name:'Microsoft Learn — AI-102 polku',url:'https://learn.microsoft.com/en-us/training/paths/prepare-for-ai-engineering/',type:'course',lang:'en'},
+  {certId:'az-305',name:'John Savill — AZ-305 Study Cram',url:'https://www.youtube.com/watch?v=vq9LuCM4YP4',type:'video',lang:'en'},
+  {certId:'az-dp100',name:'Microsoft Learn — DP-100 polku',url:'https://learn.microsoft.com/en-us/training/paths/train-deploy-machine-learning-azure/',type:'course',lang:'en'},
+  {certId:'az-copilot',name:'Microsoft Learn — Copilot polku',url:'https://learn.microsoft.com/en-us/training/paths/copilot/',type:'course',lang:'en'},
+  {certId:'gc-cdl',name:'Google Cloud Skills Boost — CDL',url:'https://www.cloudskillsboost.google/paths/9',type:'course',lang:'en'},
+  {certId:'gc-ace',name:'Google Cloud Skills Boost — ACE',url:'https://www.cloudskillsboost.google/paths/11',type:'course',lang:'en'},
+  {certId:'gc-pmle',name:'Google Cloud Skills Boost — ML Engineer',url:'https://www.cloudskillsboost.google/paths/17',type:'course',lang:'en'},
+  {certId:'gc-pde',name:'Google Cloud Skills Boost — Data Eng',url:'https://www.cloudskillsboost.google/paths/16',type:'course',lang:'en'},
+  {certId:'gc-tf',name:'Coursera — DeepLearning.AI TF kurssi',url:'https://www.coursera.org/professional-certificates/tensorflow-in-practice',type:'course',lang:'en'},
+  {certId:'ant-arch',name:'Anthropic — Build with Claude (Skilljar)',url:'https://anthropic.skilljar.com/',type:'course',lang:'en'},
+  {certId:'ant-prompt',name:'Anthropic Docs — Prompt Engineering',url:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview',type:'docs',lang:'en'},
+  {certId:'ant-api',name:'Anthropic Docs — API Reference',url:'https://docs.anthropic.com/en/api/',type:'docs',lang:'en'},
+  {certId:'ant-code',name:'Claude Code — Dokumentaatio',url:'https://docs.anthropic.com/en/docs/claude-code/',type:'docs',lang:'en'},
+  {certId:'ant-mcp',name:'MCP — Virallinen dokumentaatio',url:'https://modelcontextprotocol.io/',type:'docs',lang:'en'},
+  {certId:'ant-safety',name:'Anthropic — AI Safety tutkimus',url:'https://www.anthropic.com/research',type:'docs',lang:'en'},
+  {certId:'oai-api',name:'OpenAI — API dokumentaatio',url:'https://platform.openai.com/docs',type:'docs',lang:'en'},
+  {certId:'oai-found',name:'OpenAI Academy',url:'https://academy.openai.com/',type:'course',lang:'en'},
+  {certId:'nv-genl',name:'NVIDIA DLI — Generative AI',url:'https://www.nvidia.com/en-us/training/',type:'course',lang:'en'},
+  {certId:'nv-aai',name:'NVIDIA DLI — Building AI Agents',url:'https://www.nvidia.com/en-us/training/',type:'course',lang:'en'},
+  {certId:'gh-copilot',name:'GitHub — Copilot dokumentaatio',url:'https://docs.github.com/en/copilot',type:'docs',lang:'en'},
+  {certId:'gh-actions',name:'GitHub — Actions dokumentaatio',url:'https://docs.github.com/en/actions',type:'docs',lang:'en'},
+  {certId:'db-genai',name:'Databricks Academy — GenAI Engineer',url:'https://www.databricks.com/learn/training/catalog',type:'course',lang:'en'},
+  {certId:'db-de',name:'Databricks Academy — Data Engineer',url:'https://www.databricks.com/learn/training/catalog',type:'course',lang:'en'},
+  {certId:'dl-genai',name:'Coursera — Generative AI with LLMs',url:'https://www.coursera.org/learn/generative-ai-with-llms',type:'course',lang:'en'},
+  {certId:'dl-spec',name:'Coursera — Deep Learning Specialization',url:'https://www.coursera.org/specializations/deep-learning',type:'course',lang:'en'},
+  {certId:'dl-ml',name:'Coursera — Machine Learning Specialization',url:'https://www.coursera.org/specializations/machine-learning-introduction',type:'course',lang:'en'},
+  {certId:'hc-tf',name:'HashiCorp Learn — Terraform',url:'https://developer.hashicorp.com/terraform/tutorials',type:'course',lang:'en'},
+  {certId:'sf-agentforce',name:'Trailhead — Agentforce polku',url:'https://trailhead.salesforce.com/content/learn/trails/build-ai-agents-with-agentforce',type:'course',lang:'en'},
+  {certId:'sf-aifound',name:'Trailhead — AI Fundamentals',url:'https://trailhead.salesforce.com/content/learn/modules/artificial-intelligence-fundamentals',type:'course',lang:'en'},
+  {certId:'sf-champion',name:'Trailhead — Agentblazer 2026',url:'https://trailhead.salesforce.com/content/learn/trails/become-an-agentblazer-champion-2026',type:'course',lang:'en'},
+  {certId:'cur-dev',name:'Cursor — Dokumentaatio',url:'https://docs.cursor.com/',type:'docs',lang:'en'},
+];
+
+const RESOURCE_TYPE_LABELS = {video:'Video',course:'Kurssi',exam:'Harjoituskoe',lab:'Laboratorio',docs:'Dokumentaatio'};
+const RESOURCE_TYPE_ICONS = {video:'🎬',course:'📚',exam:'📝',lab:'🧪',docs:'📖'};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentView = 'dashboard';
+let chatMessages = [
+  {role:'bot', text:'Tervetuloa SerttiApurin AI-assistenttiin! Voin auttaa sinua sertifikaatteihin liittyvissä kysymyksissä. Kysy esimerkiksi suosituksia, tietoa tietystä sertifikaatista tai henkilöistä.', suggestions:['Suosittele sertifikaatteja','Mitä Anthropic-serttejä on?','Kuka on eniten sertifioitu?','Mikä on edullisin AI-sertti?']}
+];
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const PAGE_TITLES = {
+  dashboard:'Dashboard', catalog:'Sertifikaattikatalogi', analytics:'Analytiikka',
+  people:'Henkilöhaku', mypath:'Oma kehityspolku', goals:'Yrityksen tavoitteet',
+  chat:'AI-assistentti', leaderboard:'Tulostaulukko', tips:'Vinkit & Resurssit'
+};
+
+function navigate(view) {
+  currentView = view;
+  document.querySelectorAll('#sidebar nav a').forEach(a => a.classList.toggle('active', a.dataset.view === view));
+  document.getElementById('page-title').textContent = PAGE_TITLES[view] || view;
+  render();
+}
+
+function render() {
+  const c = document.getElementById('content');
+  switch(currentView) {
+    case 'dashboard': c.innerHTML = renderDashboard(); break;
+    case 'catalog': c.innerHTML = renderCatalog(); break;
+    case 'analytics': c.innerHTML = renderAnalytics(); break;
+    case 'people': c.innerHTML = renderPeople(); break;
+    case 'mypath': c.innerHTML = renderMyPath(); break;
+    case 'goals': c.innerHTML = renderGoals(); break;
+    case 'chat': c.innerHTML = renderChat(); break;
+    case 'leaderboard': c.innerHTML = renderLeaderboard(); break;
+    case 'tips': c.innerHTML = renderTips(); break;
+  }
+  // Re-attach event listeners
+  if (currentView === 'chat') initChat();
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function getCert(id) { return CERTS.find(c => c.id === id); }
+function getProviderClass(p) { return 'provider-' + p.toLowerCase().replace(/[\s\.]/g,''); }
+function getLevelClass(l) { return 'level-' + l.toLowerCase(); }
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').toUpperCase(); }
+function formatCost(c) { return c === 0 ? 'Ilmainen' : `${c} €`; }
+function formatHours(h) { return h < 10 ? `${h} h` : h < 40 ? `~${h} h` : `~${Math.round(h/8)} pv`; }
+function countPeopleByCert(certId) { return PEOPLE.filter(p => p.certs.includes(certId)).length; }
+function getGoalProgress(goal) {
+  if (goal.isPercentage) {
+    const devs = PEOPLE.filter(p => !['Project Manager','UX Designer'].includes(p.role));
+    const qualified = devs.filter(p => p.certs.some(c => goal.requiredCerts.includes(c)));
+    return Math.round((qualified.length / devs.length) * 100);
+  }
+  return PEOPLE.filter(p => p.certs.some(c => goal.requiredCerts.includes(c))).length;
+}
+function getGoalStatus(goal) {
+  const progress = getGoalProgress(goal);
+  const pct = goal.isPercentage ? progress : (progress / goal.targetCount * 100);
+  if (pct >= 100) return 'on-track';
+  if (pct >= 60) return 'on-track';
+  if (pct >= 35) return 'at-risk';
+  return 'behind';
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(title, html) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+
+// Pie chart helper
+const PIE_COLORS = ['#ff9900','#00a4ef','#4285f4','#d4a574','#10a37f','#76b900','#24292e','#ff3621','#0056d2','#7b42bc','#1a1a2e','#00a1e0','#e74c3c','#9b59b6','#1abc9c','#f39c12'];
+const PROVIDER_COLORS = {AWS:'#ff9900',Microsoft:'#00a4ef',Google:'#4285f4',Anthropic:'#d4a574',OpenAI:'#10a37f',NVIDIA:'#76b900',GitHub:'#24292e',Databricks:'#ff3621','DeepLearning.AI':'#0056d2',HashiCorp:'#7b42bc',Cursor:'#1a1a2e',Salesforce:'#00a1e0'};
+const LEVEL_COLORS = {Foundational:'#10b981',Associate:'#3b82f6',Professional:'#f59e0b',Expert:'#ef4444'};
+
+function renderPieChart(slices, chartId, size) {
+  size = size || 200;
+  const r = size/2 - 4;
+  const cx = size/2, cy = size/2;
+  const total = slices.reduce((s,d)=>s+d.value,0);
+  if (total === 0) return '<div class="text-muted text-sm" style="text-align:center;padding:20px">Ei dataa</div>';
+  let angle = -Math.PI/2;
+  const paths = [];
+  const legends = [];
+  slices.forEach((d,i) => {
+    if (d.value === 0) return;
+    const pct = d.value/total;
+    const sweep = pct * Math.PI * 2;
+    const large = sweep > Math.PI ? 1 : 0;
+    const x1 = cx + r * Math.cos(angle);
+    const y1 = cy + r * Math.sin(angle);
+    const x2 = cx + r * Math.cos(angle + sweep);
+    const y2 = cy + r * Math.sin(angle + sweep);
+    // Label position at midpoint of arc
+    const midAngle = angle + sweep/2;
+    const lr = r * 0.65;
+    const lx = cx + lr * Math.cos(midAngle);
+    const ly = cy + lr * Math.sin(midAngle);
+    const onclick = d.onclick || '';
+    paths.push(`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z" fill="${d.color}" stroke="#fff" stroke-width="2" style="cursor:pointer;transition:opacity 0.15s" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" onclick="${onclick}"><title>${d.label}: ${d.value} (${Math.round(pct*100)}%)</title></path>`);
+    if (pct >= 0.06) {
+      paths.push(`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="central" fill="${d.textColor||'#fff'}" font-size="11" font-weight="700" pointer-events="none">${Math.round(pct*100)}%</text>`);
+    }
+    legends.push(`<div style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 0" onclick="${onclick}"><span style="width:12px;height:12px;border-radius:3px;background:${d.color};flex-shrink:0;display:inline-block"></span><span style="font-size:0.8rem;font-weight:500">${d.label}</span><span style="font-size:0.75rem;color:var(--text-light);margin-left:auto">${d.value}</span></div>`);
+    angle += sweep;
+  });
+  return `<div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;margin:16px 0">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths.join('')}</svg>
+    <div style="min-width:140px;max-width:220px" id="${chartId}-legend">${legends.join('')}</div>
+  </div>`;
+}
+
+// Dashboard drill-down popups
+function showProviderDrilldown(provider) {
+  const certs = CERTS.filter(c => c.provider === provider);
+  const totalHolders = PEOPLE.filter(p => p.certs.some(cid => { const c = getCert(cid); return c && c.provider === provider; })).length;
+  // Pie: suoritukset tasoittain
+  const levelData = LEVELS.map(l => ({
+    label: l, value: certs.filter(c => c.level === l).reduce((s,c) => s + countPeopleByCert(c.id), 0),
+    color: LEVEL_COLORS[l] || PIE_COLORS[0],
+    onclick: `document.querySelectorAll('.prov-detail-section').forEach(e=>e.style.display='none');document.getElementById('prov-level-'+this.closest('svg').dataset.idx).style.display=''`
+  }));
+  // Assign idx for onclick
+  levelData.forEach((d,i) => { d.onclick = `document.querySelectorAll('.prov-detail-section').forEach(e=>e.style.display='none');var el=document.getElementById('prov-level-${i}');if(el)el.style.display=''`; });
+
+  openModal(`${provider} — sertifikaatit`, `
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Sertifikaatteja</div><div class="value">${certs.length} kpl</div></div>
+      <div class="detail-item"><div class="label">Suorituksia yhteensä</div><div class="value">${certs.reduce((s,c) => s + countPeopleByCert(c.id), 0)}</div></div>
+      <div class="detail-item"><div class="label">Henkilöitä</div><div class="value">${totalHolders}</div></div>
+    </div>
+    <h3 style="margin-top:12px">Suoritukset tasoittain</h3>
+    ${renderPieChart(levelData, 'prov-pie', 180)}
+    <p class="text-sm text-muted" style="text-align:center;margin-bottom:12px">Klikkaa piirakan osaa nähdäksesi tason sertifikaatit</p>
+    ${LEVELS.map((l,i) => {
+      const lCerts = certs.filter(c => c.level === l);
+      if (!lCerts.length) return `<div id="prov-level-${i}" class="prov-detail-section" style="display:none"></div>`;
+      return `<div id="prov-level-${i}" class="prov-detail-section" style="display:none">
+        <h3 style="margin-top:8px"><span class="level-badge ${getLevelClass(l)}">${l}</span> (${lCerts.length} sertifikaattia)</h3>
+        <table class="data-table" style="margin-top:8px">
+          <thead><tr><th>Sertifikaatti</th><th>Suorittajia</th><th></th></tr></thead>
+          <tbody>${lCerts.map(c => {
+            const count = countPeopleByCert(c.id);
+            return `<tr>
+              <td><strong style="color:var(--primary);cursor:pointer" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">${c.name}</strong></td>
+              <td>${count} hlö</td>
+              <td><span style="font-size:0.7rem;cursor:pointer;color:var(--primary);user-select:none" onclick="const el=this.closest('tr').nextElementSibling;if(el&&el.classList.contains('drilldown-row')){el.style.display=el.style.display==='none'?'':'none';this.textContent=el.style.display==='none'?'▶':'▼'}">▶</span></td>
+            </tr>
+            <tr class="drilldown-row" style="display:none"><td colspan="3" style="padding:4px 12px 12px">
+              ${count > 0 ? PEOPLE.filter(p => p.certs.includes(c.id)).slice(0,10).map(p => `<span class="tag" style="cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${p.name}</span>`).join('') + (count > 10 ? `<span class="text-sm text-muted"> ...ja ${count-10} muuta</span>` : '') : '<span class="text-muted text-sm">Ei suorittajia</span>'}
+            </td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+    }).join('')}
+  `);
+}
+
+function showLevelDrilldown(level) {
+  const certs = CERTS.filter(c => c.level === level);
+  const totalHoldings = certs.reduce((s,c) => s + countPeopleByCert(c.id), 0);
+  openModal(`${level}-tason sertifikaatit`, `
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Sertifikaatteja</div><div class="value">${certs.length} kpl</div></div>
+      <div class="detail-item"><div class="label">Suorituksia yhteensä</div><div class="value">${totalHoldings}</div></div>
+    </div>
+    <table class="data-table" style="margin-top:16px">
+      <thead><tr><th>Sertifikaatti</th><th>Tarjoaja</th><th>Suorittajia</th><th></th></tr></thead>
+      <tbody>${certs.map(c => {
+        const count = countPeopleByCert(c.id);
+        return `<tr>
+          <td><strong class="clickable" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)" style="color:var(--primary);cursor:pointer">${c.name}</strong></td>
+          <td><span class="provider-badge ${getProviderClass(c.provider)}" style="font-size:0.65rem">${c.provider}</span></td>
+          <td>${count} hlö</td>
+          <td><span class="toggle-arrow" style="font-size:0.7rem;cursor:pointer;color:var(--primary);user-select:none" onclick="const el=this.closest('tr').nextElementSibling;if(el&&el.classList.contains('drilldown-row')){el.style.display=el.style.display==='none'?'':'none';this.textContent=el.style.display==='none'?'▶':'▼'}">▶</span></td>
+        </tr>
+        <tr class="drilldown-row" style="display:none"><td colspan="4" style="padding:4px 12px 12px">
+          ${count > 0 ? PEOPLE.filter(p => p.certs.includes(c.id)).slice(0,10).map(p => `<span class="tag" style="cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${p.name}</span>`).join('') + (count > 10 ? `<span class="text-sm text-muted"> ...ja ${count-10} muuta</span>` : '') : '<span class="text-muted text-sm">Ei suorittajia</span>'}
+        </td></tr>`;
+      }).join('')}</tbody>
+    </table>
+  `);
+}
+
+function showAllCertsDrilldown() {
+  const byProvider = {};
+  PROVIDERS.forEach(p => { byProvider[p] = CERTS.filter(c => c.provider === p); });
+  // Pie: suoritukset tarjoajittain
+  const provSlices = PROVIDERS.filter(p => byProvider[p].length > 0).map((p,i) => ({
+    label: p,
+    value: byProvider[p].reduce((s,c) => s + countPeopleByCert(c.id), 0),
+    color: PROVIDER_COLORS[p] || PIE_COLORS[i % PIE_COLORS.length],
+    textColor: ['GitHub','Cursor'].includes(p) ? '#ccc' : '#fff',
+    onclick: `document.querySelectorAll('.allcert-detail-section').forEach(e=>e.style.display='none');var el=document.getElementById('allcert-prov-${i}');if(el)el.style.display=''`
+  }));
+  openModal('Kaikki sertifikaatit tarjoajittain', `
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Sertifikaatteja</div><div class="value">${CERTS.length} kpl</div></div>
+      <div class="detail-item"><div class="label">Tarjoajia</div><div class="value">${PROVIDERS.length}</div></div>
+      <div class="detail-item"><div class="label">Suorituksia yht.</div><div class="value">${PEOPLE.reduce((s,p) => s + p.certs.length, 0)}</div></div>
+    </div>
+    <h3 style="margin-top:12px">Suoritukset tarjoajittain</h3>
+    ${renderPieChart(provSlices, 'allcert-pie', 210)}
+    <p class="text-sm text-muted" style="text-align:center;margin-bottom:12px">Klikkaa piirakan osaa tai legendaa nähdäksesi tarjoajan sertifikaatit</p>
+    ${PROVIDERS.filter(p => byProvider[p].length > 0).map((prov,i) => {
+      const certs = byProvider[prov];
+      return `<div id="allcert-prov-${i}" class="allcert-detail-section" style="display:none">
+        <h3 style="margin-top:8px;display:flex;align-items:center;gap:8px"><span class="provider-badge ${getProviderClass(prov)}">${prov}</span> <span class="text-sm text-muted">(${certs.length} sertifikaattia)</span></h3>
+        <table class="data-table" style="margin-top:8px">
+          <thead><tr><th>Sertifikaatti</th><th>Taso</th><th>Suorittajia</th><th></th></tr></thead>
+          <tbody>${certs.map(c => {
+            const count = countPeopleByCert(c.id);
+            return `<tr>
+              <td><strong style="color:var(--primary);cursor:pointer" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">${c.name}</strong></td>
+              <td><span class="level-badge ${getLevelClass(c.level)}" style="font-size:0.65rem">${c.level}</span></td>
+              <td>${count} hlö</td>
+              <td><span style="font-size:0.7rem;cursor:pointer;color:var(--primary);user-select:none" onclick="const el=this.closest('tr').nextElementSibling;if(el&&el.classList.contains('drilldown-row')){el.style.display=el.style.display==='none'?'':'none';this.textContent=el.style.display==='none'?'▶':'▼'}">▶</span></td>
+            </tr>
+            <tr class="drilldown-row" style="display:none"><td colspan="4" style="padding:4px 12px 12px">
+              ${count > 0 ? PEOPLE.filter(p => p.certs.includes(c.id)).slice(0,10).map(p => `<span class="tag" style="cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${p.name}</span>`).join('') + (count > 10 ? `<span class="text-sm text-muted"> ...ja ${count-10} muuta</span>` : '') : '<span class="text-muted text-sm">Ei suorittajia</span>'}
+            </td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+    }).join('')}
+  `);
+}
+
+function showHoldersDrilldown() {
+  const withCerts = PEOPLE.filter(p => p.certs.length > 0).sort((a,b) => b.certs.length - a.certs.length);
+  const without = PEOPLE.filter(p => p.certs.length === 0);
+  const TEAM_COLORS = ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+  const teamSlices = TEAMS.map((t,i) => {
+    const teamCerted = PEOPLE.filter(p => p.team === t && p.certs.length > 0).length;
+    return { label: t, value: teamCerted, color: TEAM_COLORS[i % TEAM_COLORS.length],
+      onclick: `document.querySelectorAll('.holders-team-section').forEach(e=>e.style.display='none');var el=document.getElementById('holders-team-${i}');if(el)el.style.display=''` };
+  });
+  openModal(`Sertifioidut henkilöt (${withCerts.length})`, `
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Sertifioitu</div><div class="value">${withCerts.length} hlö</div></div>
+      <div class="detail-item"><div class="label">Ei sertifikaatteja</div><div class="value">${without.length} hlö</div></div>
+      <div class="detail-item"><div class="label">Kattavuus</div><div class="value">${Math.round(withCerts.length/PEOPLE.length*100)}%</div></div>
+    </div>
+    <h3 style="margin-top:12px">Sertifioidut tiimeittäin</h3>
+    ${renderPieChart(teamSlices, 'holders-pie', 200)}
+    <p class="text-sm text-muted" style="text-align:center;margin-bottom:12px">Klikkaa piirakan osaa nähdäksesi tiimin henkilöt</p>
+    ${TEAMS.map((team,i) => {
+      const teamPeople = PEOPLE.filter(p => p.team === team && p.certs.length > 0).sort((a,b) => b.certs.length - a.certs.length);
+      const allTeam = PEOPLE.filter(p => p.team === team);
+      const pct = Math.round(teamPeople.length/allTeam.length*100);
+      return `<div id="holders-team-${i}" class="holders-team-section" style="display:none">
+        <h3 style="margin-top:8px">${team} <span class="text-sm text-muted">(${teamPeople.length}/${allTeam.length} sertifioitu, ${pct}%)</span></h3>
+        ${teamPeople.length ? `<table class="data-table" style="margin-top:8px"><thead><tr><th>Nimi</th><th>Rooli</th><th>Sertifikaatteja</th></tr></thead>
+          <tbody>${teamPeople.slice(0,15).map(p => `<tr class="clickable" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)"><td><strong>${p.name}</strong></td><td>${p.role}</td><td>${p.certs.length}</td></tr>`).join('')}
+          ${teamPeople.length > 15 ? `<tr><td colspan="3" class="text-muted text-sm">...ja ${teamPeople.length-15} muuta</td></tr>` : ''}
+          </tbody></table>` : '<p class="text-muted text-sm">Ei sertifioituja henkilöitä.</p>'}
+      </div>`;
+    }).join('')}
+  `);
+}
+
+function showFreeCertsDrilldown() {
+  const free = CERTS.filter(c => c.cost === 0);
+  // Group free certs by provider
+  const freeByProv = {};
+  free.forEach(c => { if (!freeByProv[c.provider]) freeByProv[c.provider] = []; freeByProv[c.provider].push(c); });
+  const freeProvs = Object.keys(freeByProv);
+  const freeSlices = freeProvs.map((p,i) => ({
+    label: p, value: freeByProv[p].length,
+    color: PROVIDER_COLORS[p] || PIE_COLORS[i % PIE_COLORS.length],
+    textColor: ['GitHub','Cursor'].includes(p) ? '#ccc' : '#fff',
+    onclick: `document.querySelectorAll('.free-prov-section').forEach(e=>e.style.display='none');var el=document.getElementById('free-prov-${i}');if(el)el.style.display=''`
+  }));
+  openModal(`Ilmaiset sertifikaatit (${free.length})`, `
+    <p class="text-muted" style="margin-bottom:12px">Nämä sertifikaatit ovat saatavilla ilmaiseksi — erinomainen tapa aloittaa osaamisen kehittäminen.</p>
+    <h3>Ilmaiset sertifikaatit tarjoajittain</h3>
+    ${renderPieChart(freeSlices, 'free-pie', 190)}
+    <p class="text-sm text-muted" style="text-align:center;margin-bottom:12px">Klikkaa piirakan osaa nähdäksesi tarjoajan ilmaiset sertifikaatit</p>
+    ${freeProvs.map((prov,i) => {
+      const certs = freeByProv[prov];
+      return `<div id="free-prov-${i}" class="free-prov-section" style="display:none">
+        <h3 style="margin-top:8px"><span class="provider-badge ${getProviderClass(prov)}">${prov}</span> (${certs.length} ilmaista)</h3>
+        <table class="data-table" style="margin-top:8px">
+          <thead><tr><th>Sertifikaatti</th><th>Taso</th><th>Suorittajia</th><th></th></tr></thead>
+          <tbody>${certs.map(c => {
+            const count = countPeopleByCert(c.id);
+            return `<tr>
+              <td><strong style="color:var(--primary);cursor:pointer" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">${c.name}</strong></td>
+              <td><span class="level-badge ${getLevelClass(c.level)}" style="font-size:0.65rem">${c.level}</span></td>
+              <td>${count} hlö</td>
+              <td><span style="font-size:0.7rem;cursor:pointer;color:var(--primary);user-select:none" onclick="const el=this.closest('tr').nextElementSibling;if(el&&el.classList.contains('drilldown-row')){el.style.display=el.style.display==='none'?'':'none';this.textContent=el.style.display==='none'?'▶':'▼'}">▶</span></td>
+            </tr>
+            <tr class="drilldown-row" style="display:none"><td colspan="4" style="padding:4px 12px 12px">
+              ${count > 0 ? PEOPLE.filter(p => p.certs.includes(c.id)).slice(0,10).map(p => `<span class="tag" style="cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${p.name}</span>`).join('') + (count > 10 ? `<span class="text-sm text-muted"> ...ja ${count-10} muuta</span>` : '') : '<span class="text-muted text-sm">Ei suorittajia</span>'}
+            </td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+    }).join('')}
+  `);
+}
+
+function showAvgDrilldown() {
+  const byLevel = {};
+  LEVELS.forEach(l => {
+    const certs = CERTS.filter(c => c.level === l);
+    const totalHoldings = certs.reduce((s,c) => s + countPeopleByCert(c.id), 0);
+    byLevel[l] = { certs: certs.length, holdings: totalHoldings };
+  });
+  const levelSlices = LEVELS.map((l,i) => ({
+    label: l, value: byLevel[l].holdings,
+    color: LEVEL_COLORS[l] || PIE_COLORS[i],
+    onclick: `document.querySelectorAll('.avg-level-section').forEach(e=>e.style.display='none');var el=document.getElementById('avg-level-${i}');if(el)el.style.display=''`
+  }));
+  openModal('Sertifikaattijakauma tasoittain', `
+    <div class="detail-row">
+      ${LEVELS.map(l => `<div class="detail-item"><div class="label">${l}</div><div class="value">${byLevel[l].holdings} suoritusta</div></div>`).join('')}
+    </div>
+    <h3 style="margin-top:12px">Suoritukset tasoittain</h3>
+    ${renderPieChart(levelSlices, 'avg-pie', 200)}
+    <p class="text-sm text-muted" style="text-align:center;margin-bottom:12px">Klikkaa piirakan osaa nähdäksesi tason sertifikaatit</p>
+    ${LEVELS.map((l,i) => {
+      const certs = CERTS.filter(c => c.level === l);
+      return `<div id="avg-level-${i}" class="avg-level-section" style="display:none">
+        <h3 style="margin-top:8px"><span class="level-badge ${getLevelClass(l)}">${l}</span> (${certs.length} sertifikaattia, ${byLevel[l].holdings} suoritusta)</h3>
+        <table class="data-table" style="margin-top:8px">
+          <thead><tr><th>Sertifikaatti</th><th>Tarjoaja</th><th>Suorittajia</th><th></th></tr></thead>
+          <tbody>${certs.map(c => {
+            const count = countPeopleByCert(c.id);
+            return `<tr>
+              <td><strong style="color:var(--primary);cursor:pointer" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">${c.name}</strong></td>
+              <td><span class="provider-badge ${getProviderClass(c.provider)}" style="font-size:0.65rem">${c.provider}</span></td>
+              <td>${count} hlö</td>
+              <td><span style="font-size:0.7rem;cursor:pointer;color:var(--primary);user-select:none" onclick="const el=this.closest('tr').nextElementSibling;if(el&&el.classList.contains('drilldown-row')){el.style.display=el.style.display==='none'?'':'none';this.textContent=el.style.display==='none'?'▶':'▼'}">▶</span></td>
+            </tr>
+            <tr class="drilldown-row" style="display:none"><td colspan="4" style="padding:4px 12px 12px">
+              ${count > 0 ? PEOPLE.filter(p => p.certs.includes(c.id)).slice(0,10).map(p => `<span class="tag" style="cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${p.name}</span>`).join('') + (count > 10 ? `<span class="text-sm text-muted"> ...ja ${count-10} muuta</span>` : '') : '<span class="text-muted text-sm">Ei suorittajia</span>'}
+            </td></tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+    }).join('')}
+  `);
+}
+
+function showCertDetail(certId) {
+  const c = getCert(certId);
+  if (!c) return;
+  const holders = PEOPLE.filter(p => p.certs.includes(certId));
+  const prereqCerts = c.prereqs.map(id => getCert(id)).filter(Boolean);
+  const certTips = TIPS.filter(t => t.certId === certId).sort((a,b) => new Date(b.date) - new Date(a.date));
+  const certResources = RESOURCES.filter(r => r.certId === certId);
+  const avgActual = certTips.length > 0 ? Math.round(certTips.reduce((s,t) => s + t.actualHours, 0) / certTips.length) : null;
+  const avgRating = certTips.length > 0 ? (certTips.reduce((s,t) => s + t.rating, 0) / certTips.length).toFixed(1) : null;
+
+  openModal(c.name, `
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Tarjoaja</div><div class="value"><span class="provider-badge ${getProviderClass(c.provider)}">${c.provider}</span></div></div>
+      <div class="detail-item"><div class="label">Taso</div><div class="value"><span class="level-badge ${getLevelClass(c.level)}">${c.level}</span></div></div>
+      <div class="detail-item"><div class="label">Tyyppi</div><div class="value">${c.type}</div></div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Hinta</div><div class="value">${formatCost(c.cost)}</div></div>
+      <div class="detail-item"><div class="label">Arvioitu kesto</div><div class="value">${c.hours} tuntia</div></div>
+      <div class="detail-item"><div class="label">Suorittajia</div><div class="value">${holders.length} henkilöä</div></div>
+      ${avgActual !== null ? `<div class="detail-item"><div class="label">Todellinen aika (ka.)</div><div class="value"><strong>${avgActual}h</strong> <span class="tip-time-badge ${avgActual < c.hours - 2 ? 'faster' : avgActual > c.hours + 5 ? 'slower' : 'same'}" style="margin-left:4px">${avgActual - c.hours > 0 ? '+' : ''}${avgActual - c.hours}h</span></div></div>` : ''}
+    </div>
+    ${c.url ? `<div style="margin:12px 0"><a href="${c.url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--primary);color:#fff;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Avaa virallinen sivu</a></div>` : ''}
+    <h3>Kuvaus</h3>
+    <p>${c.desc}</p>
+    ${prereqCerts.length ? `<h3>Esitietovaatimukset</h3><div class="tags">${prereqCerts.map(p=>`<span class="tag" onclick="closeModal();setTimeout(()=>showCertDetail('${p.id}'),200)">${p.name}</span>`).join('')}</div>` : ''}
+    <h3>Osaamisalueet</h3>
+    <div class="tags">${c.skills.map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+    ${certResources.length ? `
+    <h3 style="margin-top:16px">Opiskelulähteet (${certResources.length})</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      ${certResources.map(r => `<a href="${r.url}" target="_blank" rel="noopener noreferrer" class="resource-link">
+        <span style="font-size:1.1rem">${RESOURCE_TYPE_ICONS[r.type] || '📄'}</span>
+        <span style="flex:1;font-weight:500">${r.name}</span>
+        <span class="resource-type">${RESOURCE_TYPE_LABELS[r.type] || r.type}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>`).join('')}
+    </div>` : ''}
+    ${certTips.length ? `
+    <h3 style="margin-top:16px">Käyttäjien vinkit ${avgRating ? `<span style="font-size:0.8rem;color:#f59e0b;margin-left:6px">${renderStars(Math.round(parseFloat(avgRating)))} ${avgRating}</span>` : ''} (${certTips.length})</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+      ${certTips.map(tip => {
+        const p = PEOPLE.find(x => x.id === tip.personId);
+        if (!p) return '';
+        const diff = tip.actualHours - c.hours;
+        const freshness = getTipFreshness(tip.date);
+        const freshColor = freshness === 'fresh' ? 'var(--success)' : freshness === 'ok' ? 'var(--text-muted)' : 'var(--danger)';
+        return `<div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px;border-left:3px solid ${freshColor}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:28px;height:28px;border-radius:50%;background:${p.avatar};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:0.65rem;cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${initials(p.name)}</div>
+              <div>
+                <span style="font-weight:600;font-size:0.82rem;cursor:pointer" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)">${p.name}</span>
+                <span class="text-sm text-muted"> &middot; ${p.team}</span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <span style="font-size:0.72rem;color:${freshColor}">${getTipAge(tip.date)}</span>
+              <div style="color:#f59e0b;font-size:0.72rem">${renderStars(tip.rating)}</div>
+            </div>
+          </div>
+          <div style="font-size:0.85rem;line-height:1.5;margin-bottom:6px">${tip.text}</div>
+          <div style="font-size:0.75rem;color:var(--text-light)">Todellinen aika: <strong>${tip.actualHours}h</strong> <span class="tip-time-badge ${diff < -2 ? 'faster' : diff > 5 ? 'slower' : 'same'}">${diff > 0 ? '+' : ''}${diff}h</span></div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+    <div style="margin-top:16px">
+      <h3 class="holders-toggle" onclick="const list=document.getElementById('holders-list-${c.id}');const arrow=this.querySelector('.toggle-arrow');if(list.style.display==='none'){list.style.display='';arrow.textContent='▼'}else{list.style.display='none';arrow.textContent='▶'}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px">
+        <span class="toggle-arrow" style="font-size:0.7rem;transition:transform 0.2s">▶</span>
+        Suorittaneet (${holders.length})
+      </h3>
+      <div id="holders-list-${c.id}" style="display:none;margin-top:8px">
+        ${holders.length ? `<table class="data-table">
+          <thead><tr><th>Nimi</th><th>Tiimi</th><th>Rooli</th></tr></thead>
+          <tbody>${holders.slice(0,20).map(p=>`<tr class="clickable" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)"><td><strong>${p.name}</strong></td><td>${p.team}</td><td>${p.role}</td></tr>`).join('')}
+          ${holders.length > 20 ? `<tr><td colspan="3" class="text-muted text-sm">...ja ${holders.length-20} muuta</td></tr>` : ''}</tbody>
+        </table>` : '<p class="text-muted">Ei vielä suorittajia organisaatiossa.</p>'}
+      </div>
+    </div>
+  `);
+}
+
+function showPersonDetail(personId) {
+  const p = PEOPLE.find(x => x.id === personId);
+  if (!p) return;
+  const personCerts = p.certs.map(id => getCert(id)).filter(Boolean);
+  const allCertIds = new Set(p.certs);
+  // Recommend certs based on team profile
+  const recommended = CERTS.filter(c => !allCertIds.has(c.id) && (
+    c.prereqs.length === 0 || c.prereqs.every(pr => allCertIds.has(pr))
+  )).slice(0, 5);
+
+  openModal(p.name, `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <div style="width:56px;height:56px;border-radius:50%;background:${p.avatar};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;flex-shrink:0">${initials(p.name)}</div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:700">${p.name}</div>
+        <div class="text-muted text-sm">${p.role} &middot; ${p.team}</div>
+      </div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-item"><div class="label">Sertifikaatit</div><div class="value">${personCerts.length} kpl</div></div>
+      <div class="detail-item"><div class="label">Tasot</div><div class="value">${[...new Set(personCerts.map(c=>c.level))].join(', ') || '-'}</div></div>
+      <div class="detail-item"><div class="label">Tarjoajat</div><div class="value">${[...new Set(personCerts.map(c=>c.provider))].length} kpl</div></div>
+    </div>
+    <h3>Sertifikaatit (${personCerts.length})</h3>
+    ${personCerts.length ? `<table class="data-table"><thead><tr><th>Sertifikaatti</th><th>Tarjoaja</th><th>Taso</th></tr></thead><tbody>
+    ${personCerts.map(c=>`<tr class="clickable" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)"><td><strong>${c.name}</strong></td><td><span class="provider-badge ${getProviderClass(c.provider)}" style="font-size:0.65rem">${c.provider}</span></td><td><span class="level-badge ${getLevelClass(c.level)}" style="font-size:0.65rem">${c.level}</span></td></tr>`).join('')}
+    </tbody></table>` : '<p class="text-muted">Ei sertifikaatteja.</p>'}
+    ${recommended.length ? `
+    <h3>Suositellut seuraavat</h3>
+    <div class="tags">${recommended.map(c=>`<span class="tag" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">+ ${c.name}</span>`).join('')}</div>` : ''}
+  `);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const totalCerts = PEOPLE.reduce((s,p) => s + p.certs.length, 0);
+  const uniqueHolders = PEOPLE.filter(p => p.certs.length > 0).length;
+  const avgPerPerson = (totalCerts / PEOPLE.length).toFixed(1);
+  const freeCerts = CERTS.filter(c => c.cost === 0).length;
+
+  // Top 5
+  const top5 = [...PEOPLE].sort((a,b) => b.certs.length - a.certs.length).slice(0,5);
+
+  // Provider distribution
+  const provDist = {};
+  PEOPLE.forEach(p => p.certs.forEach(cid => {
+    const cert = getCert(cid);
+    if (cert) provDist[cert.provider] = (provDist[cert.provider]||0) + 1;
+  }));
+
+  // Recent goals
+  const goalSummary = GOALS.slice(0,3).map(g => {
+    const progress = getGoalProgress(g);
+    const pct = g.isPercentage ? progress : Math.round(progress / g.targetCount * 100);
+    const status = getGoalStatus(g);
+    return `<div class="goal-card ${status}" style="margin-bottom:12px">
+      <h3 style="font-size:0.88rem">${g.name}</h3>
+      <div class="goal-progress mt-16">
+        <div class="progress-label"><span>${g.isPercentage ? `${progress}%` : `${progress} / ${g.targetCount}`}</span><span class="value">${Math.min(pct,100)}%</span></div>
+        <div class="progress-bar"><div class="fill ${status==='on-track'?'green':status==='at-risk'?'orange':'red'}" style="width:${Math.min(pct,100)}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="stats-grid">
+      <div class="stat-card" style="cursor:pointer;transition:box-shadow 0.2s" onclick="showAllCertsDrilldown()" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow)'"><div class="stat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/></svg></div><div class="stat-info"><h3>${totalCerts}</h3><p>Sertifikaattia yhteensä</p></div></div>
+      <div class="stat-card" style="cursor:pointer;transition:box-shadow 0.2s" onclick="showHoldersDrilldown()" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow)'"><div class="stat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-info"><h3>${uniqueHolders}</h3><p>Sertifioitua henkilöä</p></div></div>
+      <div class="stat-card" style="cursor:pointer;transition:box-shadow 0.2s" onclick="showAvgDrilldown()" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow)'"><div class="stat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-6"/></svg></div><div class="stat-info"><h3>${avgPerPerson}</h3><p>Keskiarvo / henkilö</p></div></div>
+      <div class="stat-card" style="cursor:pointer;transition:box-shadow 0.2s" onclick="showFreeCertsDrilldown()" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='var(--shadow)'"><div class="stat-icon cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div><div class="stat-info"><h3>${freeCerts}</h3><p>Ilmaista sertifikaattia</p></div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><h2>Top 5 sertifioidut</h2></div>
+        ${top5.map((p,i) => `<div class="lb-row" onclick="showPersonDetail(${p.id})" style="cursor:pointer">
+          <div class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+          <div class="lb-avatar" style="background:${p.avatar}">${initials(p.name)}</div>
+          <div class="lb-info"><div class="lb-name">${p.name}</div><div class="lb-team">${p.role} &middot; ${p.team}</div></div>
+          <div class="lb-count">${p.certs.length}</div>
+        </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Tavoitteiden eteneminen</h2><button class="btn btn-sm btn-secondary" onclick="navigate('goals')">Kaikki &rarr;</button></div>
+        ${goalSummary}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2>Sertifikaatit tarjoajittain</h2></div>
+      <div class="bar-chart">
+        ${Object.entries(provDist).sort((a,b)=>b[1]-a[1]).map(([prov,count]) => {
+          const maxCount = Math.max(...Object.values(provDist));
+          const height = Math.round(count / maxCount * 160);
+          return `<div class="bar-col">
+            <div class="bar-value">${count}</div>
+            <div class="bar ${getProviderClass(prov)}" style="height:${height}px;background:var(--primary)" onclick="showProviderDrilldown('${prov}')"></div>
+            <div class="bar-label" style="writing-mode:horizontal-tb;font-size:0.7rem">${prov}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// CATALOG
+// ============================================================
+// Catalog filter state — empty set = all shown
+let catalogFilters = { providers: new Set(), levels: new Set(), types: new Set(), costs: new Set() };
+let peopleFilters = { teams: new Set(), providers: new Set() };
+let pathFilters = { providers: new Set() };
+
+function toggleChip(category, value) {
+  const set = catalogFilters[category];
+  if (set.has(value)) {
+    set.delete(value);
+  } else {
+    set.add(value);
+  }
+  filterCatalog();
+  // Re-render just the chip states without full re-render
+  document.querySelectorAll(`[data-filter-cat="${category}"]`).forEach(el => {
+    el.classList.toggle('selected', set.has(el.dataset.filterVal));
+  });
+}
+
+function clearFilterGroup(category) {
+  catalogFilters[category].clear();
+  filterCatalog();
+  document.querySelectorAll(`[data-filter-cat="${category}"]`).forEach(el => {
+    el.classList.remove('selected');
+  });
+}
+
+const COST_OPTIONS = [
+  {value:'free', label:'Ilmainen', icon:'🆓'},
+  {value:'low', label:'< 100 €', icon:''},
+  {value:'mid', label:'100–200 €', icon:''},
+  {value:'high', label:'> 200 €', icon:''},
+];
+
+function renderCatalog() {
+  // Count certs per filter value for chip badges
+  const provCounts = {};
+  PROVIDERS.forEach(p => { provCounts[p] = CERTS.filter(c=>c.provider===p).length; });
+  const levelCounts = {};
+  LEVELS.forEach(l => { levelCounts[l] = CERTS.filter(c=>c.level===l).length; });
+  const typeCounts = {};
+  TYPES.forEach(t => { typeCounts[t] = CERTS.filter(c=>c.type===t).length; });
+  const costCounts = {
+    free: CERTS.filter(c=>c.cost===0).length,
+    low: CERTS.filter(c=>c.cost>0&&c.cost<100).length,
+    mid: CERTS.filter(c=>c.cost>=100&&c.cost<=200).length,
+    high: CERTS.filter(c=>c.cost>200).length,
+  };
+
+  return `
+    <div style="margin-bottom:20px">
+      <input class="search-input" type="text" id="cert-search" placeholder="Hae sertifikaatteja nimellä, tarjoajalla tai osaamisalueella..." oninput="filterCatalog()" style="width:100%;max-width:480px;margin-bottom:16px">
+
+      <div class="filter-section">
+        <div class="filter-label">Tarjoaja</div>
+        <div class="chip-row">
+          ${PROVIDERS.map(p => `<span class="filter-chip ${catalogFilters.providers.has(p)?'selected':''}" data-provider="${p}" data-filter-cat="providers" data-filter-val="${p}" onclick="toggleChip('providers','${p}')">${p} <span class="chip-count">${provCounts[p]}</span></span>`).join('')}
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">Taso</div>
+        <div class="chip-row">
+          ${LEVELS.map(l => `<span class="filter-chip ${catalogFilters.levels.has(l)?'selected':''}" data-level="${l}" data-filter-cat="levels" data-filter-val="${l}" onclick="toggleChip('levels','${l}')">${l} <span class="chip-count">${levelCounts[l]}</span></span>`).join('')}
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">Tyyppi</div>
+        <div class="chip-row">
+          ${TYPES.map(t => `<span class="filter-chip ${catalogFilters.types.has(t)?'selected':''}" data-type="${t}" data-filter-cat="types" data-filter-val="${t}" onclick="toggleChip('types','${t}')">${t} <span class="chip-count">${typeCounts[t]}</span></span>`).join('')}
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">Hinta</div>
+        <div class="chip-row">
+          ${COST_OPTIONS.map(o => `<span class="filter-chip ${catalogFilters.costs.has(o.value)?'selected':''}" data-cost="${o.value}" data-filter-cat="costs" data-filter-val="${o.value}" onclick="toggleChip('costs','${o.value}')">${o.label} <span class="chip-count">${costCounts[o.value]}</span></span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="flex-between mb-8">
+      <span class="text-sm text-muted" id="cert-count">${CERTS.length} sertifikaattia</span>
+      <button class="btn btn-sm btn-secondary" onclick="catalogFilters={providers:new Set(),levels:new Set(),types:new Set(),costs:new Set()};document.getElementById('cert-search').value='';render()">Tyhjennä filtterit</button>
+    </div>
+    <div class="grid-3" id="cert-grid">
+      ${getFilteredCerts().map(renderCertCard).join('')}
+    </div>
+  `;
+}
+
+function getFilteredCerts() {
+  const search = document.getElementById('cert-search')?.value.toLowerCase() || '';
+  const {providers, levels, types, costs} = catalogFilters;
+
+  return CERTS.filter(c => {
+    if (search && !c.name.toLowerCase().includes(search) && !c.provider.toLowerCase().includes(search) && !c.desc.toLowerCase().includes(search) && !c.skills.some(s=>s.toLowerCase().includes(search))) return false;
+    if (providers.size > 0 && !providers.has(c.provider)) return false;
+    if (levels.size > 0 && !levels.has(c.level)) return false;
+    if (types.size > 0 && !types.has(c.type)) return false;
+    if (costs.size > 0) {
+      let costMatch = false;
+      if (costs.has('free') && c.cost === 0) costMatch = true;
+      if (costs.has('low') && c.cost > 0 && c.cost < 100) costMatch = true;
+      if (costs.has('mid') && c.cost >= 100 && c.cost <= 200) costMatch = true;
+      if (costs.has('high') && c.cost > 200) costMatch = true;
+      if (!costMatch) return false;
+    }
+    return true;
+  });
+}
+
+function renderCertCard(c) {
+  const holders = countPeopleByCert(c.id);
+  return `<div class="cert-card" onclick="showCertDetail('${c.id}')">
+    <span class="provider-badge ${getProviderClass(c.provider)}">${c.provider}</span>
+    <h3>${c.name}</h3>
+    <div style="margin:6px 0"><span class="level-badge ${getLevelClass(c.level)}">${c.level}</span></div>
+    <p class="text-sm text-muted" style="flex:1;margin-bottom:8px">${c.desc.substring(0,100)}...</p>
+    <div class="cert-meta">
+      <span>💰 ${formatCost(c.cost)}</span>
+      <span>⏱ ${formatHours(c.hours)}</span>
+      <span>👥 ${holders}</span>
+    </div>
+  </div>`;
+}
+
+function filterCatalog() {
+  const filtered = getFilteredCerts();
+  document.getElementById('cert-count').textContent = `${filtered.length} sertifikaattia`;
+  document.getElementById('cert-grid').innerHTML = filtered.length ? filtered.map(renderCertCard).join('') : '<div class="empty-state"><h3>Ei tuloksia</h3><p>Kokeile muuttaa hakuehtoja tai tyhjennä filtterit.</p></div>';
+}
+
+// ============================================================
+// ANALYTICS
+// ============================================================
+function renderAnalytics() {
+  // By provider
+  const byProvider = {};
+  PEOPLE.forEach(p => p.certs.forEach(cid => {
+    const cert = getCert(cid);
+    if (cert) byProvider[cert.provider] = (byProvider[cert.provider]||0) + 1;
+  }));
+
+  // By level
+  const byLevel = {};
+  PEOPLE.forEach(p => p.certs.forEach(cid => {
+    const cert = getCert(cid);
+    if (cert) byLevel[cert.level] = (byLevel[cert.level]||0) + 1;
+  }));
+  const totalByLevel = Object.values(byLevel).reduce((s,v)=>s+v,0);
+  const levelColors = {Foundational:'#3b82f6', Associate:'#10b981', Professional:'#f59e0b', Expert:'#ef4444'};
+  let cumulDeg = 0;
+  const conicStops = LEVELS.filter(l=>byLevel[l]).map(l => {
+    const deg = (byLevel[l]/totalByLevel)*360;
+    const stop = `${levelColors[l]} ${cumulDeg}deg ${cumulDeg+deg}deg`;
+    cumulDeg += deg;
+    return stop;
+  }).join(', ');
+
+  // By type
+  const byType = {};
+  PEOPLE.forEach(p => p.certs.forEach(cid => {
+    const cert = getCert(cid);
+    if (cert) byType[cert.type] = (byType[cert.type]||0) + 1;
+  }));
+
+  // By team
+  const byTeam = {};
+  TEAMS.forEach(t => {
+    const teamPeople = PEOPLE.filter(p=>p.team===t);
+    const teamCerts = teamPeople.reduce((s,p)=>s+p.certs.length,0);
+    byTeam[t] = {total:teamCerts, avg: teamPeople.length ? (teamCerts/teamPeople.length).toFixed(1) : 0, people:teamPeople.length};
+  });
+
+  const maxProvCount = Math.max(...Object.values(byProvider));
+  const maxTeamAvg = Math.max(...Object.values(byTeam).map(v=>parseFloat(v.avg)));
+
+  // Goal progress data for analytics
+  const goalData = GOALS.map(g => {
+    const progress = getGoalProgress(g);
+    const pct = g.isPercentage ? progress : Math.round(progress / g.targetCount * 100);
+    const status = getGoalStatus(g);
+    const daysLeft = Math.ceil((new Date(g.deadline) - new Date()) / (1000*60*60*24));
+    return {goal:g, progress, pct:Math.min(pct,100), status, daysLeft};
+  }).sort((a,b) => a.pct - b.pct); // worst first for visibility
+
+  return `
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header"><h2>Tavoitteiden tilanne</h2><button class="btn btn-sm btn-secondary" onclick="navigate('goals')">Hallitse tavoitteita &rarr;</button></div>
+      <table class="data-table">
+        <thead><tr><th style="width:22%">Tavoite</th><th style="width:8%">Tila</th><th style="width:38%">Edistyminen</th><th style="width:14%">Lukema</th><th style="width:18%">Deadline</th></tr></thead>
+        <tbody>
+        ${goalData.map(({goal:g, progress, pct, status, daysLeft}) => {
+          const statusLabel = status==='on-track'?'Aikataulussa':status==='at-risk'?'Riskissä':'Jäljessä';
+          const statusColor = status==='on-track'?'green':status==='at-risk'?'orange':'red';
+          const dlWarning = daysLeft < 60 && status !== 'on-track' ? ' fw-700' : '';
+          return `<tr class="clickable" onclick="showGoalDetail(${g.id})" style="cursor:pointer">
+            <td><strong>${g.name}</strong></td>
+            <td><span class="level-badge ${status==='on-track'?'level-associate':status==='at-risk'?'level-professional':'level-expert'}" style="white-space:nowrap">${statusLabel}</span></td>
+            <td><div class="progress-bar progress-large" style="min-width:200px"><div class="fill ${statusColor}" style="width:${pct}%"></div></div></td>
+            <td style="font-weight:700;font-size:0.95rem">${g.isPercentage ? progress+'%' : progress+' / '+g.targetCount} <span class="text-muted text-sm">(${pct}%)</span></td>
+            <td class="${dlWarning}">${new Date(g.deadline).toLocaleDateString('fi-FI')}${daysLeft > 0 ? ` <span class="text-muted text-sm">(${daysLeft} pv)</span>` : ' <span style="color:var(--danger);font-weight:700">Mennyt!</span>'}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><h2>Sertifikaatit tarjoajittain</h2></div>
+        <div class="bar-chart" style="height:220px">
+          ${Object.entries(byProvider).sort((a,b)=>b[1]-a[1]).map(([prov,count]) => {
+            const height = Math.round(count / maxProvCount * 180);
+            return `<div class="bar-col">
+              <div class="bar-value">${count}</div>
+              <div class="bar" style="height:${height}px;background:${AVATAR_COLORS[PROVIDERS.indexOf(prov)%AVATAR_COLORS.length]}" onclick="catalogFilters={providers:new Set(['${prov}']),levels:new Set(),types:new Set(),costs:new Set()};navigate('catalog')"></div>
+              <div class="bar-label" style="writing-mode:horizontal-tb;font-size:0.68rem;max-height:none">${prov}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Sertifikaatit tasoittain</h2></div>
+        <div class="donut-container" style="justify-content:center;padding:20px 0">
+          <div class="donut" style="background:conic-gradient(${conicStops})">
+            <div class="donut-center"><div class="number">${totalByLevel}</div><div class="label">yhteensä</div></div>
+          </div>
+          <div class="donut-legend">
+            ${LEVELS.filter(l=>byLevel[l]).map(l=>`<div class="item"><div class="dot" style="background:${levelColors[l]}"></div><span>${l}: <strong>${byLevel[l]}</strong> (${Math.round(byLevel[l]/totalByLevel*100)}%)</span></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><h2>Keskiarvo per tiimi</h2></div>
+        <div class="bar-chart" style="height:200px">
+          ${TEAMS.map(t => {
+            const height = Math.round(parseFloat(byTeam[t].avg) / maxTeamAvg * 160);
+            return `<div class="bar-col">
+              <div class="bar-value">${byTeam[t].avg}</div>
+              <div class="bar" style="height:${height}px;background:var(--primary)"></div>
+              <div class="bar-label" style="writing-mode:horizontal-tb;font-size:0.65rem;max-height:none">${t}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Sertifikaatit tyypeittäin</h2></div>
+        <div style="padding:10px 0">
+          ${Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([type,count]) => {
+            const pct = Math.round(count/totalByLevel*100);
+            return `<div style="margin-bottom:14px">
+              <div class="progress-label"><span>${type}</span><span class="value">${count} (${pct}%)</span></div>
+              <div class="progress-bar progress-large"><div class="fill blue" style="width:${pct}%"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2>Tiimien yksityiskohtainen vertailu</h2></div>
+      <table class="data-table">
+        <thead><tr><th>Tiimi</th><th>Henkilöt</th><th>Sertifikaatit yht.</th><th>Keskiarvo</th><th>Kattavuus</th></tr></thead>
+        <tbody>
+        ${TEAMS.map(t => {
+          const teamP = PEOPLE.filter(p=>p.team===t);
+          const withCerts = teamP.filter(p=>p.certs.length>0).length;
+          const coverage = teamP.length ? Math.round(withCerts/teamP.length*100) : 0;
+          return `<tr><td><strong>${t}</strong></td><td>${teamP.length}</td><td>${byTeam[t].total}</td><td>${byTeam[t].avg}</td><td>
+            <div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:100px"><div class="fill ${coverage>=80?'green':coverage>=50?'orange':'red'}" style="width:${coverage}%"></div></div><span class="text-sm">${coverage}%</span></div></td></tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ============================================================
+// PEOPLE
+// ============================================================
+function togglePeopleChip(category, value) {
+  const set = peopleFilters[category];
+  if (set.has(value)) { set.delete(value); } else { set.add(value); }
+  filterPeople();
+  document.querySelectorAll(`[data-people-cat="${category}"]`).forEach(el => {
+    el.classList.toggle('selected', set.has(el.dataset.peopleVal));
+  });
+}
+
+function renderPeople() {
+  const teamCounts = {};
+  TEAMS.forEach(t => { teamCounts[t] = PEOPLE.filter(p => p.team === t).length; });
+  const provCounts = {};
+  PROVIDERS.forEach(prov => { provCounts[prov] = PEOPLE.filter(p => p.certs.some(cid => { const c = getCert(cid); return c && c.provider === prov; })).length; });
+
+  return `
+    <div style="margin-bottom:20px">
+      <input class="search-input" type="text" id="people-search" placeholder="Hae nimellä, roolilla tai sertifikaatilla..." oninput="filterPeople()" style="width:100%;max-width:480px;margin-bottom:16px">
+
+      <div class="filter-section">
+        <div class="filter-label">Tiimi</div>
+        <div class="chip-row">
+          ${TEAMS.map(t => `<span class="filter-chip ${peopleFilters.teams.has(t)?'selected':''}" data-people-cat="teams" data-people-val="${t}" onclick="togglePeopleChip('teams','${t}')">${t} <span class="chip-count">${teamCounts[t]}</span></span>`).join('')}
+        </div>
+      </div>
+
+      <div class="filter-section">
+        <div class="filter-label">Tarjoaja (sertifikaatin mukaan)</div>
+        <div class="chip-row">
+          ${PROVIDERS.map(p => `<span class="filter-chip ${peopleFilters.providers.has(p)?'selected':''}" data-provider="${p}" data-people-cat="providers" data-people-val="${p}" onclick="togglePeopleChip('providers','${p}')">${p} <span class="chip-count">${provCounts[p]}</span></span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="flex-between mb-8">
+      <span class="text-sm text-muted" id="people-count">${PEOPLE.length} henkilöä</span>
+      <button class="btn btn-sm btn-secondary" onclick="peopleFilters={teams:new Set(),providers:new Set()};document.getElementById('people-search').value='';render()">Tyhjennä filtterit</button>
+    </div>
+    <div class="grid-4" id="people-grid">
+      ${PEOPLE.map(renderPersonCard).join('')}
+    </div>
+  `;
+}
+
+function renderPersonCard(p) {
+  const personCerts = p.certs.map(id => getCert(id)).filter(Boolean).slice(0,4);
+  return `<div class="person-card" onclick="showPersonDetail(${p.id})">
+    <div class="person-header">
+      <div class="person-avatar" style="background:${p.avatar}">${initials(p.name)}</div>
+      <div><div class="person-name">${p.name}</div><div class="person-role">${p.role} &middot; ${p.team}</div></div>
+    </div>
+    <div class="person-certs">
+      ${personCerts.map(c=>`<span class="mini-badge ${getProviderClass(c.provider)}">${c.provider}</span>`).join('')}
+      ${p.certs.length > 4 ? `<span class="mini-badge" style="background:var(--bg);color:var(--text-light)">+${p.certs.length-4}</span>` : ''}
+      ${p.certs.length === 0 ? '<span class="text-sm text-muted">Ei sertifikaatteja</span>' : ''}
+    </div>
+  </div>`;
+}
+
+function filterPeople() {
+  const search = (document.getElementById('people-search')?.value || '').toLowerCase();
+  const {teams, providers} = peopleFilters;
+
+  const filtered = PEOPLE.filter(p => {
+    if (teams.size > 0 && !teams.has(p.team)) return false;
+    if (providers.size > 0 && !p.certs.some(cid => { const c = getCert(cid); return c && providers.has(c.provider); })) return false;
+    if (search) {
+      const s = search;
+      const nameMatch = p.name.toLowerCase().includes(s);
+      const roleMatch = p.role.toLowerCase().includes(s);
+      const teamMatch = p.team.toLowerCase().includes(s);
+      const certMatch = p.certs.some(cid => { const c = getCert(cid); return c && (c.name.toLowerCase().includes(s) || c.provider.toLowerCase().includes(s)); });
+      if (!nameMatch && !roleMatch && !teamMatch && !certMatch) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('people-count').textContent = `${filtered.length} henkilöä`;
+  document.getElementById('people-grid').innerHTML = filtered.length ? filtered.map(renderPersonCard).join('') : '<div class="empty-state"><h3>Ei tuloksia</h3><p>Kokeile muuttaa hakuehtoja.</p></div>';
+}
+
+// ============================================================
+// MY PATH
+// ============================================================
+function togglePathChip(category, value) {
+  const set = pathFilters[category];
+  if (set.has(value)) { set.delete(value); } else { set.add(value); }
+  filterPaths();
+  document.querySelectorAll(`[data-path-cat="${category}"]`).forEach(el => {
+    el.classList.toggle('selected', set.has(el.dataset.pathVal));
+  });
+}
+
+function getPathProviders(path) {
+  const provs = new Set();
+  path.certs.forEach(cid => { const c = getCert(cid); if (c) provs.add(c.provider); });
+  return [...provs];
+}
+
+function getFilteredPaths() {
+  const {providers} = pathFilters;
+  if (providers.size === 0) return PATHS;
+  return PATHS.filter(path => {
+    const pathProvs = getPathProviders(path);
+    return pathProvs.some(p => providers.has(p));
+  });
+}
+
+function filterPaths() {
+  const filtered = getFilteredPaths();
+  const user = CURRENT_USER;
+  const userCerts = new Set(user.certs);
+  document.getElementById('path-count').textContent = `${filtered.length} / ${PATHS.length} polkua`;
+  document.getElementById('path-grid').innerHTML = filtered.length ? filtered.map(path => renderPathCard(path, userCerts)).join('') : '<div class="empty-state"><h3>Ei tuloksia</h3><p>Kokeile muuttaa filttereitä.</p></div>';
+}
+
+function renderPathCard(path, userCerts) {
+  const completed = path.certs.filter(cid => userCerts.has(cid)).length;
+  const total = path.certs.length;
+  const pct = Math.round(completed/total*100);
+  const remainingCerts = path.certs.filter(cid => !userCerts.has(cid)).map(cid => getCert(cid)).filter(Boolean);
+  const remainingHours = remainingCerts.reduce((s,c) => s+c.hours, 0);
+  const remainingCost = remainingCerts.reduce((s,c) => s+c.cost, 0);
+  const pathProvs = getPathProviders(path);
+  return `<div class="card" style="cursor:pointer;border:2px solid transparent;transition:all 0.2s" onclick="showPathDetail('${path.id}')" onmouseover="this.style.borderColor='var(--primary-light)'" onmouseout="this.style.borderColor='transparent'">
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${pathProvs.map(p => `<span class="provider-badge ${getProviderClass(p)}" style="font-size:0.6rem">${p}</span>`).join('')}</div>
+    <h3 style="font-size:0.95rem;margin-bottom:4px">${path.name}</h3>
+    <p class="text-sm text-muted mb-8">${path.desc}</p>
+    <div class="progress-label"><span>${completed} / ${total} suoritettu</span><span class="value">${pct}%</span></div>
+    <div class="progress-bar progress-large mb-8"><div class="fill ${pct>=100?'green':pct>=50?'blue':'orange'}" style="width:${pct}%"></div></div>
+    <div class="text-sm text-muted">Jäljellä: ~${remainingHours}h &middot; ${formatCost(remainingCost)} &middot; ~${path.estimatedMonths}kk</div>
+  </div>`;
+}
+
+function renderMyPath() {
+  const user = CURRENT_USER;
+  const userCerts = new Set(user.certs);
+
+  // Collect which providers appear across all paths
+  const pathProviderSet = new Set();
+  PATHS.forEach(path => { getPathProviders(path).forEach(p => pathProviderSet.add(p)); });
+  const pathProviders = PROVIDERS.filter(p => pathProviderSet.has(p));
+
+  // Count paths per provider
+  const provCounts = {};
+  pathProviders.forEach(prov => { provCounts[prov] = PATHS.filter(path => getPathProviders(path).includes(prov)).length; });
+
+  const filtered = getFilteredPaths();
+
+  return `
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+        <div style="width:48px;height:48px;border-radius:50%;background:${user.avatar};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem">${initials(user.name)}</div>
+        <div>
+          <div style="font-size:1.1rem;font-weight:700">${user.name}</div>
+          <div class="text-muted text-sm">${user.role} &middot; ${user.team} &middot; ${user.certs.length} sertifikaattia</div>
+        </div>
+      </div>
+      <div class="tags">
+        ${user.certs.map(cid => {const c=getCert(cid); return c ? `<span class="tag active" onclick="showCertDetail('${c.id}')">${c.name}</span>` : '';}).join('')}
+        ${user.certs.length===0?'<span class="text-muted">Ei sertifikaatteja vielä</span>':''}
+      </div>
+    </div>
+
+    <h2 style="margin-bottom:16px;font-size:1.1rem">Valitse kehityspolku</h2>
+
+    <div style="margin-bottom:16px">
+      <div class="filter-section">
+        <div class="filter-label">Tarjoaja</div>
+        <div class="chip-row">
+          ${pathProviders.map(p => `<span class="filter-chip ${pathFilters.providers.has(p)?'selected':''}" data-provider="${p}" data-path-cat="providers" data-path-val="${p}" onclick="togglePathChip('providers','${p}')">${p} <span class="chip-count">${provCounts[p]}</span></span>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-between mb-8">
+      <span class="text-sm text-muted" id="path-count">${filtered.length} / ${PATHS.length} polkua</span>
+      <button class="btn btn-sm btn-secondary" onclick="pathFilters={providers:new Set()};render()">Tyhjennä filtterit</button>
+    </div>
+    <div class="grid-2" style="margin-bottom:24px" id="path-grid">
+      ${filtered.map(path => renderPathCard(path, userCerts)).join('')}
+    </div>
+  `;
+}
+
+function showPathDetail(pathId) {
+  const path = PATHS.find(p => p.id === pathId);
+  if (!path) return;
+  const user = CURRENT_USER;
+  const userCerts = new Set(user.certs);
+  const pathCerts = path.certs.map(cid => getCert(cid)).filter(Boolean);
+
+  const completed = pathCerts.filter(c => userCerts.has(c.id));
+  const remaining = pathCerts.filter(c => !userCerts.has(c.id));
+  const totalHours = remaining.reduce((s,c) => s+c.hours, 0);
+  const totalCost = remaining.reduce((s,c) => s+c.cost, 0);
+
+  openModal(path.name, `
+    <p class="text-muted mb-16">${path.desc}</p>
+    <div class="path-summary">
+      <div class="summary-item"><div class="num">${completed.length}/${pathCerts.length}</div><div class="lbl">Suoritettu</div></div>
+      <div class="summary-item"><div class="num">${totalHours}h</div><div class="lbl">Jäljellä oleva aika</div></div>
+      <div class="summary-item"><div class="num">${formatCost(totalCost)}</div><div class="lbl">Arvioitu kustannus</div></div>
+    </div>
+    <h3>Sertifikaattipolku</h3>
+    <div class="path-timeline mt-16">
+      ${pathCerts.map((c,i) => {
+        const done = userCerts.has(c.id);
+        const isCurrent = !done && (i===0 || userCerts.has(pathCerts[i-1]?.id));
+        const status = done ? 'completed' : isCurrent ? 'current' : 'upcoming';
+        return `<div class="path-step ${status}" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">
+          <h4>${done?'✓ ':isCurrent?'→ ':''}${c.name}</h4>
+          <div class="step-meta">
+            <span><span class="provider-badge ${getProviderClass(c.provider)}" style="font-size:0.6rem">${c.provider}</span></span>
+            <span>${formatCost(c.cost)}</span>
+            <span>${c.hours}h</span>
+            <span class="level-badge ${getLevelClass(c.level)}" style="font-size:0.6rem">${c.level}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `);
+}
+
+// ============================================================
+// GOALS
+// ============================================================
+let goalStatusFilter = null; // null = all, 'on-track', 'at-risk', 'behind'
+
+function toggleGoalFilter(status) {
+  goalStatusFilter = goalStatusFilter === status ? null : status;
+  // Update filter cards visually
+  document.querySelectorAll('.goal-filter-card').forEach(el => {
+    el.classList.toggle('goal-filter-active', el.dataset.status === goalStatusFilter);
+    el.classList.toggle('goal-filter-dimmed', goalStatusFilter !== null && el.dataset.status !== goalStatusFilter);
+  });
+  // Filter goal cards
+  document.querySelectorAll('.goal-card[data-status]').forEach(el => {
+    el.style.display = (!goalStatusFilter || el.dataset.status === goalStatusFilter) ? '' : 'none';
+  });
+  // Update count
+  const visible = goalStatusFilter ? GOALS.filter(g => getGoalStatus(g) === goalStatusFilter).length : GOALS.length;
+  const countEl = document.getElementById('goals-visible-count');
+  if (countEl) countEl.textContent = goalStatusFilter ? `${visible} / ${GOALS.length} tavoitetta` : `${GOALS.length} tavoitetta`;
+}
+
+function renderGoals() {
+  const onTrack = GOALS.filter(g=>getGoalStatus(g)==='on-track').length;
+  const atRisk = GOALS.filter(g=>getGoalStatus(g)==='at-risk').length;
+  const behind = GOALS.filter(g=>getGoalStatus(g)==='behind').length;
+
+  return `
+    <div class="stats-grid mb-16">
+      <div class="stat-card goal-filter-card ${goalStatusFilter===null?'':'goal-filter-dimmed'}" data-status="" onclick="goalStatusFilter=null;render()" style="cursor:pointer;transition:all 0.15s ease;border:2px solid ${goalStatusFilter===null?'var(--primary)':'transparent'}">
+        <div class="stat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+        <div class="stat-info"><h3>${GOALS.length}</h3><p>Kaikki tavoitteet</p></div>
+      </div>
+      <div class="stat-card goal-filter-card ${goalStatusFilter==='on-track'?'goal-filter-active':goalStatusFilter!==null?'goal-filter-dimmed':''}" data-status="on-track" onclick="toggleGoalFilter('on-track')" style="cursor:pointer;transition:all 0.15s ease;border:2px solid ${goalStatusFilter==='on-track'?'var(--success)':'transparent'}">
+        <div class="stat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 4 12 14.01 9 11.01"/><path d="M22 12A10 10 0 1 1 12 2"/></svg></div>
+        <div class="stat-info"><h3>${onTrack}</h3><p>Aikataulussa</p></div>
+      </div>
+      <div class="stat-card goal-filter-card ${goalStatusFilter==='at-risk'?'goal-filter-active':goalStatusFilter!==null?'goal-filter-dimmed':''}" data-status="at-risk" onclick="toggleGoalFilter('at-risk')" style="cursor:pointer;transition:all 0.15s ease;border:2px solid ${goalStatusFilter==='at-risk'?'var(--warning)':'transparent'}">
+        <div class="stat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="stat-info"><h3>${atRisk}</h3><p>Riskissä</p></div>
+      </div>
+      <div class="stat-card goal-filter-card ${goalStatusFilter==='behind'?'goal-filter-active':goalStatusFilter!==null?'goal-filter-dimmed':''}" data-status="behind" onclick="toggleGoalFilter('behind')" style="cursor:pointer;transition:all 0.15s ease;border:2px solid ${goalStatusFilter==='behind'?'var(--danger)':'transparent'}">
+        <div class="stat-icon red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        <div class="stat-info"><h3>${behind}</h3><p>Jäljessä</p></div>
+      </div>
+    </div>
+
+    <div class="mb-8 text-sm text-muted" id="goals-visible-count">${goalStatusFilter ? GOALS.filter(g=>getGoalStatus(g)===goalStatusFilter).length+' / '+GOALS.length+' tavoitetta' : GOALS.length+' tavoitetta'}</div>
+
+    <div class="grid-2">
+      ${GOALS.map(g => {
+        const progress = getGoalProgress(g);
+        const pct = g.isPercentage ? progress : Math.round(progress / g.targetCount * 100);
+        const status = getGoalStatus(g);
+        const daysLeft = Math.ceil((new Date(g.deadline) - new Date()) / (1000*60*60*24));
+        const qualifiedPeople = PEOPLE.filter(p => p.certs.some(c => g.requiredCerts.includes(c)));
+        const hidden = goalStatusFilter && status !== goalStatusFilter;
+        return `<div class="goal-card ${status}" data-status="${status}" style="cursor:pointer;${hidden?'display:none':''}" onclick="showGoalDetail(${g.id})">
+          <div class="flex-between mb-8">
+            <h3>${g.name}</h3>
+            <span class="badge level-badge ${status==='on-track'?'level-associate':status==='at-risk'?'level-professional':'level-expert'}">${status==='on-track'?'Aikataulussa':status==='at-risk'?'Riskissä':'Jäljessä'}</span>
+          </div>
+          <div class="goal-desc">${g.desc}</div>
+          <div class="goal-progress">
+            <div class="progress-label"><span>${g.isPercentage ? `${progress}%` : `${progress} / ${g.targetCount}`}</span><span class="value">${Math.min(pct,100)}%</span></div>
+            <div class="progress-bar progress-large"><div class="fill ${status==='on-track'?'green':status==='at-risk'?'orange':'red'}" style="width:${Math.min(pct,100)}%"></div></div>
+          </div>
+          <div class="goal-footer">
+            <span>${daysLeft > 0 ? `${daysLeft} päivää jäljellä` : 'Deadline mennyt'}</span>
+            <span>${qualifiedPeople.length} henkilöä kvalifioitu</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function showGoalDetail(goalId) {
+  const g = GOALS.find(x => x.id === goalId);
+  if (!g) return;
+  const qualifiedPeople = PEOPLE.filter(p => p.certs.some(c => g.requiredCerts.includes(c)));
+  const relevantCerts = g.requiredCerts.map(id => getCert(id)).filter(Boolean);
+  const progress = getGoalProgress(g);
+  const pct = g.isPercentage ? progress : Math.round(progress / g.targetCount * 100);
+
+  openModal(g.name, `
+    <p class="text-muted mb-16">${g.desc}</p>
+    <div class="detail-row mb-16">
+      <div class="detail-item"><div class="label">Edistyminen</div><div class="value">${g.isPercentage ? `${progress}%` : `${progress} / ${g.targetCount}`}</div></div>
+      <div class="detail-item"><div class="label">Deadline</div><div class="value">${new Date(g.deadline).toLocaleDateString('fi-FI')}</div></div>
+      <div class="detail-item"><div class="label">Prioriteetti</div><div class="value" style="text-transform:capitalize">${g.priority === 'high' ? 'Korkea' : 'Keskitaso'}</div></div>
+    </div>
+    <div class="progress-label"><span>Kokonaisedistyminen</span><span class="value">${Math.min(pct,100)}%</span></div>
+    <div class="progress-bar progress-large mb-16"><div class="fill ${pct>=60?'green':pct>=35?'orange':'red'}" style="width:${Math.min(pct,100)}%"></div></div>
+
+    <h3>Hyväksyttävät sertifikaatit (${relevantCerts.length})</h3>
+    <div class="tags mt-16 mb-16">
+      ${relevantCerts.map(c => `<span class="tag" onclick="closeModal();setTimeout(()=>showCertDetail('${c.id}'),200)">${c.name} (${countPeopleByCert(c.id)})</span>`).join('')}
+    </div>
+
+    <h3>Kvalifioidut henkilöt (${qualifiedPeople.length})</h3>
+    ${qualifiedPeople.length ? `<table class="data-table mt-16"><thead><tr><th>Nimi</th><th>Tiimi</th><th>Relevantit sertit</th></tr></thead><tbody>
+    ${qualifiedPeople.map(p => {
+      const relevantOwned = p.certs.filter(c => g.requiredCerts.includes(c)).map(cid=>getCert(cid)).filter(Boolean);
+      return `<tr class="clickable" onclick="closeModal();setTimeout(()=>showPersonDetail(${p.id}),200)"><td><strong>${p.name}</strong></td><td>${p.team}</td><td>${relevantOwned.map(c=>c.name).join(', ')}</td></tr>`;
+    }).join('')}
+    </tbody></table>` : '<p class="text-muted mt-16">Ei vielä kvalifioituja henkilöitä.</p>'}
+  `);
+}
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+function renderLeaderboard() {
+  const sorted = [...PEOPLE].sort((a,b) => b.certs.length - a.certs.length);
+  const topCount = sorted[0]?.certs.length || 0;
+
+  // Team rankings
+  const teamStats = TEAMS.map(t => {
+    const tp = PEOPLE.filter(p=>p.team===t);
+    const total = tp.reduce((s,p)=>s+p.certs.length,0);
+    return {team:t, total, avg:(total/tp.length).toFixed(1), people:tp.length};
+  }).sort((a,b)=>parseFloat(b.avg)-parseFloat(a.avg));
+
+  return `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><h2>Top 20 sertifioiduinta</h2></div>
+        ${sorted.slice(0,20).map((p,i) => `<div class="lb-row" onclick="showPersonDetail(${p.id})" style="cursor:pointer">
+          <div class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+          <div class="lb-avatar" style="background:${p.avatar}">${initials(p.name)}</div>
+          <div class="lb-info"><div class="lb-name">${p.name}</div><div class="lb-team">${p.role} &middot; ${p.team}</div></div>
+          <div class="lb-count">${p.certs.length}</div>
+        </div>`).join('')}
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-header"><h2>Tiimien ranking</h2></div>
+          ${teamStats.map((ts,i) => `<div class="lb-row">
+            <div class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</div>
+            <div class="lb-info"><div class="lb-name">${ts.team}</div><div class="lb-team">${ts.people} henkilöä &middot; ${ts.total} sertifikaattia</div></div>
+            <div class="lb-count">${ts.avg}<span style="font-size:0.65rem;color:var(--text-muted);margin-left:2px">ka</span></div>
+          </div>`).join('')}
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h2>Harvinaisimmat sertifikaatit</h2></div>
+          ${CERTS.map(c => ({cert:c, count:countPeopleByCert(c.id)})).filter(x=>x.count>0).sort((a,b)=>a.count-b.count).slice(0,8).map(x => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showCertDetail('${x.cert.id}')">
+              <div><div style="font-weight:600;font-size:0.85rem">${x.cert.name}</div><div class="text-sm text-muted">${x.cert.provider}</div></div>
+              <span class="badge level-badge ${getLevelClass(x.cert.level)}">${x.count} hlö</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// TIPS & RESOURCES PAGE
+// ============================================================
+let tipFilters = { providers: new Set() };
+let tipSort = 'newest'; // newest, oldest, rating, fastest
+
+function toggleTipChip(category, value) {
+  const set = tipFilters[category];
+  if (set.has(value)) { set.delete(value); } else { set.add(value); }
+  filterTips();
+  document.querySelectorAll(`[data-tip-cat="${category}"]`).forEach(el => {
+    el.classList.toggle('selected', set.has(el.dataset.tipVal));
+  });
+}
+
+function getTipAge(dateStr) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.floor((now - d) / (1000*60*60*24));
+  if (diff < 7) return `${diff} pv sitten`;
+  if (diff < 30) return `${Math.floor(diff/7)} vk sitten`;
+  if (diff < 365) return `${Math.floor(diff/30)} kk sitten`;
+  return `${Math.floor(diff/365)}v sitten`;
+}
+
+function getTipFreshness(dateStr) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const months = (now.getFullYear()-d.getFullYear())*12 + now.getMonth()-d.getMonth();
+  if (months <= 3) return 'fresh';
+  if (months <= 9) return 'ok';
+  return 'old';
+}
+
+function renderStars(n) {
+  return '★'.repeat(n) + '☆'.repeat(5-n);
+}
+
+function renderTipCard(tip) {
+  const c = getCert(tip.certId);
+  const p = PEOPLE.find(x => x.id === tip.personId);
+  if (!c || !p) return '';
+  const diff = tip.actualHours - c.hours;
+  const pct = Math.round((diff / c.hours) * 100);
+  const freshness = getTipFreshness(tip.date);
+  const freshLabel = freshness === 'fresh' ? 'Tuore' : freshness === 'ok' ? '' : 'Vanha';
+  const freshColor = freshness === 'fresh' ? 'var(--success)' : freshness === 'ok' ? 'var(--text-muted)' : 'var(--danger)';
+
+  return `<div class="tip-card">
+    <div class="tip-header">
+      <div class="tip-avatar" style="background:${p.avatar}" onclick="showPersonDetail(${p.id})">${initials(p.name)}</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:0.9rem;cursor:pointer" onclick="showPersonDetail(${p.id})">${p.name}</div>
+        <div class="tip-meta">${p.role} &middot; ${p.team}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.75rem;color:${freshColor};font-weight:600">${getTipAge(tip.date)}${freshLabel ? ` · ${freshLabel}` : ''}</div>
+        <div class="tip-rating" style="color:#f59e0b;font-size:0.8rem">${renderStars(tip.rating)}</div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <span class="tip-cert" onclick="showCertDetail('${c.id}')"><span class="provider-badge ${getProviderClass(c.provider)}" style="font-size:0.6rem;padding:1px 5px">${c.provider}</span> ${c.name}</span>
+    </div>
+    <div class="tip-text">${tip.text}</div>
+    <div class="tip-footer">
+      <span>Arvioitu: <strong>${c.hours}h</strong></span>
+      <span>Todellinen: <strong>${tip.actualHours}h</strong></span>
+      <span class="tip-time-badge ${diff < -2 ? 'faster' : diff > 5 ? 'slower' : 'same'}">${diff > 0 ? '+' : ''}${diff}h (${diff > 0 ? '+' : ''}${pct}%)</span>
+    </div>
+  </div>`;
+}
+
+function getFilteredTips() {
+  const search = (document.getElementById('tip-search')?.value || '').toLowerCase();
+  const {providers} = tipFilters;
+  let filtered = TIPS.filter(tip => {
+    const c = getCert(tip.certId);
+    if (!c) return false;
+    if (providers.size > 0 && !providers.has(c.provider)) return false;
+    if (search) {
+      const p = PEOPLE.find(x => x.id === tip.personId);
+      const matchText = tip.text.toLowerCase().includes(search);
+      const matchCert = c.name.toLowerCase().includes(search) || c.provider.toLowerCase().includes(search);
+      const matchPerson = p && (p.name.toLowerCase().includes(search) || p.team.toLowerCase().includes(search));
+      if (!matchText && !matchCert && !matchPerson) return false;
+    }
+    return true;
+  });
+  // Sort
+  switch(tipSort) {
+    case 'newest': filtered.sort((a,b) => new Date(b.date) - new Date(a.date)); break;
+    case 'oldest': filtered.sort((a,b) => new Date(a.date) - new Date(b.date)); break;
+    case 'rating': filtered.sort((a,b) => b.rating - a.rating); break;
+    case 'fastest': filtered.sort((a,b) => {
+      const ca = getCert(a.certId), cb = getCert(b.certId);
+      return (a.actualHours - (ca?.hours||0)) - (b.actualHours - (cb?.hours||0));
+    }); break;
+  }
+  return filtered;
+}
+
+function filterTips() {
+  const filtered = getFilteredTips();
+  document.getElementById('tip-count').textContent = `${filtered.length} / ${TIPS.length} vinkkiä`;
+  document.getElementById('tips-grid').innerHTML = filtered.length ? filtered.map(renderTipCard).join('') : '<div class="empty-state"><h3>Ei vinkkejä</h3><p>Kokeile muuttaa hakuehtoja.</p></div>';
+}
+
+function setTipSort(val) {
+  tipSort = val;
+  document.querySelectorAll('.tip-sort-btn').forEach(el => el.classList.toggle('selected', el.dataset.sort === val));
+  filterTips();
+}
+
+function renderTips() {
+  const provCounts = {};
+  PROVIDERS.forEach(p => { provCounts[p] = TIPS.filter(t => { const c = getCert(t.certId); return c && c.provider === p; }).length; });
+  const provsWithTips = PROVIDERS.filter(p => provCounts[p] > 0);
+
+  // Stats
+  const avgRating = (TIPS.reduce((s,t) => s + t.rating, 0) / TIPS.length).toFixed(1);
+  const avgDiff = Math.round(TIPS.reduce((s,t) => { const c = getCert(t.certId); return s + (t.actualHours - (c?.hours||0)); }, 0) / TIPS.length);
+  const fasterCount = TIPS.filter(t => { const c = getCert(t.certId); return c && t.actualHours < c.hours - 2; }).length;
+
+  // Most reviewed certs
+  const certTipCounts = {};
+  TIPS.forEach(t => { certTipCounts[t.certId] = (certTipCounts[t.certId]||0) + 1; });
+
+  // Resources stats
+  const totalResources = RESOURCES.length;
+  const certsWithResources = new Set(RESOURCES.map(r => r.certId)).size;
+
+  const filtered = getFilteredTips();
+
+  return `
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat-card"><div class="stat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><div class="stat-info"><h3>${TIPS.length}</h3><p>Vinkkiä yhteensä</p></div></div>
+      <div class="stat-card"><div class="stat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="stat-info"><h3>${avgRating}</h3><p>Keskiarvosana</p></div></div>
+      <div class="stat-card"><div class="stat-icon ${avgDiff > 0 ? 'red' : 'green'}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-info"><h3>${avgDiff > 0 ? '+' : ''}${avgDiff}h</h3><p>Keskim. aikaero arvioon</p></div></div>
+      <div class="stat-card"><div class="stat-icon cyan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><div class="stat-info"><h3>${totalResources}</h3><p>Opiskelulähdettä (${certsWithResources} sertille)</p></div></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-header"><h2>Eniten arvioituja</h2></div>
+        ${Object.entries(certTipCounts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([cid,cnt]) => {
+          const c = getCert(cid);
+          const tips = TIPS.filter(t=>t.certId===cid);
+          const avgR = (tips.reduce((s,t)=>s+t.rating,0)/tips.length).toFixed(1);
+          return c ? `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showCertDetail('${c.id}')">
+            <div><span class="provider-badge ${getProviderClass(c.provider)}" style="font-size:0.6rem">${c.provider}</span> <strong style="font-size:0.85rem">${c.name}</strong></div>
+            <div style="text-align:right"><span style="color:#f59e0b;font-size:0.8rem">${renderStars(Math.round(tips.reduce((s,t)=>s+t.rating,0)/tips.length))}</span> <span class="text-sm text-muted">(${cnt})</span></div>
+          </div>` : '';
+        }).join('')}
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Opiskelulähteet (${totalResources})</h2></div>
+        <p class="text-sm text-muted mb-8">Validoidut opiskelulähteet löytyvät myös kunkin sertifikaatin yksityiskohdista katalogissa.</p>
+        ${Object.entries(RESOURCE_TYPE_LABELS).map(([type,label]) => {
+          const count = RESOURCES.filter(r => r.type === type).length;
+          return count > 0 ? `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)"><span>${RESOURCE_TYPE_ICONS[type]} ${label}</span><span class="text-muted">${count} kpl</span></div>` : '';
+        }).join('')}
+      </div>
+    </div>
+
+    <h2 style="font-size:1.1rem;margin-bottom:16px">Käyttäjien vinkit</h2>
+    <div style="margin-bottom:16px">
+      <input class="search-input" type="text" id="tip-search" placeholder="Hae vinkeistä, sertifikaateista tai henkilöistä..." oninput="filterTips()" style="width:100%;max-width:480px;margin-bottom:12px">
+      <div class="filter-section">
+        <div class="filter-label">Tarjoaja</div>
+        <div class="chip-row">
+          ${provsWithTips.map(p => `<span class="filter-chip ${tipFilters.providers.has(p)?'selected':''}" data-provider="${p}" data-tip-cat="providers" data-tip-val="${p}" onclick="toggleTipChip('providers','${p}')">${p} <span class="chip-count">${provCounts[p]}</span></span>`).join('')}
+        </div>
+      </div>
+      <div class="filter-section">
+        <div class="filter-label">Järjestys</div>
+        <div class="chip-row">
+          <span class="filter-chip tip-sort-btn ${tipSort==='newest'?'selected':''}" data-sort="newest" onclick="setTipSort('newest')">Uusimmat ensin</span>
+          <span class="filter-chip tip-sort-btn ${tipSort==='rating'?'selected':''}" data-sort="rating" onclick="setTipSort('rating')">Parhaat ensin</span>
+          <span class="filter-chip tip-sort-btn ${tipSort==='fastest'?'selected':''}" data-sort="fastest" onclick="setTipSort('fastest')">Nopeimmat ensin</span>
+          <span class="filter-chip tip-sort-btn ${tipSort==='oldest'?'selected':''}" data-sort="oldest" onclick="setTipSort('oldest')">Vanhimmat ensin</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex-between mb-8">
+      <span class="text-sm text-muted" id="tip-count">${filtered.length} / ${TIPS.length} vinkkiä</span>
+      <button class="btn btn-sm btn-secondary" onclick="tipFilters={providers:new Set()};tipSort='newest';document.getElementById('tip-search').value='';render()">Tyhjennä filtterit</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px" id="tips-grid">
+      ${filtered.map(renderTipCard).join('')}
+    </div>
+  `;
+}
+
+// ============================================================
+// CHAT AI
+// ============================================================
+function renderChat() {
+  return `
+    <div class="card chat-container">
+      <div class="chat-messages" id="chat-messages">
+        ${chatMessages.map(renderChatMessage).join('')}
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Kysy sertifikaateista, suosituksista, henkilöistä..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()">Lähetä</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderChatMessage(msg) {
+  const avatar = msg.role === 'bot' ? 'AI' : initials(CURRENT_USER.name);
+  const suggestions = msg.suggestions ? `<div class="suggestion-chips">${msg.suggestions.map(s=>`<span class="chip" onclick="document.getElementById('chat-input').value='${s}';sendChat()">${s}</span>`).join('')}</div>` : '';
+  return `<div class="chat-msg ${msg.role}">
+    <div class="msg-avatar">${avatar}</div>
+    <div class="msg-bubble">${msg.text}${suggestions}</div>
+  </div>`;
+}
+
+function initChat() {
+  const container = document.getElementById('chat-messages');
+  if (container) container.scrollTop = container.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  chatMessages.push({role:'user', text});
+  const response = generateBotResponse(text);
+  setTimeout(() => {
+    chatMessages.push(response);
+    render();
+  }, 400 + Math.random() * 600);
+  render();
+}
+
+function generateBotResponse(input) {
+  const q = input.toLowerCase();
+  const user = CURRENT_USER;
+
+  // Greeting
+  if (/^(hei|moi|terve|hello|morjens|päivää)/.test(q)) {
+    return {role:'bot', text:`Hei ${user.name.split(' ')[0]}! Miten voin auttaa sertifikaattien kanssa tänään?`, suggestions:['Suosittele sertifikaatteja','Näytä tilastoja','Mikä on polkuni?']};
+  }
+
+  // Cert recommendation
+  if (/suosit|ehdot|mitä.*kannattaa|sopiva|seuraava/.test(q)) {
+    const userCerts = new Set(user.certs);
+    const recommended = CERTS.filter(c => !userCerts.has(c.id) && (c.prereqs.length===0 || c.prereqs.every(p=>userCerts.has(p)))).sort((a,b) => a.hours - b.hours).slice(0,4);
+    if (recommended.length) {
+      return {role:'bot', text:`Sinulle sopivia seuraavia sertifikaatteja nykyisen osaamisesi perusteella:\n\n${recommended.map((c,i)=>`<strong>${i+1}. ${c.name}</strong> (${c.provider}) — ${formatCost(c.cost)}, ~${c.hours}h`).join('<br>')}\n<br><br>Haluatko lisätietoa jostain näistä?`, suggestions: recommended.slice(0,3).map(c=>c.name)};
+    }
+    return {role:'bot', text:'Sinulla on jo kattava sertifikaattiprofiili! Voisit harkita erikoistumista yhteen polkuun syvällisemmin.'};
+  }
+
+  // Provider-specific queries
+  for (const prov of PROVIDERS) {
+    if (q.includes(prov.toLowerCase())) {
+      const provCerts = CERTS.filter(c => c.provider === prov);
+      const provHolders = PEOPLE.filter(p => p.certs.some(cid => provCerts.some(pc=>pc.id===cid)));
+      return {role:'bot', text:`<strong>${prov}</strong> — ${provCerts.length} sertifikaattia saatavilla:<br><br>${provCerts.map(c=>`• <strong>${c.name}</strong> (${c.level}) — ${formatCost(c.cost)}, ~${c.hours}h — ${countPeopleByCert(c.id)} suorittajaa`).join('<br>')}<br><br>Organisaatiossa ${provHolders.length} henkilöllä on vähintään yksi ${prov}-sertifikaatti.`, suggestions:[`${prov} polku`, 'Vertaa tarjoajia']};
+    }
+  }
+
+  // Cost questions
+  if (/hinta|maksa|kustann|edulli|ilmain|halvim/.test(q)) {
+    const free = CERTS.filter(c => c.cost === 0);
+    const cheapest = CERTS.filter(c => c.cost > 0).sort((a,b) => a.cost - b.cost).slice(0,3);
+    return {role:'bot', text:`<strong>Ilmaiset sertifikaatit (${free.length} kpl):</strong><br>${free.map(c=>`• ${c.name} (${c.provider})`).join('<br>')}<br><br><strong>Edullisimmat maksulliset:</strong><br>${cheapest.map(c=>`• ${c.name} — ${c.cost}€`).join('<br>')}`, suggestions:['Anthropic-sertit','Ilmaiset AI-sertit']};
+  }
+
+  // Time questions
+  if (/kauan|kest|aika|nope|lyhin/.test(q)) {
+    const fastest = [...CERTS].sort((a,b) => a.hours - b.hours).slice(0,5);
+    return {role:'bot', text:`<strong>Nopeimmin suoritettavat sertifikaatit:</strong><br><br>${fastest.map(c=>`• <strong>${c.name}</strong> — ~${c.hours}h (${c.provider})`).join('<br>')}`, suggestions:['Alle 20h sertit','Pitkät koulutukset']};
+  }
+
+  // Stats
+  if (/tilast|montako|statist|lukuja|yhteen/.test(q)) {
+    const total = PEOPLE.reduce((s,p) => s+p.certs.length, 0);
+    const avg = (total/PEOPLE.length).toFixed(1);
+    const withCerts = PEOPLE.filter(p=>p.certs.length>0).length;
+    return {role:'bot', text:`<strong>Organisaation sertifikaattitilastot:</strong><br><br>• Sertifikaatteja yhteensä: <strong>${total}</strong><br>• Sertifioituja henkilöitä: <strong>${withCerts}/${PEOPLE.length}</strong><br>• Keskiarvo per henkilö: <strong>${avg}</strong><br>• Eri sertifikaattityyppejä: <strong>${CERTS.length}</strong><br>• Ilmaisia sertifikaatteja: <strong>${CERTS.filter(c=>c.cost===0).length}</strong>`, suggestions:['Tavoitteet','Top sertifioidut']};
+  }
+
+  // Who/people search
+  if (/kuka|kenellä|henkilö|top|eniten/.test(q)) {
+    const top5 = [...PEOPLE].sort((a,b)=>b.certs.length-a.certs.length).slice(0,5);
+    return {role:'bot', text:`<strong>Eniten sertifioituneet henkilöt:</strong><br><br>${top5.map((p,i)=>`${i+1}. <strong>${p.name}</strong> — ${p.certs.length} sertifikaattia (${p.role}, ${p.team})`).join('<br>')}`, suggestions:['Tiimien vertailu','Näytä kaikki']};
+  }
+
+  // Path questions
+  if (/polku|reitti|ura|kehit/.test(q)) {
+    return {role:'bot', text:`<strong>Käytettävissä olevat kehityspolut:</strong><br><br>${PATHS.map(p=>`• <strong>${p.name}</strong> — ${p.desc} (~${p.estimatedMonths}kk)`).join('<br>')}<br><br>Siirry "Oma polku" -näkymään nähdäksesi henkilökohtaisen etenemisesi.`, suggestions:['Oma polku','Anthropic-spesialisti','AWS AI -polku']};
+  }
+
+  // Goals
+  if (/tavoit|goal|partneri|kumppan/.test(q)) {
+    return {role:'bot', text:`<strong>Yrityksen tavoitteet:</strong><br><br>${GOALS.map(g=>{const p=getGoalProgress(g);const pct=g.isPercentage?p:Math.round(p/g.targetCount*100);return `• <strong>${g.name}</strong>: ${g.isPercentage?p+'%':p+'/'+g.targetCount} (${Math.min(pct,100)}%) — DL: ${new Date(g.deadline).toLocaleDateString('fi-FI')}`;}).join('<br>')}`, suggestions:['Anthropic Partner','AWS Partner']};
+  }
+
+  // AI / specific cert
+  if (/ai.sert|tekoäly.sert|ml.sert/.test(q)) {
+    const aiCerts = CERTS.filter(c=>c.type==='AI/ML');
+    return {role:'bot', text:`<strong>AI/ML-sertifikaatit (${aiCerts.length} kpl):</strong><br><br>${aiCerts.slice(0,8).map(c=>`• <strong>${c.name}</strong> (${c.provider}) — ${c.level}, ${formatCost(c.cost)}`).join('<br>')}${aiCerts.length>8?`<br>...ja ${aiCerts.length-8} muuta. Katso kaikki Katalogi-näkymästä.`:''}`, suggestions:['Ilmaiset AI-sertit','Suosittele minulle']};
+  }
+
+  // Default
+  return {role:'bot', text:`Kiitos kysymyksestäsi! En ole varma mitä tarkalleen haet, mutta voin auttaa esimerkiksi näissä aiheissa:`, suggestions:['Suosittele sertifikaatteja','Näytä tilastoja','Mikä on polkuni?','Ilmaiset sertifikaatit']};
+}
+
+// ============================================================
+// INIT
+// ============================================================
+navigate('dashboard');
+</script>
+</body>
+</html>

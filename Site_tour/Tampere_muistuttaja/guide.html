@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lempeä Muistuttaja - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #fda4af; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #fecdd3; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #e11d48; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #e11d48; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #be123c; }
+        .feature-card .tag {
+            display: inline-block; background: #fff1f2; color: #be123c;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #e11d48; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #e11d48; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Lempeä Muistuttaja - Käyttöohje</h1>
+        <p class="subtitle">Rakkaudella muistuttaa sovituista asioista</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Kokouksissa sovitaan tehtäviä, mutta kukaan ei seuraa perään. Muistiinpanot katoavat sähköposteihin, sovitut deadlinet unohtuvat ja samat asiat nousevat esiin seuraavassa palaverissa. Lempeä Muistuttaja lukee kokousmuistiinpanot, tunnistaa tehtävät ja vastuuhenkilöt automaattisesti, ja muistuttaa sovituista asioista lempeästi mutta sinnikkäästi &mdash; kunnes homma on hoidettu.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>Uusi kokous</strong> -näkymään. Liitä kokouksen muistiinpanot tekstikenttään tai kokeile valmiilla demoilla.</li>
+            <li>Paina <strong>"Analysoi"</strong> &mdash; sovellus tunnistaa osallistujat ja heidän tehtävänsä automaattisesti.</li>
+            <li>Tarkista tunnistetut tehtävät ja paina <strong>"Vahvista ja luo muistutukset"</strong>.</li>
+            <li>Siirry <strong>Tehtävät</strong>-välilehdelle seuraamaan kaikkien tehtävien tilannetta ja lähettämään muistutuksia.</li>
+        </ol>
+
+        <h2>Viisi näkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 1</span>
+            <h3>Uusi kokous</h3>
+            <p>Kokousmuistiinpanojen syöttö ja automaattinen analyysi.</p>
+            <ul>
+                <li><strong>Tekstikenttä</strong> &rarr; liitä kokouksen muistiinpanot tai transkripti.</li>
+                <li><strong>"Kokeile demolla"</strong> &rarr; valitse valmis esimerkkikokous testausta varten.</li>
+                <li><strong>"Lataa kaikki esimerkit"</strong> &rarr; tuo kaikki demokokoukset kerralla.</li>
+                <li>Analyysin jälkeen näet osallistujat, tunnistetut tehtävät ja deadlinet.</li>
+                <li>Vahvista tai muokkaa ennen muistutusten luomista.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 2</span>
+            <h3>Tehtävät</h3>
+            <p>Kaikkien kokousten tehtävät keskitetysti yhdessä paikassa.</p>
+            <ul>
+                <li><strong>Suodata</strong> statuksen mukaan: odottaa, työn alla, valmis tai myöhässä.</li>
+                <li>Jokaisessa tehtäväkortissa näkyy vastuuhenkilö, deadline ja kokous josta tehtävä on peräisin.</li>
+                <li><strong>"Muistuta lempeästi"</strong> -nappi lähettää ystävällisen muistutuksen.</li>
+                <li>Muistutukset <strong>eskaloituvat</strong>: ensimmäinen on lempeä, toinen ystävällinen, kolmas dramaattisempi &mdash; mutta aina rakastava!</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 3</span>
+            <h3>Henkilöt</h3>
+            <p>Tiimin jäsenten tehtävätilanne henkilöittäin.</p>
+            <ul>
+                <li>Jokainen henkilö näkyy <strong>korttina</strong> avatarilla ja tilastoilla.</li>
+                <li>Klikkaa henkilöä &rarr; näet <strong>profiilin</strong> jossa valmiit, työn alla ja odottavat tehtävät.</li>
+                <li><strong>Edistymispalkki</strong> näyttää kuinka suuri osa tehtävistä on valmis.</li>
+                <li>Voit lähettää muistutuksia suoraan henkilönäkymästä.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 4</span>
+            <h3>Yleiskatsaus</h3>
+            <p>Dashboard kokonaiskuvan hahmottamiseen.</p>
+            <ul>
+                <li><strong>Yhteenvetokortit</strong> näyttävät tehtävien kokonaismäärän, valmiit, odottavat ja myöhässä olevat.</li>
+                <li><strong>"Mood"-kortti</strong> kertoo muistuttajan mielitilan humoristisella otteella.</li>
+                <li><strong>Kaaviot</strong> visualisoivat tehtävien valmistumisasteen ja jakauman henkilöittäin.</li>
+                <li><strong>Viimeisimmät kokoukset</strong> listana pikakatsausta varten.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 5</span>
+            <h3>Kalenteri</h3>
+            <p>Kuukausinäkymä tehtävien deadlineistä.</p>
+            <ul>
+                <li>Navigoi kuukausien välillä <strong>nuolipainikkeilla</strong>.</li>
+                <li>Jokaisessa päivässä näkyy <strong>värilliset pisteet</strong> tehtävistä joiden deadline osuu kyseiselle päivälle.</li>
+                <li>Klikkaa pistettä &rarr; näet tehtävän tiedot.</li>
+                <li>Tämän päivän ruutu korostettu.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Kokeile ensin "Lataa kaikki esimerkit" -painiketta &mdash; saat kerralla useamman kokouksen tehtävät ja pääset heti tutustumaan Tehtävät-, Henkilöt- ja Yleiskatsaus-näkymiin täydellä datalla.
+        </div>
+
+        <h2>Muistutusten eskalointi</h2>
+        <p>Muistutukset ovat aina lempeitä ja humoristisia, mutta ne muuttuvat dramaattisemmiksi kertojen myötä:</p>
+        <ul>
+            <li><strong>1. kerta:</strong> "Hei, muistutetaan vain lempeästi..."</li>
+            <li><strong>2. kerta:</strong> "Rakas ystävä, tuo tehtävä vielä odottaa..."</li>
+            <li><strong>3. kerta:</strong> "Kultaseni, tiedän että olet kiireinen..."</li>
+            <li><strong>4+ kerta:</strong> Yhä dramaattisempi &mdash; mutta aina rakastava!</li>
+        </ul>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Tiimin vetäjä</div>
+            <h3>"Kokouksen jälkeen kaikki unohtuu"</h3>
+            <p>Liitä kokousmuistiinpanot <strong>Uusi kokous</strong> -näkymään &rarr; paina "Analysoi" &rarr; vahvista tehtävät. Sovellus hoitaa muistuttamisen puolestasi &mdash; lempeästi mutta sinnikkäästi.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Projektipäällikkö</div>
+            <h3>"Missä mennään kaikkien tehtävien kanssa?"</h3>
+            <p>Avaa <strong>Yleiskatsaus</strong> &rarr; näet tilanteen yhdellä silmäyksellä. Poraudu <strong>Tehtävät</strong>-näkymään suodattamalla "Myöhässä" nähdäksesi mihin tarvitaan huomiota.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Tiimin jäsen</div>
+            <h3>"Mitä minun piti tehdä?"</h3>
+            <p>Avaa <strong>Henkilöt</strong> &rarr; klikkaa omaa nimeäsi &rarr; näet kaikki sinulle osoitetut tehtävät, deadlinet ja statukset. Merkitse valmiit tehdyiksi suoraan näkymästä.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Deadlinen seuraaja</div>
+            <h3>"Mitä tehtäviä erääntyy tällä viikolla?"</h3>
+            <p>Avaa <strong>Kalenteri</strong>-näkymä &rarr; katso kuluvaa viikkoa &mdash; värilliset pisteet näyttävät päivät joina tehtäviä erääntyy. Klikkaa pistettä nähdäksesi tehtävän tiedot.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus tukee <strong>suomea ja englantia</strong> &mdash; vaihda kieltä yläpalkin EN/FI-painikkeella.</li>
+            <li>Kaikki tiedot tallennetaan <strong>selaimen localStorageen</strong> &mdash; data säilyy sivun päivitysten yli mutta on selainkohtaista.</li>
+            <li>Tehtäviä voi ladata <strong>.ics-tiedostoina</strong> kalenteriin (Google Calendar, Apple Calendar, Outlook).</li>
+            <li>Muistuttajan "mielitila" Yleiskatsauksessa heijastaa tiimin tehtävätilannetta humoristisella tavalla.</li>
+            <li>Voit tyhjentää kaiken datan Yleiskatsaus-näkymästä.</li>
+            <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

@@ -164,6 +164,26 @@
         .card--time .card__icon { background: #eff6ff; color: #2563eb; }
         .card--time .card__tag { background: #eff6ff; color: #1d4ed8; }
 
+        .card--golf::before { background: linear-gradient(90deg, #16a34a, #4ade80); }
+        .card--golf:hover { border-color: rgba(22, 163, 74, 0.25); }
+        .card--golf .card__icon { background: #f0fdf4; color: #16a34a; }
+        .card--golf .card__tag { background: #f0fdf4; color: #15803d; }
+
+        .card--reminder::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+        .card--reminder:hover { border-color: rgba(236, 72, 153, 0.25); }
+        .card--reminder .card__icon { background: #fdf2f8; color: #db2777; }
+        .card--reminder .card__tag { background: #fdf2f8; color: #be185d; }
+
+        .card--sales::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .card--sales:hover { border-color: rgba(245, 158, 11, 0.25); }
+        .card--sales .card__icon { background: #fffbeb; color: #d97706; }
+        .card--sales .card__tag { background: #fffbeb; color: #b45309; }
+
+        .card--cert::before { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+        .card--cert:hover { border-color: rgba(8, 145, 178, 0.25); }
+        .card--cert .card__icon { background: #ecfeff; color: #0891b2; }
+        .card--cert .card__tag { background: #ecfeff; color: #0e7490; }
+
         .card__icon {
             width: 3.2rem;
             height: 3.2rem;
@@ -329,9 +349,10 @@
             <button class="filter-btn active" data-filter="all">Kaikki</button>
             <button class="filter-btn" data-filter="oulu">Oulu</button>
             <button class="filter-btn" data-filter="seinajoki">Seinäjoki</button>
+            <button class="filter-btn" data-filter="tampere">Tampere</button>
         </div>
 
-        <div class="cards cards--five" id="cards">
+        <div class="cards" id="cards">
 
             <!-- Helsinki Food -->
             <a class="card card--food" href="Helsinki_food/index.html" data-city="helsinki">
@@ -486,6 +507,123 @@
                 </div>
             </a>
 
+            <!-- Tampere Golf-apuri -->
+            <a class="card card--golf" href="Tampere_golfapuri/index.html" data-city="tampere">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="19" cy="19" r="2"/>
+                        <path d="M5 2l7 14"/>
+                        <path d="M5 2l-3 12h8"/>
+                    </svg>
+                </div>
+                <div class="card__location">Tampere &bull; Golf</div>
+                <h2>Golf-apuri</h2>
+                <p>Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä &mdash; kalenterinäkymä, kaveriäänestys ja kartta helpottavat pelaamaan pääsyä.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Leaflet.js</span>
+                    <span class="card__tag">Kartta</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> Kalenterinäkymä vapaista ajoista</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Kaveriäänestys peliajan valintaan</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Interaktiivinen karttanäkymä</div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        Avaa sovellus
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Tampere Lempeä Muistuttaja -->
+            <a class="card card--reminder" href="Tampere_muistuttaja/index.html" data-city="tampere">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                </div>
+                <div class="card__location">Tampere &bull; Kokoushallinta</div>
+                <h2>Lempeä Muistuttaja</h2>
+                <p>Kokousmuistioista automaattisesti tehtävät ja muistutukset &mdash; rakkaudella muistuttaa sovituista asioista.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag">i18n</span>
+                    <span class="card__tag">Kalenteri</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> Kokousmuistioiden automaattinen analyysi</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Tehtävien seuranta ja muistutukset</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Edistymisen visualisointi</div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        Avaa sovellus
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Tampere Myyntitavoitteet -->
+            <a class="card card--sales" href="Tampere_myyntitavoittet/index.html" data-city="tampere">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                <div class="card__location">Tampere &bull; Myynti</div>
+                <h2>Myyntitavoitteet 2026</h2>
+                <p>Myyntijohtajan dashboard &mdash; liikevaihto, pipeline, ennusteet ja asiakaskohtaiset porautumisnäkymät yhdessä paikassa.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag">Font Awesome</span>
+                    <span class="card__tag">Dashboard</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> Pipeline ja painotettu ennuste</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> KPI-mittarit ja gap-analyysi</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Asiakas- ja projektiporautuminen</div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        Avaa sovellus
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Tampere SerttiApuri -->
+            <a class="card card--cert" href="Tampere_serttiapuri/index.html" data-city="tampere">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                        <path d="M6 12v5c3 3 6 3 6 3s3 0 6-3v-5"/>
+                    </svg>
+                </div>
+                <div class="card__location">Tampere &bull; Osaaminen</div>
+                <h2>SerttiApuri</h2>
+                <p>Sertifikaattien hallintajärjestelmä &mdash; seuraa tiimin osaamista, suunnittele oppimispolkuja ja saavuta strategiset tavoitteet.</p>
+                <div class="card__tags">
+                    <span class="card__tag">SVG-kaaviot</span>
+                    <span class="card__tag">Vanilla JS</span>
+                    <span class="card__tag">100+ serttiä</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> Sertifikaattikatalogi ja haku</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Tavoitteiden hallinta ja seuranta</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Henkilökohtaiset oppimispolut</div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        Avaa sovellus
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
         </div>
 
         <footer>
@@ -516,6 +654,18 @@
             visible.forEach(c => c.style.gridColumn = '');
             if (visible.length === 5) {
                 grid.classList.add('cards--five');
+            }
+            // Center the last row if it has fewer than 3 cards
+            if (visible.length % 3 !== 0) {
+                const remainder = visible.length % 3;
+                const startIdx = visible.length - remainder;
+                if (remainder === 1) {
+                    visible[startIdx].style.gridColumn = '2 / 3';
+                } else if (remainder === 2) {
+                    // Two cards in last row - offset them to center
+                    grid.classList.remove('cards--five');
+                    grid.style.gridTemplateColumns = '';
+                }
             }
         });
     });
