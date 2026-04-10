@@ -13,6 +13,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 /* Header */
 .hdr{background:var(--card);border-bottom:1px solid var(--brd);padding:0 20px;display:flex;align-items:center;height:48px;position:sticky;top:0;z-index:100;box-shadow:var(--sh);gap:12px}
 .logo{font-size:15px;font-weight:700;color:var(--pri);display:flex;align-items:center;gap:7px;white-space:nowrap}
+.hdr-sub{font-size:10px;color:var(--mut);font-weight:400;white-space:nowrap;border-left:1px solid var(--brd);padding-left:12px;margin-left:4px}
 .nv-tabs{display:flex;gap:2px;margin-left:20px}
 .nv-tab{padding:13px 14px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--dim);border-bottom:2px solid transparent;transition:.15s}
 .nv-tab:hover{color:var(--tx)}.nv-tab.active{color:var(--pri);border-bottom-color:var(--pri)}
@@ -214,6 +215,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="logo">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     Tuntikirjanpito
+    <span class="hdr-sub">Tiedä mihin aika meni &mdash; kirjaa tunnit gitin, jiran ja kalenterin perusteella</span>
   </div>
   <div class="nv-tabs">
     <button class="nv-tab active" data-v="timesheet">Viikko</button>

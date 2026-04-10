@@ -269,6 +269,41 @@
             flex-shrink: 0;
         }
 
+        /* Filter */
+        .filter {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.45rem 1.2rem;
+            border-radius: 100px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        .filter-btn.active {
+            background: #1e293b;
+            color: #fff;
+            border-color: #1e293b;
+        }
+
+        .card.hidden {
+            display: none;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -290,10 +325,16 @@
             <p>Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa &mdash; jokaisesta ideasta toimivaan demoon nopeasti.</p>
         </header>
 
-        <div class="cards cards--five">
+        <div class="filter">
+            <button class="filter-btn active" data-filter="all">Kaikki</button>
+            <button class="filter-btn" data-filter="oulu">Oulu</button>
+            <button class="filter-btn" data-filter="seinajoki">Seinäjoki</button>
+        </div>
+
+        <div class="cards cards--five" id="cards">
 
             <!-- Helsinki Food -->
-            <a class="card card--food" href="Helsinki_food/index.html">
+            <a class="card card--food" href="Helsinki_food/index.html" data-city="helsinki">
                 <div class="card__icon">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
@@ -325,7 +366,7 @@
             </a>
 
             <!-- Oulu Culture Capital -->
-            <a class="card card--culture" href="Oulu_kulttuuripaakaupunki/index.html">
+            <a class="card card--culture" href="Oulu_kulttuuripaakaupunki/index.html" data-city="oulu">
                 <div class="card__icon">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -355,7 +396,7 @@
             </a>
 
             <!-- Koutsi Personal Trainer -->
-            <a class="card card--trainer" href="Oulu_personal_trainer/koutsi/out/index.html">
+            <a class="card card--trainer" href="Oulu_personal_trainer/koutsi/out/index.html" data-city="oulu">
                 <div class="card__icon">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 20V10"/>
@@ -386,7 +427,7 @@
             </a>
 
             <!-- Seinäjoki Lounasäänestys -->
-            <a class="card card--vote" href="Seinajoki_ruokabotti/index.html">
+            <a class="card card--vote" href="Seinajoki_ruokabotti/index.html" data-city="seinajoki">
                 <div class="card__icon">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 20V10"/>
@@ -417,7 +458,7 @@
             </a>
 
             <!-- Seinäjoki Tuntikirjanpito -->
-            <a class="card card--time" href="Seinajoki_tuntikirjanpito/index.html">
+            <a class="card card--time" href="Seinajoki_tuntikirjanpito/index.html" data-city="seinajoki">
                 <div class="card__icon">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"/>
@@ -451,5 +492,33 @@
             Rapid Agent Prototypes &mdash; Site Tour
         </footer>
     </div>
+    <script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelector('.filter-btn.active').classList.remove('active');
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+            const grid = document.getElementById('cards');
+            const cards = grid.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                const city = card.dataset.city;
+                if (filter === 'all' || city === filter) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Adjust grid layout based on visible count
+            const visible = grid.querySelectorAll('.card:not(.hidden)');
+            grid.classList.remove('cards--five');
+            visible.forEach(c => c.style.gridColumn = '');
+            if (visible.length === 5) {
+                grid.classList.add('cards--five');
+            }
+        });
+    });
+    </script>
 </body>
 </html>
