@@ -83,7 +83,22 @@
 
         @media (min-width: 768px) {
             .cards {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .cards--five {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            .cards--five .card:nth-child(-n+3) {
+                grid-column: span 2;
+            }
+            .cards--five .card:nth-child(4) {
+                grid-column: 2 / span 2;
+            }
+            .cards--five .card:nth-child(5) {
+                grid-column: 4 / span 2;
             }
         }
 
@@ -138,6 +153,16 @@
         .card--trainer:hover { border-color: rgba(16, 185, 129, 0.25); }
         .card--trainer .card__icon { background: #ecfdf5; color: #059669; }
         .card--trainer .card__tag { background: #ecfdf5; color: #047857; }
+
+        .card--vote::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .card--vote:hover { border-color: rgba(139, 92, 246, 0.25); }
+        .card--vote .card__icon { background: #f5f3ff; color: #7c3aed; }
+        .card--vote .card__tag { background: #f5f3ff; color: #6d28d9; }
+
+        .card--time::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .card--time:hover { border-color: rgba(59, 130, 246, 0.25); }
+        .card--time .card__icon { background: #eff6ff; color: #2563eb; }
+        .card--time .card__tag { background: #eff6ff; color: #1d4ed8; }
 
         .card__icon {
             width: 3.2rem;
@@ -265,7 +290,7 @@
             <p>Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa &mdash; jokaisesta ideasta toimivaan demoon nopeasti.</p>
         </header>
 
-        <div class="cards">
+        <div class="cards cards--five">
 
             <!-- Helsinki Food -->
             <a class="card card--food" href="Helsinki_food/index.html">
@@ -351,6 +376,66 @@
                     <div class="card__feature"><span class="card__feature-dot"></span> Päiväkohtainen agenda ja metriikat</div>
                     <div class="card__feature"><span class="card__feature-dot"></span> Tavoitteiden ja vaiheiden seuranta</div>
                     <div class="card__feature"><span class="card__feature-dot"></span> Treenikaverit ja "laiskottaa"-nappi</div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        Avaa sovellus
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Seinäjoki Lounasäänestys -->
+            <a class="card card--vote" href="Seinajoki_ruokabotti/index.html">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20V10"/>
+                        <path d="M18 20V4"/>
+                        <path d="M6 20v-4"/>
+                        <path d="M2 20h20"/>
+                    </svg>
+                </div>
+                <div class="card__location">Seinäjoki &bull; Lounas</div>
+                <h2>Lounasäänestys</h2>
+                <p>Tiimin lounaspaikka-äänestys analytiikalla &mdash; ennusteet, kartta, ruokalistat ja ryhmädynamiikan visualisointi.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Leaflet.js</span>
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag">Analytiikka</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> Päivän lounasennuste</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Yksilö- ja ryhmäanalyysit</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Interaktiivinen karttanäkymä</div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        Avaa sovellus
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Seinäjoki Tuntikirjanpito -->
+            <a class="card card--time" href="Seinajoki_tuntikirjanpito/index.html">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div class="card__location">Seinäjoki &bull; Projektinhallinta</div>
+                <h2>Tuntikirjanpito</h2>
+                <p>Projektien tuntiseuranta visuaalisilla raporteilla &mdash; kirjaa tunnit, seuraa projekteja ja tarkastele aikadata kaavioina.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag">Vanilla JS</span>
+                    <span class="card__tag">Raportit</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> Tuntikirjaukset projekteittain</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Visuaaliset raportit ja kaaviot</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> Viikko- ja kuukausinäkymät</div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">

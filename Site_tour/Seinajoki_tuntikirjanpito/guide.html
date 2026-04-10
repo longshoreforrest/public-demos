@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuntikirjanpito - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #60a5fa; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #2563eb; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #2563eb; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #1e3a5f; }
+        .feature-card .tag {
+            display: inline-block; background: #eff6ff; color: #1d4ed8;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #2563eb; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .shortcut-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .shortcut-table th, .shortcut-table td {
+            text-align: left; padding: 0.6rem 0.8rem; font-size: 0.88rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .shortcut-table th { color: #64748b; font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Tuntikirjanpito - Käyttöohje</h1>
+        <p class="subtitle">Viikkokohtainen tuntiseuranta projekteille</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Tuntien kirjaaminen on pakollista mutta tylsää &mdash; eikä perinteinen Excel-taulukko kerro missä aika oikeasti meni. Tuntikirjanpito yhdistää viikkokohtaisen tuntikirjauksen Git-historiaan, Jira-tehtäviin ja kalenteriin, jotta näet yhdellä silmäyksellä mitä teit ja voit kirjata tunnit luotettavasti sen perusteella.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>viikkonäkymään</strong> jossa näet kuluvan viikon työtuntitaulukon.</li>
+            <li>Ensimmäisellä kerralla avautuu <strong>tervetuloikkuna</strong> &mdash; valitse "Arvaa tunnit" niin sovellus täyttää viikon automaattisesti, tai aloita tyhjältä pohjalta.</li>
+            <li>Syötä tunnit klikkaamalla soluja ja kirjoittamalla tuntimäärä (esim. 7.5).</li>
+            <li>Vaihda <strong>välilehtien</strong> avulla tunnit-, git-, jira- ja kalenterinäkymien välillä.</li>
+            <li>Siirry <strong>Analytiikka</strong>-näkymään nähdäksesi kokonaiskuva projekteista ja ajankäytöstä.</li>
+        </ol>
+
+        <h2>Kaksi päänäkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 1</span>
+            <h3>Viikko (tuntitaulukko)</h3>
+            <p>Päätyökalu tuntien kirjaamiseen. Näyttää viikon ma&ndash;su sarakkeina ja projektit riveinä.</p>
+            <ul>
+                <li><strong>Klikkaa solua</strong> &rarr; syötä tunnit. Yhteenlaskut päivittyvät automaattisesti.</li>
+                <li><strong>Summasarake</strong> oikealla näyttää kunkin projektin viikkosumman.</li>
+                <li><strong>Alarivi</strong> näyttää päivän kokonaistunnit &mdash; ylitykset korostetaan punaisella.</li>
+                <li>Navigoi viikkojen välillä <strong>nuolipainikkeilla</strong> tai palaa tähän viikkoon <strong>"Tänään"</strong>-painikkeella.</li>
+                <li><strong>"Kopioi ed. viikko"</strong> kopioi edellisen viikon tunnit pohjaksi.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Alavälilehdet</span>
+            <h3>Git, Jira ja Kalenteri</h3>
+            <p>Tuntitaulukon yläpuolella olevat välilehdet näyttävät viikon aktiviteetin eri lähteistä:</p>
+            <ul>
+                <li><strong>Git</strong> &mdash; viikon commitit projekteittain ja päivittäin. Näet mitä koodia kirjoitit minäkin päivänä.</li>
+                <li><strong>Jira</strong> &mdash; viikon tehtävät ja niiden tilat (To Do, In Progress, Code Review, Done).</li>
+                <li><strong>Kalenteri</strong> &mdash; viikon palaverit ja tapahtumat aikoineen.</li>
+            </ul>
+            <p>Nämä auttavat muistamaan mitä teit ja kirjaamaan tunnit oikein.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 2</span>
+            <h3>Analytiikka</h3>
+            <p>Kokonaiskuva ajankäytöstä kaavioiden ja porautumisen avulla.</p>
+            <ul>
+                <li><strong>Aikarajaus:</strong> vuosi, neljännes, kuukausi tai viikko. Navigoi jaksojen välillä nuolilla.</li>
+                <li><strong>Graafin tarkkuus:</strong> päivät, viikot tai kuukaudet.</li>
+                <li><strong>Donitsikaavio</strong> näyttää tuntien jakautumisen projekteittain.</li>
+                <li><strong>Palkkikaavio</strong> näyttää tuntien kehityksen ajanjaksoittain.</li>
+                <li><strong>Klikkaa kaaviota</strong> &rarr; porautumisnäkymä avautuu yksityiskohtaisella listauksella.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Vaihda ensin Git- tai Kalenteri-välilehdelle muistaaksesi mitä teit viikolla, ja siirry sitten takaisin Tunnit-välilehdelle kirjaamaan tunnit. Näin kirjaukset vastaavat todellisuutta.
+        </div>
+
+        <h2>Toiminnot</h2>
+        <table class="shortcut-table">
+            <tr><th>Toiminto</th><th>Miten</th></tr>
+            <tr><td>Lisää projekti</td><td>Klikkaa <strong>"+ Projekti"</strong> -painiketta oikeassa yläkulmassa</td></tr>
+            <tr><td>Poista projekti viikosta</td><td>Vie hiiri projektin riville &rarr; klikkaa &times;-painiketta</td></tr>
+            <tr><td>Tallenna tunnit</td><td>Klikkaa <strong>"Tallenna muutokset"</strong> joka ilmestyy muokkauksen jälkeen</td></tr>
+            <tr><td>Kopioi edellinen viikko</td><td>Klikkaa <strong>"Kopioi ed. viikko"</strong></td></tr>
+            <tr><td>Siirry viikkoja</td><td>Nuolipainikkeet &#9664; &#9654; viikkonumeron vieressä</td></tr>
+            <tr><td>Poraudu analytiikassa</td><td>Klikkaa kaavion osaa &rarr; yksityiskohtainen erittely avautuu</td></tr>
+        </table>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Konsultti</div>
+            <h3>"Paljonko tein projektia X tässä kuussa?"</h3>
+            <p>Siirry <strong>Analytiikka</strong>-näkymään &rarr; valitse aikarajaukseksi "Kuukausi" &rarr; katso donitsikaavio tai klikkaa projektia porautuaksesi päiväkohtaisiin tunteihin.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Perjantai-kirjaaja</div>
+            <h3>"En muista mitä tein maanantaina"</h3>
+            <p>Vaihda <strong>Git</strong>-välilehdelle &rarr; näet päivän commitit. Tarkista myös <strong>Kalenteri</strong>-välilehti palavereiden osalta. Palaa <strong>Tunnit</strong>-välilehdelle ja kirjaa tuntimäärät.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Projektipäällikkö</div>
+            <h3>"Kuinka paljon resursseja meni tähän sprinttiin?"</h3>
+            <p>Avaa <strong>Analytiikka</strong> &rarr; valitse aikarajaukseksi "Viikko" ja navigoi sprintin viikoille &rarr; vertaile projektijakaumaa viikkojen välillä.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Uusi työntekijä</div>
+            <h3>"Miten kirjaan tuntini?"</h3>
+            <p>Sovellus avautuu viikkonäkymään &rarr; valitse tervetuloikkunasta "Arvaa tunnit" tai "Aloita tyhjänä" &rarr; klikkaa soluja ja syötä tuntimäärät &rarr; paina <strong>"Tallenna muutokset"</strong>.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Laskuttaja</div>
+            <h3>"Paljonko asiakkaalle A tehtiin Q1:llä?"</h3>
+            <p>Avaa <strong>Analytiikka</strong> &rarr; aikarajaus "Neljännes" &rarr; navigoi Q1:lle &rarr; klikkaa asiakkaan projektia donitsikaaviossa &rarr; porautumisnäkymä näyttää viikkokohtaisen erittelyn.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus sisältää <strong>demoaineiston</strong> useilla projekteilla, git-commiteilla, jira-tehtävillä ja kalenterimerkinnöillä.</li>
+            <li><strong>"Arvaa tunnit"</strong> -toiminto generoi realistiset tuntikirjaukset automaattisesti git- ja kalenteridatan perusteella.</li>
+            <li>Tiedot tallentuvat <strong>selaimen muistiin</strong> (localStorage) &mdash; ne säilyvät sivun uudelleenlatauksessa mutta eivät eri selainten välillä.</li>
+            <li>Viikonloppupäivät näkyvät <strong>harmaalla taustalla</strong> ja kuluvaa päivää korostetaan <strong>sinisellä</strong>.</li>
+            <li>Jos päivän tunnit ylittävät normaalin työajan, summa näkyy <strong>punaisella</strong>.</li>
+            <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

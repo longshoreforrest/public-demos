@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seinäjoki Lounasäänestys - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #a78bfa; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #7c3aed; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #7c3aed; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #2d1b69; }
+        .feature-card .tag {
+            display: inline-block; background: #f5f3ff; color: #6d28d9;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #7c3aed; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #7c3aed; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Seinäjoki Lounasäänestys - Käyttöohje</h1>
+        <p class="subtitle">Tiimin lounaspaikka-äänestys analytiikalla</p>
+        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+    </div>
+
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Tiimissä on joka päivä sama keskustelu: "Mihin mennään syömään?" Jokainen haluaa eri paikkaan, kukaan ei muista missä käytiin viimeksi, ja päätös venyy. Lounasäänestys ratkaisee tämän &mdash; yli kahden vuoden äänestysdatan perusteella sovellus ennustaa tiimin valinnan, analysoi jokaisen mieltymykset ja näyttää ryhmädynamiikan yhdessä paikassa.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>Tämän päivän ennuste</strong> -näkymään, joka ennustaa mihin tiimi todennäköisimmin menee lounaalle.</li>
+            <li>Klikkaa henkilöitä <strong>"Ketkä ovat toimistolla?"</strong> -osiossa lisätäksesi tai poistaaksesi heitä ennusteesta.</li>
+            <li>Vaihda näkymää <strong>yläosan välilehdillä</strong>: Ennuste, Kartta, Ruokalistat, Yksilöanalyysi, Ryhmädynamiikka, Historia tai Yleiskatsaus.</li>
+            <li>Tutustu eri näkymiin &mdash; jokaisessa on oma analytiikkansa tiimin lounasvalinnoista.</li>
+        </ol>
+
+        <h2>Seitsemän näkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 1</span>
+            <h3>Tämän päivän ennuste</h3>
+            <p>Oletusnäkymä joka ennustaa lounaalle menon historiadatan perusteella.</p>
+            <ul>
+                <li><strong>Valitse läsnäolijat</strong> &rarr; ennuste päivittyy reaaliajassa.</li>
+                <li><strong>Ravintoloiden todennäköisyydet</strong> näkyvät prosenttipalkeilla.</li>
+                <li><strong>Henkilökohtaiset ennusteet</strong> näyttävät jokaisen läsnäolijan todennäköisimmän valinnan.</li>
+                <li><strong>Päivän lounaslistat</strong> näkyvät alhaalla &mdash; voit myös generoida uudet menut.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 2</span>
+            <h3>Kartta</h3>
+            <p>Seinäjoen lounasravintolat kartalla suosion mukaan.</p>
+            <ul>
+                <li>Jokainen ravintola näkyy <strong>karttamerkkinä</strong> ja listattuna suosiojärjestyksessä.</li>
+                <li>Klikkaa merkkiä nähdäksesi ravintolan tiedot ja äänimäärän.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 3</span>
+            <h3>Ruokalistat</h3>
+            <p>Kaikkien ravintoloiden lounaslistat päiväkohtaisesti.</p>
+            <ul>
+                <li>Valitse <strong>päivä</strong> yläpalkin päiväpainikkeista (ma&ndash;pe).</li>
+                <li><strong>Suodata</strong> ravintoloita painikkeilla tai <strong>hae</strong> ruokalajia hakukentällä.</li>
+                <li>Jokaisen ravintolan kortti näyttää kaikki päivän ruoat ja hinnan.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 4</span>
+            <h3>Yksilöanalyysi</h3>
+            <p>Syvenny yksittäisen tiimiläisen mieltymyksiin ja käyttäytymiseen.</p>
+            <ul>
+                <li>Valitse henkilö &rarr; näet <strong>profiilin</strong> jossa on lempiravintola, kokeilunhalu ja äänestysaktiivisuus.</li>
+                <li><strong>Ravintolajakauma</strong> näyttää kuinka äänet jakautuvat donitsikaaviona.</li>
+                <li><strong>Yhteensopivuus</strong> muiden tiimiläisten kanssa &mdash; kenen kanssa äänestätte samoin?</li>
+                <li><strong>Kuukausittainen trendi</strong> paljastaa miten mieltymykset muuttuvat ajan myötä.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 5</span>
+            <h3>Ryhmädynamiikka</h3>
+            <p>Koko tiimin äänestysanalytiikka visuaalisesti.</p>
+            <ul>
+                <li><strong>Yhteensopivuusmatriisi</strong> näyttää kuinka usein kukin pari äänestää samaa ravintolaa.</li>
+                <li><strong>Vahvimmat parit</strong> listaa tiimiläiset jotka ovat useimmin samaa mieltä.</li>
+                <li><strong>Voittoprosentit</strong> kertovat kenen valinta voittaa useimmin.</li>
+                <li><strong>Äänestyksen hajonta</strong> näyttää kuinka paljon mielipiteet eroavat kuukausittain.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 6</span>
+            <h3>Historia</h3>
+            <p>Selaa kaikkia menneitä äänestyksiä aikajärjestyksessä.</p>
+            <ul>
+                <li>Jokainen päivä näyttää <strong>äänestäjät</strong>, heidän <strong>valintansa</strong> ja <strong>lopputuloksen</strong>.</li>
+                <li><strong>Hae</strong> päivämäärällä, viikonpäivällä tai ravintolan nimellä.</li>
+                <li>Selaa tuloksia <strong>sivutuksella</strong>.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 7</span>
+            <h3>Yleiskatsaus</h3>
+            <p>Korkean tason yhteenveto koko äänestyshistoriasta.</p>
+            <ul>
+                <li><strong>Suosituimmat ravintolat</strong> listana äänimäärineen.</li>
+                <li><strong>Äänten jakauma</strong>, <strong>kuukausittainen trendi</strong> ja <strong>viikonpäiväjakauma</strong> kaavioina.</li>
+                <li><strong>Tiimin jäsenten profiilit</strong> lyhyesti.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Ennustenäkymässä kannattaa aloittaa valitsemalla ne henkilöt jotka oikeasti ovat toimistolla &mdash; ennuste tarkentuu huomattavasti kun se perustuu juuri läsnäolijoiden mieltymyksiin eikä koko tiimiin.
+        </div>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Tiimin vetäjä</div>
+            <h3>"Mihin mennään tänään?"</h3>
+            <p>Avaa sovellus &rarr; valitse <strong>Tämän päivän ennuste</strong> &rarr; klikkaa läsnäolijat &rarr; katso todennäköisin ravintola ja päivän lounaslistat. Päätös on tehty!</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Uusi tiimiläinen</div>
+            <h3>"Millaisia lounaspaikkoja täällä on?"</h3>
+            <p>Avaa <strong>Kartta</strong>-näkymä &rarr; näet kaikki ravintolat sijainnin mukaan. Siirry <strong>Yleiskatsaus</strong>-näkymään nähdäksesi mitkä ovat suosituimpia.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Datanörtti</div>
+            <h3>"Kuka meistä äänestää aina samaa paikkaa?"</h3>
+            <p>Avaa <strong>Yksilöanalyysi</strong> &rarr; valitse henkilö &rarr; katso ravintolajakauma ja kokeilunhalu-prosentti. Tai mene <strong>Ryhmädynamiikka</strong> &rarr; yhteensopivuusmatriisi näyttää kuka on kenenkin kanssa samaa mieltä.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Ruoka-allergikko</div>
+            <h3>"Missä on kasvisruokaa tänään?"</h3>
+            <p>Siirry <strong>Ruokalistat</strong>-näkymään &rarr; valitse tämä päivä &rarr; kirjoita hakukenttään "kasvis", "salaatti" tai muu ruokalaji &rarr; näet sopivat ravintolat.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Perinteen vaalija</div>
+            <h3>"Missä käytiin viime perjantaina?"</h3>
+            <p>Avaa <strong>Historia</strong> &rarr; hae "perjantai" tai tarkan päivämäärän &rarr; näet äänestystuloksen ja kaikki valinnat.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus generoi <strong>yli 2 vuoden</strong> realistisen äänestyshistorian automaattisesti demoa varten.</li>
+            <li>Jokaisella tiimiläisellä on omat <strong>painotukset ja mieltymykset</strong> jotka heijastuvat dataan.</li>
+            <li>Ennustealgoritmi huomioi henkilökohtaiset mieltymykset, viimeaikaiset valinnat ja viikonpäiväkohtaiset trendit.</li>
+            <li>Lounaslistat vaihtuvat &mdash; voit generoida uudet klikkaamalla "Uudet menut" -painiketta ennustenäkymässä.</li>
+            <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
+        </ul>
+
+    </div>
+</body>
+</html>

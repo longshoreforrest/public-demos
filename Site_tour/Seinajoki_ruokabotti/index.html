@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seinäjoki Lounasäänestys - Analytiikka</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🍽️ Seinäjoki Lounasäänestys</h1>
+        <a href="guide.html" style="margin-left:auto;color:#a78bfa;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+        <div class="header-stats">
+            <div class="header-stat"><span id="stat-days">-</span> päivää</div>
+            <div class="header-stat"><span id="stat-votes">-</span> ääntä</div>
+            <div class="header-stat"><span id="stat-restaurants">-</span> ravintolaa</div>
+            <div class="header-stat"><span id="stat-members">-</span> jäsentä</div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <button class="nav-tab active" data-view="view-prediction">Tämän päivän ennuste</button>
+        <button class="nav-tab" data-view="view-map">Kartta</button>
+        <button class="nav-tab" data-view="view-daily">Ruokalistat</button>
+        <button class="nav-tab" data-view="view-individual">Yksilöanalyysi</button>
+        <button class="nav-tab" data-view="view-group">Ryhmädynamiikka</button>
+        <button class="nav-tab" data-view="view-history">Historia</button>
+        <button class="nav-tab" data-view="view-overview">Yleiskatsaus</button>
+    </nav>
+
+    <!-- Loading -->
+    <div id="loading" class="loading" style="display:none">
+        <div class="loading-spinner"></div>
+        <p>Generoidaan äänestysdata (2+ vuotta)...</p>
+    </div>
+
+    <!-- ===== YLEISKATSAUS ===== -->
+    <div id="view-overview" class="view">
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-title">🏆 Suosituimmat ravintolat</div>
+                <div id="top-restaurants"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📊 Äänten jakauma</div>
+                <div class="chart-container">
+                    <canvas id="chart-restaurant-votes"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📈 Kuukausittainen trendi (top 5)</div>
+            <div class="chart-container-lg">
+                <canvas id="chart-monthly-trend"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📅 Viikonpäiväjakauma</div>
+            <div class="chart-container">
+                <canvas id="chart-day-of-week"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">👥 Tiimi</div>
+            <div id="team-grid" class="grid grid-2"></div>
+        </div>
+    </div>
+
+    <!-- ===== KARTTA ===== -->
+    <div id="view-map" class="view">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+        <div class="card">
+            <div class="card-title">📍 Ravintolat suosion mukaan</div>
+            <div id="map-restaurant-list"></div>
+        </div>
+    </div>
+
+    <!-- ===== YKSILÖANALYYSI ===== -->
+    <div id="view-individual" class="view">
+        <div class="card">
+            <div class="card-title">Valitse henkilö</div>
+            <div id="person-selector" class="person-selector"></div>
+        </div>
+
+        <div id="person-profile" class="card"></div>
+
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-title">🍕 Ravintolajakauma</div>
+                <div class="chart-container">
+                    <canvas id="chart-person-restaurants"></canvas>
+                </div>
+            </div>
+            <div id="person-tags" class="card"></div>
+        </div>
+
+        <div id="person-agreement" class="card"></div>
+
+        <div class="card">
+            <div class="card-title">📈 Kuukausittainen trendi</div>
+            <div class="chart-container">
+                <canvas id="chart-person-trend"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RYHMÄDYNAMIIKKA ===== -->
+    <div id="view-group" class="view">
+        <div class="card">
+            <div class="card-title">🤝 Yhteensopivuusmatriisi</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Kuinka usein kaksi henkilöä äänestää samaa ravintolaa (% yhteisistä päivistä)</p>
+            <div id="agreement-matrix" style="overflow-x:auto"></div>
+        </div>
+
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-title">💑 Vahvimmat parit</div>
+                <div id="coalitions"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">🏆 Voittoprosentit</div>
+                <div class="chart-container">
+                    <canvas id="chart-win-rates"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 Äänestyksen hajonta ajan yli</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Kuinka paljon mielipiteet jakautuvat kuukausittain (0 = kaikki samaa mieltä, 1 = kaikki eri mieltä)</p>
+            <div class="chart-container">
+                <canvas id="chart-dispersal"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ENNUSTE ===== -->
+    <div id="view-prediction" class="view active">
+        <div class="card">
+            <div class="card-title">👥 Ketkä ovat toimistolla?</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Klikkaa henkilöitä lisätäksesi/poistaaksesi heidät ennusteesta</p>
+            <div id="prediction-persons"></div>
+        </div>
+
+        <div id="prediction-winner-box"></div>
+
+        <div class="grid grid-2">
+            <div class="card">
+                <div class="card-title">📊 Ravintoloiden todennäköisyydet</div>
+                <div id="prediction-result"></div>
+            </div>
+            <div id="prediction-per-person" class="card"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+                <span>🍽️ Päivän lounaslistat</span>
+                <button class="btn btn-secondary" onclick="refreshMenus()">🔄 Uudet menut</button>
+            </div>
+            <div id="today-menus"></div>
+        </div>
+    </div>
+
+    <!-- ===== RUOKALISTAT ===== -->
+    <div id="view-daily" class="view">
+        <div class="card">
+            <div id="day-selector" class="day-selector"></div>
+        </div>
+        <div class="card">
+            <div id="restaurant-filter" class="restaurant-filter"></div>
+        </div>
+        <input type="text" id="daily-search-input" class="search-bar" placeholder="Hae ruokalistalta... (esim. &quot;lohi&quot;, &quot;kasvis&quot;, &quot;burger&quot;)">
+        <div id="daily-list"></div>
+        <div id="daily-no-results" class="no-results" style="display:none">Ei hakutuloksia.</div>
+    </div>
+
+    <!-- ===== HISTORIA ===== -->
+    <div id="view-history" class="view">
+        <div class="card">
+            <input type="text" id="history-search" class="search-bar" placeholder="Hae päivämäärällä, viikonpäivällä tai ravintolan nimellä..." oninput="historyPage=0;renderHistory()">
+        </div>
+        <div id="history-list"></div>
+        <div id="history-pagination" class="pagination"></div>
+    </div>
+
+    <!-- Popup-overlay -->
+    <div id="prediction-popup-overlay" class="popup-overlay" onclick="closePredictionPopup()" style="display:none">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <button class="popup-close" onclick="closePredictionPopup()">&times;</button>
+            <div id="prediction-popup-body"></div>
+        </div>
+    </div>
+
+    <!-- Scripts (järjestyksessä) -->
+    <script src="restaurants.js"></script>
+    <script src="data_generator.js"></script>
+    <script src="analysis.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
