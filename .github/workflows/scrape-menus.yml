@@ -1,0 +1,40 @@
+name: Scrape lunch menus
+
+on:
+  schedule:
+    # Mon-Fri at 06:00 UTC = 09:00 Finnish time (EET+3 / EEST+3)
+    - cron: '0 6 * * 1-5'
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  update-menus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --silent
+        working-directory: Site_tour/Helsinki_food/scraper
+
+      - name: Run scraper
+        run: node scrape.js
+        working-directory: Site_tour/Helsinki_food/scraper
+
+      - name: Commit updated menus
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Site_tour/Helsinki_food/menus.js
+          if git diff --cached --quiet; then
+            echo "No menu changes detected"
+          else
+            git commit -m "Update lunch menus $(date -u +%Y-%m-%d)"
+            git push
+          fi

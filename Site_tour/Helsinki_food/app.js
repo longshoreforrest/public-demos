@@ -9,10 +9,32 @@ function getDayName(index) {
     return DAYS[index];
 }
 
+// Get menu for a restaurant: prefer scraped MENUS data, fall back to hardcoded
+function getMenu(restaurant) {
+    if (typeof MENUS !== 'undefined' && MENUS.menus && MENUS.menus[restaurant.id]) {
+        return MENUS.menus[restaurant.id];
+    }
+    return restaurant.menu || {};
+}
+
 function getTodayMenuForRestaurant(restaurant, dayIndex) {
     const day = getDayName(dayIndex);
-    return restaurant.menu[day] || [];
+    return getMenu(restaurant)[day] || [];
 }
+
+function getWeekDates() {
+    const today = new Date();
+    const dow = today.getDay(); // 0=Sun, 1=Mon...
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    return DAYS.map((_, i) => {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        return `${d.getDate()}.${d.getMonth() + 1}.`;
+    });
+}
+
+const weekDates = getWeekDates();
 
 // --- Tab navigation ---
 document.querySelectorAll('.tab').forEach(tab => {
@@ -176,12 +198,13 @@ function renderRestaurantList() {
         card.dataset.id = r.id;
 
         let menuHtml = '';
+        const rMenu = getMenu(r);
         DAYS.forEach((day, i) => {
-            const items = r.menu[day] || [];
+            const items = rMenu[day] || [];
             const isToday = i === todayIndex;
             menuHtml += `
                 <div class="menu-day">
-                    <div class="menu-day-name ${isToday ? 'today' : ''}">${isToday ? '&#9654; ' : ''}${day.charAt(0).toUpperCase() + day.slice(1)}${isToday ? ' (tänään)' : ''}</div>
+                    <div class="menu-day-name ${isToday ? 'today' : ''}">${isToday ? '&#9654; ' : ''}${day.charAt(0).toUpperCase() + day.slice(1)} ${weekDates[i]}</div>
                     <div class="menu-items">${items.map(item => `<div>• ${item}</div>`).join('')}</div>
                 </div>
             `;
@@ -295,14 +318,14 @@ document.getElementById('search-input').addEventListener('input', () => {
 // --- DAILY MENU VIEW ---
 let activeDayIndex = todayIndex;
 let activeFilterIds = null; // null = all
+let menuAvailFilter = 'yes'; // 'yes' | 'no' | 'all'
 
 function renderDaySelector() {
     const container = document.getElementById('day-selector');
     DAYS.forEach((day, i) => {
         const btn = document.createElement('button');
         btn.className = 'day-btn' + (i === todayIndex ? ' active' : '');
-        btn.textContent = day.charAt(0).toUpperCase() + day.slice(1);
-        if (i === todayIndex) btn.textContent += ' (tänään)';
+        btn.textContent = day.charAt(0).toUpperCase() + day.slice(1) + ' ' + weekDates[i];
         btn.addEventListener('click', () => {
             container.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -363,13 +386,35 @@ function renderRestaurantFilter() {
     });
 }
 
+function renderMenuAvailFilter() {
+    const container = document.getElementById('menu-avail-filter');
+    const options = [
+        { value: 'yes', label: 'Kyllä' },
+        { value: 'no', label: 'Ei' },
+        { value: 'all', label: 'Kaikki' },
+    ];
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn' + (opt.value === menuAvailFilter ? ' active' : '');
+        btn.textContent = opt.label;
+        btn.dataset.value = opt.value;
+        btn.addEventListener('click', () => {
+            menuAvailFilter = opt.value;
+            container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterDailyView();
+        });
+        container.appendChild(btn);
+    });
+}
+
 function renderDailyMenu(dayIndex) {
     const container = document.getElementById('daily-list');
     container.innerHTML = '';
     const dayName = getDayName(dayIndex);
 
     restaurants.forEach(r => {
-        const items = r.menu[dayName] || [];
+        const items = getMenu(r)[dayName] || [];
         const card = document.createElement('div');
         card.className = 'daily-card' + (items.length === 0 ? ' no-menu' : '');
         card.dataset.id = r.id;
@@ -400,9 +445,11 @@ function filterDailyView() {
 
     cards.forEach(card => {
         const id = Number(card.dataset.id);
+        const hasMenu = !card.classList.contains('no-menu');
+        const matchesAvail = menuAvailFilter === 'all' || (menuAvailFilter === 'yes' && hasMenu) || (menuAvailFilter === 'no' && !hasMenu);
         const matchesFilter = !activeFilterIds || activeFilterIds.has(id);
         const matchesSearch = !query || card.textContent.toLowerCase().includes(query);
-        const visible = matchesFilter && matchesSearch;
+        const visible = matchesAvail && matchesFilter && matchesSearch;
         card.style.display = visible ? '' : 'none';
         if (visible) visibleCount++;
     });
@@ -428,5 +475,31 @@ document.getElementById('daily-search-input').addEventListener('input', () => {
 });
 
 renderDaySelector();
+renderMenuAvailFilter();
 renderRestaurantFilter();
-renderDailyMenu(todayIndex);
+filterDailyView();
+
+// Update subtitle with dynamic week info
+(function updateSubtitle() {
+    const today = new Date();
+    const dow = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+    const friday = new Date(monday);
+    friday.setDate(monday.getDate() + 4);
+
+    // ISO week number
+    const jan4 = new Date(today.getFullYear(), 0, 4);
+    const weekNum = Math.ceil(((today - jan4) / 86400000 + jan4.getDay() + 1) / 7);
+
+    const range = `${monday.getDate()}.${monday.getMonth()+1}.–${friday.getDate()}.${friday.getMonth()+1}.${friday.getFullYear()}`;
+    const el = document.getElementById('header-subtitle');
+    if (el) {
+        let text = `Lounasravintolat Ruoholahdessa ja Kampissa \u00b7 Viikko ${weekNum} / ${range}`;
+        if (typeof MENUS !== 'undefined' && MENUS.lastUpdated) {
+            const updated = new Date(MENUS.lastUpdated);
+            text += ` \u00b7 Päivitetty ${updated.getDate()}.${updated.getMonth()+1}. klo ${updated.getHours()}:${String(updated.getMinutes()).padStart(2,'0')}`;
+        }
+        el.textContent = text;
+    }
+})();

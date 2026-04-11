@@ -270,19 +270,19 @@
     <header>
         <div>
             <h1>Siili Lounas</h1>
-            <div class="subtitle">Lounasravintolat Ruoholahdessa ja Kampissa &middot; Viikko 15 / 7.&ndash;11.4.2026</div>
+            <div class="subtitle" id="header-subtitle">Lounasravintolat Ruoholahdessa ja Kampissa</div>
         </div>
         <a href="guide.html" style="margin-left:auto;color:#ff6b6b;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
     </header>
 
     <div class="tabs">
-        <div class="tab active" data-view="map-view">Kartta</div>
+        <div class="tab active" data-view="daily-view">Päivän lounas</div>
+        <div class="tab" data-view="map-view">Kartta</div>
         <div class="tab" data-view="list-view">Ravintolat</div>
-        <div class="tab" data-view="daily-view">Päivän lounas</div>
     </div>
 
     <!-- Map View -->
-    <div id="map-view" class="view active">
+    <div id="map-view" class="view">
         <div class="search-bar">
             <input type="text" id="map-search-input" placeholder="Hae ravintolaa...">
         </div>
@@ -304,12 +304,15 @@
     </div>
 
     <!-- Daily Menu View -->
-    <div id="daily-view" class="view">
+    <div id="daily-view" class="view active">
         <div class="search-bar">
             <input type="text" id="daily-search-input" placeholder="Hae ruokalajia tai ravintolaa...">
         </div>
         <div class="day-selector" id="day-selector">
             <label>Valitse päivä:</label>
+        </div>
+        <div class="restaurant-filter" id="menu-avail-filter">
+            <label>Menu saatavilla:</label>
         </div>
         <div class="restaurant-filter" id="restaurant-filter">
             <label>Ravintolat:</label>
@@ -318,6 +321,7 @@
     </div>
 
     <script src="restaurants.js"></script>
+    <script src="menus.js"></script>
     <script src="app.js"></script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
