@@ -587,7 +587,7 @@ function renderAnDrill(){
     const p=PROJECTS.find(x=>x.id===dr.id);
     const entries=data.entries.filter(e=>e.project===dr.id);
     const totalH=entries.reduce((s,e)=>s+e.hours,0);
-    const colLabel=S.anGrain==='day'?'Paiva':S.anGrain==='week'?'Viikko':'Kuukausi';
+    const colLabel=S.anGrain==='day'?'Päivä':S.anGrain==='week'?'Viikko':'Kuukausi';
     const maxH=Math.max(...data.byDay.map(bd=>entries.filter(e=>matchEntryToGroup(e,bd)).reduce((s,e)=>s+e.hours,0)),1);
     let h=drBreadcrumb([{label:'Yhteenveto',action:'S.anDrill=null;renderAnDrill()'}])+
       `<div class="dr-hdr"><span class="pd2" style="background:${p.color}"></span><strong>${p.name}</strong> &mdash; ${p.description}<span class="pld" style="margin-left:auto">${fh(totalH)} h</span></div>`;

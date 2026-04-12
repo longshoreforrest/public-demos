@@ -5,10 +5,10 @@
 const PROJECTS = [
   { id: 'kanta',    name: 'Kanta-palvelut',  color: '#2563eb', description: 'Reseptikeskus-uudistus' },
   { id: 'suomifi',  name: 'Suomi.fi',        color: '#7c3aed', description: 'Viestit-palvelun kehitys' },
-  { id: 'dvv',      name: 'DVV / VTJ',       color: '#059669', description: 'Vaestotietojarjestelma-modernisointi' },
+  { id: 'dvv',      name: 'DVV / VTJ',       color: '#059669', description: 'Väestötietojärjestelmä-modernisointi' },
   { id: 'omavero',  name: 'OmaVero',         color: '#d97706', description: 'Veroilmoitus-uudistus 2026' },
-  { id: 'kela',     name: 'Kela-etuudet',    color: '#dc2626', description: 'Etuuskaasittelyn automatisointi' },
-  { id: 'sisainen', name: 'Sisainen kehitys',color: '#6b7280', description: 'CI/CD, tyokalut, infra' },
+  { id: 'kela',     name: 'Kela-etuudet',    color: '#dc2626', description: 'Etuuskäsittelyn automatisointi' },
+  { id: 'sisainen', name: 'Sisäinen kehitys',color: '#6b7280', description: 'CI/CD, työkalut, infra' },
 ];
 
 function getMonday(date) {
@@ -50,22 +50,22 @@ function generateGitCommits(mondayDate) {
 
   const templates = [
     { project:'kanta', branch:'feature/KANTA-1423-resepti-validointi', messages:[
-      'feat(resepti): lisaa FHIR R4 -validointi reseptisanomille',
-      'fix(resepti): korjaa laakemaarayksen annoskentän tarkistus',
+      'feat(resepti): lisää FHIR R4 -validointi reseptisanomille',
+      'fix(resepti): korjaa lääkemääräyksen annoskentän tarkistus',
       'test(resepti): yksikkotestit validointilogiikalle',
-      'refactor(resepti): eriytetaan validointipalvelu omaksi moduuliksi',
+      'refactor(resepti): eriytetään validointipalvelu omaksi moduuliksi',
     ]},
     { project:'kanta', branch:'fix/KANTA-1401-potilastiedon-haku', messages:[
-      'fix(potilas): korjaa OID-tunnisteen kasittely haussa',
-      'fix(potilas): lisaa null-tarkistus hoitojaksotietoihin',
+      'fix(potilas): korjaa OID-tunnisteen käsittely haussa',
+      'fix(potilas): lisää null-tarkistus hoitojaksotietoihin',
     ]},
     { project:'suomifi', branch:'feature/SUOMIFI-892-viestit-arkistointi', messages:[
-      'feat(viestit): viestien automaattinen arkistointi 12kk jalkeen',
+      'feat(viestit): viestien automaattinen arkistointi 12kk jälkeen',
       'feat(viestit): arkistoidun viestin palautustoiminto',
       'test(viestit): integraatiotestit arkistointipalvelulle',
     ]},
     { project:'suomifi', branch:'feature/SUOMIFI-905-saavutettavuus', messages:[
-      'feat(a11y): WCAG 2.1 AA -korjaukset viestinakeille',
+      'feat(a11y): WCAG 2.1 AA -korjaukset viestinäkymille',
       'fix(a11y): ruudunlukijan tuki viesti-ilmoituksille',
     ]},
     { project:'dvv', branch:'feature/DVV-2301-osoitepalvelu-api', messages:[
@@ -74,18 +74,18 @@ function generateGitCommits(mondayDate) {
       'test(osoite): API-integraatiotestit osoitepalvelulle',
     ]},
     { project:'omavero', branch:'feature/VERO-4501-esitaytetty-veroilmoitus', messages:[
-      'feat(veroilmoitus): esitaytetyt tiedot Tulorekisterista',
-      'feat(veroilmoitus): vahennysten laskentalogiikka',
-      'fix(veroilmoitus): pyoristysvirhe paaomatuloissa',
-      'test(veroilmoitus): E2E-testit lahetykselle',
+      'feat(veroilmoitus): esitäytetyt tiedot Tulorekisteristä',
+      'feat(veroilmoitus): vähennysten laskentalogiikka',
+      'fix(veroilmoitus): pyöristysvirhe pääomatuloissa',
+      'test(veroilmoitus): E2E-testit lähetykselle',
     ]},
     { project:'omavero', branch:'fix/VERO-4489-kirjautuminen', messages:[
       'fix(auth): Suomi.fi-tunnistautumisen session hallinta',
     ]},
     { project:'kela', branch:'feature/KELA-3310-paatosautomaatio', messages:[
-      'feat(paatos): automaattinen paatoksenteko peruspaivarahalle',
-      'feat(paatos): saantotarkistukset tulorajoille',
-      'test(paatos): yksikkotestit paatossaannoille',
+      'feat(paatos): automaattinen päätöksenteko peruspäivärahalle',
+      'feat(paatos): sääntötarkistukset tulorajoille',
+      'test(paatos): yksikkötestit päätössäännöille',
     ]},
     { project:'sisainen', branch:'chore/infra-pipeline-update', messages:[
       'chore(ci): GitHub Actions Node 20',
@@ -124,21 +124,21 @@ function generateJiraTickets(mondayDate) {
       status:'In Progress', type:'Story', priority:'High',
       events:[
         { dayIndex:0, type:'transition', text:'To Do \u2192 In Progress', detail:'Aloitettu kehitys' },
-        { dayIndex:1, type:'comment', text:'Validointisaannot maaritelty arkkitehdin kanssa' },
+        { dayIndex:1, type:'comment', text:'Validointisäännöt määritelty arkkitehdin kanssa' },
         { dayIndex:3, type:'transition', text:'In Progress \u2192 Code Review', detail:'PR avattu' },
         { dayIndex:3, type:'comment', text:'Koodikatselmointi pyydetty @matti.virtanen' },
       ]},
-    { key:'KANTA-1401', project:'kanta', summary:'OID-tunnisteen kasittely potilastiedon haussa',
+    { key:'KANTA-1401', project:'kanta', summary:'OID-tunnisteen käsittely potilastiedon haussa',
       status:'Done', type:'Bug', priority:'Critical',
       events:[
         { dayIndex:0, type:'transition', text:'To Do \u2192 In Progress', detail:'Aloitettu korjaus' },
         { dayIndex:0, type:'comment', text:'Tuotannossa havaittu virhe, priorisoidaan' },
         { dayIndex:1, type:'transition', text:'In Progress \u2192 Done', detail:'Korjattu ja testattu' },
       ]},
-    { key:'KANTA-1430', project:'kanta', summary:'Laakemaaraysten arkistoinnin suunnittelu',
+    { key:'KANTA-1430', project:'kanta', summary:'Lääkemääräysten arkistoinnin suunnittelu',
       status:'To Do', type:'Task', priority:'Medium',
       events:[
-        { dayIndex:2, type:'comment', text:'Maarittelydokumentti luonnosteltu' },
+        { dayIndex:2, type:'comment', text:'Määrittelydokumentti luonnosteltu' },
       ]},
     { key:'SUOMIFI-892', project:'suomifi', summary:'Viestien automaattinen arkistointi',
       status:'In Progress', type:'Story', priority:'High',
@@ -157,25 +157,25 @@ function generateJiraTickets(mondayDate) {
       events:[
         { dayIndex:0, type:'transition', text:'To Do \u2192 In Progress', detail:'Kehitys aloitettu' },
         { dayIndex:1, type:'comment', text:'OpenAPI-spesifikaatio katselmointiin' },
-        { dayIndex:3, type:'comment', text:'Rajapinta toteutettu, testit kaynnissa' },
+        { dayIndex:3, type:'comment', text:'Rajapinta toteutettu, testit käynnissä' },
       ]},
-    { key:'VERO-4501', project:'omavero', summary:'Esitaytetyn veroilmoituksen kehitys',
+    { key:'VERO-4501', project:'omavero', summary:'Esitäytetyn veroilmoituksen kehitys',
       status:'In Progress', type:'Epic', priority:'Critical',
       events:[
-        { dayIndex:1, type:'comment', text:'Tulorekisteri-integraatio toimii kehitysymparistossa' },
-        { dayIndex:3, type:'comment', text:'Vahennyslaskenta valmis, aloitetaan E2E-testit' },
+        { dayIndex:1, type:'comment', text:'Tulorekisteri-integraatio toimii kehitysympäristössä' },
+        { dayIndex:3, type:'comment', text:'Vähennyslaskenta valmis, aloitetaan E2E-testit' },
       ]},
     { key:'VERO-4489', project:'omavero', summary:'Suomi.fi-tunnistautumisen session hallinta',
       status:'Done', type:'Bug', priority:'Critical',
       events:[
         { dayIndex:0, type:'transition', text:'To Do \u2192 Done', detail:'Hotfix julkaistu' },
       ]},
-    { key:'KELA-3310', project:'kela', summary:'Automaattinen paatoksenteko peruspaivarahalle',
+    { key:'KELA-3310', project:'kela', summary:'Automaattinen päätöksenteko peruspäivärahalle',
       status:'In Progress', type:'Story', priority:'High',
       events:[
         { dayIndex:1, type:'transition', text:'To Do \u2192 In Progress', detail:'Kehitys aloitettu' },
-        { dayIndex:1, type:'comment', text:'Saantotarkistukset maaritelty liiketoiminnan kanssa' },
-        { dayIndex:4, type:'comment', text:'Testit menevat lapi, odottaa katselmointia' },
+        { dayIndex:1, type:'comment', text:'Sääntötarkistukset määritelty liiketoiminnan kanssa' },
+        { dayIndex:4, type:'comment', text:'Testit menevät läpi, odottaa katselmointia' },
       ]},
   ];
 }
@@ -217,8 +217,8 @@ function generateCalendarEvents(mondayDate) {
     { project:'kela', title:'Kela Etuusautomaatio -standup', day:1, time:'09:30', duration:15, recurring:true },
     { project:'kela', title:'Kela Etuusautomaatio -standup', day:3, time:'09:30', duration:15, recurring:true },
     { project:'kela', title:'Kela Retrospektiivi', day:4, time:'15:00', duration:60, recurring:true },
-    // Sisainen
-    { project:'sisainen', title:'Kehittajien viikkokokous', day:0, time:'08:30', duration:30, recurring:true },
+    // Sisäinen
+    { project:'sisainen', title:'Kehittäjien viikkokokous', day:0, time:'08:30', duration:30, recurring:true },
     { project:'sisainen', title:'Tech Talk: Observability', day:3, time:'15:00', duration:45, recurring:false },
   ];
 }
