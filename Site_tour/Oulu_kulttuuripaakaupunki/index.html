@@ -177,6 +177,12 @@
         .popup-title { font-weight:600; font-size:0.85rem; margin-bottom:0.3rem; }
         .popup-meta { font-size:0.75rem; color:var(--text-light); line-height:1.4; }
 
+        .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;flex-shrink:0}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.85rem;line-height:1}
+
         @media (max-width:768px) {
             header { flex-direction:column; gap:0.5rem; }
             .app-container { flex-direction:column; height:auto; }
@@ -190,33 +196,37 @@
 <header>
     <div class="header-left">
         <div class="header-logo">🌌</div>
-        <div><h1>Oulu kulttuuripääkaupunki <span>2026</span></h1><p>Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana</p></div>
+        <div><h1>Oulu kulttuuripääkaupunki <span>2026</span></h1><p data-i18n="headerSubtitle">Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana</p></div>
     </div>
     <nav class="nav-tabs">
-        <button class="nav-tab active" data-view="map">Kartta</button>
-        <button class="nav-tab" data-view="list">Lista</button>
-        <button class="nav-tab" data-view="calendar">Kalenteri</button>
-        <button class="nav-tab" data-view="route">Reitti</button>
-        <button class="nav-tab" data-view="dashboard">Dashboard</button>
+        <button class="nav-tab active" data-view="map" data-i18n="tabMap">Kartta</button>
+        <button class="nav-tab" data-view="list" data-i18n="tabList">Lista</button>
+        <button class="nav-tab" data-view="calendar" data-i18n="tabCalendar">Kalenteri</button>
+        <button class="nav-tab" data-view="route" data-i18n="tabRoute">Reitti</button>
+        <button class="nav-tab" data-view="dashboard" data-i18n="tabDashboard">Dashboard</button>
     </nav>
-    <a href="guide.html" style="color:#ff8c42;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;flex-shrink:0">Käyttöohje &rarr;</a>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+        <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+    </div>
+    <a href="guide.html" data-i18n="guide" style="color:#ff8c42;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;flex-shrink:0">Käyttöohje &rarr;</a>
 </header>
 
 <div class="app-container">
     <!-- Normal sidebar -->
     <aside class="sidebar" id="normalSidebar">
         <div class="search-section">
-            <div class="search-box"><input type="text" id="searchInput" placeholder="Hae tapahtumia..."></div>
+            <div class="search-box"><input type="text" id="searchInput" placeholder="Hae tapahtumia..." data-i18n-placeholder="searchEvents"></div>
             <div class="filters" id="categoryFilters"></div>
         </div>
         <div class="month-filter">
-            <label>Kuukausi</label>
+            <label data-i18n="labelMonth">Kuukausi</label>
             <select id="monthFilter">
-                <option value="">Kaikki</option>
-                <option value="1">Tammi</option><option value="2">Helmi</option><option value="3">Maalis</option>
-                <option value="4">Huhti</option><option value="5">Touko</option><option value="6">Kesä</option>
-                <option value="7">Heinä</option><option value="8">Elo</option><option value="9">Syys</option>
-                <option value="10">Loka</option><option value="11">Marras</option><option value="12">Joulu</option>
+                <option value="" data-i18n="monthAll">Kaikki</option>
+                <option value="1" data-i18n="monthJan">Tammi</option><option value="2" data-i18n="monthFeb">Helmi</option><option value="3" data-i18n="monthMar">Maalis</option>
+                <option value="4" data-i18n="monthApr">Huhti</option><option value="5" data-i18n="monthMay">Touko</option><option value="6" data-i18n="monthJun">Kesä</option>
+                <option value="7" data-i18n="monthJul">Heinä</option><option value="8" data-i18n="monthAug">Elo</option><option value="9" data-i18n="monthSep">Syys</option>
+                <option value="10" data-i18n="monthOct">Loka</option><option value="11" data-i18n="monthNov">Marras</option><option value="12" data-i18n="monthDec">Joulu</option>
             </select>
         </div>
         <div class="event-count" id="eventCount"></div>
@@ -226,9 +236,9 @@
     <!-- Route sidebar -->
     <aside class="sidebar route-sidebar" id="routeSidebar">
         <div class="route-config">
-            <h3>🗺️ Reittisuunnittelu</h3>
+            <h3 data-i18n="routeTitle">🗺️ Reittisuunnittelu</h3>
             <div class="route-input-group">
-                <label>Lähtöpaikka</label>
+                <label data-i18n="routeStart">Lähtöpaikka</label>
                 <select id="routeStart">
                     <option value="65.0125,25.4680">Oulu</option>
                     <option value="65.0139,25.4633">Oulun kauppatori</option>
@@ -244,7 +254,7 @@
                 <input type="text" id="routeStartCustom" placeholder="Paikka tai koordinaatit" style="display:none;margin-top:0.3rem">
             </div>
             <div class="route-input-group">
-                <label>Määränpää</label>
+                <label data-i18n="routeEnd">Määränpää</label>
                 <select id="routeEnd">
                     <option value="66.5039,25.7294">Rovaniemi</option>
                     <option value="65.0125,25.4680">Oulu</option>
@@ -1234,6 +1244,47 @@ function setupEventListeners() {
         updateRouteMapMarkers();
     });
 }
+</script>
+<script>
+const translations = {
+    fi: {
+        headerSubtitle: 'Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana',
+        guide: 'Käyttöohje →',
+        tabMap: 'Kartta', tabList: 'Lista', tabCalendar: 'Kalenteri', tabRoute: 'Reitti', tabDashboard: 'Dashboard',
+        searchEvents: 'Hae tapahtumia...',
+        labelMonth: 'Kuukausi',
+        monthAll: 'Kaikki', monthJan: 'Tammi', monthFeb: 'Helmi', monthMar: 'Maalis', monthApr: 'Huhti', monthMay: 'Touko', monthJun: 'Kesä', monthJul: 'Heinä', monthAug: 'Elo', monthSep: 'Syys', monthOct: 'Loka', monthNov: 'Marras', monthDec: 'Joulu',
+        routeTitle: '🗺️ Reittisuunnittelu',
+        routeStart: 'Lähtöpaikka', routeEnd: 'Määränpää',
+    },
+    en: {
+        headerSubtitle: 'Over 560 cultural events on map, calendar and list',
+        guide: 'User guide →',
+        tabMap: 'Map', tabList: 'List', tabCalendar: 'Calendar', tabRoute: 'Route', tabDashboard: 'Dashboard',
+        searchEvents: 'Search events...',
+        labelMonth: 'Month',
+        monthAll: 'All', monthJan: 'Jan', monthFeb: 'Feb', monthMar: 'Mar', monthApr: 'Apr', monthMay: 'May', monthJun: 'Jun', monthJul: 'Jul', monthAug: 'Aug', monthSep: 'Sep', monthOct: 'Oct', monthNov: 'Nov', monthDec: 'Dec',
+        routeTitle: '🗺️ Route planner',
+        routeStart: 'Starting point', routeEnd: 'Destination',
+    }
+};
+let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('siteTourLang', lang);
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[lang] && translations[lang][key]) el.textContent = translations[lang][key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
+    });
+}
+document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => applyLanguage(b.dataset.lang)));
+applyLanguage(currentLang);
 </script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>

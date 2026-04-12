@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seinäjoki Lounasäänestys - Analytiikka</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+    .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;flex-shrink:0;margin-left:12px}
+    .lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+    .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+    .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+    .lang-flag{font-size:0.85rem;line-height:1}
+    </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -13,41 +20,47 @@
     <!-- Header -->
     <header class="header">
         <h1>🍽️ Seinäjoki Lounasäänestys</h1>
-        <a href="guide.html" style="margin-left:auto;color:#a78bfa;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <div class="lang-switcher">
+                <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+                <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+            </div>
+            <a href="guide.html" data-i18n="guide" style="color:#a78bfa;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+        </div>
         <div class="header-stats">
-            <div class="header-stat"><span id="stat-days">-</span> päivää</div>
-            <div class="header-stat"><span id="stat-votes">-</span> ääntä</div>
-            <div class="header-stat"><span id="stat-restaurants">-</span> ravintolaa</div>
-            <div class="header-stat"><span id="stat-members">-</span> jäsentä</div>
+            <div class="header-stat"><span id="stat-days">-</span> <span data-i18n="statDays">päivää</span></div>
+            <div class="header-stat"><span id="stat-votes">-</span> <span data-i18n="statVotes">ääntä</span></div>
+            <div class="header-stat"><span id="stat-restaurants">-</span> <span data-i18n="statRestaurants">ravintolaa</span></div>
+            <div class="header-stat"><span id="stat-members">-</span> <span data-i18n="statMembers">jäsentä</span></div>
         </div>
     </header>
 
     <!-- Navigation -->
     <nav class="nav">
-        <button class="nav-tab active" data-view="view-prediction">Tämän päivän ennuste</button>
-        <button class="nav-tab" data-view="view-map">Kartta</button>
-        <button class="nav-tab" data-view="view-daily">Ruokalistat</button>
-        <button class="nav-tab" data-view="view-individual">Yksilöanalyysi</button>
-        <button class="nav-tab" data-view="view-group">Ryhmädynamiikka</button>
-        <button class="nav-tab" data-view="view-history">Historia</button>
-        <button class="nav-tab" data-view="view-overview">Yleiskatsaus</button>
+        <button class="nav-tab active" data-view="view-prediction" data-i18n="navPrediction">Tämän päivän ennuste</button>
+        <button class="nav-tab" data-view="view-map" data-i18n="navMap">Kartta</button>
+        <button class="nav-tab" data-view="view-daily" data-i18n="navMenus">Ruokalistat</button>
+        <button class="nav-tab" data-view="view-individual" data-i18n="navIndividual">Yksilöanalyysi</button>
+        <button class="nav-tab" data-view="view-group" data-i18n="navGroup">Ryhmädynamiikka</button>
+        <button class="nav-tab" data-view="view-history" data-i18n="navHistory">Historia</button>
+        <button class="nav-tab" data-view="view-overview" data-i18n="navOverview">Yleiskatsaus</button>
     </nav>
 
     <!-- Loading -->
     <div id="loading" class="loading" style="display:none">
         <div class="loading-spinner"></div>
-        <p>Generoidaan äänestysdata (2+ vuotta)...</p>
+        <p data-i18n="loading">Generoidaan äänestysdata (2+ vuotta)...</p>
     </div>
 
     <!-- ===== YLEISKATSAUS ===== -->
     <div id="view-overview" class="view">
         <div class="grid grid-2">
             <div class="card">
-                <div class="card-title">🏆 Suosituimmat ravintolat</div>
+                <div class="card-title" data-i18n="titleTopRestaurants">🏆 Suosituimmat ravintolat</div>
                 <div id="top-restaurants"></div>
             </div>
             <div class="card">
-                <div class="card-title">📊 Äänten jakauma</div>
+                <div class="card-title" data-i18n="titleVoteDistribution">📊 Äänten jakauma</div>
                 <div class="chart-container">
                     <canvas id="chart-restaurant-votes"></canvas>
                 </div>
@@ -55,21 +68,21 @@
         </div>
 
         <div class="card">
-            <div class="card-title">📈 Kuukausittainen trendi (top 5)</div>
+            <div class="card-title" data-i18n="titleMonthlyTrend">📈 Kuukausittainen trendi (top 5)</div>
             <div class="chart-container-lg">
                 <canvas id="chart-monthly-trend"></canvas>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">📅 Viikonpäiväjakauma</div>
+            <div class="card-title" data-i18n="titleDayOfWeek">📅 Viikonpäiväjakauma</div>
             <div class="chart-container">
                 <canvas id="chart-day-of-week"></canvas>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">👥 Tiimi</div>
+            <div class="card-title" data-i18n="titleTeam">👥 Tiimi</div>
             <div id="team-grid" class="grid grid-2"></div>
         </div>
     </div>
@@ -80,7 +93,7 @@
             <div id="map"></div>
         </div>
         <div class="card">
-            <div class="card-title">📍 Ravintolat suosion mukaan</div>
+            <div class="card-title" data-i18n="titleRestaurantsByPopularity">📍 Ravintolat suosion mukaan</div>
             <div id="map-restaurant-list"></div>
         </div>
     </div>
@@ -88,7 +101,7 @@
     <!-- ===== YKSILÖANALYYSI ===== -->
     <div id="view-individual" class="view">
         <div class="card">
-            <div class="card-title">Valitse henkilö</div>
+            <div class="card-title" data-i18n="titleSelectPerson">Valitse henkilö</div>
             <div id="person-selector" class="person-selector"></div>
         </div>
 
@@ -96,7 +109,7 @@
 
         <div class="grid grid-2">
             <div class="card">
-                <div class="card-title">🍕 Ravintolajakauma</div>
+                <div class="card-title" data-i18n="titleRestaurantDistribution">🍕 Ravintolajakauma</div>
                 <div class="chart-container">
                     <canvas id="chart-person-restaurants"></canvas>
                 </div>
@@ -107,7 +120,7 @@
         <div id="person-agreement" class="card"></div>
 
         <div class="card">
-            <div class="card-title">📈 Kuukausittainen trendi</div>
+            <div class="card-title" data-i18n="titlePersonMonthlyTrend">📈 Kuukausittainen trendi</div>
             <div class="chart-container">
                 <canvas id="chart-person-trend"></canvas>
             </div>
@@ -117,18 +130,18 @@
     <!-- ===== RYHMÄDYNAMIIKKA ===== -->
     <div id="view-group" class="view">
         <div class="card">
-            <div class="card-title">🤝 Yhteensopivuusmatriisi</div>
-            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Kuinka usein kaksi henkilöä äänestää samaa ravintolaa (% yhteisistä päivistä)</p>
+            <div class="card-title" data-i18n="titleCompatibilityMatrix">🤝 Yhteensopivuusmatriisi</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px" data-i18n="descCompatibilityMatrix">Kuinka usein kaksi henkilöä äänestää samaa ravintolaa (% yhteisistä päivistä)</p>
             <div id="agreement-matrix" style="overflow-x:auto"></div>
         </div>
 
         <div class="grid grid-2">
             <div class="card">
-                <div class="card-title">💑 Vahvimmat parit</div>
+                <div class="card-title" data-i18n="titleStrongestPairs">💑 Vahvimmat parit</div>
                 <div id="coalitions"></div>
             </div>
             <div class="card">
-                <div class="card-title">🏆 Voittoprosentit</div>
+                <div class="card-title" data-i18n="titleWinRates">🏆 Voittoprosentit</div>
                 <div class="chart-container">
                     <canvas id="chart-win-rates"></canvas>
                 </div>
@@ -136,8 +149,8 @@
         </div>
 
         <div class="card">
-            <div class="card-title">📊 Äänestyksen hajonta ajan yli</div>
-            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Kuinka paljon mielipiteet jakautuvat kuukausittain (0 = kaikki samaa mieltä, 1 = kaikki eri mieltä)</p>
+            <div class="card-title" data-i18n="titleVoteDispersion">📊 Äänestyksen hajonta ajan yli</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px" data-i18n="descVoteDispersion">Kuinka paljon mielipiteet jakautuvat kuukausittain (0 = kaikki samaa mieltä, 1 = kaikki eri mieltä)</p>
             <div class="chart-container">
                 <canvas id="chart-dispersal"></canvas>
             </div>
@@ -147,8 +160,8 @@
     <!-- ===== ENNUSTE ===== -->
     <div id="view-prediction" class="view active">
         <div class="card">
-            <div class="card-title">👥 Ketkä ovat toimistolla?</div>
-            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Klikkaa henkilöitä lisätäksesi/poistaaksesi heidät ennusteesta</p>
+            <div class="card-title" data-i18n="titleWhoIsAtOffice">👥 Ketkä ovat toimistolla?</div>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px" data-i18n="descWhoIsAtOffice">Klikkaa henkilöitä lisätäksesi/poistaaksesi heidät ennusteesta</p>
             <div id="prediction-persons"></div>
         </div>
 
@@ -156,7 +169,7 @@
 
         <div class="grid grid-2">
             <div class="card">
-                <div class="card-title">📊 Ravintoloiden todennäköisyydet</div>
+                <div class="card-title" data-i18n="titleRestaurantProbabilities">📊 Ravintoloiden todennäköisyydet</div>
                 <div id="prediction-result"></div>
             </div>
             <div id="prediction-per-person" class="card"></div>
@@ -164,8 +177,8 @@
 
         <div class="card">
             <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-                <span>🍽️ Päivän lounaslistat</span>
-                <button class="btn btn-secondary" onclick="refreshMenus()">🔄 Uudet menut</button>
+                <span data-i18n="titleTodayMenus">🍽️ Päivän lounaslistat</span>
+                <button class="btn btn-secondary" onclick="refreshMenus()" data-i18n="btnRefreshMenus">🔄 Uudet menut</button>
             </div>
             <div id="today-menus"></div>
         </div>
@@ -179,15 +192,15 @@
         <div class="card">
             <div id="restaurant-filter" class="restaurant-filter"></div>
         </div>
-        <input type="text" id="daily-search-input" class="search-bar" placeholder="Hae ruokalistalta... (esim. &quot;lohi&quot;, &quot;kasvis&quot;, &quot;burger&quot;)">
+        <input type="text" id="daily-search-input" class="search-bar" data-i18n-placeholder="searchMenuPlaceholder" placeholder="Hae ruokalistalta... (esim. &quot;lohi&quot;, &quot;kasvis&quot;, &quot;burger&quot;)">
         <div id="daily-list"></div>
-        <div id="daily-no-results" class="no-results" style="display:none">Ei hakutuloksia.</div>
+        <div id="daily-no-results" class="no-results" style="display:none" data-i18n="noResults">Ei hakutuloksia.</div>
     </div>
 
     <!-- ===== HISTORIA ===== -->
     <div id="view-history" class="view">
         <div class="card">
-            <input type="text" id="history-search" class="search-bar" placeholder="Hae päivämäärällä, viikonpäivällä tai ravintolan nimellä..." oninput="historyPage=0;renderHistory()">
+            <input type="text" id="history-search" class="search-bar" data-i18n-placeholder="searchHistoryPlaceholder" placeholder="Hae päivämäärällä, viikonpäivällä tai ravintolan nimellä..." oninput="historyPage=0;renderHistory()">
         </div>
         <div id="history-list"></div>
         <div id="history-pagination" class="pagination"></div>
@@ -200,6 +213,87 @@
             <div id="prediction-popup-body"></div>
         </div>
     </div>
+
+    <!-- i18n -->
+    <script>
+    (function(){
+        const T = {
+            fi: {
+                guide: 'Käyttöohje \u2192',
+                statDays: 'päivää', statVotes: 'ääntä', statRestaurants: 'ravintolaa', statMembers: 'jäsentä',
+                navPrediction: 'Tämän päivän ennuste', navMap: 'Kartta', navMenus: 'Ruokalistat',
+                navIndividual: 'Yksilöanalyysi', navGroup: 'Ryhmädynamiikka', navHistory: 'Historia', navOverview: 'Yleiskatsaus',
+                loading: 'Generoidaan äänestysdata (2+ vuotta)...',
+                titleTopRestaurants: '🏆 Suosituimmat ravintolat', titleVoteDistribution: '📊 Äänten jakauma',
+                titleMonthlyTrend: '📈 Kuukausittainen trendi (top 5)', titleDayOfWeek: '📅 Viikonpäiväjakauma',
+                titleTeam: '👥 Tiimi', titleRestaurantsByPopularity: '📍 Ravintolat suosion mukaan',
+                titleSelectPerson: 'Valitse henkilö', titleRestaurantDistribution: '🍕 Ravintolajakauma',
+                titlePersonMonthlyTrend: '📈 Kuukausittainen trendi',
+                titleCompatibilityMatrix: '🤝 Yhteensopivuusmatriisi',
+                descCompatibilityMatrix: 'Kuinka usein kaksi henkilöä äänestää samaa ravintolaa (% yhteisistä päivistä)',
+                titleStrongestPairs: '💑 Vahvimmat parit', titleWinRates: '🏆 Voittoprosentit',
+                titleVoteDispersion: '📊 Äänestyksen hajonta ajan yli',
+                descVoteDispersion: 'Kuinka paljon mielipiteet jakautuvat kuukausittain (0 = kaikki samaa mieltä, 1 = kaikki eri mieltä)',
+                titleWhoIsAtOffice: '👥 Ketkä ovat toimistolla?',
+                descWhoIsAtOffice: 'Klikkaa henkilöitä lisätäksesi/poistaaksesi heidät ennusteesta',
+                titleRestaurantProbabilities: '📊 Ravintoloiden todennäköisyydet',
+                titleTodayMenus: '🍽️ Päivän lounaslistat', btnRefreshMenus: '🔄 Uudet menut',
+                searchMenuPlaceholder: 'Hae ruokalistalta... (esim. "lohi", "kasvis", "burger")',
+                noResults: 'Ei hakutuloksia.',
+                searchHistoryPlaceholder: 'Hae päivämäärällä, viikonpäivällä tai ravintolan nimellä...'
+            },
+            en: {
+                guide: 'User guide \u2192',
+                statDays: 'days', statVotes: 'votes', statRestaurants: 'restaurants', statMembers: 'members',
+                navPrediction: "Today's prediction", navMap: 'Map', navMenus: 'Menus',
+                navIndividual: 'Individual analysis', navGroup: 'Group dynamics', navHistory: 'History', navOverview: 'Overview',
+                loading: 'Generating voting data (2+ years)...',
+                titleTopRestaurants: '🏆 Most popular restaurants', titleVoteDistribution: '📊 Vote distribution',
+                titleMonthlyTrend: '📈 Monthly trend (top 5)', titleDayOfWeek: '📅 Day of week distribution',
+                titleTeam: '👥 Team', titleRestaurantsByPopularity: '📍 Restaurants by popularity',
+                titleSelectPerson: 'Select person', titleRestaurantDistribution: '🍕 Restaurant distribution',
+                titlePersonMonthlyTrend: '📈 Monthly trend',
+                titleCompatibilityMatrix: '🤝 Compatibility matrix',
+                descCompatibilityMatrix: 'How often two people vote for the same restaurant (% of shared days)',
+                titleStrongestPairs: '💑 Strongest pairs', titleWinRates: '🏆 Win rates',
+                titleVoteDispersion: '📊 Vote dispersion over time',
+                descVoteDispersion: 'How much opinions diverge monthly (0 = all agree, 1 = all disagree)',
+                titleWhoIsAtOffice: '👥 Who is at the office?',
+                descWhoIsAtOffice: 'Click people to add/remove them from the prediction',
+                titleRestaurantProbabilities: '📊 Restaurant probabilities',
+                titleTodayMenus: "🍽️ Today's lunch menus", btnRefreshMenus: '🔄 New menus',
+                searchMenuPlaceholder: 'Search menus... (e.g. "salmon", "vegetarian", "burger")',
+                noResults: 'No results.',
+                searchHistoryPlaceholder: 'Search by date, weekday or restaurant name...'
+            }
+        };
+        window._siteTourI18n = T;
+        function applyLang(lang) {
+            localStorage.setItem('siteTourLang', lang);
+            document.documentElement.lang = lang;
+            var dict = T[lang] || T.fi;
+            document.querySelectorAll('[data-i18n]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n');
+                if (dict[key] !== undefined) el.textContent = dict[key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n-placeholder');
+                if (dict[key] !== undefined) el.placeholder = dict[key];
+            });
+            document.querySelectorAll('.lang-btn').forEach(function(b) {
+                b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+            });
+        }
+        window._applyLang = applyLang;
+        document.addEventListener('DOMContentLoaded', function() {
+            var lang = localStorage.getItem('siteTourLang') || 'fi';
+            applyLang(lang);
+            document.querySelectorAll('.lang-btn').forEach(function(b) {
+                b.addEventListener('click', function() { applyLang(this.getAttribute('data-lang')); });
+            });
+        });
+    })();
+    </script>
 
     <!-- Scripts (järjestyksessä) -->
     <script src="restaurants.js"></script>

@@ -35,7 +35,7 @@
             z-index: 1;
             max-width: 1100px;
             margin: 0 auto;
-            padding: 3rem 1.5rem 4rem;
+            padding: 4.5rem 1.5rem 4rem;
         }
 
         /* Header */
@@ -333,20 +333,83 @@
             color: #94a3b8;
             font-size: 0.8rem;
         }
+
+        /* Language switcher */
+        .lang-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 100px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .lang-flag {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .lang-btn:hover:not(.active) {
+            color: #334155;
+            background: #f1f5f9;
+        }
+
     </style>
 </head>
 <body>
+    <div class="lang-bar">
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
+    </div>
+
     <div class="bg-pattern"></div>
 
     <div class="content">
         <header>
-            <div class="badge">Tekoälyavusteiset prototyypit</div>
+            <div class="badge" data-i18n="badge">Tekoälyavusteiset prototyypit</div>
             <h1>Site Tour</h1>
-            <p>Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa &mdash; jokaisesta ideasta toimivaan demoon nopeasti.</p>
+            <p data-i18n="subtitle">Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa &mdash; jokaisesta ideasta toimivaan demoon nopeasti.</p>
         </header>
 
         <div class="filter">
-            <button class="filter-btn active" data-filter="all">Kaikki</button>
+            <button class="filter-btn active" data-filter="all" data-i18n="filterAll">Kaikki</button>
             <button class="filter-btn" data-filter="oulu">Oulu</button>
             <button class="filter-btn" data-filter="seinajoki">Seinäjoki</button>
             <button class="filter-btn" data-filter="tampere">Tampere</button>
@@ -367,20 +430,20 @@
                 </div>
                 <div class="card__location">Helsinki &bull; Ruoholahti &amp; Kamppi</div>
                 <h2>Siili Lounas</h2>
-                <p>Kymmenien lähialueen ravintoloiden sijainnit, viikon lounaslistat ja hinnat yhdessä paikassa &mdash; ei tarvitse selata jokaista ravintolasivua erikseen.</p>
+                <p data-i18n="foodDesc">Kymmenien lähialueen ravintoloiden sijainnit, viikon lounaslistat ja hinnat yhdessä paikassa &mdash; ei tarvitse selata jokaista ravintolasivua erikseen.</p>
                 <div class="card__tags">
                     <span class="card__tag">Leaflet.js</span>
-                    <span class="card__tag">Kartta</span>
+                    <span class="card__tag" data-i18n="tagMap">Kartta</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Interaktiivinen karttanäkymä</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Viikon lounaslistat</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Haku nimellä, osoitteella tai ruokalajilla</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="foodFeat1">Interaktiivinen karttanäkymä</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="foodFeat2">Viikon lounaslistat</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="foodFeat3">Haku nimellä, osoitteella tai ruokalajilla</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -396,21 +459,21 @@
                     </svg>
                 </div>
                 <div class="card__location">Oulu &bull; Kulttuuripääkaupunki 2026</div>
-                <h2>Oulu Kulttuuripääkaupunki 2026</h2>
-                <p>Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana &mdash; löydä juuri sinua kiinnostavat tapahtumat helposti.</p>
+                <h2 data-i18n="cultureTitle">Oulu Kulttuuripääkaupunki 2026</h2>
+                <p data-i18n="cultureDesc">Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana &mdash; löydä juuri sinua kiinnostavat tapahtumat helposti.</p>
                 <div class="card__tags">
                     <span class="card__tag">Leaflet.js</span>
                     <span class="card__tag">Chart.js</span>
-                    <span class="card__tag">560+ tapahtumaa</span>
+                    <span class="card__tag" data-i18n="tagEvents">560+ tapahtumaa</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Kartta-, lista- ja kalenterinäkymät</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Reittisuunnittelija matkan varrelle</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Dashboard ja analytiikka</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="cultureFeat1">Kartta-, lista- ja kalenterinäkymät</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="cultureFeat2">Reittisuunnittelija matkan varrelle</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="cultureFeat3">Dashboard ja analytiikka</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -427,7 +490,7 @@
                 </div>
                 <div class="card__location">Oulu &bull; Hyvinvointi</div>
                 <h2>Koutsi</h2>
-                <p>Korvaa jääkaapin oveen liimatut treenilaput &mdash; tavoitteet, kalenteri ja treenikaverit yhdessä paikassa ruuhkavuosien hallintaan.</p>
+                <p data-i18n="trainerDesc">Korvaa jääkaapin oveen liimatut treenilaput &mdash; tavoitteet, kalenteri ja treenikaverit yhdessä paikassa ruuhkavuosien hallintaan.</p>
                 <div class="card__tags">
                     <span class="card__tag">Next.js</span>
                     <span class="card__tag">React</span>
@@ -435,13 +498,13 @@
                     <span class="card__tag">Tailwind</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Päiväkohtainen agenda ja metriikat</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Tavoitteiden ja vaiheiden seuranta</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Treenikaverit ja "laiskottaa"-nappi</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="trainerFeat1">Päiväkohtainen agenda ja metriikat</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="trainerFeat2">Tavoitteiden ja vaiheiden seuranta</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="trainerFeat3">Treenikaverit ja "laiskottaa"-nappi</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -458,21 +521,21 @@
                     </svg>
                 </div>
                 <div class="card__location">Seinäjoki &bull; Lounas</div>
-                <h2>Lounasäänestys</h2>
-                <p>Tiimin lounaspaikka-äänestys analytiikalla &mdash; ennusteet, kartta, ruokalistat ja ryhmädynamiikan visualisointi.</p>
+                <h2 data-i18n="voteTitle">Lounasäänestys</h2>
+                <p data-i18n="voteDesc">Tiimin lounaspaikka-äänestys analytiikalla &mdash; ennusteet, kartta, ruokalistat ja ryhmädynamiikan visualisointi.</p>
                 <div class="card__tags">
                     <span class="card__tag">Leaflet.js</span>
                     <span class="card__tag">Chart.js</span>
-                    <span class="card__tag">Analytiikka</span>
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Päivän lounasennuste</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Yksilö- ja ryhmäanalyysit</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Interaktiivinen karttanäkymä</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="voteFeat1">Päivän lounasennuste</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="voteFeat2">Yksilö- ja ryhmäanalyysit</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="voteFeat3">Interaktiivinen karttanäkymä</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -487,21 +550,21 @@
                     </svg>
                 </div>
                 <div class="card__location">Seinäjoki &bull; Projektinhallinta</div>
-                <h2>Tuntikirjanpito</h2>
-                <p>Projektien tuntiseuranta visuaalisilla raporteilla &mdash; kirjaa tunnit, seuraa projekteja ja tarkastele aikadata kaavioina.</p>
+                <h2 data-i18n="timeTitle">Tuntikirjanpito</h2>
+                <p data-i18n="timeDesc">Projektien tuntiseuranta visuaalisilla raporteilla &mdash; kirjaa tunnit, seuraa projekteja ja tarkastele aikadata kaavioina.</p>
                 <div class="card__tags">
                     <span class="card__tag">Chart.js</span>
                     <span class="card__tag">Vanilla JS</span>
-                    <span class="card__tag">Raportit</span>
+                    <span class="card__tag" data-i18n="tagReports">Raportit</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Tuntikirjaukset projekteittain</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Visuaaliset raportit ja kaaviot</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Viikko- ja kuukausinäkymät</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="timeFeat1">Tuntikirjaukset projekteittain</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="timeFeat2">Visuaaliset raportit ja kaaviot</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="timeFeat3">Viikko- ja kuukausinäkymät</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -517,21 +580,21 @@
                     </svg>
                 </div>
                 <div class="card__location">Tampere &bull; Golf</div>
-                <h2>Golf-apuri</h2>
-                <p>Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä &mdash; kalenterinäkymä, kaveriäänestys ja kartta helpottavat pelaamaan pääsyä.</p>
+                <h2 data-i18n="golfTitle">Golf-apuri</h2>
+                <p data-i18n="golfDesc">Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä &mdash; kalenterinäkymä, kaveriäänestys ja kartta helpottavat pelaamaan pääsyä.</p>
                 <div class="card__tags">
                     <span class="card__tag">Leaflet.js</span>
-                    <span class="card__tag">Kartta</span>
+                    <span class="card__tag" data-i18n="tagMap">Kartta</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Kalenterinäkymä vapaista ajoista</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Kaveriäänestys peliajan valintaan</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Interaktiivinen karttanäkymä</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="golfFeat1">Kalenterinäkymä vapaista ajoista</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="golfFeat2">Kaveriäänestys peliajan valintaan</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="golfFeat3">Interaktiivinen karttanäkymä</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -546,21 +609,21 @@
                     </svg>
                 </div>
                 <div class="card__location">Tampere &bull; Kokoushallinta</div>
-                <h2>Lempeä Muistuttaja</h2>
-                <p>Kokousmuistioista automaattisesti tehtävät ja muistutukset &mdash; rakkaudella muistuttaa sovituista asioista.</p>
+                <h2 data-i18n="reminderTitle">Lempeä Muistuttaja</h2>
+                <p data-i18n="reminderDesc">Kokousmuistioista automaattisesti tehtävät ja muistutukset &mdash; rakkaudella muistuttaa sovituista asioista.</p>
                 <div class="card__tags">
                     <span class="card__tag">Chart.js</span>
                     <span class="card__tag">i18n</span>
-                    <span class="card__tag">Kalenteri</span>
+                    <span class="card__tag" data-i18n="tagCalendar">Kalenteri</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Kokousmuistioiden automaattinen analyysi</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Tehtävien seuranta ja muistutukset</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Edistymisen visualisointi</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="reminderFeat1">Kokousmuistioiden automaattinen analyysi</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="reminderFeat2">Tehtävien seuranta ja muistutukset</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="reminderFeat3">Edistymisen visualisointi</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -575,21 +638,21 @@
                     </svg>
                 </div>
                 <div class="card__location">Tampere &bull; Myynti</div>
-                <h2>Myyntitavoitteet 2026</h2>
-                <p>Myyntijohtajan dashboard &mdash; liikevaihto, pipeline, ennusteet ja asiakaskohtaiset porautumisnäkymät yhdessä paikassa.</p>
+                <h2 data-i18n="salesTitle">Myyntitavoitteet 2026</h2>
+                <p data-i18n="salesDesc">Myyntijohtajan dashboard &mdash; liikevaihto, pipeline, ennusteet ja asiakaskohtaiset porautumisnäkymät yhdessä paikassa.</p>
                 <div class="card__tags">
                     <span class="card__tag">Chart.js</span>
                     <span class="card__tag">Font Awesome</span>
                     <span class="card__tag">Dashboard</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Pipeline ja painotettu ennuste</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> KPI-mittarit ja gap-analyysi</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Asiakas- ja projektiporautuminen</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="salesFeat1">Pipeline ja painotettu ennuste</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="salesFeat2">KPI-mittarit ja gap-analyysi</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="salesFeat3">Asiakas- ja projektiporautuminen</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -605,20 +668,20 @@
                 </div>
                 <div class="card__location">Tampere &bull; Osaaminen</div>
                 <h2>SerttiApuri</h2>
-                <p>Sertifikaattien hallintajärjestelmä &mdash; seuraa tiimin osaamista, suunnittele oppimispolkuja ja saavuta strategiset tavoitteet.</p>
+                <p data-i18n="certDesc">Sertifikaattien hallintajärjestelmä &mdash; seuraa tiimin osaamista, suunnittele oppimispolkuja ja saavuta strategiset tavoitteet.</p>
                 <div class="card__tags">
-                    <span class="card__tag">SVG-kaaviot</span>
+                    <span class="card__tag" data-i18n="tagSvgCharts">SVG-kaaviot</span>
                     <span class="card__tag">Vanilla JS</span>
-                    <span class="card__tag">100+ serttiä</span>
+                    <span class="card__tag" data-i18n="tagCerts">100+ serttiä</span>
                 </div>
                 <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> Sertifikaattikatalogi ja haku</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Tavoitteiden hallinta ja seuranta</div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> Henkilökohtaiset oppimispolut</div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="certFeat1">Sertifikaattikatalogi ja haku</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="certFeat2">Tavoitteiden hallinta ja seuranta</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="certFeat3">Henkilökohtaiset oppimispolut</span></div>
                 </div>
                 <div class="card__bottom">
                     <span class="card__open-label">
-                        Avaa sovellus
+                        <span data-i18n="openApp">Avaa sovellus</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </span>
                 </div>
@@ -631,6 +694,168 @@
         </footer>
     </div>
     <script>
+    // --- i18n translations ---
+    const translations = {
+        fi: {
+            badge: 'Tekoälyavusteiset prototyypit',
+            subtitle: 'Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa \u2014 jokaisesta ideasta toimivaan demoon nopeasti.',
+            filterAll: 'Kaikki',
+            openApp: 'Avaa sovellus',
+            tagMap: 'Kartta',
+            tagEvents: '560+ tapahtumaa',
+            tagAnalytics: 'Analytiikka',
+            tagReports: 'Raportit',
+            tagCalendar: 'Kalenteri',
+            tagSvgCharts: 'SVG-kaaviot',
+            tagCerts: '100+ serttiä',
+            // Helsinki Food
+            foodDesc: 'Kymmenien lähialueen ravintoloiden sijainnit, viikon lounaslistat ja hinnat yhdessä paikassa \u2014 ei tarvitse selata jokaista ravintolasivua erikseen.',
+            foodFeat1: 'Interaktiivinen karttanäkymä',
+            foodFeat2: 'Viikon lounaslistat',
+            foodFeat3: 'Haku nimellä, osoitteella tai ruokalajilla',
+            // Oulu Culture
+            cultureTitle: 'Oulu Kulttuuripääkaupunki 2026',
+            cultureDesc: 'Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana \u2014 löydä juuri sinua kiinnostavat tapahtumat helposti.',
+            cultureFeat1: 'Kartta-, lista- ja kalenterinäkymät',
+            cultureFeat2: 'Reittisuunnittelija matkan varrelle',
+            cultureFeat3: 'Dashboard ja analytiikka',
+            // Koutsi
+            trainerDesc: 'Korvaa jääkaapin oveen liimatut treenilaput \u2014 tavoitteet, kalenteri ja treenikaverit yhdessä paikassa ruuhkavuosien hallintaan.',
+            trainerFeat1: 'Päiväkohtainen agenda ja metriikat',
+            trainerFeat2: 'Tavoitteiden ja vaiheiden seuranta',
+            trainerFeat3: 'Treenikaverit ja "laiskottaa"-nappi',
+            // Lounasäänestys
+            voteTitle: 'Lounasäänestys',
+            voteDesc: 'Tiimin lounaspaikka-äänestys analytiikalla \u2014 ennusteet, kartta, ruokalistat ja ryhmädynamiikan visualisointi.',
+            voteFeat1: 'Päivän lounasennuste',
+            voteFeat2: 'Yksilö- ja ryhmäanalyysit',
+            voteFeat3: 'Interaktiivinen karttanäkymä',
+            // Tuntikirjanpito
+            timeTitle: 'Tuntikirjanpito',
+            timeDesc: 'Projektien tuntiseuranta visuaalisilla raporteilla \u2014 kirjaa tunnit, seuraa projekteja ja tarkastele aikadata kaavioina.',
+            timeFeat1: 'Tuntikirjaukset projekteittain',
+            timeFeat2: 'Visuaaliset raportit ja kaaviot',
+            timeFeat3: 'Viikko- ja kuukausinäkymät',
+            // Golf-apuri
+            golfTitle: 'Golf-apuri',
+            golfDesc: 'Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä \u2014 kalenterinäkymä, kaveriäänestys ja kartta helpottavat pelaamaan pääsyä.',
+            golfFeat1: 'Kalenterinäkymä vapaista ajoista',
+            golfFeat2: 'Kaveriäänestys peliajan valintaan',
+            golfFeat3: 'Interaktiivinen karttanäkymä',
+            // Lempeä Muistuttaja
+            reminderTitle: 'Lempeä Muistuttaja',
+            reminderDesc: 'Kokousmuistioista automaattisesti tehtävät ja muistutukset \u2014 rakkaudella muistuttaa sovituista asioista.',
+            reminderFeat1: 'Kokousmuistioiden automaattinen analyysi',
+            reminderFeat2: 'Tehtävien seuranta ja muistutukset',
+            reminderFeat3: 'Edistymisen visualisointi',
+            // Myyntitavoitteet
+            salesTitle: 'Myyntitavoitteet 2026',
+            salesDesc: 'Myyntijohtajan dashboard \u2014 liikevaihto, pipeline, ennusteet ja asiakaskohtaiset porautumisnäkymät yhdessä paikassa.',
+            salesFeat1: 'Pipeline ja painotettu ennuste',
+            salesFeat2: 'KPI-mittarit ja gap-analyysi',
+            salesFeat3: 'Asiakas- ja projektiporautuminen',
+            // SerttiApuri
+            certDesc: 'Sertifikaattien hallintajärjestelmä \u2014 seuraa tiimin osaamista, suunnittele oppimispolkuja ja saavuta strategiset tavoitteet.',
+            certFeat1: 'Sertifikaattikatalogi ja haku',
+            certFeat2: 'Tavoitteiden hallinta ja seuranta',
+            certFeat3: 'Henkilökohtaiset oppimispolut',
+        },
+        en: {
+            badge: 'AI-Assisted Prototypes',
+            subtitle: 'Humans share the idea and need, AI builds it \u2014 from every idea to a working demo, fast.',
+            filterAll: 'All',
+            openApp: 'Open app',
+            tagMap: 'Map',
+            tagEvents: '560+ events',
+            tagAnalytics: 'Analytics',
+            tagReports: 'Reports',
+            tagCalendar: 'Calendar',
+            tagSvgCharts: 'SVG charts',
+            tagCerts: '100+ certs',
+            // Helsinki Food
+            foodDesc: 'Locations, weekly lunch menus and prices of dozens of nearby restaurants in one place \u2014 no need to browse each restaurant site separately.',
+            foodFeat1: 'Interactive map view',
+            foodFeat2: 'Weekly lunch menus',
+            foodFeat3: 'Search by name, address or dish',
+            // Oulu Culture
+            cultureTitle: 'Oulu European Capital of Culture 2026',
+            cultureDesc: 'Over 560 cultural events on a map, calendar and list \u2014 easily find the events that interest you.',
+            cultureFeat1: 'Map, list & calendar views',
+            cultureFeat2: 'Route planner for your trip',
+            cultureFeat3: 'Dashboard & analytics',
+            // Koutsi
+            trainerDesc: 'Replace the workout notes stuck on the fridge door \u2014 goals, calendar and workout buddies in one place for busy life management.',
+            trainerFeat1: 'Daily agenda & metrics',
+            trainerFeat2: 'Goal & milestone tracking',
+            trainerFeat3: 'Workout buddies & "feeling lazy" button',
+            // Lounasäänestys
+            voteTitle: 'Lunch Vote',
+            voteDesc: 'Team lunch place voting with analytics \u2014 predictions, map, menus and group dynamics visualization.',
+            voteFeat1: 'Daily lunch prediction',
+            voteFeat2: 'Individual & group analysis',
+            voteFeat3: 'Interactive map view',
+            // Tuntikirjanpito
+            timeTitle: 'Time Tracking',
+            timeDesc: 'Project time tracking with visual reports \u2014 log hours, follow projects and explore time data as charts.',
+            timeFeat1: 'Time entries by project',
+            timeFeat2: 'Visual reports & charts',
+            timeFeat3: 'Weekly & monthly views',
+            // Golf-apuri
+            golfTitle: 'Golf Assistant',
+            golfDesc: 'All local courses and available tee times at a glance \u2014 calendar view, buddy voting and map make it easy to get playing.',
+            golfFeat1: 'Calendar view of available tee times',
+            golfFeat2: 'Buddy voting for play time',
+            golfFeat3: 'Interactive map view',
+            // Lempeä Muistuttaja
+            reminderTitle: 'Gentle Reminder',
+            reminderDesc: 'Automatically extracts tasks and reminders from meeting notes \u2014 lovingly reminds you of agreed actions.',
+            reminderFeat1: 'Automatic meeting notes analysis',
+            reminderFeat2: 'Task tracking & reminders',
+            reminderFeat3: 'Progress visualization',
+            // Myyntitavoitteet
+            salesTitle: 'Sales Targets 2026',
+            salesDesc: 'Sales director dashboard \u2014 revenue, pipeline, forecasts and customer drill-down views in one place.',
+            salesFeat1: 'Pipeline & weighted forecast',
+            salesFeat2: 'KPI metrics & gap analysis',
+            salesFeat3: 'Customer & project drill-down',
+            // SerttiApuri
+            certDesc: 'Certification management system \u2014 track team competencies, plan learning paths and achieve strategic goals.',
+            certFeat1: 'Certification catalog & search',
+            certFeat2: 'Goal management & tracking',
+            certFeat3: 'Personal learning paths',
+        }
+    };
+
+    let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+
+    function applyLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('siteTourLang', lang);
+        document.documentElement.lang = lang;
+
+        // Update lang buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+
+        // Update all translatable elements
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            if (translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+    }
+
+    // Language switcher
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+    });
+
+    // Apply saved language on load
+    applyLanguage(currentLang);
+
+    // --- Filter logic ---
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelector('.filter-btn.active').classList.remove('active');
@@ -662,7 +887,6 @@
                 if (remainder === 1) {
                     visible[startIdx].style.gridColumn = '2 / 3';
                 } else if (remainder === 2) {
-                    // Two cards in last row - offset them to center
                     grid.classList.remove('cards--five');
                     grid.style.gridTemplateColumns = '';
                 }

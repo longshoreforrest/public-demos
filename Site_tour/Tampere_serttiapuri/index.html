@@ -364,6 +364,11 @@ select:focus { outline:none; border-color:var(--primary); }
 .resource-link { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg); border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text); text-decoration:none; transition:background 0.15s; border:1px solid var(--border); }
 .resource-link:hover { background:var(--border); }
 .resource-type { font-size:0.7rem; padding:2px 6px; border-radius:4px; background:var(--card); color:var(--text-light); font-weight:600; white-space:nowrap; }
+.lang-switcher{display:flex;border:1px solid var(--border);border-radius:100px;overflow:hidden}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:var(--text-light);cursor:pointer;transition:all 0.2s}
+.lang-btn.active{background:var(--primary);color:#fff}
+.lang-btn:hover:not(.active){color:var(--text);background:var(--bg)}
+.lang-flag{font-size:0.85rem;line-height:1}
 </style>
 </head>
 <body>
@@ -377,44 +382,44 @@ select:focus { outline:none; border-color:var(--primary); }
     </div>
   </div>
   <nav>
-    <div class="sidebar-section">Yleisnäkymä</div>
+    <div class="sidebar-section" data-i18n="secOverview">Yleisnäkymä</div>
     <ul>
       <li><a data-view="dashboard" class="active" onclick="navigate('dashboard')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Dashboard</a></li>
+        <span data-i18n="navDashboard">Dashboard</span></a></li>
     </ul>
-    <div class="sidebar-section">Yritys</div>
+    <div class="sidebar-section" data-i18n="secCompany">Yritys</div>
     <ul>
       <li><a data-view="goals" onclick="navigate('goals')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-        Tavoitteet</a></li>
+        <span data-i18n="navGoals">Tavoitteet</span></a></li>
       <li><a data-view="analytics" onclick="navigate('analytics')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-        Analytiikka</a></li>
+        <span data-i18n="navAnalytics">Analytiikka</span></a></li>
     </ul>
-    <div class="sidebar-section">Sertifikaatit</div>
+    <div class="sidebar-section" data-i18n="secCerts">Sertifikaatit</div>
     <ul>
       <li><a data-view="catalog" onclick="navigate('catalog')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/></svg>
-        Katalogi</a></li>
+        <span data-i18n="navCatalog">Katalogi</span></a></li>
       <li><a data-view="tips" onclick="navigate('tips')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-        Vinkit & Resurssit</a></li>
+        <span data-i18n="navTips">Vinkit & Resurssit</span></a></li>
     </ul>
-    <div class="sidebar-section">Henkilöstö</div>
+    <div class="sidebar-section" data-i18n="secPeople">Henkilöstö</div>
     <ul>
       <li><a data-view="people" onclick="navigate('people')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Henkilöhaku</a></li>
+        <span data-i18n="navPeopleSearch">Henkilöhaku</span></a></li>
       <li><a data-view="mypath" onclick="navigate('mypath')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Oma polku</a></li>
+        <span data-i18n="navMyPath">Oma polku</span></a></li>
       <li><a data-view="leaderboard" onclick="navigate('leaderboard')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        Tulostaulukko</a></li>
+        <span data-i18n="navLeaderboard">Tulostaulukko</span></a></li>
       <li><a data-view="chat" onclick="navigate('chat')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        AI-assistentti <span class="notif-dot"></span></a></li>
+        <span data-i18n="navAiAssistant">AI-assistentti</span> <span class="notif-dot"></span></a></li>
     </ul>
   </nav>
   <div class="sidebar-footer">SerttiApuri v1.0 &copy; 2026<br>AI-teknologiayritys</div>
@@ -424,7 +429,11 @@ select:focus { outline:none; border-color:var(--primary); }
   <header id="topbar">
     <h1 id="page-title">Dashboard</h1>
     <div style="display:flex;align-items:center;gap:16px">
-    <a href="guide.html" style="color:#2563eb;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+        <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+    </div>
+    <a href="guide.html" data-i18n="guide" style="color:#2563eb;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
     <div class="user-info">
       <span>Milla Korhonen</span>
       <div class="avatar">MK</div>
@@ -443,6 +452,88 @@ select:focus { outline:none; border-color:var(--primary); }
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
+
+<script>
+// ===== LANGUAGE =====
+const I18N = {
+    fi: {
+        guide: 'Käyttöohje \u2192',
+        secOverview: 'Yleisnäkymä',
+        secCompany: 'Yritys',
+        secCerts: 'Sertifikaatit',
+        secPeople: 'Henkilöstö',
+        navDashboard: 'Dashboard',
+        navGoals: 'Tavoitteet',
+        navAnalytics: 'Analytiikka',
+        navCatalog: 'Katalogi',
+        navTips: 'Vinkit & Resurssit',
+        navPeopleSearch: 'Henkilöhaku',
+        navMyPath: 'Oma polku',
+        navLeaderboard: 'Tulostaulukko',
+        navAiAssistant: 'AI-assistentti',
+        pageDashboard: 'Dashboard',
+        pageCatalog: 'Sertifikaattikatalogi',
+        pageAnalytics: 'Analytiikka',
+        pagePeople: 'Henkilöhaku',
+        pageMypath: 'Oma kehityspolku',
+        pageGoals: 'Yrityksen tavoitteet',
+        pageChat: 'AI-assistentti',
+        pageLeaderboard: 'Tulostaulukko',
+        pageTips: 'Vinkit & Resurssit'
+    },
+    en: {
+        guide: 'User guide \u2192',
+        secOverview: 'Overview',
+        secCompany: 'Company',
+        secCerts: 'Certifications',
+        secPeople: 'People',
+        navDashboard: 'Dashboard',
+        navGoals: 'Goals',
+        navAnalytics: 'Analytics',
+        navCatalog: 'Catalog',
+        navTips: 'Tips & Resources',
+        navPeopleSearch: 'People search',
+        navMyPath: 'My path',
+        navLeaderboard: 'Leaderboard',
+        navAiAssistant: 'AI assistant',
+        pageDashboard: 'Dashboard',
+        pageCatalog: 'Certification catalog',
+        pageAnalytics: 'Analytics',
+        pagePeople: 'People search',
+        pageMypath: 'My development path',
+        pageGoals: 'Company goals',
+        pageChat: 'AI assistant',
+        pageLeaderboard: 'Leaderboard',
+        pageTips: 'Tips & Resources'
+    }
+};
+
+let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+
+function applyLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('siteTourLang', lang);
+    const t = I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (t[key] !== undefined) el.textContent = t[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    // Update page title for current view
+    if (typeof currentView !== 'undefined') {
+        const pageKey = 'page' + currentView.charAt(0).toUpperCase() + currentView.slice(1);
+        document.getElementById('page-title').textContent = t[pageKey] || currentView;
+    }
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+});
+
+applyLang(currentLang);
+</script>
 
 <script>
 // ============================================================
@@ -759,16 +850,16 @@ let chatMessages = [
 // ============================================================
 // NAVIGATION
 // ============================================================
-const PAGE_TITLES = {
-  dashboard:'Dashboard', catalog:'Sertifikaattikatalogi', analytics:'Analytiikka',
-  people:'Henkilöhaku', mypath:'Oma kehityspolku', goals:'Yrityksen tavoitteet',
-  chat:'AI-assistentti', leaderboard:'Tulostaulukko', tips:'Vinkit & Resurssit'
-};
+function getPageTitle(view) {
+  const t = I18N[currentLang];
+  const pageKey = 'page' + view.charAt(0).toUpperCase() + view.slice(1);
+  return t[pageKey] || view;
+}
 
 function navigate(view) {
   currentView = view;
   document.querySelectorAll('#sidebar nav a').forEach(a => a.classList.toggle('active', a.dataset.view === view));
-  document.getElementById('page-title').textContent = PAGE_TITLES[view] || view;
+  document.getElementById('page-title').textContent = getPageTitle(view);
   render();
 }
 

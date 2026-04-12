@@ -71,16 +71,29 @@
             background: #4f6ef7; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Fortera Oyj &mdash; Myyntitavoitteet 2026</h1>
-        <p class="subtitle">Myyntijohtajan dashboard: liikevaihto, pipeline ja ennusteet reaaliajassa</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Fortera Oyj — Myyntitavoitteet 2026" data-i18n-en="Fortera Oyj — Sales Targets 2026">Fortera Oyj &mdash; Myyntitavoitteet 2026</h1>
+        <p class="subtitle" data-i18n-fi="Myyntijohtajan dashboard: liikevaihto, pipeline ja ennusteet reaaliajassa" data-i18n-en="Sales Director dashboard: revenue, pipeline and forecasts in real time">Myyntijohtajan dashboard: liikevaihto, pipeline ja ennusteet reaaliajassa</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -196,7 +209,158 @@
             <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
         </ul>
 
+        </div><!-- /lang-content fi -->
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>The Sales Director of a listed company needs to know in real time whether the organization is on target or not. When there are five business lines, a hundred accounts and dozens of pipeline deals at various stages, the big picture easily gets lost across different systems and spreadsheets. This dashboard brings everything together &mdash; revenue, pipeline forecast, gap analysis and account-level drill-downs &mdash; so that sales leadership always has a clear view of the situation.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>Overview</strong> view where you can see KPI metrics and gap analysis at a glance.</li>
+            <li>Click any <strong>KPI card</strong> or chart element to open a drill-down view with more detailed data.</li>
+            <li>Navigate between views using the <strong>left sidebar</strong> links: Business Lines, Accounts, Pipeline and Targets.</li>
+            <li>Explore pipeline deals and update their status in the <strong>Pipeline &amp; Forecast</strong> view.</li>
+        </ol>
+
+        <h2>Five views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Overview (Dashboard)</h3>
+            <p>A high-level summary of the entire sales organization's performance.</p>
+            <ul>
+                <li><strong>KPI cards</strong>: revenue YTD, variance to target, annual target, weighted pipeline and required monthly run rate.</li>
+                <li><strong>Gap analysis</strong>: a visual representation of how much of the year has elapsed vs. how much of the target has been achieved, and how much still needs to be sold per month.</li>
+                <li><strong>Charts</strong>: monthly revenue vs. target, business line performance and pipeline forecast.</li>
+                <li>Click cards and charts to drill down into more detailed data.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Business Lines</h3>
+            <p>Performance and organization of the five business lines.</p>
+            <ul>
+                <li>Each BL is shown as a <strong>card</strong> with name, lead, revenue and target.</li>
+                <li><strong>Visual bars</strong> show progress against target.</li>
+                <li>Click a BL to see its accounts, account managers and deals.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>Accounts</h3>
+            <p>Data for one hundred accounts in a filterable table.</p>
+            <ul>
+                <li>Columns: account, BL, account manager, annual value, revenue YTD, variance to target and status.</li>
+                <li><strong>Filter</strong> by business line or account manager.</li>
+                <li>Click an account to open a <strong>detailed view</strong> with invoice history.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 4</span>
+            <h3>Pipeline &amp; Forecast</h3>
+            <p>Sales pipeline management and weighted forecast.</p>
+            <ul>
+                <li><strong>Summary cards</strong>: closed-won deals, committed value, weighted pipeline and coverage ratio.</li>
+                <li><strong>Donut chart</strong> shows the pipeline by stage: lead, qualified, proposal, negotiation, contract, won.</li>
+                <li><strong>Bar chart</strong> shows the pipeline by business line (total and weighted value).</li>
+                <li><strong>Deal table</strong> of all pipeline deals &mdash; filter by stage or BL.</li>
+                <li>Click a deal to open an <strong>edit view</strong> where you can change the stage and probability.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 5</span>
+            <h3>Targets</h3>
+            <p>Annual and quarterly targets and their achievement.</p>
+            <ul>
+                <li><strong>Target table</strong> by business line: annual target, Q1&ndash;Q4 targets and Q1 actual.</li>
+                <li><strong>Charts</strong>: quarterly target vs. actual and annual target distribution.</li>
+                <li><strong>Run rate analysis</strong>: current monthly pace vs. required pace and an estimate of target achievability.</li>
+                <li><strong>Organization chart</strong>: CEO, Sales Director, BL leads and account managers.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Start from the Overview and click the KPI cards &mdash; each opens a drill-down view that takes you directly to the relevant data. This is the fastest way to find where you are falling behind target.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Sales Director (CSO)</div>
+            <h3>"Are we on target?"</h3>
+            <p>Open <strong>Overview</strong> &rarr; the gap analysis tells you at a glance how much of the target has been achieved and how much still needs to be sold per month. Drill down to the BL level as needed.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">BL Lead</div>
+            <h3>"How are my business line's accounts performing?"</h3>
+            <p>Open <strong>Business Lines</strong> &rarr; click your line &rarr; see accounts, account managers and pipeline deals. Go to the <strong>Accounts</strong> view and filter by your BL to see the detailed situation.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Account Manager</div>
+            <h3>"How are my accounts progressing?"</h3>
+            <p>Open <strong>Accounts</strong> &rarr; filter by your name &rarr; see the revenue and variance to target for all your accounts. Go to the <strong>Pipeline</strong> view to review open deals.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">CEO</div>
+            <h3>"Is the pipeline enough to cover the rest of the year?"</h3>
+            <p>Open <strong>Pipeline &amp; Forecast</strong> &rarr; check the coverage ratio card and weighted pipeline against the remaining target. Review the run rate analysis in the <strong>Targets</strong> view for a realistic assessment.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>Fortera Oyj is a <strong>fictional listed company</strong> (Nasdaq Helsinki: FORT) &mdash; all data is generated for demo purposes.</li>
+            <li>The organization has <strong>five business lines</strong>: Cloud & Infrastructure, Data & Analytics, Cybersecurity, Digital Services and IoT & Smart Industry.</li>
+            <li>The 2026 <strong>overall target is EUR 135 million</strong> split across five lines.</li>
+            <li>Invoicing data covers <strong>January&ndash;April 2026</strong> (~300 invoices, ~100 accounts).</li>
+            <li>Pipeline deal <strong>probabilities</strong> are weighted by stage: lead 10%, qualified 25%, proposal 50%, negotiation 70%, contract 90%.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

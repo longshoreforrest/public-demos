@@ -71,16 +71,29 @@
             background: #e11d48; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Lempeä Muistuttaja - Käyttöohje</h1>
-        <p class="subtitle">Rakkaudella muistuttaa sovituista asioista</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Lempeä Muistuttaja - Käyttöohje" data-i18n-en="Gentle Reminder - User Guide">Lempeä Muistuttaja - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Rakkaudella muistuttaa sovituista asioista" data-i18n-en="Lovingly reminds about agreed-upon tasks">Rakkaudella muistuttaa sovituista asioista</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">← Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -207,7 +220,169 @@
             <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
         </ul>
 
+        </div><!-- /lang-content fi -->
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>Tasks are agreed upon in meetings, but nobody follows up. Notes get buried in emails, agreed deadlines are forgotten, and the same issues resurface in the next meeting. Gentle Reminder reads your meeting notes, automatically identifies tasks and responsible persons, and reminds people about their commitments gently but persistently &mdash; until the job is done.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>New Meeting</strong> view. Paste your meeting notes into the text field or try a ready-made demo.</li>
+            <li>Press <strong>"Analyse"</strong> &mdash; the app automatically identifies participants and their tasks.</li>
+            <li>Review the identified tasks and press <strong>"Confirm and create reminders"</strong>.</li>
+            <li>Switch to the <strong>Tasks</strong> tab to track all tasks and send reminders.</li>
+        </ol>
+
+        <h2>Five views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>New Meeting</h3>
+            <p>Meeting notes input and automatic analysis.</p>
+            <ul>
+                <li><strong>Text field</strong> &rarr; paste your meeting notes or transcript.</li>
+                <li><strong>"Try with demo"</strong> &rarr; choose a ready-made example meeting for testing.</li>
+                <li><strong>"Load all examples"</strong> &rarr; import all demo meetings at once.</li>
+                <li>After analysis you'll see participants, identified tasks and deadlines.</li>
+                <li>Confirm or edit before creating reminders.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Tasks</h3>
+            <p>All meeting tasks gathered centrally in one place.</p>
+            <ul>
+                <li><strong>Filter</strong> by status: pending, in progress, done or overdue.</li>
+                <li>Each task card shows the responsible person, deadline and the meeting the task originated from.</li>
+                <li><strong>"Remind gently"</strong> button sends a friendly reminder.</li>
+                <li>Reminders <strong>escalate</strong>: the first is gentle, the second friendly, the third more dramatic &mdash; but always loving!</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>People</h3>
+            <p>Team members' task status on a per-person basis.</p>
+            <ul>
+                <li>Each person appears as a <strong>card</strong> with an avatar and statistics.</li>
+                <li>Click a person &rarr; see their <strong>profile</strong> with completed, in-progress and pending tasks.</li>
+                <li><strong>Progress bar</strong> shows what proportion of tasks are complete.</li>
+                <li>You can send reminders directly from the person view.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 4</span>
+            <h3>Overview</h3>
+            <p>A dashboard for grasping the big picture.</p>
+            <ul>
+                <li><strong>Summary cards</strong> show the total number of tasks, completed, pending and overdue.</li>
+                <li><strong>"Mood" card</strong> conveys the reminder's state of mind with a humorous touch.</li>
+                <li><strong>Charts</strong> visualise the task completion rate and distribution by person.</li>
+                <li><strong>Recent meetings</strong> listed for a quick glance.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 5</span>
+            <h3>Calendar</h3>
+            <p>Monthly view of task deadlines.</p>
+            <ul>
+                <li>Navigate between months with <strong>arrow buttons</strong>.</li>
+                <li>Each day shows <strong>colored dots</strong> for tasks whose deadline falls on that day.</li>
+                <li>Click a dot &rarr; see the task details.</li>
+                <li>Today's cell is highlighted.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Start by trying the "Load all examples" button &mdash; you'll get tasks from several meetings at once and can immediately explore the Tasks, People and Overview views with a full set of data.
+        </div>
+
+        <h2>Reminder escalation</h2>
+        <p>Reminders are always gentle and humorous, but they become more dramatic with each attempt:</p>
+        <ul>
+            <li><strong>1st time:</strong> "Hey, just a gentle reminder..."</li>
+            <li><strong>2nd time:</strong> "Dear friend, that task is still waiting..."</li>
+            <li><strong>3rd time:</strong> "Darling, I know you're busy..."</li>
+            <li><strong>4th+ time:</strong> Increasingly dramatic &mdash; but always loving!</li>
+        </ul>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Team lead</div>
+            <h3>"Everything is forgotten after the meeting"</h3>
+            <p>Paste meeting notes into the <strong>New Meeting</strong> view &rarr; press "Analyse" &rarr; confirm tasks. The app takes care of reminding on your behalf &mdash; gently but persistently.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Project manager</div>
+            <h3>"Where do we stand with all the tasks?"</h3>
+            <p>Open <strong>Overview</strong> &rarr; see the situation at a glance. Drill into the <strong>Tasks</strong> view by filtering "Overdue" to see what needs attention.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Team member</div>
+            <h3>"What was I supposed to do?"</h3>
+            <p>Open <strong>People</strong> &rarr; click your own name &rarr; see all tasks assigned to you, their deadlines and statuses. Mark completed ones as done directly from the view.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Deadline tracker</div>
+            <h3>"Which tasks are due this week?"</h3>
+            <p>Open the <strong>Calendar</strong> view &rarr; look at the current week &mdash; colored dots show the days when tasks are due. Click a dot to see the task details.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app supports <strong>Finnish and English</strong> &mdash; switch language using the FI/EN button in the header.</li>
+            <li>All data is stored in the <strong>browser's localStorage</strong> &mdash; data persists across page refreshes but is browser-specific.</li>
+            <li>Tasks can be exported as <strong>.ics files</strong> to your calendar (Google Calendar, Apple Calendar, Outlook).</li>
+            <li>The reminder's "mood" in the Overview reflects the team's task situation in a humorous way.</li>
+            <li>You can clear all data from the Overview view.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

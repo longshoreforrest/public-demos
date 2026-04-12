@@ -71,16 +71,29 @@
             background: #2E7D32; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Tampereen Golf-apuri - Käyttöohje</h1>
-        <p class="subtitle">Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Tampereen Golf-apuri - Käyttöohje" data-i18n-en="Tampere Golf Helper - User Guide">Tampereen Golf-apuri - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä" data-i18n-en="All local courses and available tee times at a glance">Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">← Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -173,7 +186,135 @@
             <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
         </ul>
 
+        </div><!-- /lang-content fi -->
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>Finding a suitable tee time for a group of four friends is tedious: everyone has to check their own calendar first, then browse each course's booking system separately, and finally try to find a time that works for all. Golf Helper gathers available tee times from the Tampere region courses into one place and provides your group with a voting tool that finds a common playing time in seconds.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>Buddy Vote</strong> view where you can coordinate playing times with friends.</li>
+            <li>Create a <strong>buddy group</strong> from the left sidebar and add your golf buddies to the group.</li>
+            <li>Suggest <strong>tee times</strong> and see who's available &mdash; in either the matrix or calendar view.</li>
+            <li>Switch to the <strong>Calendar</strong> tab to see available tee times across all courses in a weekly or monthly view.</li>
+            <li>Check course locations on the <strong>Map</strong> tab.</li>
+        </ol>
+
+        <h2>Three views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Buddy Vote</h3>
+            <p>The default view for coordinating tee times within your group.</p>
+            <ul>
+                <li><strong>Buddy groups</strong> &rarr; create groups for different playing parties, give each group a name and emoji.</li>
+                <li><strong>Time suggestions</strong> &rarr; add a date, time and course, and see who can make it.</li>
+                <li><strong>Matrix</strong> shows every buddy's availability at a glance.</li>
+                <li><strong>Calendar view</strong> displays suggestions visually on a calendar.</li>
+                <li>Filter suggestions by course.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Calendar</h3>
+            <p>Available tee times across all courses in a weekly or monthly view.</p>
+            <ul>
+                <li><strong>Select courses</strong> from the left sidebar &mdash; see availability only for the courses you're interested in.</li>
+                <li><strong>Player count</strong> slider (1&ndash;20) &mdash; the app shows times that can accommodate your chosen group size.</li>
+                <li><strong>Color codes</strong> indicate availability: green = plenty of room, yellow = some room, orange = limited, grey = full.</li>
+                <li>Switch between <strong>weekly and monthly views</strong> and navigate back and forth in time.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>Map</h3>
+            <p>Tampere region golf courses on an interactive map.</p>
+            <ul>
+                <li>Each course appears as a <strong>map marker</strong> &mdash; click to see details.</li>
+                <li>The popup shows the course name, address and a <strong>link to its website</strong>.</li>
+                <li>Useful when you want to check how courses are located relative to each other.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Start by creating a buddy group and adding your playing partners. After that, adding time suggestions and finding a common time is quick &mdash; the matrix instantly shows who can make it and who can't.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Weekend golfer</div>
+            <h3>"When could we get out for a round together?"</h3>
+            <p>Open <strong>Buddy Vote</strong> &rarr; select your group &rarr; add a few time suggestions for the weekend &rarr; check the matrix to see which time works for everyone. Verify on the Calendar tab which course has availability.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Group organiser</div>
+            <h3>"Which course would be closest for everyone?"</h3>
+            <p>Open the <strong>Map</strong> view &rarr; check course locations &rarr; switch to the <strong>Calendar</strong> view and select the nearest courses from the sidebar &rarr; see where there's availability for your group size.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Spontaneous player</div>
+            <h3>"Is there availability anywhere today for four?"</h3>
+            <p>Open <strong>Calendar</strong> &rarr; set player count to 4 &rarr; select all courses &rarr; check today's color codes. Green cells mean plenty of room.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">New player in the area</div>
+            <h3>"What courses are there in the Tampere region?"</h3>
+            <p>Open the <strong>Map</strong> view &rarr; you'll see all courses in the area by location. Click markers to get course details and links to their websites.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app includes <strong>Tampere region golf courses</strong> with realistic locations and availability data.</li>
+            <li>Availability data is <strong>generated for demo purposes</strong> &mdash; in real use it would come from the courses' booking systems.</li>
+            <li>You can create multiple buddy groups &mdash; for example "Friday crew" and "Summer league".</li>
+            <li>Calendar color codes update automatically based on the selected player count.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

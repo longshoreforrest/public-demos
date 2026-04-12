@@ -80,15 +80,28 @@
             border-radius: 0.5rem; font-size: 0.82rem;
         }
         .color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+        .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;margin:1.2rem auto 0;width:fit-content}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1><span class="koutsi">Koutsi</span> - Käyttöohje</h1>
-        <p class="subtitle">Kokonaisvaltainen hyvinvointivalmentaja ruuhkavuosiin</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1><span class="koutsi">Koutsi</span> - <span data-i18n-fi="Käyttöohje" data-i18n-en="User Guide">Käyttöohje</span></h1>
+        <p class="subtitle" data-i18n-fi="Kokonaisvaltainen hyvinvointivalmentaja ruuhkavuosiin" data-i18n-en="Comprehensive wellness coach for busy years">Kokonaisvaltainen hyvinvointivalmentaja ruuhkavuosiin</p>
+        <a class="back" href="index.html" data-i18n-fi="&larr; Takaisin sovellukseen" data-i18n-en="&larr; Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span style="font-size:0.85rem;line-height:1">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span style="font-size:0.85rem;line-height:1">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
+    <!-- Finnish content -->
+    <div class="lang-content" data-lang="fi">
     <div class="content">
 
         <div class="problem-box">
@@ -238,6 +251,193 @@
         </ul>
 
     </div>
+    </div>
+
+    <!-- English content -->
+    <div class="lang-content hidden" data-lang="en">
+    <div class="content">
+
+        <div class="problem-box">
+            <h2>Why was this app created?</h2>
+            <p>During the busy years, maintaining a workout routine feels impossible: work meetings, kids' activities and everyday life consume all your time. Koutsi replaces those workout notes stuck on the fridge by combining goals, calendar, wellness metrics and workout buddies in one place &mdash; and understands that exercise isn't always the most important thing of the day.</p>
+        </div>
+
+        <h2>Navigation</h2>
+        <table class="nav-table">
+            <tr><th>Page</th><th>Path</th><th>Content</th></tr>
+            <tr><td><strong>Dashboard</strong></td><td><span class="route">/</span></td><td>Daily summary, wellness, goals, quick workout, buddies</td></tr>
+            <tr><td><strong>Calendar</strong></td><td><span class="route">/kalenteri</span></td><td>Weekly view with work, family and workouts side by side</td></tr>
+            <tr><td><strong>Goals</strong></td><td><span class="route">/tavoitteet</span></td><td>All goals and their training programs</td></tr>
+            <tr><td><strong>Buddies</strong></td><td><span class="route">/kamut</span></td><td>Workout buddies, streak stats, activity feed</td></tr>
+        </table>
+
+        <h2>Dashboard &mdash; your daily command center</h2>
+
+        <div class="feature-card">
+            <span class="tag">Left column</span>
+            <h3>Today's schedule</h3>
+            <p>Shows today's events in chronological order. Events are color-coded:</p>
+            <div class="color-grid">
+                <div class="color-item"><span class="color-dot" style="background:#3b82f6"></span> Work</div>
+                <div class="color-item"><span class="color-dot" style="background:#f59e0b"></span> Family</div>
+                <div class="color-item"><span class="color-dot" style="background:#10b981"></span> Workout</div>
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Left column</span>
+            <h3>Quick workout optimizer</h3>
+            <p>For busy days: select how much time you have (10&ndash;60 min) and get workout recommendations that fit your schedule. Each workout shows which goal it advances.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Left column</span>
+            <h3>Active goals</h3>
+            <p>In card view you see each goal's progress as a percentage and progress bar. Click a card to expand its training step details right on the dashboard.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Right column</span>
+            <h3>Wellbeing metrics</h3>
+            <p>Four key metrics at a glance:</p>
+            <ul>
+                <li><strong>Sleep</strong> &mdash; hours and minutes slept</li>
+                <li><strong>Steps</strong> &mdash; daily step counter</li>
+                <li><strong>Training week</strong> &mdash; how many of the week's workout goals are done</li>
+                <li><strong>Stress</strong> &mdash; stress level estimate (Low / Moderate / High)</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Right column</span>
+            <h3>Workout buddies preview</h3>
+            <p>See which of your friends are online or working out right now. "Show all" link takes you to the Buddies page.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Right column</span>
+            <h3>"FEELING LAZY!" button</h3>
+            <p>Today's special! If the couch is calling, click the button. The app:</p>
+            <ol>
+                <li>Generates an absurd <strong>excuse</strong> why you can't work out (e.g. "NASA research shows today is the optimal day to do absolutely nothing")</li>
+                <li>If you choose the couch, shows <strong>realistic consequences</strong> &mdash; how skipping one workout concretely impacts one of your goals</li>
+                <li>No judgment after your decision &mdash; either choice is OK</li>
+            </ol>
+        </div>
+
+        <h2>Goal system</h2>
+        <p>Each goal contains an automatically generated <strong>progressive training program</strong>:</p>
+        <ul>
+            <li><strong>Phases</strong> (3&ndash;4): major milestones with time periods (e.g. "Base fitness", "Endurance", "Marathon pace")</li>
+            <li><strong>Steps</strong> (2&ndash;3 per phase): concrete workout tasks you can mark as done</li>
+            <li>Progress updates automatically when you mark steps complete</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Navigation tip:</strong> You can navigate between a goal and its steps in multiple ways: click a goal card on the dashboard, open the goals page from the navigation bar, or click an individual step to open the side panel with detailed instructions.
+        </div>
+
+        <h3>Example goals in the app</h3>
+        <ul>
+            <li><strong>Marathon in autumn 2026</strong> (Fitness) &mdash; 12 steps from 5km runs to marathon, 4 phases</li>
+            <li><strong>Sleep better</strong> (Recovery) &mdash; 8 steps from sleep hygiene improvement to regular sleep routine</li>
+            <li><strong>First pull-up</strong> (Fitness) &mdash; 7 steps from assisted pull-ups to a clean rep</li>
+            <li><strong>Stress management</strong> (Wellbeing) &mdash; 6 steps from meditation basics to daily routine</li>
+        </ul>
+
+        <h2>Calendar</h2>
+        <p>The weekly view shows work, family events and workouts side by side with color coding. Today's column is highlighted in green.</p>
+        <ul>
+            <li>Navigate between weeks with <strong>arrow buttons</strong>. The "Today" button returns to the current week.</li>
+            <li><strong>Drag events</strong> to another day to reschedule &mdash; when a work meeting takes your workout slot, drag the workout to the next day.</li>
+            <li>Filter the view by category: All, Work, Family or Workout.</li>
+        </ul>
+
+        <h2>Workout buddies</h2>
+        <p>On the Buddies page you can see your workout friends' status:</p>
+        <ul>
+            <li><strong>Status</strong>: green dot = online, pulsing orange dot = working out right now, gray = offline</li>
+            <li><strong>Streak</strong>: how many consecutive days your buddy has worked out</li>
+            <li>Click a buddy to expand their card &rarr; see their motto, shared goals and action buttons</li>
+            <li><strong>"Join workout!"</strong> button when a buddy is working out, <strong>"Challenge to workout"</strong> when offline</li>
+        </ul>
+        <p>In the right sidebar you see the <strong>streak leaderboard</strong> (who has the longest consecutive workout streak) and the <strong>activity feed</strong> (what buddies have been doing recently).</p>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Marathon runner</div>
+            <h3>"I want to run a marathon in autumn"</h3>
+            <p>Create a marathon goal &rarr; get a progressive 4-phase program from 5km to 42km. Track progress from the dashboard, use the quick workout optimizer on busy days and see how each skipped workout affects the schedule.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Busy parent</div>
+            <h3>"I need to fit work and kids' activities around workouts"</h3>
+            <p>The calendar's color coding shows at a glance which days have room for workouts. When a surprise meeting comes up, drag the workout to another day. The quick workout optimizer suggests 10&ndash;15 minute exercises when time is short.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Beginner</div>
+            <h3>"I'd like to learn to do a pull-up"</h3>
+            <p>The pull-up goal breaks an ambitious target into small steps: assisted pull-ups &rarr; scapular control &rarr; negative pull-ups &rarr; first clean pull-up. See detailed instructions for each step in the StepPanel view.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Stressed worker</div>
+            <h3>"I should learn to relax"</h3>
+            <p>Stress management and sleep goals cover meditation, breathing exercises and sleep routines. The quick workout optimizer suggests 10&ndash;15 min breathing and meditation sessions. Wellbeing metrics show stress level and sleep data.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Social exerciser</div>
+            <h3>"I prefer working out together"</h3>
+            <p>On the Buddies page you see who's working out right now and can join with one click. The streak leaderboard creates healthy competition, and the activity feed keeps you connected to friends' workout lives.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app is designed to be holistic &mdash; instead of just workouts, it also tracks sleep, stress and recovery.</li>
+            <li>The "Feeling lazy" button isn't a joke but a deliberate design choice: it acknowledges that motivation varies and offers a humorous way to deal with it.</li>
+            <li>Goal programs are progressive &mdash; each step builds on the previous one.</li>
+            <li>Calendar drag-and-drop works with mouse: grab and drag to another day.</li>
+        </ul>
+
+    </div>
+    </div>
+
+<script>
+(function(){
+    var lang = localStorage.getItem('siteTourLang') || 'fi';
+    // Apply hero text
+    document.querySelectorAll('[data-i18n-fi]').forEach(function(el){
+        el.innerHTML = el.getAttribute('data-i18n-' + lang) || el.innerHTML;
+    });
+    // Toggle content sections
+    document.querySelectorAll('.lang-content').forEach(function(el){
+        if(el.dataset.lang === lang) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+    });
+    // Update buttons
+    document.querySelectorAll('.lang-btn').forEach(function(btn){
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+        btn.addEventListener('click', function(){
+            var l = this.dataset.lang;
+            localStorage.setItem('siteTourLang', l);
+            document.querySelectorAll('[data-i18n-fi]').forEach(function(el){
+                el.innerHTML = el.getAttribute('data-i18n-' + l) || el.innerHTML;
+            });
+            document.querySelectorAll('.lang-content').forEach(function(el){
+                if(el.dataset.lang === l) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+            document.querySelectorAll('.lang-btn').forEach(function(b){
+                b.classList.toggle('active', b.dataset.lang === l);
+            });
+        });
+    });
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

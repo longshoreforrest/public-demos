@@ -71,16 +71,29 @@
             background: #7c3aed; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Seinäjoki Lounasäänestys - Käyttöohje</h1>
-        <p class="subtitle">Tiimin lounaspaikka-äänestys analytiikalla</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Seinäjoki Lounasäänestys - Käyttöohje" data-i18n-en="Seinäjoki Lunch Voting - User Guide">Seinäjoki Lounasäänestys - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Tiimin lounaspaikka-äänestys analytiikalla" data-i18n-en="Team lunch venue voting with analytics">Tiimin lounaspaikka-äänestys analytiikalla</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -221,7 +234,183 @@
             <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
         </ul>
 
+        </div>
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>Every day the team has the same discussion: "Where should we go for lunch?" Everyone wants a different place, nobody remembers where we went last time, and the decision drags on. Lunch Voting solves this &mdash; based on over two years of voting data, the app predicts the team's choice, analyzes everyone's preferences, and shows group dynamics in one place.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>Today's Prediction</strong> view, which predicts where the team is most likely to go for lunch.</li>
+            <li>Click people in the <strong>"Who's in the office?"</strong> section to add or remove them from the prediction.</li>
+            <li>Switch views using the <strong>top tabs</strong>: Prediction, Map, Menus, Individual Analysis, Group Dynamics, History, or Overview.</li>
+            <li>Explore the different views &mdash; each one has its own analytics on the team's lunch choices.</li>
+        </ol>
+
+        <h2>Seven views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Today's Prediction</h3>
+            <p>The default view that predicts the lunch destination based on historical data.</p>
+            <ul>
+                <li><strong>Select attendees</strong> &rarr; the prediction updates in real time.</li>
+                <li><strong>Restaurant probabilities</strong> are shown with percentage bars.</li>
+                <li><strong>Personal predictions</strong> display each attendee's most likely choice.</li>
+                <li><strong>Today's lunch menus</strong> appear at the bottom &mdash; you can also generate new menus.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Map</h3>
+            <p>Seinäjoki lunch restaurants on a map ranked by popularity.</p>
+            <ul>
+                <li>Each restaurant appears as a <strong>map marker</strong> and is listed by popularity.</li>
+                <li>Click a marker to see restaurant details and vote count.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>Menus</h3>
+            <p>Lunch menus from all restaurants by day.</p>
+            <ul>
+                <li>Select a <strong>day</strong> from the day buttons at the top (Mon&ndash;Fri).</li>
+                <li><strong>Filter</strong> restaurants with buttons or <strong>search</strong> for a dish using the search field.</li>
+                <li>Each restaurant card shows all dishes and prices for that day.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 4</span>
+            <h3>Individual Analysis</h3>
+            <p>Dive into an individual team member's preferences and behavior.</p>
+            <ul>
+                <li>Select a person &rarr; you'll see a <strong>profile</strong> with their favorite restaurant, adventurousness, and voting activity.</li>
+                <li><strong>Restaurant distribution</strong> shows how votes are split as a donut chart.</li>
+                <li><strong>Compatibility</strong> with other team members &mdash; who votes the same way as you?</li>
+                <li><strong>Monthly trend</strong> reveals how preferences change over time.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 5</span>
+            <h3>Group Dynamics</h3>
+            <p>The whole team's voting analytics visualized.</p>
+            <ul>
+                <li><strong>Compatibility matrix</strong> shows how often each pair votes for the same restaurant.</li>
+                <li><strong>Strongest pairs</strong> lists team members who agree most often.</li>
+                <li><strong>Win rates</strong> show whose choice wins most frequently.</li>
+                <li><strong>Vote dispersion</strong> shows how much opinions differ month by month.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 6</span>
+            <h3>History</h3>
+            <p>Browse all past votes in chronological order.</p>
+            <ul>
+                <li>Each day shows the <strong>voters</strong>, their <strong>choices</strong>, and the <strong>result</strong>.</li>
+                <li><strong>Search</strong> by date, day of the week, or restaurant name.</li>
+                <li>Browse results with <strong>pagination</strong>.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 7</span>
+            <h3>Overview</h3>
+            <p>A high-level summary of the entire voting history.</p>
+            <ul>
+                <li><strong>Most popular restaurants</strong> listed with their vote counts.</li>
+                <li><strong>Vote distribution</strong>, <strong>monthly trend</strong>, and <strong>day-of-week distribution</strong> as charts.</li>
+                <li><strong>Team member profiles</strong> in brief.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> In the prediction view, start by selecting only the people who are actually in the office &mdash; the prediction becomes much more accurate when it's based on attendees' preferences rather than the entire team.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Team lead</div>
+            <h3>"Where should we go today?"</h3>
+            <p>Open the app &rarr; select <strong>Today's Prediction</strong> &rarr; click the attendees &rarr; check the most likely restaurant and today's lunch menus. Decision made!</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">New team member</div>
+            <h3>"What lunch places are around here?"</h3>
+            <p>Open the <strong>Map</strong> view &rarr; you'll see all restaurants by location. Switch to the <strong>Overview</strong> view to see which ones are the most popular.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Data enthusiast</div>
+            <h3>"Who always votes for the same place?"</h3>
+            <p>Open <strong>Individual Analysis</strong> &rarr; select a person &rarr; check the restaurant distribution and adventurousness score. Or go to <strong>Group Dynamics</strong> &rarr; the compatibility matrix shows who agrees with whom.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Dietary needs</div>
+            <h3>"Where can I find vegetarian food today?"</h3>
+            <p>Go to the <strong>Menus</strong> view &rarr; select today &rarr; type "vegetarian", "salad", or another dish in the search field &rarr; you'll see matching restaurants.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Tradition keeper</div>
+            <h3>"Where did we go last Friday?"</h3>
+            <p>Open <strong>History</strong> &rarr; search for "Friday" or the exact date &rarr; you'll see the voting result and all choices.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app automatically generates <strong>over 2 years</strong> of realistic voting history for demo purposes.</li>
+            <li>Each team member has their own <strong>weights and preferences</strong> that are reflected in the data.</li>
+            <li>The prediction algorithm considers personal preferences, recent choices, and day-of-week trends.</li>
+            <li>Lunch menus rotate &mdash; you can generate new ones by clicking the "New menus" button in the prediction view.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div>
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

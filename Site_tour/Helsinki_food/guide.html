@@ -67,16 +67,29 @@
             padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
         }
         .tip strong { color: #78350f; }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Siili Lounas - Käyttöohje</h1>
-        <p class="subtitle">Lounasravintolahaku Ruoholahdessa ja Kampissa</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Siili Lounas - Käyttöohje" data-i18n-en="Siili Lunch - User Guide">Siili Lounas - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Lounasravintolahaku Ruoholahdessa ja Kampissa" data-i18n-en="Lunch restaurant finder in Ruoholahti and Kamppi">Lounasravintolahaku Ruoholahdessa ja Kampissa</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">← Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -182,7 +195,149 @@
             <li>Kaikki linkit aukeavat uuteen välilehteen.</li>
         </ul>
 
+        </div><!-- /lang-content fi -->
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why does this app exist?</h2>
+            <p>There are dozens of lunch restaurants near the Siili Solutions office, but nobody wants to browse each restaurant's website separately. Siili Lunch brings together the locations, weekly menus and prices of 33 restaurants in one place &mdash; so heading out for lunch no longer requires 15 minutes of research.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol>
+            <li>The app opens in the <strong>Map view</strong>, showing all restaurants on a map around the Siili Solutions office.</li>
+            <li>Switch views using the <strong>tabs</strong> at the top: Map, Restaurants or Today's Lunch.</li>
+            <li>Use the <strong>search field</strong> to find a restaurant by name, address or dish.</li>
+            <li>Use the <strong>filter buttons</strong> to narrow the view to specific restaurants.</li>
+        </ol>
+
+        <h2>Views</h2>
+
+        <div class="feature-card">
+            <span class="tag">Tab 1</span>
+            <h3>Map</h3>
+            <p>An interactive map where every restaurant is marked with a red pin. The Siili Solutions office is shown as a blue marker with a dashed circle.</p>
+            <ul>
+                <li><strong>Click a pin</strong> &rarr; you'll see the restaurant's name, address, opening hours, price range and <em>today's menu</em>.</li>
+                <li>The <strong>"Homepage"</strong> link opens the restaurant's own website in a new tab.</li>
+                <li>You can freely zoom and pan the map.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Tab 2</span>
+            <h3>Restaurants</h3>
+            <p>All 33 restaurants displayed as cards. Each card includes:</p>
+            <ul>
+                <li>Restaurant name, address, opening hours and price range</li>
+                <li>A short description of the restaurant</li>
+                <li>The <strong>full weekly menu</strong> from Monday to Friday</li>
+                <li>Today's menu highlighted in <strong>red</strong> with an arrow marker</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Tab 3</span>
+            <h3>Today's Lunch</h3>
+            <p>A comparison view that shows what all restaurants are serving <strong>on a single day</strong>.</p>
+            <ul>
+                <li>Pick a day using the <strong>day buttons</strong> (Mon&ndash;Fri). Today's button is marked "(today)".</li>
+                <li>Each restaurant is shown on a row: name, address, menu and price.</li>
+                <li>Restaurants with no menu for the selected day appear dimmed.</li>
+            </ul>
+        </div>
+
+        <h2>Search and filtering</h2>
+        <p>Every view includes a search field and a restaurant filter:</p>
+        <table class="shortcut-table">
+            <tr><th>Action</th><th>How</th></tr>
+            <tr><td>Search for a dish</td><td>Type in the search field, e.g. "chicken", "pasta" or "vegetarian"</td></tr>
+            <tr><td>Search for a restaurant</td><td>Type the restaurant name or address</td></tr>
+            <tr><td>Show only certain restaurants</td><td>Click restaurant names in the filter buttons</td></tr>
+            <tr><td>Show all restaurants</td><td>Click the "All" button</td></tr>
+        </table>
+
+        <div class="tip">
+            <strong>Tip:</strong> Search works in real time &mdash; results are filtered as you type. In the "Today's Lunch" view, the search also covers menu contents, so you can search for e.g. "salmon" to find every restaurant serving salmon on the selected day.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Busy office worker</div>
+            <h3>"What should we eat today?"</h3>
+            <p>Open the app &rarr; go to the <strong>Today's Lunch</strong> tab &rarr; see every restaurant's menu for today at a glance. Pick your favourite and head out for lunch.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">New employee</div>
+            <h3>"Where are the nearest restaurants?"</h3>
+            <p>Open the <strong>Map</strong> view &rarr; see all restaurants placed on the map around the office. Click pins to explore restaurants and read the descriptions.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Food allergy or vegetarian</div>
+            <h3>"Are there vegetarian options available?"</h3>
+            <p>Use the search field with words like "vegetarian", "vegan", "tofu" or "gluten-free" &rarr; you'll see all restaurants that offer suitable options.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Lunch planner</div>
+            <h3>"What's on the menu this week?"</h3>
+            <p>Go to the <strong>Restaurants</strong> tab &rarr; browse the full week's menus for your favourite restaurants. Or use the <strong>Today's Lunch</strong> view and click different days (Mon&ndash;Fri) to plan the week's lunches in advance.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Group lunch organiser</div>
+            <h3>"Where can we find something for everyone?"</h3>
+            <p>Open <strong>Today's Lunch</strong> &rarr; browse all restaurant menus &rarr; find a restaurant with a diverse selection. Or search with several different keywords to compare offerings.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li><strong>Prices</strong> are shown in red on every card and in the map popup.</li>
+            <li><strong>Opening hours</strong> are typically weekdays from 10:30 to 14:00.</li>
+            <li><strong>Restaurant areas:</strong> 18 restaurants in Ruoholahti (closer to the office) and 15 in Kamppi.</li>
+            <li>On weekends, the app shows Monday's menu by default.</li>
+            <li>All links open in a new tab.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    // Hero text
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

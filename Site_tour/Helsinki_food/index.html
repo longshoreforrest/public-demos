@@ -264,30 +264,40 @@
             .tab { padding: 10px 14px; font-size: 0.85rem; }
             header h1 { font-size: 1.1rem; }
         }
+
+        .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;margin-left:auto;margin-right:12px}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.85rem;line-height:1}
     </style>
 </head>
 <body>
     <header>
         <div>
             <h1>Siili Lounas</h1>
-            <div class="subtitle" id="header-subtitle">Lounasravintolat Ruoholahdessa ja Kampissa</div>
+            <div class="subtitle" id="header-subtitle" data-i18n="subtitle">Lounasravintolat Ruoholahdessa ja Kampissa</div>
         </div>
-        <a href="guide.html" style="margin-left:auto;color:#ff6b6b;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
+        <a href="guide.html" data-i18n="guide" style="margin-left:0;color:#ff6b6b;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
     </header>
 
     <div class="tabs">
-        <div class="tab active" data-view="daily-view">Päivän lounas</div>
-        <div class="tab" data-view="map-view">Kartta</div>
-        <div class="tab" data-view="list-view">Ravintolat</div>
+        <div class="tab active" data-view="daily-view" data-i18n="tabDaily">Päivän lounas</div>
+        <div class="tab" data-view="map-view" data-i18n="tabMap">Kartta</div>
+        <div class="tab" data-view="list-view" data-i18n="tabRestaurants">Ravintolat</div>
     </div>
 
     <!-- Map View -->
     <div id="map-view" class="view">
         <div class="search-bar">
-            <input type="text" id="map-search-input" placeholder="Hae ravintolaa...">
+            <input type="text" id="map-search-input" placeholder="Hae ravintolaa..." data-i18n-placeholder="searchRestaurant">
         </div>
         <div class="restaurant-filter" id="map-restaurant-filter">
-            <label>Ravintolat:</label>
+            <label data-i18n="labelRestaurants">Ravintolat:</label>
         </div>
         <div id="map"></div>
     </div>
@@ -295,10 +305,10 @@
     <!-- Restaurant List View -->
     <div id="list-view" class="view">
         <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Hae ravintolaa tai ruokalajia...">
+            <input type="text" id="search-input" placeholder="Hae ravintolaa tai ruokalajia..." data-i18n-placeholder="searchRestaurantOrDish">
         </div>
         <div class="restaurant-filter" id="list-restaurant-filter">
-            <label>Ravintolat:</label>
+            <label data-i18n="labelRestaurants">Ravintolat:</label>
         </div>
         <div class="restaurant-list" id="restaurant-list"></div>
     </div>
@@ -306,20 +316,67 @@
     <!-- Daily Menu View -->
     <div id="daily-view" class="view active">
         <div class="search-bar">
-            <input type="text" id="daily-search-input" placeholder="Hae ruokalajia tai ravintolaa...">
+            <input type="text" id="daily-search-input" placeholder="Hae ruokalajia tai ravintolaa..." data-i18n-placeholder="searchDishOrRestaurant">
         </div>
         <div class="day-selector" id="day-selector">
-            <label>Valitse päivä:</label>
+            <label data-i18n="labelSelectDay">Valitse päivä:</label>
         </div>
         <div class="restaurant-filter" id="menu-avail-filter">
-            <label>Menu saatavilla:</label>
+            <label data-i18n="labelMenuAvail">Menu saatavilla:</label>
         </div>
         <div class="restaurant-filter" id="restaurant-filter">
-            <label>Ravintolat:</label>
+            <label data-i18n="labelRestaurants">Ravintolat:</label>
         </div>
         <div class="daily-list" id="daily-list"></div>
     </div>
 
+    <script>
+const translations = {
+    fi: {
+        subtitle: 'Lounasravintolat Ruoholahdessa ja Kampissa',
+        guide: 'Käyttöohje \u2192',
+        tabDaily: 'Päivän lounas',
+        tabMap: 'Kartta',
+        tabRestaurants: 'Ravintolat',
+        searchRestaurant: 'Hae ravintolaa...',
+        searchRestaurantOrDish: 'Hae ravintolaa tai ruokalajia...',
+        searchDishOrRestaurant: 'Hae ruokalajia tai ravintolaa...',
+        labelSelectDay: 'Valitse päivä:',
+        labelMenuAvail: 'Menu saatavilla:',
+        labelRestaurants: 'Ravintolat:',
+    },
+    en: {
+        subtitle: 'Lunch restaurants in Ruoholahti and Kamppi',
+        guide: 'User guide \u2192',
+        tabDaily: "Today's lunch",
+        tabMap: 'Map',
+        tabRestaurants: 'Restaurants',
+        searchRestaurant: 'Search restaurant...',
+        searchRestaurantOrDish: 'Search restaurant or dish...',
+        searchDishOrRestaurant: 'Search dish or restaurant...',
+        labelSelectDay: 'Select day:',
+        labelMenuAvail: 'Menu available:',
+        labelRestaurants: 'Restaurants:',
+    }
+};
+let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+function applyLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('siteTourLang', lang);
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[lang] && translations[lang][key]) el.textContent = translations[lang][key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (translations[lang] && translations[lang][key]) el.placeholder = translations[lang][key];
+    });
+}
+document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => applyLanguage(b.dataset.lang)));
+applyLanguage(currentLang);
+</script>
     <script src="restaurants.js"></script>
     <script src="menus.js"></script>
     <script src="app.js"></script>

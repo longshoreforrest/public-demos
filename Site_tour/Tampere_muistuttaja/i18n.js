@@ -288,7 +288,7 @@ const I18N = {
 };
 
 // Current language state
-let currentLang = localStorage.getItem('tm_lang') || 'fi';
+let currentLang = localStorage.getItem('siteTourLang') || 'fi';
 
 function t(key) {
   return I18N[currentLang][key] || I18N['fi'][key] || key;
@@ -296,7 +296,7 @@ function t(key) {
 
 function setLang(lang) {
   currentLang = lang;
-  localStorage.setItem('tm_lang', lang);
+  localStorage.setItem('siteTourLang', lang);
 }
 
 function getLang() {

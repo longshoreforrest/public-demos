@@ -207,6 +207,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .hi{width:34px;font-size:10px}
   .an-ch{grid-template-columns:1fr}
 }
+
+.lang-switcher{display:flex;border:1px solid var(--brd);border-radius:100px;overflow:hidden;margin-right:12px}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:3px 8px;font-size:0.7rem;font-weight:500;border:none;background:transparent;color:var(--dim);cursor:pointer;transition:all 0.2s}
+.lang-btn.active{background:var(--tx);color:#fff}
+.lang-btn:hover:not(.active){color:var(--tx);background:var(--hov)}
+.lang-flag{font-size:0.8rem;line-height:1}
 </style>
 </head>
 <body>
@@ -215,15 +221,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="logo">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     Tuntikirjanpito
-    <span class="hdr-sub">Tiedä mihin aika meni &mdash; kirjaa tunnit gitin, jiran ja kalenterin perusteella</span>
+    <span class="hdr-sub" data-i18n="subtitle">Tiedä mihin aika meni &mdash; kirjaa tunnit gitin, jiran ja kalenterin perusteella</span>
   </div>
   <div class="nv-tabs">
-    <button class="nv-tab active" data-v="timesheet">Viikko</button>
-    <button class="nv-tab" data-v="analytics">Analytiikka</button>
+    <button class="nv-tab active" data-v="timesheet" data-i18n="tabWeek">Viikko</button>
+    <button class="nv-tab" data-v="analytics" data-i18n="tabAnalytics">Analytiikka</button>
   </div>
   <div class="hsp"></div>
-  <a href="guide.html" style="color:#60a5fa;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;margin-right:12px">Käyttöohje &rarr;</a>
-  <button class="btn btn-sm" onclick="showModal()">+ Projekti</button>
+  <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+      <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+  </div>
+  <a href="guide.html" data-i18n="guide" style="color:#60a5fa;font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;margin-right:12px">Käyttöohje &rarr;</a>
+  <button class="btn btn-sm" data-i18n="addProject" onclick="showModal()">+ Projekti</button>
 </header>
 
 <div class="main-area">
@@ -234,41 +244,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div><div id="wkNum"></div><div id="wkRange"></div></div>
       <button class="wk-n" onclick="navWeek(1)">&#9654;</button>
       <div class="wk-btns">
-        <button class="btn btn-sm" onclick="goNow()">Tanaan</button>
-        <button class="btn btn-sm" onclick="copyPrev()">Kopioi ed. viikko</button>
+        <button class="btn btn-sm" data-i18n="btnToday" onclick="goNow()">Tanaan</button>
+        <button class="btn btn-sm" data-i18n="btnCopyPrev" onclick="copyPrev()">Kopioi ed. viikko</button>
       </div>
     </div>
     <div class="grid-tabs">
-      <button class="grid-tab active" data-t="hours"><span class="gt-ico">&#128337;</span> Tunnit</button>
+      <button class="grid-tab active" data-t="hours" data-i18n="gridHours"><span class="gt-ico">&#128337;</span> Tunnit</button>
       <button class="grid-tab" data-t="git"><span class="gt-ico">&#128187;</span> Git</button>
       <button class="grid-tab" data-t="jira"><span class="gt-ico">&#128203;</span> Jira</button>
-      <button class="grid-tab" data-t="calendar"><span class="gt-ico">&#128197;</span> Kalenteri</button>
+      <button class="grid-tab" data-t="calendar" data-i18n="gridCalendar"><span class="gt-ico">&#128197;</span> Kalenteri</button>
     </div>
     <div class="grid-card"><div id="gridBody"></div></div>
     <div id="sug"></div>
     <div class="save-bar">
-      <span id="savedInd" class="saved-ind" style="display:none">&#10003; Tallennettu</span>
-      <button id="saveBtn" class="btn btn-save" style="display:none" onclick="saveWeek()">&#128190; Tallenna muutokset</button>
+      <span id="savedInd" class="saved-ind" style="display:none" data-i18n="saved">&#10003; Tallennettu</span>
+      <button id="saveBtn" class="btn btn-save" style="display:none" data-i18n="btnSave" onclick="saveWeek()">&#128190; Tallenna muutokset</button>
     </div>
   </div>
 
   <!-- ANALYTICS -->
   <div id="vAnalytics">
     <div class="an-hdr">
-      <span class="an-lbl-s">Aikarajaus</span>
-      <div class="am" id="anRange"><button class="am-btn" data-r="year">Vuosi</button><button class="am-btn active" data-r="quarter">Neljannes</button><button class="am-btn" data-r="month">Kuukausi</button><button class="am-btn" data-r="week">Viikko</button></div>
+      <span class="an-lbl-s" data-i18n="anTimeRange">Aikarajaus</span>
+      <div class="am" id="anRange"><button class="am-btn" data-r="year" data-i18n="anYear">Vuosi</button><button class="am-btn active" data-r="quarter" data-i18n="anQuarter">Neljannes</button><button class="am-btn" data-r="month" data-i18n="anMonth">Kuukausi</button><button class="am-btn" data-r="week" data-i18n="anWeek">Viikko</button></div>
       <button class="wk-n" onclick="navAn(-1)">&#9664;</button>
       <div id="anLbl"></div>
       <button class="wk-n" onclick="navAn(1)">&#9654;</button>
-      <span class="an-lbl-s" style="margin-left:12px">Graafi</span>
-      <div class="am" id="anGrain"><button class="am-btn" data-g="day">Paivat</button><button class="am-btn active" data-g="week">Viikot</button><button class="am-btn" data-g="month">Kuukaudet</button></div>
+      <span class="an-lbl-s" style="margin-left:12px" data-i18n="anGraph">Graafi</span>
+      <div class="am" id="anGrain"><button class="am-btn" data-g="day" data-i18n="anDays">Paivat</button><button class="am-btn active" data-g="week" data-i18n="anWeeks">Viikot</button><button class="am-btn" data-g="month" data-i18n="anMonths">Kuukaudet</button></div>
     </div>
     <div id="anSum"></div>
     <div class="an-ch">
-      <div class="an-cc"><div class="an-ct">Projekteittain</div><div class="cw"><canvas id="cDonut"></canvas></div></div>
-      <div class="an-cc"><div class="an-ct">Ajanjaksoittain</div><div class="cw"><canvas id="cBar"></canvas></div></div>
+      <div class="an-cc"><div class="an-ct" data-i18n="anByProject">Projekteittain</div><div class="cw"><canvas id="cDonut"></canvas></div></div>
+      <div class="an-cc"><div class="an-ct" data-i18n="anByPeriod">Ajanjaksoittain</div><div class="cw"><canvas id="cBar"></canvas></div></div>
     </div>
-    <div id="anDr"><div class="dr-hint">Klikkaa kaaviota porautuaksesi</div></div>
+    <div id="anDr"><div class="dr-hint" data-i18n="drillHint">Klikkaa kaaviota porautuaksesi</div></div>
   </div>
 </div>
 
@@ -282,17 +292,82 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <p id="welcomeDesc"></p>
     <div id="welcomeProjects"></div>
     <div class="welcome-btns">
-      <button class="btn" onclick="welcomeEmpty()">Aloita tyhjana</button>
-      <button class="btn" onclick="welcomeCopy()">Kopioi projektit</button>
-      <button class="btn btn-pri" onclick="welcomeSmart()">Arvaa tunnit</button>
+      <button class="btn" data-i18n="btnStartEmpty" onclick="welcomeEmpty()">Aloita tyhjana</button>
+      <button class="btn" data-i18n="btnCopyProjects" onclick="welcomeCopy()">Kopioi projektit</button>
+      <button class="btn btn-pri" data-i18n="btnGuessHours" onclick="welcomeSmart()">Arvaa tunnit</button>
     </div>
   </div>
 </div>
 
 <!-- Modal -->
-<div class="modal-ov" id="modal"><div class="modal"><h3>Lisaa projekti</h3><div id="mList"></div></div></div>
+<div class="modal-ov" id="modal"><div class="modal"><h3 data-i18n="modalAddProject">Lisaa projekti</h3><div id="mList"></div></div></div>
 
 <div id="toast"></div>
+
+<!-- i18n -->
+<script>
+(function(){
+    const T = {
+        fi: {
+            subtitle: 'Tiedä mihin aika meni \u2014 kirjaa tunnit gitin, jiran ja kalenterin perusteella',
+            guide: 'Käyttöohje \u2192',
+            tabWeek: 'Viikko', tabAnalytics: 'Analytiikka',
+            addProject: '+ Projekti',
+            btnToday: 'Tanaan', btnCopyPrev: 'Kopioi ed. viikko',
+            gridHours: '\uD83D\uDD51 Tunnit', gridCalendar: '\uD83D\uDCC5 Kalenteri',
+            saved: '\u2713 Tallennettu', btnSave: '\uD83D\uDCBE Tallenna muutokset',
+            anTimeRange: 'Aikarajaus', anGraph: 'Graafi',
+            anYear: 'Vuosi', anQuarter: 'Neljannes', anMonth: 'Kuukausi', anWeek: 'Viikko',
+            anDays: 'Paivat', anWeeks: 'Viikot', anMonths: 'Kuukaudet',
+            anByProject: 'Projekteittain', anByPeriod: 'Ajanjaksoittain',
+            drillHint: 'Klikkaa kaaviota porautuaksesi',
+            btnStartEmpty: 'Aloita tyhjana', btnCopyProjects: 'Kopioi projektit', btnGuessHours: 'Arvaa tunnit',
+            modalAddProject: 'Lisaa projekti'
+        },
+        en: {
+            subtitle: 'Know where your time went \u2014 log hours based on git, jira and calendar',
+            guide: 'User guide \u2192',
+            tabWeek: 'Week', tabAnalytics: 'Analytics',
+            addProject: '+ Project',
+            btnToday: 'Today', btnCopyPrev: 'Copy prev. week',
+            gridHours: '\uD83D\uDD51 Hours', gridCalendar: '\uD83D\uDCC5 Calendar',
+            saved: '\u2713 Saved', btnSave: '\uD83D\uDCBE Save changes',
+            anTimeRange: 'Time range', anGraph: 'Graph',
+            anYear: 'Year', anQuarter: 'Quarter', anMonth: 'Month', anWeek: 'Week',
+            anDays: 'Days', anWeeks: 'Weeks', anMonths: 'Months',
+            anByProject: 'By project', anByPeriod: 'By period',
+            drillHint: 'Click a chart to drill down',
+            btnStartEmpty: 'Start empty', btnCopyProjects: 'Copy projects', btnGuessHours: 'Guess hours',
+            modalAddProject: 'Add project'
+        }
+    };
+    window._siteTourI18n = T;
+    function applyLang(lang) {
+        localStorage.setItem('siteTourLang', lang);
+        document.documentElement.lang = lang;
+        var dict = T[lang] || T.fi;
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            if (dict[key] !== undefined) el.textContent = dict[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n-placeholder');
+            if (dict[key] !== undefined) el.placeholder = dict[key];
+        });
+        document.querySelectorAll('.lang-btn').forEach(function(b) {
+            b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+        });
+    }
+    window._applyLang = applyLang;
+    document.addEventListener('DOMContentLoaded', function() {
+        var lang = localStorage.getItem('siteTourLang') || 'fi';
+        applyLang(lang);
+        document.querySelectorAll('.lang-btn').forEach(function(b) {
+            b.addEventListener('click', function() { applyLang(this.getAttribute('data-lang')); });
+        });
+    });
+})();
+</script>
 
 <script src="data.js"></script>
 <script src="app.js"></script>

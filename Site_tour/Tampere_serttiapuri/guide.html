@@ -71,16 +71,29 @@
             background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>SerttiApuri - Käyttöohje</h1>
-        <p class="subtitle">Sertifikaattien hallintajärjestelmä AI-teknologiayritykselle</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="SerttiApuri - Käyttöohje" data-i18n-en="SerttiApuri - User Guide">SerttiApuri - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Sertifikaattien hallintajärjestelmä AI-teknologiayritykselle" data-i18n-en="Certification management system for an AI technology company">Sertifikaattien hallintajärjestelmä AI-teknologiayritykselle</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -248,7 +261,210 @@
             <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
         </ul>
 
+        </div><!-- /lang-content fi -->
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>In an AI technology company, employees earn certifications from dozens of different providers &mdash; AWS, Azure, Google Cloud, Anthropic, OpenAI and many others. No one has a clear picture of who has completed what, how strategic goals are progressing (e.g. partnership statuses) or which certifications should be prioritized. SerttiApuri brings everything together: catalog, goals, analytics and personalized learning paths.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>Dashboard</strong> view where you see a summary of the organization's certification status.</li>
+            <li>Explore the <strong>Catalog</strong> view to browse over 60 certifications and filter by provider, level or type.</li>
+            <li>Check the <strong>Goals</strong> view for the company's strategic certification targets and their progress.</li>
+            <li>Find colleagues in the <strong>People</strong> view or plan your career path in the <strong>My Path</strong> view.</li>
+        </ol>
+
+        <h2>Nine views</h2>
+
+        <div class="feature-card">
+            <span class="tag">Overview</span>
+            <h3>Dashboard</h3>
+            <p>A high-level summary of the organization's certification status.</p>
+            <ul>
+                <li><strong>Stat cards</strong>: headcount, completed certifications, certifications in the catalog and active goals.</li>
+                <li><strong>Charts</strong>: distributions by provider, level and team.</li>
+                <li>A quick overview of the organization's competency landscape.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Company</span>
+            <h3>Goals</h3>
+            <p>Strategic certification targets and their tracking.</p>
+            <ul>
+                <li>Company-level goals such as "10 Anthropic Partner certifications" or "80% of developers AI-trained".</li>
+                <li><strong>Progress bars</strong> show how close you are to each target.</li>
+                <li>Deadlines and responsible persons for each goal.</li>
+                <li>Click the "completed" count to see who has already passed.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Company</span>
+            <h3>Analytics</h3>
+            <p>In-depth analytics on certifications across the entire organization.</p>
+            <ul>
+                <li>Distribution <strong>by provider, level, team</strong> and cost.</li>
+                <li>Drill down into individual certifications and their holders.</li>
+                <li>Trends and developments over time.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Certifications</span>
+            <h3>Catalog</h3>
+            <p>A comprehensive directory of all available certifications.</p>
+            <ul>
+                <li>Over <strong>60 certifications</strong> from providers: AWS, Microsoft, Google, Anthropic, OpenAI, NVIDIA, GitHub, Databricks and more.</li>
+                <li><strong>Filter</strong> by provider, level (Foundational/Associate/Professional/Expert), type and price.</li>
+                <li><strong>Search</strong> by name or description.</li>
+                <li>Each certification shows price, duration, level and how many people have completed it.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Certifications</span>
+            <h3>Tips &amp; Resources</h3>
+            <p>Colleague tips for completing certifications.</p>
+            <ul>
+                <li>Practical exam tips: difficulty level, preparation time, best study materials.</li>
+                <li><strong>Time estimates</strong> and recommended study strategies.</li>
+                <li>Links to official resources and study materials.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">People</span>
+            <h3>People Search</h3>
+            <p>Find colleagues and their certifications.</p>
+            <ul>
+                <li><strong>Search</strong> by name, team or certification.</li>
+                <li>Each person shows team, role and completed certifications.</li>
+                <li>Click a person to see their detailed profile.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">People</span>
+            <h3>My Path</h3>
+            <p>Your personal certification path and recommendations.</p>
+            <ul>
+                <li><strong>Recommended certifications</strong> based on your role and team.</li>
+                <li>Estimates of <strong>cost and time</strong> to complete the path.</li>
+                <li>Prioritization according to strategic goals.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">People</span>
+            <h3>Leaderboard</h3>
+            <p>Ranking of certification achievers.</p>
+            <ul>
+                <li>Staff ranked by <strong>number of completed certifications</strong>.</li>
+                <li>Shows certification count, level and most recent completion.</li>
+                <li>Motivates and gives visibility to active learners.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">People</span>
+            <h3>AI Assistant</h3>
+            <p>A conversational helper for certification questions.</p>
+            <ul>
+                <li>Ask anything about certifications, learning paths or goals.</li>
+                <li>Get <strong>personalized recommendations</strong> based on your situation.</li>
+                <li>A demo implementation showcasing what an AI-assisted experience could look like.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Start from the Catalog view and filter by provider "Anthropic" &mdash; you will immediately see which certifications the partnership status requires and how many people have already completed them. This helps you understand the organization's progress toward strategic goals.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">HR Manager</div>
+            <h3>"How are certification goals progressing?"</h3>
+            <p>Open <strong>Goals</strong> &rarr; see company-level targets with progress bars. Drill into the <strong>Analytics</strong> view to see the breakdown by team and identify where more effort is needed.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Developer</div>
+            <h3>"Which certification should I take next?"</h3>
+            <p>Open <strong>My Path</strong> &rarr; see recommended certifications based on your role and team. Check <strong>Tips &amp; Resources</strong> for colleagues' experiences before you start studying.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Team Lead</div>
+            <h3>"Who on my team has AWS expertise?"</h3>
+            <p>Open <strong>People Search</strong> &rarr; filter by provider "AWS" &rarr; see everyone with AWS certifications. Or open <strong>Analytics</strong> and drill down to the team level.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">CTO</div>
+            <h3>"Do we have enough AI expertise for partnerships?"</h3>
+            <p>Open <strong>Goals</strong> &rarr; check partnership goal progress (e.g. "Anthropic Partner"). Go to the <strong>Dashboard</strong> for the big picture and the <strong>Analytics</strong> view for provider-level drill-downs.</p>
+        </div>
+
+        <h2>Certification providers</h2>
+        <p>The app covers certifications from the following providers:</p>
+        <ul>
+            <li><strong>Cloud platforms:</strong> AWS, Microsoft Azure, Google Cloud</li>
+            <li><strong>AI platforms:</strong> Anthropic (Claude), OpenAI, NVIDIA, DeepLearning.AI</li>
+            <li><strong>Dev tools:</strong> GitHub, Cursor, HashiCorp</li>
+            <li><strong>Data &amp; CRM:</strong> Databricks, Salesforce</li>
+        </ul>
+        <p>Certification levels: <strong>Foundational</strong> (entry level), <strong>Associate</strong> (intermediate), <strong>Professional</strong> (advanced) and <strong>Expert</strong> (specialist).</p>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app contains <strong>over 60 certifications</strong> and approximately <strong>100 employee</strong> profiles for demo purposes.</li>
+            <li>All data is <strong>generated</strong> &mdash; people, completions and goals are fictional.</li>
+            <li>The AI assistant is a demo implementation and does not use a real AI model.</li>
+            <li>Certification prices and durations are based on actual market prices (2024&ndash;2025).</li>
+            <li>Provider brand colors (AWS orange, Anthropic brown, etc.) aid visual identification.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

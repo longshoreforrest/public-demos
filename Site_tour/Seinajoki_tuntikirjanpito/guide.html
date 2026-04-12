@@ -78,16 +78,29 @@
             background: #2563eb; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Tuntikirjanpito - Käyttöohje</h1>
-        <p class="subtitle">Viikkokohtainen tuntiseuranta projekteille</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Tuntikirjanpito - Käyttöohje" data-i18n-en="Time Tracking - User Guide">Tuntikirjanpito - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Viikkokohtainen tuntiseuranta projekteille" data-i18n-en="Weekly time tracking for projects">Viikkokohtainen tuntiseuranta projekteille</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -200,7 +213,155 @@
             <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
         </ul>
 
+        </div>
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>Logging hours is mandatory but tedious &mdash; and a traditional Excel spreadsheet doesn't tell you where the time actually went. Time Tracking combines weekly hour logging with Git history, Jira tasks, and your calendar, so you can see at a glance what you did and log your hours reliably based on that.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>week view</strong> showing the current week's timesheet.</li>
+            <li>On first visit, a <strong>welcome dialog</strong> appears &mdash; choose "Guess hours" to have the app fill in the week automatically, or start with a blank sheet.</li>
+            <li>Enter hours by clicking cells and typing the amount (e.g. 7.5).</li>
+            <li>Switch between hours, Git, Jira, and calendar views using the <strong>tabs</strong>.</li>
+            <li>Go to the <strong>Analytics</strong> view to see the big picture of projects and time usage.</li>
+        </ol>
+
+        <h2>Two main views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Week (timesheet)</h3>
+            <p>The main tool for logging hours. Shows the week Mon&ndash;Sun as columns and projects as rows.</p>
+            <ul>
+                <li><strong>Click a cell</strong> &rarr; enter hours. Totals update automatically.</li>
+                <li><strong>Sum column</strong> on the right shows each project's weekly total.</li>
+                <li><strong>Bottom row</strong> shows daily total hours &mdash; overages are highlighted in red.</li>
+                <li>Navigate between weeks with <strong>arrow buttons</strong> or return to this week with the <strong>"Today"</strong> button.</li>
+                <li><strong>"Copy prev. week"</strong> copies the previous week's hours as a starting point.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Sub-tabs</span>
+            <h3>Git, Jira, and Calendar</h3>
+            <p>The tabs above the timesheet show the week's activity from different sources:</p>
+            <ul>
+                <li><strong>Git</strong> &mdash; the week's commits by project and day. See what code you wrote each day.</li>
+                <li><strong>Jira</strong> &mdash; the week's tasks and their statuses (To Do, In Progress, Code Review, Done).</li>
+                <li><strong>Calendar</strong> &mdash; the week's meetings and events with times.</li>
+            </ul>
+            <p>These help you remember what you did and log hours accurately.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Analytics</h3>
+            <p>A big-picture view of time usage through charts and drill-downs.</p>
+            <ul>
+                <li><strong>Time range:</strong> year, quarter, month, or week. Navigate between periods with arrows.</li>
+                <li><strong>Chart granularity:</strong> days, weeks, or months.</li>
+                <li><strong>Donut chart</strong> shows hour distribution by project.</li>
+                <li><strong>Bar chart</strong> shows hour trends over time periods.</li>
+                <li><strong>Click a chart</strong> &rarr; a drill-down view opens with a detailed breakdown.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> First switch to the Git or Calendar tab to recall what you did during the week, then go back to the Hours tab to log your time. This way your entries match reality.
+        </div>
+
+        <h2>Actions</h2>
+        <table class="shortcut-table">
+            <tr><th>Action</th><th>How</th></tr>
+            <tr><td>Add a project</td><td>Click the <strong>"+ Project"</strong> button in the top right corner</td></tr>
+            <tr><td>Remove project from week</td><td>Hover over the project row &rarr; click the &times; button</td></tr>
+            <tr><td>Save hours</td><td>Click <strong>"Save changes"</strong> which appears after editing</td></tr>
+            <tr><td>Copy previous week</td><td>Click <strong>"Copy prev. week"</strong></td></tr>
+            <tr><td>Navigate weeks</td><td>Arrow buttons &#9664; &#9654; next to the week number</td></tr>
+            <tr><td>Drill down in analytics</td><td>Click a chart segment &rarr; a detailed breakdown opens</td></tr>
+        </table>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Consultant</div>
+            <h3>"How much did I work on project X this month?"</h3>
+            <p>Go to the <strong>Analytics</strong> view &rarr; set the time range to "Month" &rarr; check the donut chart or click a project to drill down to daily hours.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Friday logger</div>
+            <h3>"I don't remember what I did on Monday"</h3>
+            <p>Switch to the <strong>Git</strong> tab &rarr; you'll see the day's commits. Also check the <strong>Calendar</strong> tab for meetings. Return to the <strong>Hours</strong> tab and log your time.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Project manager</div>
+            <h3>"How many resources went into this sprint?"</h3>
+            <p>Open <strong>Analytics</strong> &rarr; set the time range to "Week" and navigate to the sprint weeks &rarr; compare project distribution across weeks.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">New employee</div>
+            <h3>"How do I log my hours?"</h3>
+            <p>The app opens to the week view &rarr; choose "Guess hours" or "Start empty" from the welcome dialog &rarr; click cells and enter hours &rarr; press <strong>"Save changes"</strong>.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Billing</div>
+            <h3>"How much was done for client A in Q1?"</h3>
+            <p>Open <strong>Analytics</strong> &rarr; time range "Quarter" &rarr; navigate to Q1 &rarr; click the client's project in the donut chart &rarr; the drill-down view shows a week-by-week breakdown.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app includes <strong>demo data</strong> with multiple projects, Git commits, Jira tasks, and calendar entries.</li>
+            <li>The <strong>"Guess hours"</strong> feature automatically generates realistic time entries based on Git and calendar data.</li>
+            <li>Data is saved in <strong>browser storage</strong> (localStorage) &mdash; it persists across page reloads but not across different browsers.</li>
+            <li>Weekend days have a <strong>grey background</strong> and the current day is highlighted in <strong>blue</strong>.</li>
+            <li>If daily hours exceed normal working time, the total appears in <strong>red</strong>.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div>
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

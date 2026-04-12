@@ -6,6 +6,13 @@
   <title>Tampereen Golf-apuri</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+.lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;flex-shrink:0}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+.lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+.lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+.lang-flag{font-size:0.85rem;line-height:1}
+  </style>
 </head>
 <body>
 
@@ -16,21 +23,25 @@
         <span class="logo-icon">&#9971;</span>
         <div>
           <h1>Tampereen Golf-apuri</h1>
-          <p class="subtitle">Ei tarvitse selata jokaisen kentän kalenteria erikseen — sovita peliaika kaveriporukalle yhdessä paikassa</p>
+          <p class="subtitle" data-i18n="subtitle">Ei tarvitse selata jokaisen kentän kalenteria erikseen — sovita peliaika kaveriporukalle yhdessä paikassa</p>
         </div>
       </div>
       <nav class="nav-tabs">
         <button class="nav-tab active" data-view="poll">
-          <span class="tab-icon">&#9889;</span> Kaveriäänestys
+          <span class="tab-icon">&#9889;</span> <span data-i18n="tabPoll">Kaveriäänestys</span>
         </button>
         <button class="nav-tab" data-view="calendar">
-          <span class="tab-icon">&#128197;</span> Kalenteri
+          <span class="tab-icon">&#128197;</span> <span data-i18n="tabCalendar">Kalenteri</span>
         </button>
         <button class="nav-tab" data-view="map">
-          <span class="tab-icon">&#128506;</span> Kartta
+          <span class="tab-icon">&#128506;</span> <span data-i18n="tabMap">Kartta</span>
         </button>
       </nav>
-      <a href="guide.html" style="margin-left:12px;color:rgba(255,255,255,0.9);font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;flex-shrink:0">Käyttöohje &rarr;</a>
+      <div class="lang-switcher">
+          <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+          <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+      </div>
+      <a href="guide.html" data-i18n="guide" style="margin-left:12px;color:rgba(255,255,255,0.9);font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap;flex-shrink:0">Käyttöohje &rarr;</a>
     </div>
   </header>
 
@@ -43,20 +54,20 @@
 
         <!-- Sivupaneeli: kenttälista -->
         <aside class="course-sidebar">
-          <h2>Golf-kentät</h2>
+          <h2 data-i18n="sidebarCourses">Golf-kentät</h2>
           <div class="course-filter">
             <label class="filter-all">
-              <input type="checkbox" id="select-all-courses" checked> Valitse kaikki
+              <input type="checkbox" id="select-all-courses" checked> <span data-i18n="selectAll">Valitse kaikki</span>
             </label>
           </div>
           <ul id="course-list" class="course-list"></ul>
           <div class="legend">
-            <h3>Viikkonäkymä</h3>
-            <div class="legend-item"><span class="legend-color avail-high"></span> Monta kenttää vapaana</div>
-            <div class="legend-item"><span class="legend-color avail-medium"></span> Muutama kenttä vapaana</div>
-            <div class="legend-item"><span class="legend-color avail-low"></span> 1 kenttä vapaana</div>
-            <div class="legend-item"><span class="legend-color avail-none"></span> Ei mahdu</div>
-            <div class="legend-hint">Klikkaa solua nähdäksesi mitkä kentät</div>
+            <h3 data-i18n="legendWeekView">Viikkonäkymä</h3>
+            <div class="legend-item"><span class="legend-color avail-high"></span> <span data-i18n="legendHigh">Monta kenttää vapaana</span></div>
+            <div class="legend-item"><span class="legend-color avail-medium"></span> <span data-i18n="legendMedium">Muutama kenttä vapaana</span></div>
+            <div class="legend-item"><span class="legend-color avail-low"></span> <span data-i18n="legendLow">1 kenttä vapaana</span></div>
+            <div class="legend-item"><span class="legend-color avail-none"></span> <span data-i18n="legendNone">Ei mahdu</span></div>
+            <div class="legend-hint" data-i18n="legendHint">Klikkaa solua nähdäksesi mitkä kentät</div>
           </div>
         </aside>
 
@@ -64,23 +75,23 @@
         <div class="calendar-area">
           <!-- Pelaajamäärä-slider -->
           <div class="player-slider-bar">
-            <label class="player-slider-label" for="player-count">Pelaajia:</label>
+            <label class="player-slider-label" for="player-count" data-i18n="labelPlayers">Pelaajia:</label>
             <input type="range" id="player-count" min="1" max="20" value="4" class="player-slider">
             <span id="player-count-display" class="player-count-display">4</span>
-            <span class="player-count-hint">Näytä kentät joihin mahtuu koko porukka</span>
+            <span class="player-count-hint" data-i18n="playerHint">Näytä kentät joihin mahtuu koko porukka</span>
           </div>
 
           <div class="calendar-controls">
             <div class="calendar-nav">
-              <button id="prev-period" class="btn btn-nav">&larr; Edellinen</button>
+              <button id="prev-period" class="btn btn-nav" data-i18n="prevPeriod">&larr; Edellinen</button>
               <h2 id="calendar-title" class="calendar-title"></h2>
-              <button id="next-period" class="btn btn-nav">Seuraava &rarr;</button>
+              <button id="next-period" class="btn btn-nav" data-i18n="nextPeriod">Seuraava &rarr;</button>
             </div>
             <div class="view-toggle">
-              <button class="btn btn-view active" data-calendar="week">Viikko</button>
-              <button class="btn btn-view" data-calendar="month">Kuukausi</button>
+              <button class="btn btn-view active" data-calendar="week" data-i18n="viewWeek">Viikko</button>
+              <button class="btn btn-view" data-calendar="month" data-i18n="viewMonth">Kuukausi</button>
             </div>
-            <button id="today-btn" class="btn btn-today">Tänään</button>
+            <button id="today-btn" class="btn btn-today" data-i18n="today">Tänään</button>
           </div>
 
           <div id="calendar-container" class="calendar-container"></div>
@@ -94,27 +105,27 @@
 
         <!-- Vasemmalla: kaveriryhmät ja kaverilista -->
         <aside class="poll-sidebar">
-          <h2>Kaveriryhmät</h2>
+          <h2 data-i18n="buddyGroups">Kaveriryhmät</h2>
           <div id="buddy-group-selector" class="buddy-group-selector"></div>
-          <button id="add-group-btn" class="btn-add-group" onclick="showNewGroupForm()">+ Uusi ryhmä</button>
+          <button id="add-group-btn" class="btn-add-group" onclick="showNewGroupForm()" data-i18n="newGroup">+ Uusi ryhmä</button>
 
           <!-- Uuden ryhmän lomake -->
           <div id="new-group-form" class="new-group-form hidden">
-            <input type="text" id="new-group-name" class="buddy-input" placeholder="Ryhmän nimi...">
+            <input type="text" id="new-group-name" class="buddy-input" placeholder="Ryhmän nimi..." data-i18n-placeholder="groupNamePlaceholder">
             <div id="icon-picker" class="icon-picker"></div>
             <div class="new-group-actions">
-              <button class="btn btn-today" onclick="createNewGroup()">Luo</button>
-              <button class="btn btn-nav" onclick="hideNewGroupForm()">Peruuta</button>
+              <button class="btn btn-today" onclick="createNewGroup()" data-i18n="create">Luo</button>
+              <button class="btn btn-nav" onclick="hideNewGroupForm()" data-i18n="cancel">Peruuta</button>
             </div>
           </div>
 
           <!-- Ryhmän muokkaus -->
           <div id="group-edit-bar" class="group-edit-bar"></div>
 
-          <h2 style="margin-top:16px">Golfkaverit</h2>
+          <h2 style="margin-top:16px" data-i18n="golfBuddies">Golfkaverit</h2>
           <ul id="buddy-list" class="buddy-list"></ul>
           <div class="buddy-add">
-            <input type="text" id="buddy-name-input" placeholder="Lisää kaveri..." class="buddy-input">
+            <input type="text" id="buddy-name-input" placeholder="Lisää kaveri..." class="buddy-input" data-i18n-placeholder="addBuddyPlaceholder">
             <button id="buddy-add-btn" class="btn btn-today">+</button>
           </div>
         </aside>
@@ -190,6 +201,107 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
+<script>
+(function(){
+  const GOLF_I18N = {
+    fi: {
+      subtitle: 'Ei tarvitse selata jokaisen kentän kalenteria erikseen — sovita peliaika kaveriporukalle yhdessä paikassa',
+      guide: 'Käyttöohje \u2192',
+      tabPoll: 'Kaveriäänestys',
+      tabCalendar: 'Kalenteri',
+      tabMap: 'Kartta',
+      sidebarCourses: 'Golf-kentät',
+      selectAll: 'Valitse kaikki',
+      legendWeekView: 'Viikkonäkymä',
+      legendHigh: 'Monta kenttää vapaana',
+      legendMedium: 'Muutama kenttä vapaana',
+      legendLow: '1 kenttä vapaana',
+      legendNone: 'Ei mahdu',
+      legendHint: 'Klikkaa solua nähdäksesi mitkä kentät',
+      labelPlayers: 'Pelaajia:',
+      playerHint: 'Näytä kentät joihin mahtuu koko porukka',
+      prevPeriod: '\u2190 Edellinen',
+      nextPeriod: 'Seuraava \u2192',
+      viewWeek: 'Viikko',
+      viewMonth: 'Kuukausi',
+      today: 'Tänään',
+      buddyGroups: 'Kaveriryhmät',
+      newGroup: '+ Uusi ryhmä',
+      groupNamePlaceholder: 'Ryhmän nimi...',
+      golfBuddies: 'Golfkaverit',
+      addBuddyPlaceholder: 'Lisää kaveri...',
+      create: 'Luo',
+      cancel: 'Peruuta'
+    },
+    en: {
+      subtitle: 'All local courses and tee times at a glance \u2014 find a play time with your buddy group in one place',
+      guide: 'User guide \u2192',
+      tabPoll: 'Buddy vote',
+      tabCalendar: 'Calendar',
+      tabMap: 'Map',
+      sidebarCourses: 'Golf courses',
+      selectAll: 'Select all',
+      legendWeekView: 'Week view',
+      legendHigh: 'Many courses available',
+      legendMedium: 'Some courses available',
+      legendLow: '1 course available',
+      legendNone: 'No availability',
+      legendHint: 'Click a cell to see which courses',
+      labelPlayers: 'Players:',
+      playerHint: 'Show courses that fit the whole group',
+      prevPeriod: '\u2190 Previous',
+      nextPeriod: 'Next \u2192',
+      viewWeek: 'Week',
+      viewMonth: 'Month',
+      today: 'Today',
+      buddyGroups: 'Buddy groups',
+      newGroup: '+ New group',
+      groupNamePlaceholder: 'Group name...',
+      golfBuddies: 'Golf buddies',
+      addBuddyPlaceholder: 'Add buddy...',
+      create: 'Create',
+      cancel: 'Cancel'
+    }
+  };
+
+  let golfLang = localStorage.getItem('siteTourLang') || 'fi';
+
+  function applyGolfI18n() {
+    const strings = GOLF_I18N[golfLang] || GOLF_I18N.fi;
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      const key = el.getAttribute('data-i18n');
+      if (strings[key] !== undefined) el.textContent = strings[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (strings[key] !== undefined) el.placeholder = strings[key];
+    });
+  }
+
+  function switchGolfLang(lang) {
+    golfLang = lang;
+    localStorage.setItem('siteTourLang', lang);
+    document.querySelectorAll('.lang-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    applyGolfI18n();
+  }
+
+  document.querySelectorAll('.lang-switcher .lang-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      switchGolfLang(this.getAttribute('data-lang'));
+    });
+  });
+
+  // Apply on load
+  if (golfLang !== 'fi') {
+    document.querySelectorAll('.lang-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-lang') === golfLang);
+    });
+  }
+  applyGolfI18n();
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

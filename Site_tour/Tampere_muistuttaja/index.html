@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lempeä Muistuttaja</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+.lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;flex-shrink:0}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+.lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+.lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+.lang-flag{font-size:0.85rem;line-height:1}
+  </style>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💝</text></svg>">
 </head>
 <body>
@@ -20,7 +27,10 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn-lang" id="langBtn" onclick="handleLangSwitch()">EN</button>
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-btn active" data-lang="fi" onclick="switchToLang('fi')"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en" onclick="switchToLang('en')"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
         <a class="btn-guide" href="guide.html" data-i18n="navGuide">?</a>
       </div>
     </div>

@@ -79,16 +79,29 @@
             background: #e8491d; color: white; font-size: 0.75rem; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
         }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
     </style>
 </head>
 <body>
     <div class="hero">
-        <h1>Oulu2026 Tapahtumat - Käyttöohje</h1>
-        <p class="subtitle">Kulttuuripääkaupunkivuoden tapahtumaopas</p>
-        <a class="back" href="index.html">&larr; Takaisin sovellukseen</a>
+        <h1 data-i18n-fi="Oulu2026 Tapahtumat - Käyttöohje" data-i18n-en="Oulu2026 Events - User Guide">Oulu2026 Tapahtumat - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Kulttuuripääkaupunkivuoden tapahtumaopas" data-i18n-en="European Capital of Culture event guide">Kulttuuripääkaupunkivuoden tapahtumaopas</p>
+        <a class="back" href="index.html" data-i18n-fi="← Takaisin sovellukseen" data-i18n-en="← Back to app">← Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
     </div>
 
     <div class="content">
+
+        <div class="lang-content" data-lang="fi">
 
         <div class="problem-box">
             <h2>Miksi tämä sovellus on tehty?</h2>
@@ -256,7 +269,211 @@
             <li>Kaikki ulkoiset linkit aukeavat uuteen välilehteen.</li>
         </ul>
 
+        </div><!-- /lang-content fi -->
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why does this app exist?</h2>
+            <p>Oulu is the European Capital of Culture in 2026, with over 560 events taking place across Northern Finland throughout the year. Event information is scattered across various sources and channels. This app brings it all together &mdash; on a map, in a calendar and as a list &mdash; so you can easily find the events that interest you.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens in the <strong>Map view</strong> showing all events on a map.</li>
+            <li>Use the <strong>search field</strong> and <strong>category filters</strong> in the left sidebar to narrow down events.</li>
+            <li>Switch views using the <strong>tabs at the top</strong>: Map, List, Calendar, Route or Dashboard.</li>
+            <li>Click any event to open its <strong>detail card</strong>.</li>
+        </ol>
+
+        <h2>Five views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Map</h3>
+            <p>Events displayed as colour-coded markers on the map. Event cards appear in the sidebar.</p>
+            <ul>
+                <li>Click a <strong>map marker</strong> &rarr; you'll see the event name, date and location.</li>
+                <li>Click a <strong>sidebar card</strong> &rarr; the map zooms to the event and opens its detail card.</li>
+                <li>Filter by categories and the month selector.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>List</h3>
+            <p>A table view of all events grouped by month.</p>
+            <ul>
+                <li>Columns: event name, date, location, category and link.</li>
+                <li>The <strong>"Open"</strong> button takes you to the event's own page.</li>
+                <li>Click the event name to open its detail card.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>Calendar</h3>
+            <p>A monthly view with events placed on their respective days.</p>
+            <ul>
+                <li>Navigate between months with the <strong>arrow buttons</strong>.</li>
+                <li>Each day shows 1&ndash;3 events as colour badges. If there are more, a "+N more" label appears.</li>
+                <li>Today's cell is highlighted with a blue background.</li>
+                <li>Selecting a month from the dropdown jumps the calendar straight to that month.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 4</span>
+            <h3>Route Planner</h3>
+            <p>Find events along a travel route. A great tool for planning a trip!</p>
+            <ol>
+                <li>Choose a <strong>starting point</strong> and <strong>destination</strong> from the dropdowns (or type your own).</li>
+                <li>Adjust the <strong>search radius</strong> with the slider (5&ndash;100 km from the route).</li>
+                <li>Click <strong>"Find events along route"</strong>.</li>
+                <li>The route appears on the map with events listed in order from start to finish.</li>
+                <li>Filter results by category, month or keyword.</li>
+                <li>Print your travel plan with the <strong>"Print plan"</strong> button.</li>
+            </ol>
+            <p>The route is calculated using real road networks (OSRM), so distances are realistic.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 5</span>
+            <h3>Dashboard</h3>
+            <p>Analytics and statistics for the entire Capital of Culture year.</p>
+            <ul>
+                <li><strong>Summary cards:</strong> number of events, categories, largest category, free events, locations.</li>
+                <li><strong>Four interactive charts:</strong> categories, months, locations and price distribution.</li>
+                <li>Click a chart segment &rarr; a <strong>drill-down view</strong> opens with a detailed listing.</li>
+                <li>Within the drill-down, you can further filter the results.</li>
+            </ul>
+        </div>
+
+        <h2>Search and filtering</h2>
+        <p>The sidebar search field and filters are available in the Map, List and Calendar views:</p>
+        <ul>
+            <li><strong>Text search:</strong> searches event names, locations, descriptions and category names.</li>
+            <li><strong>Category filter:</strong> click a category button to see only that category's events. You can select one or more.</li>
+            <li><strong>Month filter:</strong> narrow events down to a specific month.</li>
+        </ul>
+
+        <h2>Event categories</h2>
+        <div class="categories">
+            <span class="cat-badge" style="background:#dbeafe;color:#1e40af">&#127925; Music</span>
+            <span class="cat-badge" style="background:#fce7f3;color:#9d174d">&#127917; Theatre</span>
+            <span class="cat-badge" style="background:#d1fae5;color:#065f46">&#127912; Visual Arts</span>
+            <span class="cat-badge" style="background:#fef3c7;color:#78350f">&#127869; Food Culture</span>
+            <span class="cat-badge" style="background:#ede9fe;color:#5b21b6">&#127914; Festival</span>
+            <span class="cat-badge" style="background:#fee2e2;color:#991b1b">&#127916; Film</span>
+            <span class="cat-badge" style="background:#e0e7ff;color:#3730a3">&#128218; Literature</span>
+            <span class="cat-badge" style="background:#cffafe;color:#0f766e">&#128161; Art &amp; Technology</span>
+            <span class="cat-badge" style="background:#fef9c3;color:#78350f">&#128118; Children's Culture</span>
+            <span class="cat-badge" style="background:#f3e8ff;color:#6b21a8">&#127963; Heritage</span>
+            <span class="cat-badge" style="background:#ffedd5;color:#c2410c">&#129337; Circus</span>
+            <span class="cat-badge" style="background:#ecfccb;color:#3f6212">&#9832; Sauna</span>
+            <span class="cat-badge" style="background:#f0fdf4;color:#166534">&#129309; Community</span>
+            <span class="cat-badge" style="background:#f0f9ff;color:#1e40af">&#128300; Science</span>
+            <span class="cat-badge" style="background:#fdf2f8;color:#9d174d">&#128131; Dance</span>
+            <span class="cat-badge" style="background:#fef2f2;color:#991b1b">&#127941; Sports</span>
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Local resident</div>
+            <h3>"What events are on this week?"</h3>
+            <p>Open the <strong>Calendar</strong> view &rarr; check the current week &rarr; click events that interest you. Or open the <strong>Map</strong> and filter to the current month's events to see what's happening nearby.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Tourist</div>
+            <h3>"I'm planning a trip to the Oulu region"</h3>
+            <p>Open the <strong>Route Planner</strong> &rarr; select e.g. Helsinki as the starting point and Oulu as the destination &rarr; adjust the search radius &rarr; see the events along the way in order. Print the plan to take with you.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Family with children</div>
+            <h3>"What's available for kids?"</h3>
+            <p>Click <strong>"Children's Culture"</strong> in the sidebar category filter &rarr; you'll see all child-friendly events. Also check the "Circus" and "Festival" categories.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Culture professional</div>
+            <h3>"What will the culture year look like?"</h3>
+            <p>Open the <strong>Dashboard</strong> &rarr; see statistics and charts showing how events are distributed across categories, months and locations. Click a chart segment to drill down into the details.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Road trip planner</div>
+            <h3>"Let's drive from Oulu to Rovaniemi &mdash; what's happening along the way?"</h3>
+            <p>Open the <strong>Route Planner</strong> &rarr; starting point Oulu, destination Rovaniemi, search radius 30 km &rarr; see all events along the road. Filter by e.g. "Food Culture" and "Festival" for the perfect trip.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Free event seeker</div>
+            <h3>"What can I do for free?"</h3>
+            <p>Open the <strong>Dashboard</strong> &rarr; check the "Free events" figure on the summary card &rarr; click the green "Free" section of the price distribution chart &rarr; see a list of all free events.</p>
+        </div>
+
+        <h2>Detail card (modal)</h2>
+        <p>Clicking any event opens a detail card that includes:</p>
+        <ul>
+            <li>Event name and category as a colour badge</li>
+            <li>Date and location</li>
+            <li>Pricing information (if available)</li>
+            <li>Link to the event's website</li>
+            <li>Event description</li>
+        </ul>
+        <p>Close the detail card by clicking the X, the background overlay or pressing ESC.</p>
+
+        <div class="tip">
+            <strong>Tip:</strong> The Route Planner also accepts custom locations &mdash; select "Other..." and enter coordinates or a place name to plan a route from anywhere.
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>There are over <strong>560 events</strong> in total, gathered from the Oulu2026 Bubster database and supplemented with 20 flagship events.</li>
+            <li>Events span the entire year 2026, from January to December.</li>
+            <li>Geographic coverage extends from Oulu to surrounding municipalities: Kajaani, Kemi, Tornio, Kuusamo, Raahe, Vaasa and other parts of Northern Finland.</li>
+            <li>The sidebar displays up to 200 events at a time for performance reasons &mdash; use filters to narrow your search.</li>
+            <li>All external links open in a new tab.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
     </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    // Hero text
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
 <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

@@ -68,7 +68,18 @@ function updateAllI18n() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPlaceholder);
   });
-  document.getElementById('langBtn').textContent = t('langSwitch');
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === getLang());
+  });
+}
+
+function switchToLang(lang) {
+  setLang(lang);
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  updateAllI18n();
+  renderCurrentView();
 }
 
 function handleLangSwitch() {
