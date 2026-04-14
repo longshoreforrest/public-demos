@@ -204,6 +204,42 @@
         .filter-btn:hover { border-color: #1a1a2e; color: #1a1a2e; }
         .filter-btn.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
 
+        .filter-toggle {
+            display: none;
+            padding: 4px 12px;
+            border: 1px solid #d0d0d0;
+            background: #f9f9f9;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .filter-toggle:hover { border-color: #1a1a2e; color: #1a1a2e; }
+
+        .search-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 0 0;
+            max-width: 600px;
+        }
+        .search-suggestion {
+            padding: 4px 10px;
+            border: 1px solid #e63946;
+            background: #fef2f2;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #e63946;
+            transition: all 0.15s;
+        }
+        .search-suggestion:hover { background: #e63946; color: #fff; }
+        .search-suggestion.active { background: #e63946; color: #fff; }
+
         .daily-list {
             max-width: 900px;
             margin: 0 auto;
@@ -263,6 +299,9 @@
             .daily-card .dc-name { min-width: auto; }
             .tab { padding: 10px 14px; font-size: 0.85rem; }
             header h1 { font-size: 1.1rem; }
+            .filter-toggle { display: inline-flex; }
+            .restaurant-filter > label { display: none; }
+            .restaurant-filter.collapsed .filter-btn { display: none; }
         }
 
         .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;margin-left:auto;margin-right:12px}

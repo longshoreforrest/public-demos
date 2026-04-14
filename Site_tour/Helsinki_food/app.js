@@ -479,6 +479,79 @@ renderMenuAvailFilter();
 renderRestaurantFilter();
 filterDailyView();
 
+// --- Mobile: collapsible restaurant filters ---
+function setupFilterToggle(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const toggle = document.createElement('button');
+    toggle.className = 'filter-toggle';
+    container.insertBefore(toggle, container.querySelector('.filter-btn'));
+
+    function updateText() {
+        const collapsed = container.classList.contains('collapsed');
+        const activeCount = container.querySelectorAll('.filter-btn.active:not([data-id="all"])').length;
+        const isAll = container.querySelector('.filter-btn[data-id="all"]')?.classList.contains('active');
+        let text = currentLang === 'en' ? 'Restaurants' : 'Ravintolat';
+        if (activeCount > 0 && !isAll) text += ` (${activeCount})`;
+        text += collapsed ? ' \u25BC' : ' \u25B2';
+        toggle.textContent = text;
+    }
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        container.classList.add('collapsed');
+    }
+    toggle.addEventListener('click', () => {
+        container.classList.toggle('collapsed');
+        updateText();
+    });
+    new MutationObserver(updateText).observe(container, {
+        attributes: true, subtree: true, attributeFilter: ['class']
+    });
+    updateText();
+}
+
+setupFilterToggle('restaurant-filter');
+setupFilterToggle('list-restaurant-filter');
+setupFilterToggle('map-restaurant-filter');
+
+// --- Search: restaurant name suggestions ---
+function setupSearchSuggestions(inputId, filterContainerId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const box = document.createElement('div');
+    box.className = 'search-suggestions';
+    input.after(box);
+
+    function update() {
+        const q = input.value.toLowerCase().trim();
+        box.innerHTML = '';
+        if (q.length < 1) return;
+        const hits = restaurants.filter(r => r.name.toLowerCase().includes(q));
+        if (hits.length === 0 || hits.length === restaurants.length) return;
+        hits.forEach(r => {
+            const chip = document.createElement('button');
+            const filterBtn = document.getElementById(filterContainerId)
+                ?.querySelector('.filter-btn[data-id="' + r.id + '"]');
+            chip.className = 'search-suggestion' + (filterBtn?.classList.contains('active') ? ' active' : '');
+            chip.textContent = r.name;
+            chip.addEventListener('click', e => {
+                e.preventDefault();
+                input.value = '';
+                box.innerHTML = '';
+                if (filterBtn) filterBtn.click();
+            });
+            box.appendChild(chip);
+        });
+    }
+
+    input.addEventListener('input', update);
+    input.addEventListener('blur', () => setTimeout(() => { box.innerHTML = ''; }, 150));
+}
+
+setupSearchSuggestions('daily-search-input', 'restaurant-filter');
+setupSearchSuggestions('search-input', 'list-restaurant-filter');
+setupSearchSuggestions('map-search-input', 'map-restaurant-filter');
+
 // Update subtitle with dynamic week info
 (function updateSubtitle() {
     const today = new Date();
