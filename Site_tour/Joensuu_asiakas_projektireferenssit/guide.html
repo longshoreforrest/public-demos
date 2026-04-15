@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje - Asiakasreferenssit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127970;</text></svg>">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .lang-tab.active {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 24px; }
+    h2 { font-size: 1.1rem; font-weight: 700; margin: 24px 0 12px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+    h2:first-of-type { border-top: none; padding-top: 0; }
+    p { font-size: 0.9rem; margin-bottom: 12px; }
+    ul { margin: 8px 0 16px 20px; }
+    li { font-size: 0.88rem; margin-bottom: 6px; }
+    .section {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.83rem;
+    }
+    .tag-example {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin: 2px;
+    }
+    .tag-blue { background: #dbeafe; color: #1d4ed8; }
+    .tag-green { background: #f0fdf4; color: #15803d; }
+    .tag-yellow { background: #fef3c7; color: #92400e; }
+    .tag-pink { background: #fce7f3; color: #9d174d; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="index.html">&larr; Takaisin sovellukseen</a>
+
+  <div class="lang-tabs">
+    <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+    <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+  </div>
+
+  <!-- FINNISH -->
+  <div class="guide-section active" id="guide-fi">
+    <h1>Käyttöohje</h1>
+    <p class="subtitle">Siili Solutions - Asiakasreferenssien hallinta</p>
+
+    <div class="section">
+      <h2>Yleiskuvaus</h2>
+      <p>Tämä sovellus on Siili Solutionsin asiakasreferenssien hallintaportaali. Sovelluksen avulla voit selata, suodattaa ja analysoida Siilin asiakasprojekteja, käytettyjä teknologioita, asiantuntijaprofiileja ja kilpailutuksiin liittyviä referenssejä.</p>
+    </div>
+
+    <div class="section">
+      <h2>Näkymät</h2>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Referenssit</h3>
+      <p>Päänakyma, jossa näet kaikki asiakasreferenssit listamuodossa. Voit suodattaa toimialan mukaan tai hakea vapaatekstillä. Klikkaa referenssiä nähdäksesi lisätiedot.</p>
+      <p>Värikoodatut tagit:</p>
+      <ul>
+        <li><span class="tag-example tag-blue">Toimiala</span> - Projektin toimiala</li>
+        <li><span class="tag-example tag-green">Teknologia</span> - Käytetty teknologia</li>
+        <li><span class="tag-example tag-yellow">Tyyppi</span> - Avainsana</li>
+        <li><span class="tag-example tag-pink">Kilpailutus</span> - Kilpailutusreferenssi</li>
+      </ul>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Asiakkaat</h3>
+      <p>Asiakaskohtainen näkymä, jossa näet jokaisen asiakkaan projektit koottuna yhteen. Klikkaa asiakaskorttia nähdäksesi kootut tiedot.</p>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Teknologiat</h3>
+      <p>Teknologiakohtainen näkymä, jossa näet kaikki projekteissa käytetyt teknologiat kategorioittain. Jokaisen teknologian vieressä näkyy kuinka monessa projektissa sitä on käytetty. Klikkaa teknologiaa nähdäksesi projektit.</p>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Asiantuntijat</h3>
+      <p>Siilin asiantuntijoiden profiilit sisältäen osaamiskuvaukset, toimialakokemuksen, sertifikaatit ja projektit joissa asiantuntija on ollut mukana.</p>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Kilpailutus</h3>
+      <p>Kilpailutusreferenssit vaatimuslomakemuodossa. Tämä näkymä on suunniteltu erityisesti julkisten hankintojen referenssikuvauksiin, kuten Ruokaviraston osa-alueen 1 (sovelluskehitys ja ylläpito) vaatimuksiin.</p>
+    </div>
+
+    <div class="section">
+      <h2>Datan käsittely</h2>
+      <p>Lähtödata on johdettu konsulttien CV-tiedoista ja kilpailutusreferenssidokumenteista. Henkilöiden nimet on anonymisoitu. Asiantuntijaprofiilien tiedot on koostettu useista lähteistä yhtenäiseksi referenssikuvaukseksi.</p>
+      <p>Asiakkuusreferenssit on muodostettu yhdistämällä samassa asiakkuudessa olleiden henkilöiden profiilit ja projektikuvaukset.</p>
+    </div>
+
+    <div class="section">
+      <h2>Kielen vaihto</h2>
+      <p>Sovellus tukee suomea ja englantia. Kieli vaihdetaan oikean yläkulman kielivalitsimella (FI / EN). Valittu kieli tallennetaan selaimen muistiin.</p>
+    </div>
+
+    <div class="section">
+      <h2>Tekninen toteutus</h2>
+      <p>Sovellus on toteutettu puhtaalla HTML, CSS ja JavaScriptillä ilman ulkoisia kirjastoja. Kaikki data on staattisessa <code>data.js</code>-tiedostossa.</p>
+    </div>
+  </div>
+
+  <!-- ENGLISH -->
+  <div class="guide-section" id="guide-en">
+    <h1>User Guide</h1>
+    <p class="subtitle">Siili Solutions - Customer Reference Management</p>
+
+    <div class="section">
+      <h2>Overview</h2>
+      <p>This application is Siili Solutions' customer reference management portal. It allows you to browse, filter and analyze Siili's client projects, technologies used, expert profiles and tender-related references.</p>
+    </div>
+
+    <div class="section">
+      <h2>Views</h2>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">References</h3>
+      <p>The main view where you can see all customer references in a list format. You can filter by industry or search with free text. Click a reference to see more details.</p>
+      <p>Color-coded tags:</p>
+      <ul>
+        <li><span class="tag-example tag-blue">Industry</span> - Project industry</li>
+        <li><span class="tag-example tag-green">Technology</span> - Technology used</li>
+        <li><span class="tag-example tag-yellow">Type</span> - Keyword</li>
+        <li><span class="tag-example tag-pink">Tender</span> - Tender reference</li>
+      </ul>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Clients</h3>
+      <p>Client-specific view where you can see all projects grouped by client. Click a client card to view the compiled details.</p>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Technologies</h3>
+      <p>Technology-specific view showing all technologies used across projects, organized by category. Each technology displays the number of projects where it has been used. Click a technology to see the related projects.</p>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Experts</h3>
+      <p>Siili expert profiles including competence descriptions, industry experience, certifications and projects the expert has been involved in.</p>
+
+      <h3 style="font-size:0.95rem;margin:12px 0 6px">Tender</h3>
+      <p>Tender references in a requirements form format. This view is specifically designed for public procurement reference descriptions, such as the Finnish Food Authority's area 1 (application development and maintenance) requirements.</p>
+    </div>
+
+    <div class="section">
+      <h2>Data Processing</h2>
+      <p>The source data is derived from consultant CV data and tender reference documents. Personal names have been anonymized. Expert profile information has been compiled from multiple sources into a unified reference description.</p>
+      <p>Client references have been formed by combining the profiles and project descriptions of individuals who have worked within the same client engagement.</p>
+    </div>
+
+    <div class="section">
+      <h2>Language Selection</h2>
+      <p>The application supports Finnish and English. Switch the language using the language selector (FI / EN) in the top-right corner. The selected language is saved in the browser's local storage.</p>
+    </div>
+
+    <div class="section">
+      <h2>Technical Implementation</h2>
+      <p>The application is built with plain HTML, CSS and JavaScript without external libraries. All data is stored in a static <code>data.js</code> file.</p>
+    </div>
+  </div>
+
+  <a class="back-link" href="index.html">&larr; Takaisin sovellukseen</a>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+
+  <!-- Analytics -->
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

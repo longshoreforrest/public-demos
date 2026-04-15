@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Käyttöohje – Myynnistä projektiin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #1e293b;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 { font-size: 1.1rem; font-weight: 600; }
+        .header .subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+
+        .back-link {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #fff; }
+
+        .lang-switch {
+            display: flex;
+            gap: 2px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 100px;
+            padding: 2px;
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            padding: 0.3rem 0.6rem;
+            border-radius: 100px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .section-header:hover { background: #f8fafc; }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .section-icon.blue { background: #eff6ff; }
+        .section-icon.amber { background: #fef3c7; }
+        .section-icon.green { background: #ecfdf5; }
+        .section-icon.purple { background: #f3e8ff; }
+        .section-icon.red { background: #fef2f2; }
+
+        .section-title { font-weight: 600; font-size: 0.95rem; }
+        .section-subtitle { font-size: 0.8rem; color: #94a3b8; }
+
+        .section-body {
+            padding: 0 1.5rem 1.25rem;
+            font-size: 0.88rem;
+            color: #475569;
+        }
+
+        .section-body p { margin-bottom: 0.75rem; }
+
+        .section-body h4 {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 1rem 0 0.35rem;
+        }
+
+        .section-body ul {
+            padding-left: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-body li { margin-bottom: 0.25rem; }
+
+        .section-body code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            color: #334155;
+        }
+
+        .section-body pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            margin: 0.75rem 0;
+            line-height: 1.6;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin: 0.75rem 0;
+            overflow-x: auto;
+        }
+
+        .flow-box {
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .flow-box.input { background: #eff6ff; color: #1d4ed8; }
+        .flow-box.process { background: #fef3c7; color: #b45309; }
+        .flow-box.output { background: #ecfdf5; color: #047857; }
+        .flow-box.result { background: #f3e8ff; color: #7c3aed; }
+
+        .flow-arrow { color: #cbd5e1; font-size: 1.2rem; }
+
+        .role-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+            font-size: 0.85rem;
+        }
+
+        .role-table th {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .role-table td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+        }
+
+        .tip {
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin: 0.75rem 0;
+            font-size: 0.85rem;
+        }
+
+        .tip strong { color: #b45309; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-inner">
+        <div>
+            <h1 data-fi="K&auml;ytt&ouml;ohje" data-en="User Guide">K&auml;ytt&ouml;ohje</h1>
+            <div class="subtitle" data-fi="Myynti &rarr; Projekti" data-en="Sales &rarr; Project">Myynti &rarr; Projekti</div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+            <a href="index.html" class="back-link" data-fi="&larr; Takaisin" data-en="&larr; Back">&larr; Takaisin</a>
+            <div class="lang-switch">
+                <button class="lang-btn active" onclick="setLang('fi')">&#127467;&#127470; FI</button>
+                <button class="lang-btn" onclick="setLang('en')">&#127468;&#127463; EN</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+
+    <!-- Section 1: Overview -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon blue">&#128640;</div>
+            <div>
+                <div class="section-title" data-fi="Mik&auml; t&auml;m&auml; on?" data-en="What is this?">Mik&auml; t&auml;m&auml; on?</div>
+                <div class="section-subtitle" data-fi="Yleiskatsaus ty&ouml;kaluun" data-en="Tool overview">Yleiskatsaus ty&ouml;kaluun</div>
+            </div>
+        </div>
+        <div class="section-body" id="section-overview">
+            <!-- filled by JS -->
+        </div>
+    </div>
+
+    <!-- Section 2: How it works -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon amber">&#9881;&#65039;</div>
+            <div>
+                <div class="section-title" data-fi="Miten se toimii?" data-en="How does it work?">Miten se toimii?</div>
+                <div class="section-subtitle" data-fi="Prosessi askel askeleelta" data-en="Step-by-step process">Prosessi askel askeleelta</div>
+            </div>
+        </div>
+        <div class="section-body" id="section-howto">
+        </div>
+    </div>
+
+    <!-- Section 3: Roles -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon green">&#128101;</div>
+            <div>
+                <div class="section-title" data-fi="Roolit ja vastuut" data-en="Roles and responsibilities">Roolit ja vastuut</div>
+                <div class="section-subtitle" data-fi="Kuka tekee mit&auml;?" data-en="Who does what?">Kuka tekee mit&auml;?</div>
+            </div>
+        </div>
+        <div class="section-body" id="section-roles">
+        </div>
+    </div>
+
+    <!-- Section 4: File structure -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon purple">&#128193;</div>
+            <div>
+                <div class="section-title" data-fi="Tiedostorakenne" data-en="File structure">Tiedostorakenne</div>
+                <div class="section-subtitle" data-fi="Kansiot ja tiedostot" data-en="Folders and files">Kansiot ja tiedostot</div>
+            </div>
+        </div>
+        <div class="section-body" id="section-files">
+        </div>
+    </div>
+
+    <!-- Section 5: Extending -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-icon red">&#128736;&#65039;</div>
+            <div>
+                <div class="section-title" data-fi="Laajentaminen" data-en="Extending">Laajentaminen</div>
+                <div class="section-subtitle" data-fi="Miten lis&auml;t&auml; uusia projekteja" data-en="How to add new projects">Miten lis&auml;t&auml; uusia projekteja</div>
+            </div>
+        </div>
+        <div class="section-body" id="section-extend">
+        </div>
+    </div>
+
+</div>
+
+<script>
+const sections = {
+    overview: {
+        fi: `
+            <p><strong>Myynnistä projektiin</strong> on demo-työkalu joka näyttää miten myyntimateriaalit voidaan muuntaa kevyesti tekniseen muotoon ja interaktiiviseksi verkkosivuksi.</p>
+            <p>Idea on yksinkertainen: myynti ja asiakas luovat dokumentit tutuilla työkaluilla (Word, PowerPoint), ja AI-agentti prosessoi ne automaattisesti rakenteiseen muotoon.</p>
+            <div class="flow-diagram">
+                <div class="flow-box input">.docx / .pptx</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-box process">AI-agentti</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-box output">Markdown</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-box result">Verkkosivu</div>
+            </div>
+            <div class="tip"><strong>Miksi tämä on tärkeää?</strong> Myynnin ja teknisen tiimin välille jää usein "kuilu" – myynti lupaa, tekniikka tulkitsee. Tämä työkalu tekee siirron näkyväksi ja rakenteiseksi, jolloin kaikki sidosryhmät näkevät saman kuvan.</div>
+        `,
+        en: `
+            <p><strong>Sales to Project</strong> is a demo tool showing how sales materials can be easily converted to technical format and an interactive website.</p>
+            <p>The idea is simple: sales and client create documents with familiar tools (Word, PowerPoint), and an AI agent automatically processes them into structured format.</p>
+            <div class="flow-diagram">
+                <div class="flow-box input">.docx / .pptx</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-box process">AI Agent</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-box output">Markdown</div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-box result">Website</div>
+            </div>
+            <div class="tip"><strong>Why does this matter?</strong> There's often a "gap" between sales and technical teams – sales promises, tech interprets. This tool makes the handoff visible and structured, so all stakeholders see the same picture.</div>
+        `
+    },
+    howto: {
+        fi: `
+            <h4>1. Syötteet (data_input/)</h4>
+            <p>Aseta myyntidokumentit <code>data_input/</code>-kansioon. Tuetut muodot:</p>
+            <ul>
+                <li><strong>.docx</strong> – Word-dokumentit (tarjouspyynnöt, tarjousluonnokset)</li>
+                <li><strong>.pptx</strong> – PowerPoint-esitykset (pilottiraportit, demot)</li>
+                <li><strong>.pdf</strong> – PDF-tiedostot (sopimukset, liitteet)</li>
+            </ul>
+            <h4>2. Prosessointi</h4>
+            <p>AI-agentti (esim. Claude Code) lukee dokumentit ja tuottaa rakenteisen markdown-muodon:</p>
+            <pre>data_input/
+  tarjouspyynto.docx        &rarr;  data_processed/tarjouspyynto.md
+  tarjousluonnos.docx       &rarr;  data_processed/tarjousluonnos.md
+  pilottiraportti.pptx      &rarr;  data_processed/pilottiraportti.md</pre>
+            <h4>3. Visualisointi</h4>
+            <p>Verkkosivusto (<code>index.html</code>) lukee prosessoidun datan ja tarjoaa viisi näkymää:</p>
+            <ul>
+                <li><strong>Putki</strong> – Dokumenttien eteneminen tarjouspyynnöstä pilottiin</li>
+                <li><strong>Vertailu</strong> – Samat teemat eri dokumenteissa rinnakkain</li>
+                <li><strong>Aikajana</strong> – Projektin eteneminen aikajärjestyksessä</li>
+                <li><strong>Sidosryhmät</strong> – Kunkin roolin hyödyt ja toimenpiteet</li>
+                <li><strong>Prosessi</strong> – Materiaalin siirron vaiheet</li>
+            </ul>
+            <h4>4. Iterointi</h4>
+            <p>Sidosryhmät tarkastelevat sivustoa, antavat palautetta, ja materiaaleja päivitetään. Uusi prosessointikierros tuottaa päivitetyn sivuston.</p>
+        `,
+        en: `
+            <h4>1. Inputs (data_input/)</h4>
+            <p>Place sales documents in the <code>data_input/</code> folder. Supported formats:</p>
+            <ul>
+                <li><strong>.docx</strong> – Word documents (RFPs, proposal drafts)</li>
+                <li><strong>.pptx</strong> – PowerPoint presentations (pilot reports, demos)</li>
+                <li><strong>.pdf</strong> – PDF files (contracts, attachments)</li>
+            </ul>
+            <h4>2. Processing</h4>
+            <p>AI agent (e.g. Claude Code) reads the documents and produces structured markdown:</p>
+            <pre>data_input/
+  tarjouspyynto.docx        &rarr;  data_processed/tarjouspyynto.md
+  tarjousluonnos.docx       &rarr;  data_processed/tarjousluonnos.md
+  pilottiraportti.pptx      &rarr;  data_processed/pilottiraportti.md</pre>
+            <h4>3. Visualization</h4>
+            <p>The website (<code>index.html</code>) reads processed data and offers five views:</p>
+            <ul>
+                <li><strong>Pipeline</strong> – Document flow from RFP to pilot</li>
+                <li><strong>Comparison</strong> – Same themes across documents side by side</li>
+                <li><strong>Timeline</strong> – Project progression in chronological order</li>
+                <li><strong>Stakeholders</strong> – Benefits and actions for each role</li>
+                <li><strong>Process</strong> – Material handoff steps</li>
+            </ul>
+            <h4>4. Iteration</h4>
+            <p>Stakeholders review the site, provide feedback, and materials are updated. A new processing cycle produces an updated site.</p>
+        `
+    },
+    roles: {
+        fi: `
+            <table class="role-table">
+                <tr><th>Rooli</th><th>Tekee</th><th>Saa</th></tr>
+                <tr>
+                    <td><strong>Myynti</strong></td>
+                    <td>Luo tarjousluonnoksen (.docx)</td>
+                    <td>Demo-sivusto joka konkretisoida vision asiakkaalle</td>
+                </tr>
+                <tr>
+                    <td><strong>Asiakas</strong></td>
+                    <td>Toimittaa tarjouspyynnön</td>
+                    <td>Näkee miltä ratkaisu voisi näyttää ennen päätöstä</td>
+                </tr>
+                <tr>
+                    <td><strong>Tekninen tiimi</strong></td>
+                    <td>Prosessoi materiaalin, rakentaa prototyypin</td>
+                    <td>Vaatimukset suoraan myyntimateriaalista</td>
+                </tr>
+                <tr>
+                    <td><strong>Projektipäällikkö</strong></td>
+                    <td>Koordinoi, seuraa etenemistä</td>
+                    <td>Kaikki materiaali yhdessä paikassa</td>
+                </tr>
+            </table>
+            <div class="tip"><strong>Avain yhteistyöhön:</strong> Jokainen sidosryhmä työskentelee tutuilla työkaluilla. Myynti käyttää Wordia, asiakas käyttää Wordia, ja AI-agentti hoitaa muunnoksen. Kenenkään ei tarvitse opetella uutta järjestelmää.</div>
+        `,
+        en: `
+            <table class="role-table">
+                <tr><th>Role</th><th>Does</th><th>Gets</th></tr>
+                <tr>
+                    <td><strong>Sales</strong></td>
+                    <td>Creates proposal draft (.docx)</td>
+                    <td>Demo site that makes the vision concrete for the client</td>
+                </tr>
+                <tr>
+                    <td><strong>Client</strong></td>
+                    <td>Delivers RFP</td>
+                    <td>Sees what the solution could look like before deciding</td>
+                </tr>
+                <tr>
+                    <td><strong>Technical Team</strong></td>
+                    <td>Processes material, builds prototype</td>
+                    <td>Requirements directly from sales material</td>
+                </tr>
+                <tr>
+                    <td><strong>Project Manager</strong></td>
+                    <td>Coordinates, tracks progress</td>
+                    <td>All material in one place</td>
+                </tr>
+            </table>
+            <div class="tip"><strong>Key to collaboration:</strong> Each stakeholder works with familiar tools. Sales uses Word, client uses Word, and the AI agent handles the conversion. Nobody needs to learn a new system.</div>
+        `
+    },
+    files: {
+        fi: `
+            <pre>Joensuu_myynnistä_projektiin/
+├── data_input/                          # Raakadokumentit
+│   ├── tarjouspyynto_laajennettu.docx   # Asiakkaan tarjouspyyntö
+│   ├── myynnin_tarjousluonnos_buzzword.docx  # Myynnin tarjous
+│   └── pilottiraportti_rikas.pptx       # Pilotin tulokset
+│
+├── data_processed/                      # AI-agentin tuottama markdown
+│   ├── tarjouspyynto.md
+│   ├── tarjousluonnos.md
+│   └── pilottiraportti.md
+│
+├── specs/                               # Spesifikaatio
+│   └── 001.md
+│
+├── index.html                           # Pääsovellus
+└── guide.html                           # Tämä käyttöohje</pre>
+            <h4>data_input/</h4>
+            <p>Tänne tulevat alkuperäiset myyntidokumentit. Kansion sisältöä ei muokata – se toimii "lähteenä".</p>
+            <h4>data_processed/</h4>
+            <p>AI-agentin tuottamat markdown-tiedostot. Rakenteinen muoto sisältää metatiedot (tyyppi, lähde, rooli) ja selkeät otsikkotasot.</p>
+        `,
+        en: `
+            <pre>Joensuu_myynnistä_projektiin/
+├── data_input/                          # Raw documents
+│   ├── tarjouspyynto_laajennettu.docx   # Client RFP
+│   ├── myynnin_tarjousluonnos_buzzword.docx  # Sales proposal
+│   └── pilottiraportti_rikas.pptx       # Pilot results
+│
+├── data_processed/                      # AI-agent produced markdown
+│   ├── tarjouspyynto.md
+│   ├── tarjousluonnos.md
+│   └── pilottiraportti.md
+│
+├── specs/                               # Specification
+│   └── 001.md
+│
+├── index.html                           # Main application
+└── guide.html                           # This user guide</pre>
+            <h4>data_input/</h4>
+            <p>Original sales documents go here. This folder is not modified – it serves as the "source of truth".</p>
+            <h4>data_processed/</h4>
+            <p>Markdown files produced by the AI agent. Structured format includes metadata (type, source, role) and clear heading levels.</p>
+        `
+    },
+    extend: {
+        fi: `
+            <h4>Uuden projektin lisääminen</h4>
+            <p>Prosessi on sama joka kerta:</p>
+            <ul>
+                <li>Lisää uudet dokumentit <code>data_input/</code>-kansioon</li>
+                <li>Pyydä AI-agenttia prosessoimaan ne</li>
+                <li>Päivitä <code>index.html</code>:n data-osio uusilla sisällöillä</li>
+            </ul>
+            <h4>Muunnosprosessin automatisointi</h4>
+            <p>Tulevaisuudessa muunnos voidaan automatisoida täysin:</p>
+            <ul>
+                <li><strong>CI/CD-putki:</strong> Kun uusi dokumentti lisätään repoon, agentti prosessoi sen automaattisesti</li>
+                <li><strong>Webhook:</strong> SharePoint/Teams-integraatio laukaisee prosessoinnin</li>
+                <li><strong>Slack-botti:</strong> Myynti voi lähettää dokumentin Slackiin ja saada linkin demosivuun</li>
+            </ul>
+            <div class="tip"><strong>Agenttipohjainen kehitys:</strong> Tämä demo itsessään on rakennettu AI-agentilla (Claude Code). Sama agentti joka prosessoi dokumentit voi myös päivittää verkkosivuston – pyydä vain!</div>
+        `,
+        en: `
+            <h4>Adding a new project</h4>
+            <p>The process is the same every time:</p>
+            <ul>
+                <li>Add new documents to <code>data_input/</code></li>
+                <li>Ask the AI agent to process them</li>
+                <li>Update the data section in <code>index.html</code> with new content</li>
+            </ul>
+            <h4>Automating the conversion process</h4>
+            <p>In the future, the conversion can be fully automated:</p>
+            <ul>
+                <li><strong>CI/CD pipeline:</strong> When a new document is added to the repo, the agent processes it automatically</li>
+                <li><strong>Webhook:</strong> SharePoint/Teams integration triggers processing</li>
+                <li><strong>Slack bot:</strong> Sales can send a document to Slack and receive a link to the demo page</li>
+            </ul>
+            <div class="tip"><strong>Agent-based development:</strong> This demo itself was built with an AI agent (Claude Code). The same agent that processes documents can also update the website – just ask!</div>
+        `
+    }
+};
+
+let currentLang = 'fi';
+
+function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(lang.toUpperCase()));
+    });
+    document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang);
+    });
+    render();
+}
+
+function render() {
+    Object.keys(sections).forEach(key => {
+        document.getElementById('section-' + key).innerHTML = sections[key][currentLang];
+    });
+}
+
+render();
+</script>
+
+</body>
+</html>

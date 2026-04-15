@@ -184,6 +184,42 @@
         .card--cert .card__icon { background: #ecfeff; color: #0891b2; }
         .card--cert .card__tag { background: #ecfeff; color: #0e7490; }
 
+        /* Joensuu cards */
+        .card--projref::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+        .card--projref:hover { border-color: rgba(99, 102, 241, 0.25); }
+        .card--projref .card__icon { background: #eef2ff; color: #4f46e5; }
+        .card--projref .card__tag { background: #eef2ff; color: #4338ca; }
+
+        .card--custref::before { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+        .card--custref:hover { border-color: rgba(13, 148, 136, 0.25); }
+        .card--custref .card__icon { background: #f0fdfa; color: #0d9488; }
+        .card--custref .card__tag { background: #f0fdfa; color: #0f766e; }
+
+        .card--billiard::before { background: linear-gradient(90deg, #059669, #34d399); }
+        .card--billiard:hover { border-color: rgba(5, 150, 105, 0.25); }
+        .card--billiard .card__icon { background: #ecfdf5; color: #059669; }
+        .card--billiard .card__tag { background: #ecfdf5; color: #047857; }
+
+        .card--sales2proj::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+        .card--sales2proj:hover { border-color: rgba(217, 119, 6, 0.25); }
+        .card--sales2proj .card__icon { background: #fffbeb; color: #d97706; }
+        .card--sales2proj .card__tag { background: #fffbeb; color: #b45309; }
+
+        .card--meeting::before { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+        .card--meeting:hover { border-color: rgba(2, 132, 199, 0.25); }
+        .card--meeting .card__icon { background: #f0f9ff; color: #0284c7; }
+        .card--meeting .card__tag { background: #f0f9ff; color: #0369a1; }
+
+        .card--events::before { background: linear-gradient(90deg, #e11d48, #fb7185); }
+        .card--events:hover { border-color: rgba(225, 29, 72, 0.25); }
+        .card--events .card__icon { background: #fff1f2; color: #e11d48; }
+        .card--events .card__tag { background: #fff1f2; color: #be123c; }
+
+        .card--invoices::before { background: linear-gradient(90deg, #475569, #94a3b8); }
+        .card--invoices:hover { border-color: rgba(71, 85, 105, 0.25); }
+        .card--invoices .card__icon { background: #f8fafc; color: #475569; }
+        .card--invoices .card__tag { background: #f8fafc; color: #334155; }
+
         .card__icon {
             width: 3.2rem;
             height: 3.2rem;
@@ -413,6 +449,7 @@
             <button class="filter-btn" data-filter="oulu">Oulu</button>
             <button class="filter-btn" data-filter="seinajoki">Seinäjoki</button>
             <button class="filter-btn" data-filter="tampere">Tampere</button>
+            <button class="filter-btn" data-filter="joensuu">Joensuu</button>
         </div>
 
         <div class="cards" id="cards">
@@ -687,6 +724,226 @@
                 </div>
             </a>
 
+            <!-- Joensuu Asiakasprojektireferenssit -->
+            <a class="card card--projref" href="Joensuu_asiakas_projektireferenssit/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                        <path d="M9 14l2 2 4-4"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Myynti &amp; referenssit</div>
+                <h2 data-i18n="projrefTitle">Projektireferenssit</h2>
+                <p data-i18n="projrefDesc">CV-tiedoista kootut asiakasreferenssit &mdash; konsulttien osaamisprofiileista automaattisesti koostetut projektihistoriat ja teknologiakartoitukset.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
+                    <span class="card__tag" data-i18n="tagDrilldown">Porautuvat graafit</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="projrefFeat1">CV-pohjainen referenssikooste</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="projrefFeat2">Porautuvat analytiikkagraafit</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="projrefFeat3">Teknologia- ja osaamiskartoitus</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Joensuu Asiakasreferenssit -->
+            <a class="card card--custref" href="Joensuu_asiakasreferenssit/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Asiakkuudet</div>
+                <h2 data-i18n="custrefTitle">Asiakasreferenssit</h2>
+                <p data-i18n="custrefDesc">Interaktiivinen referenssihallinta &mdash; suodata asiakkaita kategorioittain, poraudu graafeihin ja tarkastele kilpailutusmateriaaleja.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagFilters">Filtterit</span>
+                    <span class="card__tag" data-i18n="tagDrilldown">Porautuvat graafit</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="custrefFeat1">Monipuoliset kategoriafiltterit</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="custrefFeat2">Porautuvat graafit ja analytiikka</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="custrefFeat3">Kilpailutusmateriaalin tuki</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Joensuu Biljardipöytä -->
+            <a class="card card--billiard" href="Joensuu_biljardip%C3%B6yt%C3%A4/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <line x1="12" y1="2" x2="12" y2="5"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Yhteisö</div>
+                <h2 data-i18n="billiardTitle">Biljardipöytä</h2>
+                <p data-i18n="billiardDesc">Toimiston biljardipöydän hallinta &mdash; varauskalenteri, turnausjärjestelmä, pelaajatilastot ja humoristiset haastekutsut.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagCalendar">Kalenteri</span>
+                    <span class="card__tag" data-i18n="tagTournaments">Turnaukset</span>
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="billiardFeat1">Varauskalenteri ja kuukausinäkymä</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="billiardFeat2">Turnausjärjestelmä ja paritus</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="billiardFeat3">Porautuvat pelaajatilastot</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Joensuu Myynnistä projektiin -->
+            <a class="card card--sales2proj" href="Joensuu_myynnist%C3%A4_projektiin/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M12 18v-6"/>
+                        <path d="m9 15 3-3 3 3"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Myyntiprosessi</div>
+                <h2 data-i18n="sales2projTitle">Myynnistä projektiin</h2>
+                <p data-i18n="sales2projDesc">Myyntimateriaalista tekniseen toteutukseen &mdash; myynnin ja asiantuntijoiden yhteistyöalusta dokumentaatioineen ja esimerkkeineen.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagDocs">Dokumentaatio</span>
+                    <span class="card__tag" data-i18n="tagWorkflow">Työnkulku</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="sales2projFeat1">Myyntimateriaalin muunnos</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="sales2projFeat2">Sidosryhmänäkymät ja dokumentaatio</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="sales2projFeat3">Yhteistyöesimerkit ja mallit</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Joensuu Neukkarit -->
+            <a class="card card--meeting" href="Joensuu_neukkarit/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <path d="M8 14h.01"/>
+                        <path d="M12 14h.01"/>
+                        <path d="M16 14h.01"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Toimisto</div>
+                <h2 data-i18n="meetingTitle">Neukkarihallinta</h2>
+                <p data-i18n="meetingDesc">Neukkareiden reaaliaikainen varaustilanne &mdash; aikajananäkymästä näet kuka on varannut minkäkin tilan ja milloin se vapautuu.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagTimeline">Aikajana</span>
+                    <span class="card__tag" data-i18n="tagBooking">Varaukset</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="meetingFeat1">Aikajananäkymä 5 neukkarista</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="meetingFeat2">Reaaliaikainen varaustilanne</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="meetingFeat3">Helppo varaus ja henkilöfiltterit</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Joensuu Site tapahtumat -->
+            <a class="card card--events" href="Joensuu_site_tapahtumat/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                        <path d="M12 16l-2-2h4l-2 2z"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Tapahtumat</div>
+                <h2 data-i18n="eventsTitle">Site-tapahtumat</h2>
+                <p data-i18n="eventsDesc">Toimiston tapahtumakalenteri &mdash; klubit, site monthly, vierailijat ja muut tilaisuudet yhdessä paikassa filtteröitynä ja kalenteriin lisättävinä.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagCalendar">Kalenteri</span>
+                    <span class="card__tag" data-i18n="tagFilters">Filtterit</span>
+                    <span class="card__tag">Slack</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="eventsFeat1">Kalenterinäkymä tapahtumista</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="eventsFeat2">Tapahtumatyyppien filtteröinti</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="eventsFeat3">Excel-export ja Slack-integraatio</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Joensuu Toimiston laskut -->
+            <a class="card card--invoices" href="Joensuu_toimiston_laskut/index.html" data-city="joensuu">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="8" y1="13" x2="16" y2="13"/>
+                        <line x1="8" y1="17" x2="16" y2="17"/>
+                        <line x1="10" y1="9" x2="10" y2="9"/>
+                    </svg>
+                </div>
+                <div class="card__location">Joensuu &bull; Taloushallinto</div>
+                <h2 data-i18n="invoicesTitle">Laskujen tarkastus</h2>
+                <p data-i18n="invoicesDesc">Laskujen älykäs tarkastusjärjestelmä &mdash; vertaa toimittajahistoriaan, tunnista poikkeamat ja saa hyväksymissuositukset automaattisesti.</p>
+                <div class="card__tags">
+                    <span class="card__tag">PDF</span>
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
+                    <span class="card__tag" data-i18n="tagAutomation">Automaatio</span>
+                </div>
+                <div class="card__features">
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="invoicesFeat1">Toimittajahistorian vertailu</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="invoicesFeat2">Poikkeamien automaattinen tunnistus</span></div>
+                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="invoicesFeat3">Hyväksymissuositukset ja analytiikka</span></div>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label">
+                        <span data-i18n="openApp">Avaa sovellus</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
         </div>
 
         <footer>
@@ -708,6 +965,14 @@
             tagCalendar: 'Kalenteri',
             tagSvgCharts: 'SVG-kaaviot',
             tagCerts: '100+ serttiä',
+            tagDrilldown: 'Porautuvat graafit',
+            tagFilters: 'Filtterit',
+            tagTournaments: 'Turnaukset',
+            tagDocs: 'Dokumentaatio',
+            tagWorkflow: 'Työnkulku',
+            tagTimeline: 'Aikajana',
+            tagBooking: 'Varaukset',
+            tagAutomation: 'Automaatio',
             // Helsinki Food
             foodDesc: 'Kymmenien lähialueen ravintoloiden sijainnit, viikon lounaslistat ja hinnat yhdessä paikassa \u2014 ei tarvitse selata jokaista ravintolasivua erikseen.',
             foodFeat1: 'Interaktiivinen karttanäkymä',
@@ -759,6 +1024,48 @@
             certFeat1: 'Sertifikaattikatalogi ja haku',
             certFeat2: 'Tavoitteiden hallinta ja seuranta',
             certFeat3: 'Henkilökohtaiset oppimispolut',
+            // Projektireferenssit
+            projrefTitle: 'Projektireferenssit',
+            projrefDesc: 'CV-tiedoista kootut asiakasreferenssit \u2014 konsulttien osaamisprofiileista automaattisesti koostetut projektihistoriat ja teknologiakartoitukset.',
+            projrefFeat1: 'CV-pohjainen referenssikooste',
+            projrefFeat2: 'Porautuvat analytiikkagraafit',
+            projrefFeat3: 'Teknologia- ja osaamiskartoitus',
+            // Asiakasreferenssit
+            custrefTitle: 'Asiakasreferenssit',
+            custrefDesc: 'Interaktiivinen referenssihallinta \u2014 suodata asiakkaita kategorioittain, poraudu graafeihin ja tarkastele kilpailutusmateriaaleja.',
+            custrefFeat1: 'Monipuoliset kategoriafiltterit',
+            custrefFeat2: 'Porautuvat graafit ja analytiikka',
+            custrefFeat3: 'Kilpailutusmateriaalin tuki',
+            // Biljardipöytä
+            billiardTitle: 'Biljardipöytä',
+            billiardDesc: 'Toimiston biljardipöydän hallinta \u2014 varauskalenteri, turnausjärjestelmä, pelaajatilastot ja humoristiset haastekutsut.',
+            billiardFeat1: 'Varauskalenteri ja kuukausinäkymä',
+            billiardFeat2: 'Turnausjärjestelmä ja paritus',
+            billiardFeat3: 'Porautuvat pelaajatilastot',
+            // Myynnistä projektiin
+            sales2projTitle: 'Myynnistä projektiin',
+            sales2projDesc: 'Myyntimateriaalista tekniseen toteutukseen \u2014 myynnin ja asiantuntijoiden yhteistyöalusta dokumentaatioineen ja esimerkkeineen.',
+            sales2projFeat1: 'Myyntimateriaalin muunnos',
+            sales2projFeat2: 'Sidosryhmänäkymät ja dokumentaatio',
+            sales2projFeat3: 'Yhteistyöesimerkit ja mallit',
+            // Neukkarihallinta
+            meetingTitle: 'Neukkarihallinta',
+            meetingDesc: 'Neukkareiden reaaliaikainen varaustilanne \u2014 aikajananäkymästä näet kuka on varannut minkäkin tilan ja milloin se vapautuu.',
+            meetingFeat1: 'Aikajananäkymä 5 neukkarista',
+            meetingFeat2: 'Reaaliaikainen varaustilanne',
+            meetingFeat3: 'Helppo varaus ja henkilöfiltterit',
+            // Site-tapahtumat
+            eventsTitle: 'Site-tapahtumat',
+            eventsDesc: 'Toimiston tapahtumakalenteri \u2014 klubit, site monthly, vierailijat ja muut tilaisuudet yhdessä paikassa filtteröitynä ja kalenteriin lisättävinä.',
+            eventsFeat1: 'Kalenterinäkymä tapahtumista',
+            eventsFeat2: 'Tapahtumatyyppien filtteröinti',
+            eventsFeat3: 'Excel-export ja Slack-integraatio',
+            // Laskujen tarkastus
+            invoicesTitle: 'Laskujen tarkastus',
+            invoicesDesc: 'Laskujen älykäs tarkastusjärjestelmä \u2014 vertaa toimittajahistoriaan, tunnista poikkeamat ja saa hyväksymissuositukset automaattisesti.',
+            invoicesFeat1: 'Toimittajahistorian vertailu',
+            invoicesFeat2: 'Poikkeamien automaattinen tunnistus',
+            invoicesFeat3: 'Hyväksymissuositukset ja analytiikka',
         },
         en: {
             badge: 'AI-Assisted Prototypes',
@@ -772,6 +1079,14 @@
             tagCalendar: 'Calendar',
             tagSvgCharts: 'SVG charts',
             tagCerts: '100+ certs',
+            tagDrilldown: 'Drill-down charts',
+            tagFilters: 'Filters',
+            tagTournaments: 'Tournaments',
+            tagDocs: 'Documentation',
+            tagWorkflow: 'Workflow',
+            tagTimeline: 'Timeline',
+            tagBooking: 'Bookings',
+            tagAutomation: 'Automation',
             // Helsinki Food
             foodDesc: 'Locations, weekly lunch menus and prices of dozens of nearby restaurants in one place \u2014 no need to browse each restaurant site separately.',
             foodFeat1: 'Interactive map view',
@@ -823,6 +1138,48 @@
             certFeat1: 'Certification catalog & search',
             certFeat2: 'Goal management & tracking',
             certFeat3: 'Personal learning paths',
+            // Project References
+            projrefTitle: 'Project References',
+            projrefDesc: 'Customer references compiled from CV data \u2014 automatically aggregated project histories and technology maps from consultant expertise profiles.',
+            projrefFeat1: 'CV-based reference compilation',
+            projrefFeat2: 'Drill-down analytics charts',
+            projrefFeat3: 'Technology & competency mapping',
+            // Customer References
+            custrefTitle: 'Customer References',
+            custrefDesc: 'Interactive reference management \u2014 filter customers by category, drill into charts and explore tender materials.',
+            custrefFeat1: 'Multi-category filters',
+            custrefFeat2: 'Drill-down charts & analytics',
+            custrefFeat3: 'Tender material support',
+            // Billiard Table
+            billiardTitle: 'Billiard Table',
+            billiardDesc: 'Office billiard table management \u2014 booking calendar, tournament system, player stats and humorous challenge invitations.',
+            billiardFeat1: 'Booking calendar & monthly view',
+            billiardFeat2: 'Tournament system & matchmaking',
+            billiardFeat3: 'Drill-down player statistics',
+            // Sales to Project
+            sales2projTitle: 'Sales to Project',
+            sales2projDesc: 'From sales material to technical delivery \u2014 a collaboration platform for sales and experts with documentation and examples.',
+            sales2projFeat1: 'Sales material conversion',
+            sales2projFeat2: 'Stakeholder views & documentation',
+            sales2projFeat3: 'Collaboration examples & templates',
+            // Meeting Room Management
+            meetingTitle: 'Meeting Rooms',
+            meetingDesc: 'Real-time meeting room availability \u2014 see who booked which room and when it becomes free from the timeline view.',
+            meetingFeat1: 'Timeline view of 5 rooms',
+            meetingFeat2: 'Real-time availability status',
+            meetingFeat3: 'Easy booking & person filters',
+            // Site Events
+            eventsTitle: 'Site Events',
+            eventsDesc: 'Office event calendar \u2014 clubs, site monthly, visitors and other gatherings in one place with filters and calendar integration.',
+            eventsFeat1: 'Calendar view of events',
+            eventsFeat2: 'Event type filtering',
+            eventsFeat3: 'Excel export & Slack integration',
+            // Invoice Review
+            invoicesTitle: 'Invoice Review',
+            invoicesDesc: 'Smart invoice review system \u2014 compare supplier history, detect anomalies and get automatic approval recommendations.',
+            invoicesFeat1: 'Supplier history comparison',
+            invoicesFeat2: 'Automatic anomaly detection',
+            invoicesFeat3: 'Approval recommendations & analytics',
         }
     };
 

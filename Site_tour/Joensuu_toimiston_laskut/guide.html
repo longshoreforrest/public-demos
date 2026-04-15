@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Laskujen tarkastus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-light: #eff6ff;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">📄</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Laskujen tarkastus — Joensuu</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- FINNISH -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Laskujen tarkastus on Joensuun toimiston älykäs laskujenhallintajärjestelmä. Sovellus vertaa laskuja toimittajahistoriaan, tunnistaa poikkeamat ja antaa hyväksymissuositukset.</p>
+
+      <h2>Yhteenveto (Dashboard)</h2>
+      <div class="card">
+        <p>Oletusnäkymä näyttää kokonaiskuvan laskutilanteesta:</p>
+        <ul>
+          <li><strong>Mittarit:</strong> Laskujen kokonaismäärä, summa, automaattisesti hyväksyttävien osuus, tarkistettavat ja huomioitavat.</li>
+          <li><strong>Kuukausitrendit:</strong> Kaavio laskujen kuukausittaisesta kehityksestä.</li>
+          <li><strong>Tuoreimmat laskut:</strong> Viimeisimmät laskut toimenpidepainikkeilla (hyväksy, hylkää, tarkista).</li>
+          <li><strong>Huomiot:</strong> Viimeisimmät järjestelmän havaitsemat poikkeamat.</li>
+        </ul>
+      </div>
+
+      <h2>Kaikki laskut</h2>
+      <div class="card">
+        <h3>Selaaminen ja suodatus</h3>
+        <ul>
+          <li><strong>Haku:</strong> Etsi laskuja sisällön tai toimittajan nimellä.</li>
+          <li><strong>Status:</strong> Suodata tilalla (odottaa, hyväksytty, hylätty, tarkistettava).</li>
+          <li><strong>Toimittaja:</strong> Suodata tietyn toimittajan laskuihin.</li>
+          <li><strong>Kategoria:</strong> Suodata laskukategorian mukaan.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Laskun tiedot</h3>
+        <p>Klikkaa laskuriviä avataksesi yksityiskohtaisen näkymän. Näet laskun rivit, vertailun edelliseen laskuun, mahdolliset hälytykset ja toimenpidepainikkeet.</p>
+      </div>
+
+      <h2>Analytiikka</h2>
+      <div class="card">
+        <p>Porautuvat kaaviot laskudatasta:</p>
+        <ul>
+          <li><strong>Kustannukset kategorioittain:</strong> Vaakapalkkikaavio menojakaumasta.</li>
+          <li><strong>Kustannukset toimittajittain:</strong> Toimittajakohtainen erittely.</li>
+          <li><strong>Kuukausitrendit:</strong> Pinottu palkkikaavio kuukausittaisesta kehityksestä.</li>
+        </ul>
+        <p>Voit rajata tietoja päivämäärä- ja summasuodattimilla. Klikkaa kaavion elementtiä porautuaksesi tarkempiin tietoihin.</p>
+      </div>
+
+      <h2>Toimittajat</h2>
+      <div class="card">
+        <p>Toimittajakortit näyttävät kunkin toimittajan yhteenvedon: laskujen määrä, keskimääräinen summa ja hintatrendi. Klikkaa korttia nähdäksesi toimittajan laskuhistorian.</p>
+      </div>
+
+      <h2>Huomioitavat</h2>
+      <div class="card">
+        <p>Tarkistusta vaativat laskut kootaan tähän näkymään. Sovellus tunnistaa automaattisesti:</p>
+        <ul>
+          <li>Hintojen muutokset edelliseen laskuun verrattuna</li>
+          <li>Mahdolliset tuplalaskut (sama summa samalta toimittajalta)</li>
+          <li>Puuttuvat viitetiedot</li>
+          <li>Epäselvät kuvaukset</li>
+        </ul>
+      </div>
+
+      <h2>Kielivalinta</h2>
+      <p>Vaihda kieltä oikean yläkulman FI/EN-painikkeilla. Kielivalinta tallentuu automaattisesti.</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">Invoice Review is a smart invoice management system for the Joensuu office. The app compares invoices against supplier history, detects anomalies and provides approval recommendations.</p>
+
+      <h2>Dashboard</h2>
+      <div class="card">
+        <p>The default view shows an overview of the invoice situation:</p>
+        <ul>
+          <li><strong>Metrics:</strong> Total invoices, total amount, auto-approve recommendations, review needed and flagged items.</li>
+          <li><strong>Monthly trends:</strong> Chart showing invoice trends over time.</li>
+          <li><strong>Latest invoices:</strong> Most recent invoices with action buttons (approve, reject, review).</li>
+          <li><strong>Flags:</strong> Latest anomalies detected by the system.</li>
+        </ul>
+      </div>
+
+      <h2>All Invoices</h2>
+      <div class="card">
+        <h3>Browsing and Filtering</h3>
+        <ul>
+          <li><strong>Search:</strong> Find invoices by content or supplier name.</li>
+          <li><strong>Status:</strong> Filter by status (pending, approved, rejected, review needed).</li>
+          <li><strong>Supplier:</strong> Filter to a specific supplier's invoices.</li>
+          <li><strong>Category:</strong> Filter by invoice category.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Invoice Details</h3>
+        <p>Click an invoice row to open a detailed view. You'll see line items, comparison with the previous invoice, alerts and action buttons.</p>
+      </div>
+
+      <h2>Analytics</h2>
+      <div class="card">
+        <p>Drill-down charts for invoice data:</p>
+        <ul>
+          <li><strong>Costs by category:</strong> Horizontal bar chart of expense distribution.</li>
+          <li><strong>Costs by supplier:</strong> Supplier-level breakdown.</li>
+          <li><strong>Monthly trends:</strong> Stacked bar chart of monthly development.</li>
+        </ul>
+        <p>You can narrow data with date and amount filters. Click a chart element to drill down into more detailed data.</p>
+      </div>
+
+      <h2>Suppliers</h2>
+      <div class="card">
+        <p>Supplier cards show a summary for each supplier: invoice count, average amount and price trend. Click a card to see the supplier's invoice history.</p>
+      </div>
+
+      <h2>Flagged Items</h2>
+      <div class="card">
+        <p>Invoices requiring review are collected in this view. The app automatically detects:</p>
+        <ul>
+          <li>Price changes compared to the previous invoice</li>
+          <li>Possible duplicate invoices (same amount from the same supplier)</li>
+          <li>Missing reference information</li>
+          <li>Unclear descriptions</li>
+        </ul>
+      </div>
+
+      <h2>Language</h2>
+      <p>Switch language using the FI/EN buttons in the top-right corner. Your selection is saved automatically.</p>
+    </div>
+  </div>
+
+  <div class="footer">Siili Solutions — Laskujen tarkastus Joensuu</div>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

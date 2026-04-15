@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Biljardipöytä</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎱</text></svg>">
+  <style>
+    :root {
+      --primary: #2E7D32;
+      --primary-dark: #1B5E20;
+      --primary-light: #e8f5e9;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #388E3C 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">🎱</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Siili Pool — Biljardipöytä</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- FINNISH -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Siili Pool on Joensuun toimiston biljardipöydän hallintasovellus. Varaa vuoroja, seuraa pelaajatilastoja, osallistu turnauksiin ja pidä hauskaa!</p>
+
+      <h2>Varaukset</h2>
+      <div class="card">
+        <h3>Kalenterinäkymä</h3>
+        <p>Päänäkymässä näet biljardipöydän varaukset viikko- tai kuukausinäkymässä. Vaihda näkymää yläpalkin painikkeilla.</p>
+        <ul>
+          <li><strong>Viikkonäkymä:</strong> Näet päivittäiset varaukset aikaruudukossa.</li>
+          <li><strong>Kuukausinäkymä:</strong> Yleiskatsaus koko kuukauden varauksista.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Varauksen tekeminen</h3>
+        <p>Klikkaa <code>Varaa vuoro</code> -painiketta avataksesi varauslomakkeen. Valitse pelaajat, päivämäärä ja aikaväli. Vahvista varaus ja saat ilmoituksen onnistumisesta.</p>
+      </div>
+      <div class="card">
+        <h3>Suodattaminen</h3>
+        <p>Voit suodattaa varauksia pelaajan mukaan tai näyttää vain tulevat tai jo pelatut ottelut.</p>
+      </div>
+
+      <h2>Pelaajat</h2>
+      <div class="card">
+        <h3>Tulostaulu</h3>
+        <p>Tulostaulu näyttää pelaajat paremmuusjärjestyksessä voittojen, häviöiden ja putkien mukaan. Jokaisella pelaajalla on oma motto.</p>
+      </div>
+      <div class="card">
+        <h3>Pelaajaruudukko</h3>
+        <p>Kaikki pelaajat -näkymässä näet jokaisen pelaajan kortin tilastoineen.</p>
+      </div>
+
+      <h2>Turnaukset</h2>
+      <div class="card">
+        <p>Turnausnäkymässä voit selata meneillään olevia ja tulevia turnauksia. Näet turnauskaavion (bracket), ottelutulokset ja voittajat. Sovellus osaa myös automaattisesti paritella pelaajia otteluihin.</p>
+      </div>
+
+      <h2>Analytiikka</h2>
+      <div class="card">
+        <p>Analytiikkanäkymässä voit tarkastella pelaajien suoritustilastoja porautuvilla kaavioilla. Valitse pelaaja pudotusvalikosta nähdäksesi yksittäisen pelaajan otteluhistorian ja trendit.</p>
+      </div>
+
+      <h2>Slack-integraatio</h2>
+      <div class="card">
+        <p>Simuloitu Slack-näkymä näyttää miltä biljardipöydän varausilmoitukset ja haastekutsut näyttäisivät Slack-kanavalla. Voit lähettää viestejä ja saada bot-vastauksen.</p>
+      </div>
+
+      <h2>Kielivalinta</h2>
+      <p>Vaihda kieltä oikean yläkulman FI/EN-painikkeilla. Kielivalinta tallentuu automaattisesti.</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">Siili Pool is a management app for the billiard table at the Joensuu office. Book time slots, track player stats, join tournaments and have fun!</p>
+
+      <h2>Reservations</h2>
+      <div class="card">
+        <h3>Calendar View</h3>
+        <p>The main view shows pool table reservations in a weekly or monthly calendar. Switch between views using the top bar buttons.</p>
+        <ul>
+          <li><strong>Week view:</strong> See daily reservations on a time grid.</li>
+          <li><strong>Month view:</strong> Overview of all reservations for the entire month.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Making a Reservation</h3>
+        <p>Click the <code>Book a slot</code> button to open the booking form. Select players, date and time slot. Confirm the reservation and you'll receive a confirmation notification.</p>
+      </div>
+      <div class="card">
+        <h3>Filtering</h3>
+        <p>You can filter reservations by player or show only upcoming or already played matches.</p>
+      </div>
+
+      <h2>Players</h2>
+      <div class="card">
+        <h3>Leaderboard</h3>
+        <p>The leaderboard ranks players by wins, losses and streaks. Each player has their own motto.</p>
+      </div>
+      <div class="card">
+        <h3>Player Grid</h3>
+        <p>The all players view shows every player's card with their statistics.</p>
+      </div>
+
+      <h2>Tournaments</h2>
+      <div class="card">
+        <p>The tournament view lets you browse ongoing and upcoming tournaments. You can see the bracket, match results and winners. The app can also automatically pair players for matches.</p>
+      </div>
+
+      <h2>Analytics</h2>
+      <div class="card">
+        <p>The analytics view lets you explore player performance stats with drill-down charts. Select a player from the dropdown to see their individual match history and trends.</p>
+      </div>
+
+      <h2>Slack Integration</h2>
+      <div class="card">
+        <p>The simulated Slack view shows how pool table booking notifications and challenge invitations would look on a Slack channel. You can send messages and receive bot replies.</p>
+      </div>
+
+      <h2>Language</h2>
+      <p>Switch language using the FI/EN buttons in the top-right corner. Your selection is saved automatically.</p>
+    </div>
+  </div>
+
+  <div class="footer">Siili Solutions — Siili Pool</div>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

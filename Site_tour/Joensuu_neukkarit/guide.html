@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Neukkarihallinta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+  <style>
+    :root {
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --primary-light: #e0f2f1;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">🏢</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Neukkarihallinta — Joensuu</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- FINNISH -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Neukkarihallinta on Joensuun toimiston kokoushuoneiden varausjärjestelmä. Näe reaaliaikaisesti kuka on varannut minkäkin tilan ja milloin se vapautuu.</p>
+
+      <h2>Huoneet-näkymä</h2>
+      <div class="card">
+        <h3>Huonekortit</h3>
+        <p>Näet kaikki 5 kokoushuonetta kortteina. Jokainen kortti näyttää huoneen nimen, kapasiteetin, kerroksen ja tilan statuksen.</p>
+        <ul>
+          <li><code>Vapaa</code> — Huone on vapaana ja varattavissa.</li>
+          <li><code>Varattu</code> — Huoneessa on meneillään kokous.</li>
+          <li><code>Vapautuu pian</code> — Nykyinen varaus päättyy lähiaikoina.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Varaaminen</h3>
+        <p>Klikkaa huonekorttia tai <code>Varaa</code>-painiketta avataksesi varauslomakkeen. Täytä kokouksen aihe, järjestäjä sekä alku- ja loppuaika. Vahvista varaus ja saat ilmoituksen.</p>
+      </div>
+
+      <h2>Aikajana-näkymä</h2>
+      <div class="card">
+        <p>Aikajana on oletusnäkymä ja näyttää koko päivän varaukset kaikista huoneista rinnakkain aikaruudukossa. Yhdellä silmäyksellä näet milloin mikäkin huone on varattu.</p>
+        <ul>
+          <li><strong>Päivän vaihto:</strong> Käytä nuolipainikkeita tai <code>Tänään</code>-painiketta siirtyäksesi päivien välillä.</li>
+          <li><strong>Varauksen tiedot:</strong> Klikkaa varausta aikajanalla nähdäksesi tiedot tai poistaaksesi varauksen.</li>
+        </ul>
+      </div>
+
+      <h2>Ihmiset-näkymä</h2>
+      <div class="card">
+        <p>Ihmiset-välilehti näyttää toimiston henkilöstön läsnäolotiedot:</p>
+        <ul>
+          <li><strong>Tilastot:</strong> Montako henkilöä on toimistolla, etänä tai poissa.</li>
+          <li><strong>Suodatus:</strong> Suodata henkilöitä läsnäolostatuksen mukaan (toimistolla, etänä, poissa).</li>
+          <li><strong>Haku:</strong> Etsi henkilöitä nimellä.</li>
+        </ul>
+      </div>
+
+      <h2>Kielivalinta</h2>
+      <p>Vaihda kieltä oikean yläkulman FI/EN-painikkeilla. Kielivalinta tallentuu automaattisesti.</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">Meeting Room Management is a booking system for the Joensuu office meeting rooms. See in real-time who has booked which room and when it becomes free.</p>
+
+      <h2>Rooms View</h2>
+      <div class="card">
+        <h3>Room Cards</h3>
+        <p>You can see all 5 meeting rooms as cards. Each card shows the room name, capacity, floor and current status.</p>
+        <ul>
+          <li><code>Free</code> — The room is available for booking.</li>
+          <li><code>Busy</code> — A meeting is currently in progress.</li>
+          <li><code>Free soon</code> — The current booking ends shortly.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Booking</h3>
+        <p>Click a room card or the <code>Book</code> button to open the booking form. Fill in the meeting subject, organizer, start and end time. Confirm and you'll receive a notification.</p>
+      </div>
+
+      <h2>Timeline View</h2>
+      <div class="card">
+        <p>The timeline is the default view and shows all rooms' bookings side by side on a time grid for the entire day. At a glance, you can see when each room is booked.</p>
+        <ul>
+          <li><strong>Day navigation:</strong> Use arrow buttons or the <code>Today</code> button to navigate between days.</li>
+          <li><strong>Booking details:</strong> Click a booking on the timeline to view details or delete the reservation.</li>
+        </ul>
+      </div>
+
+      <h2>People View</h2>
+      <div class="card">
+        <p>The People tab shows office staff presence information:</p>
+        <ul>
+          <li><strong>Statistics:</strong> How many people are in the office, remote or away.</li>
+          <li><strong>Filtering:</strong> Filter people by presence status (in office, remote, away).</li>
+          <li><strong>Search:</strong> Search people by name.</li>
+        </ul>
+      </div>
+
+      <h2>Language</h2>
+      <p>Switch language using the FI/EN buttons in the top-right corner. Your selection is saved automatically.</p>
+    </div>
+  </div>
+
+  <div class="footer">Siili Solutions — Neukkarihallinta Joensuu</div>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

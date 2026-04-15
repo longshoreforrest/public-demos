@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Joensuu Site Tapahtumat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
+  <style>
+    :root {
+      --primary: #0891b2;
+      --primary-dark: #0e7490;
+      --primary-light: #e0f7fa;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">📅</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Joensuu Site Tapahtumat</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- FINNISH -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Joensuu Site Tapahtumat on interaktiivinen sovellus Siili Solutionsin Joensuun toimiston tapahtumien hallintaan ja selaamiseen.</p>
+
+      <h2>Tapahtumat-näkymä</h2>
+      <div class="card">
+        <h3>Selaaminen</h3>
+        <p>Päänäkymässä näet kaikki tulevat tapahtumat aikajärjestyksessä. Jokainen tapahtuma näyttää päivämäärän, kellonajan, paikan ja kuvauksen.</p>
+      </div>
+      <div class="card">
+        <h3>Suodattaminen</h3>
+        <ul>
+          <li><strong>Kategoria:</strong> Klikkaa kategoriapainikkeita valitaksesi yhden tai useamman kategorian. Voit valita useita samanaikaisesti.</li>
+          <li><strong>Päivämäärä:</strong> Aseta aikaväli "Alkaen"- ja "Saakka"-kentillä.</li>
+          <li><strong>Haku:</strong> Kirjoita hakukenttään etsiäksesi tapahtumia nimellä, kuvauksella tai paikalla.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Kalenteriin lisääminen</h3>
+        <p>Klikkaa minkä tahansa tapahtuman kohdalla <code>Lisää kalenteriin</code> -painiketta ladataksesi .ics-tiedoston. Tiedoston voi avata Google Calendarissa, Outlookissa tai Apple Calendarissa.</p>
+      </div>
+
+      <h2>Kalenterinäkymä</h2>
+      <p>Kuukausinäkymässä näet tapahtumat visuaalisesti kalenterissa. Klikkaa tapahtumaa nähdäksesi lisätiedot. Vaihda kuukautta nuolipainikkeilla.</p>
+
+      <h2>Slack-integraatio</h2>
+      <div class="card">
+        <p>Simuloitu Slack-näkymä näyttää miltä tapahtumailmoitukset näyttäisivät Slack-kanavilla. Voit:</p>
+        <ul>
+          <li>Selata eri kanavia (tapahtumat, AI-klubi, liikunta, lautapelit)</li>
+          <li>Lähettää viestejä ja saada bot-vastauksen</li>
+          <li>Simuloida ilmoituspopupin "Simuloi ilmoitus" -painikkeella</li>
+          <li>Säätää ilmoitusasetuksia</li>
+        </ul>
+      </div>
+
+      <h2>Vienti</h2>
+      <div class="card">
+        <h3>Excel (.csv)</h3>
+        <p>Lataa kaikki tapahtumat CSV-tiedostona, jonka voi avata Excelissä. Tiedosto sisältää kaikki tiedot puolipisteellä erotettuna ja tukee skandinaavisia merkkejä.</p>
+      </div>
+      <div class="card">
+        <h3>Kalenteri (.ics)</h3>
+        <p>Lataa kaikki tapahtumat yhtenä .ics-kalenteritiedostona. Voit tuoda sen mihin tahansa kalenterisovellukseen.</p>
+        <p>Molemmissa vientivaihtoehdoissa voit valita viedäänkö kaikki vai vain suodatetut tapahtumat.</p>
+      </div>
+
+      <h2>Kielivalinta</h2>
+      <p>Vaihda kieltä oikeasta yläkulmasta FI/EN-painikkeilla. Kielivalinta tallentuu automaattisesti.</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">Joensuu Site Events is an interactive application for browsing and managing events at Siili Solutions' Joensuu office.</p>
+
+      <h2>Events View</h2>
+      <div class="card">
+        <h3>Browsing</h3>
+        <p>The main view shows all upcoming events in chronological order. Each event displays the date, time, location and description.</p>
+      </div>
+      <div class="card">
+        <h3>Filtering</h3>
+        <ul>
+          <li><strong>Category:</strong> Click category chips to select one or more categories. Multiple selections are supported.</li>
+          <li><strong>Date range:</strong> Set a date range using the "From" and "To" fields.</li>
+          <li><strong>Search:</strong> Type in the search field to find events by name, description or location.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Adding to Calendar</h3>
+        <p>Click the <code>Add to calendar</code> button on any event to download an .ics file. This file can be opened in Google Calendar, Outlook, or Apple Calendar.</p>
+      </div>
+
+      <h2>Calendar View</h2>
+      <p>The monthly view shows events visually on a calendar grid. Click any event to see details. Navigate between months using the arrow buttons.</p>
+
+      <h2>Slack Integration</h2>
+      <div class="card">
+        <p>The simulated Slack view shows how event notifications would look on Slack channels. You can:</p>
+        <ul>
+          <li>Browse different channels (events, AI club, sports, board games)</li>
+          <li>Send messages and receive bot replies</li>
+          <li>Simulate a notification popup with the "Simulate notification" button</li>
+          <li>Configure notification settings</li>
+        </ul>
+      </div>
+
+      <h2>Export</h2>
+      <div class="card">
+        <h3>Excel (.csv)</h3>
+        <p>Download all events as a CSV file that can be opened in Excel. The file uses semicolons as separators and supports Scandinavian characters.</p>
+      </div>
+      <div class="card">
+        <h3>Calendar (.ics)</h3>
+        <p>Download all events as a single .ics calendar file. You can import this into any calendar application.</p>
+        <p>Both export options allow you to export all events or only the currently filtered ones.</p>
+      </div>
+
+      <h2>Language</h2>
+      <p>Switch language using the FI/EN buttons in the top-right corner. Your selection is saved automatically.</p>
+    </div>
+  </div>
+
+  <div class="footer">Siili Solutions — Joensuu Site Tapahtumat</div>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+
+  <!-- Analytics -->
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

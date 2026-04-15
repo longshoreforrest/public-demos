@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joensuu Site Tapahtumat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;flex-shrink:0}
+    .lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+    .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+    .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+    .lang-flag{font-size:0.85rem;line-height:1}
+  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <span class="header-logo">📅</span>
+        <div>
+          <div class="header-title" data-i18n="appTitle">Joensuu Site Tapahtumat</div>
+          <div class="header-subtitle" data-i18n="appSubtitle">Kaikki Joensuun toimiston tapahtumat yhdessä paikassa</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="lang-switcher" id="langSwitcher">
+          <button class="lang-btn active" data-lang="fi" onclick="switchToLang('fi')"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+          <button class="lang-btn" data-lang="en" onclick="switchToLang('en')"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
+        <a class="btn-guide" href="guide.html" data-i18n="navGuide">?</a>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nav-tab" data-view="events" data-i18n="navEvents">Tapahtumat</button>
+      <button class="nav-tab active" data-view="calendar" data-i18n="navCalendar">Kalenteri</button>
+      <button class="nav-tab" data-view="slack" data-i18n="navSlack">Slack</button>
+      <button class="nav-tab" data-view="export" data-i18n="navExport">Vienti</button>
+      <button class="nav-tab" data-view="analytics" data-i18n="navAnalytics">Analytiikka</button>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- 1. Events View -->
+    <div class="view" id="view-events">
+      <div class="view-header">
+        <h2 data-i18n="eventsTitle">Tapahtumat</h2>
+        <p data-i18n="eventsSubtitle">Selaa ja suodata Joensuun toimiston tapahtumia</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label data-i18n="filterCategory">Kategoria</label>
+          <div class="filter-chips" id="categoryFilters"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-group filter-group-small">
+            <label data-i18n="filterDateFrom">Alkaen</label>
+            <input type="date" id="filterDateFrom" class="filter-input">
+          </div>
+          <div class="filter-group filter-group-small">
+            <label data-i18n="filterDateTo">Saakka</label>
+            <input type="date" id="filterDateTo" class="filter-input">
+          </div>
+          <div class="filter-group filter-group-small">
+            <label data-i18n="filterSearch">Haku</label>
+            <input type="text" id="filterSearch" class="filter-input" data-i18n-placeholder="filterSearchPlaceholder">
+          </div>
+        </div>
+      </div>
+
+      <!-- Event Stats -->
+      <div class="event-stats" id="eventStats"></div>
+
+      <!-- Event List -->
+      <div class="event-list" id="eventList"></div>
+    </div>
+
+    <!-- 2. Calendar View -->
+    <div class="view active" id="view-calendar">
+      <div class="view-header">
+        <h2 data-i18n="calendarTitle">Kalenteri</h2>
+        <p data-i18n="calendarSubtitle">Kuukausinäkymä tapahtumista</p>
+      </div>
+
+      <!-- Calendar Filters -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label data-i18n="filterCategory">Kategoria</label>
+          <div class="filter-chips" id="calCategoryFilters"></div>
+        </div>
+      </div>
+
+      <div class="calendar-nav">
+        <button class="btn btn-secondary btn-small" id="calPrev">&larr;</button>
+        <h3 id="calMonthLabel"></h3>
+        <button class="btn btn-secondary btn-small" id="calNext">&rarr;</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <!-- 3. Slack View -->
+    <div class="view" id="view-slack">
+      <div class="view-header">
+        <h2 data-i18n="slackTitle">Slack-integraatio</h2>
+        <p data-i18n="slackSubtitle">Simuloitu näkymä Slack-kanavien tapahtumaviesteistä</p>
+      </div>
+      <div class="slack-container">
+        <div class="slack-sidebar">
+          <div class="slack-workspace">
+            <span class="slack-ws-icon">S</span>
+            <span class="slack-ws-name">Siili Joensuu</span>
+          </div>
+          <div class="slack-channels" id="slackChannels"></div>
+        </div>
+        <div class="slack-main">
+          <div class="slack-header" id="slackHeader">
+            <span class="slack-channel-name">#joensuu-tapahtumat</span>
+          </div>
+          <div class="slack-messages" id="slackMessages"></div>
+          <div class="slack-compose">
+            <input type="text" class="slack-input" id="slackInput" data-i18n-placeholder="slackPlaceholder">
+            <button class="btn btn-primary btn-small" onclick="sendSlackMessage()" data-i18n="slackSend">Lähetä</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slack Notification Settings -->
+      <div class="slack-settings">
+        <h3 data-i18n="slackSettingsTitle">Ilmoitusasetukset</h3>
+        <div class="slack-setting-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="slackNotifyNew" checked>
+            <span data-i18n="slackNotifyNew">Ilmoita uusista tapahtumista</span>
+          </label>
+        </div>
+        <div class="slack-setting-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="slackNotifyReminder" checked>
+            <span data-i18n="slackNotifyReminder">Muistutus päivää ennen</span>
+          </label>
+        </div>
+        <div class="slack-setting-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="slackNotifyWeekly" checked>
+            <span data-i18n="slackNotifyWeekly">Viikkoyhteenveto maanantaisin</span>
+          </label>
+        </div>
+        <button class="btn btn-primary" onclick="showSlackDemo()" data-i18n="slackDemoBtn">Simuloi ilmoitus</button>
+      </div>
+    </div>
+
+    <!-- 4. Export View -->
+    <div class="view" id="view-export">
+      <div class="view-header">
+        <h2 data-i18n="exportTitle">Vienti</h2>
+        <p data-i18n="exportSubtitle">Lataa tapahtumat Exceliin tai kalenteritiedostona</p>
+      </div>
+
+      <div class="export-cards">
+        <div class="export-card">
+          <div class="export-card-icon">📊</div>
+          <h3 data-i18n="exportExcelTitle">Excel-vienti</h3>
+          <p data-i18n="exportExcelDesc">Lataa kaikki tapahtumat Excel-muodossa (.csv). Sisältää päivämäärän, ajan, kategorian, sijainnin ja kuvauksen.</p>
+          <div class="export-options">
+            <label class="toggle-label">
+              <input type="checkbox" id="exportFiltered">
+              <span data-i18n="exportOnlyFiltered">Vie vain suodatetut tapahtumat</span>
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="exportExcel()">
+            <span data-i18n="exportExcelBtn">Lataa Excel (.csv)</span>
+          </button>
+        </div>
+
+        <div class="export-card">
+          <div class="export-card-icon">📅</div>
+          <h3 data-i18n="exportIcsTitle">Kalenterivienti</h3>
+          <p data-i18n="exportIcsDesc">Lataa tapahtumat .ics-tiedostona, jonka voit tuoda Google Calendariin, Outlookiin tai Apple Calendariin.</p>
+          <div class="export-options">
+            <label class="toggle-label">
+              <input type="checkbox" id="exportIcsFiltered">
+              <span data-i18n="exportOnlyFiltered">Vie vain suodatetut tapahtumat</span>
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="exportICS()">
+            <span data-i18n="exportIcsBtn">Lataa .ics-tiedosto</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Export preview -->
+      <div class="export-preview">
+        <h3 data-i18n="exportPreviewTitle">Esikatselu</h3>
+        <div class="export-table-wrap">
+          <table class="export-table" id="exportTable">
+            <thead id="exportTableHead"></thead>
+            <tbody id="exportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Analytics View -->
+    <div class="view" id="view-analytics">
+      <div class="view-header">
+        <h2 data-i18n="analyticsTitle">Analytiikka</h2>
+        <p data-i18n="analyticsSubtitle">Tapahtumien tilastot ja jakaumat — klikkaa kaavioita porautuaksesi</p>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="analytics-summary" id="analyticsStats"></div>
+
+      <!-- Row 1: Category charts -->
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <h3 data-i18n="analyticsCategoryDonut">Kategoriajakauma</h3>
+          <p class="chart-hint" data-i18n="analyticsClickHint">Klikkaa kaavioelementtiä porautuaksesi</p>
+          <div class="analytics-chart-container">
+            <canvas id="chartCategoryDonut"></canvas>
+          </div>
+        </div>
+        <div class="analytics-card">
+          <h3 data-i18n="analyticsCategoryBar">Tapahtumat kategorioittain</h3>
+          <p class="chart-hint" data-i18n="analyticsClickHint">Klikkaa kaavioelementtiä porautuaksesi</p>
+          <div class="analytics-chart-container">
+            <canvas id="chartCategoryBar"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Monthly -->
+      <div class="analytics-card">
+        <h3 data-i18n="analyticsMonthly">Kuukausijakauma</h3>
+        <p class="chart-hint" data-i18n="analyticsMonthlyHint">Klikkaa kuukautta siirtyäksesi kalenterinäkymään</p>
+        <div class="analytics-chart-container-lg">
+          <canvas id="chartMonthly"></canvas>
+        </div>
+      </div>
+
+      <!-- Row 3: Location -->
+      <div class="analytics-card">
+        <h3 data-i18n="analyticsLocation">Tapahtumat sijainneittain</h3>
+        <p class="chart-hint" data-i18n="analyticsClickHint">Klikkaa kaavioelementtiä porautuaksesi</p>
+        <div class="analytics-chart-container-lg">
+          <canvas id="chartLocation"></canvas>
+        </div>
+      </div>
+
+      <!-- Row 4: Timeline -->
+      <div class="analytics-card">
+        <h3 data-i18n="analyticsTimeline">Tapahtuma-aikajana</h3>
+        <p class="chart-hint" data-i18n="analyticsClickHint">Klikkaa kaavioelementtiä porautuaksesi</p>
+        <div class="analytics-chart-container-lg">
+          <canvas id="chartTimeline"></canvas>
+        </div>
+      </div>
+
+      <!-- Drilldown panel -->
+      <div class="analytics-drilldown" id="analyticsDrilldown">
+        <div class="analytics-drilldown-header">
+          <h3 id="drilldownTitle"></h3>
+          <div class="analytics-drilldown-actions">
+            <button class="btn btn-primary btn-small" id="drilldownCalBtn" onclick="drilldownGoCalendar()" data-i18n="analyticsDrilldownCalendar">Näytä kalenterissa</button>
+            <button class="btn btn-secondary btn-small" onclick="closeAnalyticsDrilldown()" data-i18n="analyticsDrilldownClose">Sulje</button>
+          </div>
+        </div>
+        <div class="event-list" id="drilldownEvents"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Event Detail Modal -->
+  <div class="modal-overlay" id="eventModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Analytics -->
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
