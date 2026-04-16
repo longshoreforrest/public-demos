@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Desktop-testausautomaatio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #dbeafe;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul, ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .code-block {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      margin: 8px 0 12px;
+      overflow-x: auto;
+    }
+
+    .warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 12px 0;
+      font-size: 0.88rem;
+    }
+
+    .warn strong { color: #92400e; }
+
+    .tip {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 12px 0;
+      font-size: 0.88rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 600px) {
+      .header { flex-direction: column; gap: 12px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">🖥️</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Desktop-testausautomaatio</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- FINNISH -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Tämä sovellus esittelee miten desktop-sovelluksia (Outlook, SAP, Excel) voidaan testata automaattisesti kuvantunnistuksen ja AI:n avulla. Mukana on interaktiivinen web-demo ja oikeat Python-skriptit.</p>
+
+      <h2>Web-sovelluksen välilehdet</h2>
+
+      <div class="card">
+        <h3>Simulaattori</h3>
+        <p>Interaktiivinen animaatio joka näyttää miten PyAutoGUI-pohjainen botti automatisoisi Outlook-sovelluksen käyttöä. Paina "Aloita testi" ja seuraa miten botti:</p>
+        <ul>
+          <li>Käynnistää sovelluksen</li>
+          <li>Etsii UI-elementtejä kuvantunnistuksella</li>
+          <li>Syöttää tietoja ja klikkaa nappeja</li>
+          <li>Ottaa kuvakaappauksia todisteiksi</li>
+        </ul>
+        <p>Sivun alaosassa on myös ohjeet oikeiden Python-skriptien ajamiseen omalla koneella.</p>
+      </div>
+
+      <div class="card">
+        <h3>Yleiskatsaus</h3>
+        <p>Selittää ongelman (miksi desktop-testaus on vaikeaa) ja esittelee kaksi päälähestymistapaa: kuvantunnistuspohjainen ja saavutettavuuspuupohjainen.</p>
+      </div>
+
+      <div class="card">
+        <h3>Lähestymistavat</h3>
+        <p>Vertailutaulukko kuudesta eri teknologiasta (PyAutoGUI, Claude Computer Use, SikuliX, WinAppDriver, Appium, Power Automate). Jokaiselle on listattu vahvuudet ja heikkoudet.</p>
+      </div>
+
+      <div class="card">
+        <h3>Esimerkki</h3>
+        <p>Kolme konkreettista Python-koodiesimerkikä samasta testitapauksesta ("avaa Outlook, lue sähköposti") toteutettuna kolmella eri teknologialla.</p>
+      </div>
+
+      <div class="card">
+        <h3>Testaajan työnkulku</h3>
+        <p>Askel askeleelta -ohje: asennuksesta, referenssikuvien ottamisesta, skriptin kirjoittamisesta ja CI/CD-integraatiosta.</p>
+      </div>
+
+      <div class="card">
+        <h3>Rajoitteet</h3>
+        <p>Rehellinen kuvaus desktop-testausautomaation haasteista: resoluutioriippuvuus, ei headless-tukea, ajoitusongelmat, ylläpitokustannukset ja tietoturva.</p>
+      </div>
+
+      <h2>Oikeiden skriptien ajaminen</h2>
+
+      <div class="card">
+        <h3>Vaihtoehto 1: PyAutoGUI-demo (ei API-avainta)</h3>
+        <p>Yksinkertaisin tapa kokeilla. Avaa Laskin-sovelluksen ja laskee 42 + 58.</p>
+        <div class="code-block">pip install pyautogui pillow
+python scripts/demo_pyautogui.py</div>
+      </div>
+
+      <div class="card">
+        <h3>Vaihtoehto 2: Claude Computer Use -demo</h3>
+        <p>AI-pohjainen demo. Vaatii Anthropic API-avaimen.</p>
+        <div class="code-block">pip install anthropic pyautogui pillow
+export ANTHROPIC_API_KEY="sk-ant-..."
+python scripts/demo_claude_computeruse.py</div>
+        <p>Voit myös antaa oman tehtävän:</p>
+        <div class="code-block">python scripts/demo_claude_computeruse.py \
+  --task "Avaa TextEdit ja kirjoita Hello World"</div>
+      </div>
+
+      <div class="warn">
+        <strong>Varoitus:</strong> Skriptit ottavat hiiren ja näppäimistön haltuunsa ajon ajaksi. Turvamekanismi: siirrä hiiri ruudun nurkkaan, niin skripti pysähtyy välittömästi (PyAutoGUI FAILSAFE).
+      </div>
+
+      <h2>Esivaatimukset</h2>
+      <ul>
+        <li><strong>Python 3.8+</strong> asennettu koneelle</li>
+        <li><strong>macOS:</strong> Anna terminaalille Screen Recording -oikeus (System Settings &rarr; Privacy &amp; Security &rarr; Screen Recording)</li>
+        <li><strong>Windows:</strong> Ei erityisvaatimuksia</li>
+        <li><strong>Claude-demolle:</strong> Anthropic API-avain (<code>sk-ant-...</code>)</li>
+      </ul>
+
+      <h2>Kielenvaihtaja</h2>
+      <p>Pääsovelluksessa oikean yläkulman FI/EN-painikkeella voi vaihtaa kielen suomen ja englannin välillä.</p>
+
+      <div class="tip">
+        <strong>Vinkki:</strong> Claude Computer Use -lähestymistapa on joustavin: se ei tarvitse referenssikuvia eikä kovakoodattuja koordinaatteja. AI sopeutuu automaattisesti kun sovelluksen UI muuttuu.
+      </div>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">This application demonstrates how desktop applications (Outlook, SAP, Excel) can be tested automatically using image recognition and AI. Includes an interactive web demo and real Python scripts.</p>
+
+      <h2>Web Application Tabs</h2>
+
+      <div class="card">
+        <h3>Simulator</h3>
+        <p>An interactive animation showing how a PyAutoGUI-based bot would automate Outlook. Press "Start Test" and watch the bot:</p>
+        <ul>
+          <li>Launch the application</li>
+          <li>Find UI elements using image recognition</li>
+          <li>Enter data and click buttons</li>
+          <li>Take screenshots as evidence</li>
+        </ul>
+        <p>The bottom of the page also contains instructions for running the real Python scripts on your own machine.</p>
+      </div>
+
+      <div class="card">
+        <h3>Overview</h3>
+        <p>Explains the problem (why desktop testing is hard) and presents two main approaches: image recognition-based and accessibility tree-based.</p>
+      </div>
+
+      <div class="card">
+        <h3>Approaches</h3>
+        <p>Comparison table of six different technologies (PyAutoGUI, Claude Computer Use, SikuliX, WinAppDriver, Appium, Power Automate). Each includes strengths and weaknesses.</p>
+      </div>
+
+      <div class="card">
+        <h3>Example</h3>
+        <p>Three concrete Python code examples of the same test case ("open Outlook, read email") implemented with three different technologies.</p>
+      </div>
+
+      <div class="card">
+        <h3>Tester Workflow</h3>
+        <p>Step-by-step guide: from installation, capturing reference images, writing scripts, to CI/CD integration.</p>
+      </div>
+
+      <div class="card">
+        <h3>Limitations</h3>
+        <p>An honest description of desktop test automation challenges: resolution dependency, no headless support, timing issues, maintenance costs, and security.</p>
+      </div>
+
+      <h2>Running the Real Scripts</h2>
+
+      <div class="card">
+        <h3>Option 1: PyAutoGUI Demo (no API key needed)</h3>
+        <p>The simplest way to try it out. Opens Calculator and computes 42 + 58.</p>
+        <div class="code-block">pip install pyautogui pillow
+python scripts/demo_pyautogui.py</div>
+      </div>
+
+      <div class="card">
+        <h3>Option 2: Claude Computer Use Demo</h3>
+        <p>AI-based demo. Requires an Anthropic API key.</p>
+        <div class="code-block">pip install anthropic pyautogui pillow
+export ANTHROPIC_API_KEY="sk-ant-..."
+python scripts/demo_claude_computeruse.py</div>
+        <p>You can also provide a custom task:</p>
+        <div class="code-block">python scripts/demo_claude_computeruse.py \
+  --task "Open TextEdit and type Hello World"</div>
+      </div>
+
+      <div class="warn">
+        <strong>Warning:</strong> The scripts take control of your mouse and keyboard during execution. Safety mechanism: move the mouse to a screen corner and the script stops immediately (PyAutoGUI FAILSAFE).
+      </div>
+
+      <h2>Prerequisites</h2>
+      <ul>
+        <li><strong>Python 3.8+</strong> installed on your machine</li>
+        <li><strong>macOS:</strong> Grant Screen Recording permission to your terminal (System Settings &rarr; Privacy &amp; Security &rarr; Screen Recording)</li>
+        <li><strong>Windows:</strong> No special requirements</li>
+        <li><strong>For Claude demo:</strong> Anthropic API key (<code>sk-ant-...</code>)</li>
+      </ul>
+
+      <h2>Language Switcher</h2>
+      <p>In the main application, use the FI/EN button in the top-right corner to switch between Finnish and English.</p>
+
+      <div class="tip">
+        <strong>Tip:</strong> The Claude Computer Use approach is the most flexible: it doesn't need reference images or hardcoded coordinates. The AI automatically adapts when the application UI changes.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Rakennettu Claude Code:lla &mdash; Siili Solutions, Jyväskylä 2026</div>
+
+<script>
+function showGuide(lang, btn) {
+  document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('guide-' + lang).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

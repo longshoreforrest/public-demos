@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Siili Jyväskylä Tapahtumat</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+  <style>
+    :root {
+      --primary: #0891b2;
+      --primary-dark: #0e7490;
+      --primary-light: #e0f7fa;
+      --bg: #f5f5f5;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e0e0e0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .tip {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .tip strong { color: #92400e; }
+    .tip p { color: #78350f; margin-bottom: 0; }
+
+    .warning {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .warning strong { color: #991b1b; }
+    .warning p { color: #7f1d1d; margin-bottom: 0; }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 600px) {
+      .header { padding: 16px; }
+      .content { padding: 20px 16px 40px; }
+      h1 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">🏢</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Siili Jyväskylä — Tapahtumat & Kalenteri</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- ══════════ FINNISH ══════════ -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Siili Jyväskylä — Tapahtumat & Kalenteri on sovellus, joka kokoaa yhteen Siilin Jyväskylän toimiston tapahtumat sekä lähialueen kaupunkitapahtumat, joilla voi olla vaikutusta työmatkoihin ja pysäköintiin.</p>
+
+      <h2>Kalenterinäkymä</h2>
+      <div class="card">
+        <h3>Kuukausinäkymä</h3>
+        <p>Oletusnäkymä on kuukausikalenteri. Tapahtumat näkyvät värikkäinä palkkeina kunkin päivän kohdalla. Väri kertoo tapahtuman kategorian.</p>
+        <ul>
+          <li><strong>Toimistotapahtumat</strong> — vasemmassa reunassa valkoinen raita</li>
+          <li><strong>Kaupunkitapahtumat</strong> — vasemmassa reunassa tumma raita</li>
+          <li><strong>Tänään-merkintä</strong> — nykyinen päivä korostettu sinisellä reunuksella</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Liikennevaroitukset</h3>
+        <p>Jos päivällä on merkittävän liikennevaikutuksen tapahtuma, päivän oikeassa yläkulmassa näkyy punainen pallo <code>🔴</code>. Tämä tarkoittaa, että Lutakon alueen liikenne ja pysäköinti ovat tavanomaista ruuhkaisempia.</p>
+      </div>
+      <div class="card">
+        <h3>Navigointi</h3>
+        <p>Vaihda kuukautta nuolipainikkeilla kalenterin yläpuolella. Klikkaa mitä tahansa tapahtumaa nähdäksesi lisätiedot. Jos päivässä on enemmän kuin 3 tapahtumaa, klikkaa <code>+N lisää</code> -linkkiä nähdäksesi kaikki.</p>
+      </div>
+
+      <h2>Suodattimet</h2>
+      <div class="card">
+        <h3>Tyyppisuodatin</h3>
+        <p>Valitse näytettävien tapahtumien tyyppi:</p>
+        <ul>
+          <li><strong>Kaikki</strong> — näyttää sekä toimisto- että kaupunkitapahtumat</li>
+          <li><strong>Toimisto</strong> — vain Siilin sisäiset tapahtumat (Site Monthly, AI Club, Tech Talk jne.)</li>
+          <li><strong>Kaupunki</strong> — vain Jyväskylän kaupunkitapahtumat (festivaalit, konsertit, messut jne.)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Liikennevaikutussuodatin</h3>
+        <p>Suodata kaupunkitapahtumat niiden liikennevaikutuksen perusteella:</p>
+        <ul>
+          <li><code>🟢 Vähäinen</code> — pieni tapahtuma, ei merkittävää vaikutusta</li>
+          <li><code>🟡 Kohtalainen</code> — kohtalainen määrä kävijöitä, parkkipaikat voivat täyttyä</li>
+          <li><code>🔴 Merkittävä</code> — suuri tapahtuma, tiekatkoja ja merkittäviä pysäköintiongelmia</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Haku ja kategoriat</h3>
+        <p>Hakukentällä voit etsiä tapahtumia nimellä, kuvauksella, paikalla tai kategorialla. Kategoriapainikkeet suodattavat tapahtumia yksittäisten kategorioiden mukaan — voit valita useita.</p>
+      </div>
+      <div class="tip">
+        <p><strong>Vinkki:</strong> Kun suodattimia on käytössä, filtteripalkissa näkyy punainen <code>✕ Nollaa suodattimet</code> -painike, jolla saat kaikki tapahtumat takaisin näkyviin yhdellä klikkauksella.</p>
+      </div>
+
+      <h2>Karttanäkymä</h2>
+      <div class="card">
+        <p>Karttanäkymä näyttää Siilin toimiston sijainnin sekä tapahtumapaikat interaktiivisella kartalla.</p>
+        <ul>
+          <li><strong>Sininen 🏢-merkki</strong> — Siilin toimisto, Lutakonaukio 1</li>
+          <li><strong>Värilliset numeromerkit</strong> — tapahtumapaikat, joissa luku kertoo tapahtumien määrän</li>
+          <li>Merkkien väri kertoo pahimman liikennevaikutuksen: <strong>vihreä</strong> (vähäinen), <strong>keltainen</strong> (kohtalainen), <strong>punainen</strong> (merkittävä)</li>
+          <li>Klikkaa merkkiä nähdäksesi kyseisen paikan tapahtumat</li>
+        </ul>
+      </div>
+
+      <h2>Tapahtumalista</h2>
+      <div class="card">
+        <p>Tapahtumat-näkymä listaa kaikki tapahtumat aikajärjestyksessä päivämäärittäin ryhmiteltynä. Jokainen kortti näyttää:</p>
+        <ul>
+          <li>Kategorian emojin ja värin</li>
+          <li>Kellonajan, keston ja paikan</li>
+          <li>Liikennevaikutusbadgen (kaupunkitapahtumat)</li>
+          <li>Lyhyen kuvauksen</li>
+        </ul>
+        <p>Klikkaa korttia avataksesi lisätiedot modaalissa.</p>
+      </div>
+      <div class="card">
+        <h3>Vienti</h3>
+        <ul>
+          <li><strong>Lataa .ics</strong> — lataa kaikki suodatetut tapahtumat kalenteritiedostona (Google Calendar, Outlook, Apple Calendar)</li>
+          <li><strong>Lataa .csv</strong> — lataa tapahtumat Excel-yhteensopivana CSV-tiedostona</li>
+        </ul>
+        <p>Yksittäisen tapahtuman voi lisätä kalenteriin klikkaamalla tapahtuman tietonäkymässä <code>Lisää kalenteriin</code> -painiketta.</p>
+      </div>
+
+      <h2>Analytiikka</h2>
+      <p>Analytiikkanäkymässä näet yhteenvedon tapahtumista neljänä kaaviona: kategorioittain, kuukausittain, liikennevaikutuksittain ja tapahtumapaikoittain. Yläreunassa näkyvät kokonaisluvut.</p>
+
+      <h2>Kielivalinta</h2>
+      <p>Vaihda kieltä otsikkorivin oikeassa reunassa olevista 🇫🇮 FI / 🇬🇧 EN -painikkeista. Kielivalinta tallentuu automaattisesti selaimen muistiin.</p>
+
+      <h2>Kriittiset päivämäärät kesällä 2026</h2>
+      <div class="warning">
+        <p><strong>⚠️ 12.–13.6.2026</strong> — SM Jyväskylä Ralli + OlutSatama + Cheerleading SM samanaikaisesti Lutakon alueella. Suosittelemme etätyötä tai julkista liikennettä.</p>
+      </div>
+      <div class="warning">
+        <p><strong>⚠️ 4.–7.6.2026</strong> — Kansainväliset Suurmarkkinat Lutakonaukiolla, aivan Siilin toimiston edessä. Merkittäviä pysäköintiongelmia.</p>
+      </div>
+      <div class="tip">
+        <p><strong>Vinkki:</strong> Käytä liikennevaikutussuodatinta <code>🔴 Merkittävä</code> nähdäksesi nopeasti kaikki päivät joina kannattaa harkita etätyötä tai vaihtoehtoista kulkutapaa.</p>
+      </div>
+    </div>
+
+    <!-- ══════════ ENGLISH ══════════ -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">Siili Jyväskylä — Events & Calendar is an application that brings together Siili's Jyväskylä office events and nearby city events that may affect commuting and parking.</p>
+
+      <h2>Calendar View</h2>
+      <div class="card">
+        <h3>Monthly View</h3>
+        <p>The default view is a monthly calendar. Events appear as coloured pills on each day. The colour indicates the event category.</p>
+        <ul>
+          <li><strong>Office events</strong> — white stripe on the left edge</li>
+          <li><strong>City events</strong> — dark stripe on the left edge</li>
+          <li><strong>Today marker</strong> — current day highlighted with a blue border</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Traffic Warnings</h3>
+        <p>If a day has an event with significant traffic impact, a red dot <code>🔴</code> appears in the top-right corner. This means traffic and parking in the Lutakko area will be heavier than usual.</p>
+      </div>
+      <div class="card">
+        <h3>Navigation</h3>
+        <p>Switch months using the arrow buttons above the calendar. Click any event to see details. If a day has more than 3 events, click the <code>+N more</code> link to see all of them.</p>
+      </div>
+
+      <h2>Filters</h2>
+      <div class="card">
+        <h3>Type Filter</h3>
+        <p>Select which type of events to display:</p>
+        <ul>
+          <li><strong>All</strong> — shows both office and city events</li>
+          <li><strong>Office</strong> — only Siili internal events (Site Monthly, AI Club, Tech Talk, etc.)</li>
+          <li><strong>City</strong> — only Jyväskylä city events (festivals, concerts, fairs, etc.)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Traffic Impact Filter</h3>
+        <p>Filter city events by their traffic impact level:</p>
+        <ul>
+          <li><code>🟢 Low</code> — small event, no significant impact</li>
+          <li><code>🟡 Medium</code> — moderate number of visitors, parking may fill up</li>
+          <li><code>🔴 Significant</code> — large event, road closures and major parking issues</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Search and Categories</h3>
+        <p>Use the search field to find events by name, description, location, or category. Category chips filter events by individual categories — you can select multiple.</p>
+      </div>
+      <div class="tip">
+        <p><strong>Tip:</strong> When filters are active, a red <code>✕ Reset filters</code> button appears in the filter bar, allowing you to restore all events with a single click.</p>
+      </div>
+
+      <h2>Map View</h2>
+      <div class="card">
+        <p>The map view shows the Siili office location and event venues on an interactive map.</p>
+        <ul>
+          <li><strong>Blue 🏢 marker</strong> — Siili office at Lutakonaukio 1</li>
+          <li><strong>Coloured number markers</strong> — event venues, where the number indicates the event count</li>
+          <li>Marker colour indicates the worst traffic impact: <strong>green</strong> (low), <strong>yellow</strong> (medium), <strong>red</strong> (significant)</li>
+          <li>Click a marker to see events at that venue</li>
+        </ul>
+      </div>
+
+      <h2>Events List</h2>
+      <div class="card">
+        <p>The Events view lists all events chronologically, grouped by date. Each card shows:</p>
+        <ul>
+          <li>Category emoji and colour</li>
+          <li>Time, duration, and location</li>
+          <li>Traffic impact badge (city events)</li>
+          <li>Short description</li>
+        </ul>
+        <p>Click a card to open the full details in a modal.</p>
+      </div>
+      <div class="card">
+        <h3>Export</h3>
+        <ul>
+          <li><strong>Download .ics</strong> — download all filtered events as a calendar file (Google Calendar, Outlook, Apple Calendar)</li>
+          <li><strong>Download .csv</strong> — download events as an Excel-compatible CSV file</li>
+        </ul>
+        <p>You can also add a single event to your calendar by clicking <code>Add to calendar</code> in the event detail view.</p>
+      </div>
+
+      <h2>Analytics</h2>
+      <p>The Analytics view provides a summary of events in four charts: by category, by month, by traffic impact, and by venue. Summary totals are shown at the top.</p>
+
+      <h2>Language</h2>
+      <p>Switch language using the 🇫🇮 FI / 🇬🇧 EN buttons in the top-right corner of the header. Your selection is saved automatically in the browser.</p>
+
+      <h2>Critical Dates in Summer 2026</h2>
+      <div class="warning">
+        <p><strong>⚠️ June 12–13, 2026</strong> — Finnish Rally Championship + OlutSatama + Cheerleading Championships all at the same time in the Lutakko area. We recommend remote work or public transport.</p>
+      </div>
+      <div class="warning">
+        <p><strong>⚠️ June 4–7, 2026</strong> — International Grand Market at Lutakonaukio, right in front of the Siili office. Significant parking problems expected.</p>
+      </div>
+      <div class="tip">
+        <p><strong>Tip:</strong> Use the traffic impact filter <code>🔴 Significant</code> to quickly see all days when you should consider remote work or alternative transport.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Siili Solutions — Jyväskylä Tapahtumat & Kalenteri</div>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+</body>
+</html>

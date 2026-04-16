@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWASP Security Scanner - Site Tour</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="findings.js"></script>
+  <style>
+    :root {
+      --primary: #1a1a2e;
+      --primary-light: #2d2d52;
+      --accent: #3b82f6;
+      --accent-dark: #2563eb;
+      --accent-light: #eff6ff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --hover: #f1f5f9;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --critical: #dc2626; --critical-bg: #fef2f2;
+      --high: #ea580c; --high-bg: #fff7ed;
+      --medium: #ca8a04; --medium-bg: #fefce8;
+      --low: #0891b2; --low-bg: #ecfeff;
+      --info: #64748b; --info-bg: #f8fafc;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 1000;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .header-top {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 20px; max-width: 1400px; margin: 0 auto;
+    }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .header-logo { font-size: 1.8rem; }
+    .header-title { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.3px; }
+    .header-subtitle { font-size: 0.75rem; opacity: 0.7; margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+
+    .lang-switcher{display:flex;border:1px solid rgba(255,255,255,0.2);border-radius:100px;overflow:hidden;flex-shrink:0}
+    .lang-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;font-size:0.75rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s;font-family:inherit}
+    .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+    .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+    .lang-flag{font-size:0.85rem;line-height:1}
+
+    .header-btn {
+      display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+      border-radius: 100px; border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85);
+      font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .header-btn svg { width: 14px; height: 14px; }
+    .btn-guide {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85);
+      font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-guide:hover { background: rgba(255,255,255,0.3); color: #fff; }
+
+    .nav {
+      display: flex; gap: 2px; padding: 0 20px 0; max-width: 1400px; margin: 0 auto; overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 8px 16px; border: none; background: transparent;
+      color: rgba(255,255,255,0.6); font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all 0.2s; white-space: nowrap; font-family: inherit;
+    }
+    .nav-tab:hover { color: rgba(255,255,255,0.9); }
+    .nav-tab.active { color: #fff; border-bottom-color: var(--accent); font-weight: 600; }
+
+    /* ── Main layout ── */
+    .main-container { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── Filters (pill-buttons, matching parent page) ── */
+    .filters-wrapper { margin-bottom: 1.5rem; }
+    .filters-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-bottom: 0.5rem; cursor: pointer; background: none; border: none;
+      font-family: inherit; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+      transition: color 0.2s; padding: 4px 14px; border-radius: 100px;
+      border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow);
+      margin-left: auto; margin-right: auto;
+    }
+    .filters-toggle:hover { color: var(--text); border-color: #cbd5e1; }
+    .filters-toggle .toggle-chevron { transition: transform 0.25s ease; display: inline-block; font-size: 0.7rem; }
+    .filters-toggle .toggle-chevron.collapsed { transform: rotate(-90deg); }
+    .filters-toggle .filter-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 18px; height: 18px; border-radius: 100px; font-size: 0.65rem;
+      font-weight: 700; background: var(--accent); color: #fff; padding: 0 5px;
+    }
+    .filters-body {
+      display: flex; flex-direction: column; gap: 0.5rem; align-items: center;
+      overflow: hidden; transition: max-height 0.3s ease, opacity 0.25s ease;
+      max-height: 600px; opacity: 1;
+    }
+    .filters-body.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+    .filters {
+      display: flex; flex-direction: column; gap: 0.5rem;
+      align-items: center;
+    }
+    .filter-group {
+      display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: center;
+    }
+    .filter-label {
+      font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;
+      letter-spacing: 0.06em; font-weight: 600; margin-right: 0.2rem;
+    }
+    .filter-btn {
+      padding: 0.35rem 0.9rem; border-radius: 100px; border: 1px solid #e2e8f0;
+      background: #fff; color: #64748b; font-size: 0.8rem; font-weight: 500;
+      cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+    }
+    .filter-btn:hover { border-color: #cbd5e1; color: #334155; }
+    .filter-btn.active { background: #1e293b; color: #fff; border-color: #1e293b; }
+
+    /* ── Severity cards ── */
+    .severity-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+    .sev-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px 20px; cursor: pointer; transition: all 0.2s;
+      position: relative; overflow: hidden; box-shadow: var(--shadow);
+    }
+    .sev-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; }
+    .sev-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light), var(--shadow); }
+    .sev-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+    .sev-card .sev-count { font-size: 28px; font-weight: 700; line-height: 1; }
+    .sev-card .sev-label { font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sev-critical { background: var(--critical-bg); } .sev-critical::before { background: var(--critical); } .sev-critical .sev-count { color: var(--critical); }
+    .sev-high { background: var(--high-bg); } .sev-high::before { background: var(--high); } .sev-high .sev-count { color: var(--high); }
+    .sev-medium { background: var(--medium-bg); } .sev-medium::before { background: var(--medium); } .sev-medium .sev-count { color: var(--medium); }
+    .sev-low { background: var(--low-bg); } .sev-low::before { background: var(--low); } .sev-low .sev-count { color: var(--low); }
+    .sev-info { background: var(--info-bg); } .sev-info::before { background: var(--info); } .sev-info .sev-count { color: var(--info); }
+
+    /* ── Risk score ── */
+    .risk-score {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+      border-radius: 100px; font-size: 0.72rem; font-weight: 600;
+    }
+    .risk-critical { background: var(--critical-bg); color: var(--critical); border: 1px solid #fca5a5; }
+    .risk-high { background: var(--high-bg); color: var(--high); border: 1px solid #fdba74; }
+    .risk-medium { background: var(--medium-bg); color: var(--medium); border: 1px solid #fde047; }
+    .risk-low { background: var(--low-bg); color: var(--low); border: 1px solid #67e8f9; }
+
+    /* ── Dashboard findings list ── */
+    .dash-findings {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); margin-top: 20px; overflow: hidden;
+    }
+    .dash-findings-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--hover);
+    }
+    .dash-findings-header h3 { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+    .dash-findings-link {
+      font-size: 0.78rem; color: var(--accent); text-decoration: none; font-weight: 500; cursor: pointer;
+      border: none; background: none; font-family: inherit; padding: 0;
+    }
+    .dash-findings-link:hover { text-decoration: underline; }
+    .dash-findings-list { list-style: none; }
+    .dash-findings-list li {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      border-bottom: 1px solid var(--border); font-size: 0.82rem;
+      cursor: pointer; transition: background 0.1s;
+    }
+    .dash-findings-list li:last-child { border-bottom: none; }
+    .dash-findings-list li:hover { background: var(--accent-light); }
+    .dash-findings-list .finding-app { color: var(--text-muted); font-size: 0.75rem; min-width: 120px; }
+    .dash-findings-list .finding-title { flex: 1; }
+
+    /* ── Charts ── */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .chart-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.2s;
+    }
+    .chart-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+    .chart-card h3 { font-size: 0.82rem; margin-bottom: 14px; color: var(--text-secondary); font-weight: 600; }
+    .chart-canvas-wrap { position: relative; height: 260px; }
+    .chart-canvas-wrap canvas { max-height: 260px; }
+
+    /* ── Table ── */
+    .findings-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; flex-wrap: wrap; gap: 12px;
+    }
+    .findings-header h2 { font-size: 1.1rem; font-weight: 700; }
+    .search-box {
+      padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 0.82rem; width: 280px;
+      font-family: inherit; transition: all 0.2s;
+    }
+    .search-box:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .search-box::placeholder { color: var(--text-muted); }
+
+    .findings-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      background: var(--card); border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+    .findings-table th {
+      background: var(--hover); padding: 10px 14px; text-align: left;
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; white-space: nowrap; font-weight: 600;
+    }
+    .findings-table th:hover { color: var(--text); }
+    .findings-table th .sort-icon { margin-left: 4px; opacity: 0.4; }
+    .findings-table th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+    .findings-table td {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem; vertical-align: top;
+    }
+    .findings-table tr { cursor: pointer; transition: background 0.1s; }
+    .findings-table tbody tr:hover { background: var(--accent-light); }
+
+    .sev-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 0.68rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .sev-badge-Critical { background: var(--critical-bg); color: var(--critical); border: 1px solid #fca5a5; }
+    .sev-badge-High { background: var(--high-bg); color: var(--high); border: 1px solid #fdba74; }
+    .sev-badge-Medium { background: var(--medium-bg); color: var(--medium); border: 1px solid #fde047; }
+    .sev-badge-Low { background: var(--low-bg); color: var(--low); border: 1px solid #67e8f9; }
+    .sev-badge-Info { background: var(--info-bg); color: var(--info); border: 1px solid #cbd5e1; }
+
+    .owasp-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem;
+      background: var(--accent-light); color: var(--accent-dark); font-weight: 600;
+    }
+
+    /* ── Pagination ── */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; }
+    .pagination button {
+      padding: 6px 12px; border-radius: 100px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 0.82rem; cursor: pointer;
+      font-family: inherit; transition: all 0.15s;
+    }
+    .pagination button:hover { border-color: var(--accent); color: var(--accent); }
+    .pagination button.active { background: #1e293b; border-color: #1e293b; color: #fff; }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination span { color: var(--text-muted); font-size: 0.82rem; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* ── Drawer ── */
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 1100;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .drawer-overlay.open { opacity: 1; pointer-events: all; }
+    .drawer {
+      position: fixed; right: 0; top: 0; bottom: 0; width: 560px; max-width: 92vw;
+      background: var(--card); z-index: 1101; transform: translateX(100%);
+      transition: transform 0.25s ease; overflow-y: auto;
+      border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgba(0,0,0,0.1);
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-close {
+      position: absolute; top: 16px; right: 16px; background: var(--hover); border: 1px solid var(--border);
+      color: var(--text-secondary); font-size: 20px; cursor: pointer; padding: 2px 8px;
+      border-radius: var(--radius-sm); transition: all 0.15s;
+    }
+    .drawer-close:hover { background: var(--border); color: var(--text); }
+    .drawer-content { padding: 28px; }
+    .drawer-content h2 { font-size: 1.1rem; margin-bottom: 20px; padding-right: 40px; font-weight: 700; }
+    .detail-row { margin-bottom: 14px; }
+    .detail-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    .detail-value { font-size: 0.88rem; line-height: 1.6; }
+    .detail-value code {
+      background: var(--hover); padding: 2px 8px; border-radius: 4px; font-size: 0.78rem;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; border: 1px solid var(--border);
+    }
+    .recommendation {
+      margin-top: 16px; padding: 16px; border-radius: var(--radius-sm);
+      background: var(--accent-light); border-left: 3px solid var(--accent);
+    }
+    .recommendation .rec-title {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--accent-dark); margin-bottom: 6px; font-weight: 700;
+    }
+    .recommendation .rec-body { font-size: 0.82rem; line-height: 1.6; color: var(--text); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1200;
+      display: none; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: var(--radius); padding: 28px;
+      max-width: 700px; width: 90%; max-height: 80vh; overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal h2 { margin-bottom: 14px; font-size: 1.05rem; font-weight: 700; }
+    .modal-close {
+      float: right; background: var(--hover); border: 1px solid var(--border);
+      color: var(--text-secondary); font-size: 18px; cursor: pointer;
+      padding: 2px 8px; border-radius: var(--radius-sm);
+    }
+    .modal-close:hover { background: var(--border); color: var(--text); }
+    .modal-list { list-style: none; }
+    .modal-list li {
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; gap: 10px;
+      transition: background 0.1s;
+    }
+    .modal-list li:hover { background: var(--accent-light); }
+
+    /* ── Scroll top ── */
+    .scroll-top {
+      position: fixed; bottom: 24px; right: 24px; width: 40px; height: 40px;
+      border-radius: 50%; background: var(--primary); color: white; border: none;
+      font-size: 18px; cursor: pointer; display: none; z-index: 50;
+      box-shadow: 0 4px 12px rgba(26,26,46,0.4); transition: all 0.2s;
+    }
+    .scroll-top.visible { display: flex; align-items: center; justify-content: center; }
+    .scroll-top:hover { background: var(--primary-light); transform: translateY(-2px); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .severity-strip { grid-template-columns: repeat(3, 1fr); }
+      .main-container { padding: 16px 12px; }
+      .header-top { padding: 10px 12px; }
+      .nav { padding: 0 12px; }
+    }
+    @media (max-width: 600px) {
+      .severity-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-top">
+    <div class="header-brand">
+      <span class="header-logo">&#128737;</span>
+      <div>
+        <div class="header-title" id="headerTitle">OWASP-tietoturvaskannaaja</div>
+        <div class="header-subtitle" id="headerSubtitle"></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="exportExcel()" id="exportBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Excel</span>
+      </button>
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-btn active" data-lang="fi" onclick="switchLang('fi')"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+        <button class="lang-btn" data-lang="en" onclick="switchLang('en')"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+      </div>
+      <a class="btn-guide" href="guide.html" title="Käyttöohje / User Guide">?</a>
+    </div>
+  </div>
+  <nav class="nav" id="nav">
+    <button class="nav-tab active" data-view="dashboard" id="navDashboard">Kojelauta</button>
+    <button class="nav-tab" data-view="findings" id="navFindings">Havainnot</button>
+    <button class="nav-tab" data-view="applications" id="navApps">Sovellukset</button>
+  </nav>
+</header>
+
+<div class="main-container">
+  <!-- Pill filters matching parent page style -->
+  <div class="filters-wrapper">
+    <button class="filters-toggle" id="filtersToggle" onclick="toggleFiltersPanel()">
+      <span class="toggle-chevron" id="filtersChevron">&#9660;</span>
+      <span id="filtersToggleLabel"></span>
+    </button>
+    <div class="filters-body" id="filtersBody">
+      <div class="filters" id="filtersArea"></div>
+    </div>
+  </div>
+
+  <div class="severity-strip" id="severityStrip"></div>
+
+  <!-- Dashboard view -->
+  <div class="view active" id="view-dashboard">
+    <div class="charts-grid" id="chartsGrid"></div>
+    <div id="dashboardFindings"></div>
+  </div>
+  <!-- Findings view -->
+  <div class="view" id="view-findings">
+    <div id="findingsContent"></div>
+  </div>
+  <!-- Applications view -->
+  <div class="view" id="view-applications">
+    <div id="appsContent"></div>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeDrawer()">&times;</button>
+  <div class="drawer-content" id="drawerContent"></div>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let lang = localStorage.getItem('siteTourLang') || 'fi';
+let activeSeverities = new Set();
+let activeApps = new Set();
+let activeOwasp = new Set();
+let searchQuery = '';
+let sortCol = 'severity';
+let sortDir = 'asc';
+let currentPage = 1;
+let currentView = 'dashboard';
+const PAGE_SIZE = 20;
+const SEV_ORDER = { Critical: 0, High: 1, Medium: 2, Low: 3, Info: 4 };
+
+// Derive city groups from app names
+function getCity(app) {
+  if (app.startsWith('Helsinki')) return 'Helsinki';
+  if (app.startsWith('Joensuu')) return 'Joensuu';
+  if (app.startsWith('Kuopio')) return 'Kuopio';
+  if (app.startsWith('Oulu')) return 'Oulu';
+  if (app.startsWith('Seinajoki') || app.startsWith('Seinäjoki')) return 'Seinäjoki';
+  if (app.startsWith('Tampere')) return 'Tampere';
+  return 'Muu';
+}
+
+const OWASP_CATS = {
+  A01: { en: 'Broken Access Control', fi: 'Puutteellinen pääsynhallinta' },
+  A02: { en: 'Security Misconfiguration', fi: 'Tietoturvan virheasetukset' },
+  A03: { en: 'Supply Chain Failures', fi: 'Toimitusketjun haavoittuvuudet' },
+  A04: { en: 'Cryptographic Failures', fi: 'Salauksen puutteet' },
+  A05: { en: 'Injection', fi: 'Injektiohyökkäykset' },
+  A06: { en: 'Insecure Design', fi: 'Turvaton suunnittelu' },
+  A07: { en: 'Authentication Failures', fi: 'Todennuksen puutteet' },
+  A08: { en: 'Data Integrity Failures', fi: 'Datan eheyspuutteet' },
+  A09: { en: 'Logging Failures', fi: 'Lokituksen puutteet' },
+  A10: { en: 'Exception Handling', fi: 'Poikkeustilanteiden käsittely' }
+};
+
+const OWASP_URLS = {
+  A01: 'https://owasp.org/Top10/A01_2021-Broken_Access_Control/',
+  A02: 'https://owasp.org/Top10/A05_2021-Security_Misconfiguration/',
+  A03: 'https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/',
+  A04: 'https://owasp.org/Top10/A02_2021-Cryptographic_Failures/',
+  A05: 'https://owasp.org/Top10/A03_2021-Injection/',
+  A06: 'https://owasp.org/Top10/A04_2021-Insecure_Design/',
+  A07: 'https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/',
+  A08: 'https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/',
+  A09: 'https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/',
+  A10: 'https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/'
+};
+
+const OWASP_TIPS = {
+  A01: { en: 'Access control enforces policy so users cannot act outside intended permissions.', fi: 'Pääsynhallinta varmistaa, etteivät käyttäjät voi toimia valtuuksiensa ulkopuolella.' },
+  A02: { en: 'Missing or incorrect security hardening across the application stack.', fi: 'Puuttuva tai virheellinen tietoturvan koventaminen sovelluspinossa.' },
+  A03: { en: 'Failures related to supply chain risks including components with known vulnerabilities.', fi: 'Toimitusketjun riskit, kuten tunnetusti haavoittuvien komponenttien käyttö.' },
+  A04: { en: 'Failures related to cryptography which often lead to data exposure.', fi: 'Salauksen puutteet, jotka johtavat usein tietojen paljastumiseen.' },
+  A05: { en: 'User-supplied data is not validated, filtered, or sanitized.', fi: 'Käyttäjän syöttämiä tietoja ei validoida, suodateta tai sanitoida.' },
+  A06: { en: 'Missing or ineffective control design.', fi: 'Puuttuva tai tehoton suunnittelutason kontrolli.' },
+  A07: { en: 'User identity, authentication, and session management.', fi: 'Käyttäjän tunnistaminen, todennus ja istunnonhallinta.' },
+  A08: { en: 'Code that does not protect against integrity violations.', fi: 'Koodi, joka ei suojaa eheyden loukkauksilta.' },
+  A09: { en: 'Without logging and monitoring, breaches cannot be detected.', fi: 'Ilman lokitusta tietomurtoja ei voida havaita.' },
+  A10: { en: 'Not properly handling errors and exceptional conditions.', fi: 'Virhe- ja poikkeustilanteiden puutteellinen käsittely.' }
+};
+
+const T = {
+  appTitle: { en: 'OWASP Security Scanner', fi: 'OWASP-tietoturvaskannaaja' },
+  scanDate: { en: 'Scan date', fi: 'Skannausaika' },
+  totalFindings: { en: 'findings', fi: 'havaintoa' },
+  apps: { en: 'applications', fi: 'sovellusta' },
+  applications: { en: 'Applications', fi: 'Sovellukset' },
+  findings: { en: 'Findings', fi: 'Havainnot' },
+  search: { en: 'Search findings...', fi: 'Hae havaintoja...' },
+  severity: { en: 'Severity', fi: 'Vakavuus' },
+  application: { en: 'Application', fi: 'Sovellus' },
+  file: { en: 'File', fi: 'Tiedosto' },
+  titleCol: { en: 'Title', fi: 'Otsikko' },
+  owasp: { en: 'OWASP', fi: 'OWASP' },
+  description: { en: 'Description', fi: 'Kuvaus' },
+  byOwasp: { en: 'By OWASP Category', fi: 'OWASP-kategorialla' },
+  bySeverity: { en: 'By Severity', fi: 'Vakavuudella' },
+  byApp: { en: 'By Application', fi: 'Sovelluksella' },
+  sevByApp: { en: 'Severity per Application', fi: 'Vakavuus sovelluksittain' },
+  noResults: { en: 'No findings match your filters', fi: 'Suodattimilla ei löydy havaintoja' },
+  drillTitle: { en: 'Findings', fi: 'Havainnot' },
+  critical: { en: 'Critical', fi: 'Kriittinen' },
+  high: { en: 'High', fi: 'Korkea' },
+  medium: { en: 'Medium', fi: 'Keskitaso' },
+  low: { en: 'Low', fi: 'Matala' },
+  info: { en: 'Info', fi: 'Info' },
+  prev: { en: 'Prev', fi: 'Edellinen' },
+  next: { en: 'Next', fi: 'Seuraava' },
+  page: { en: 'Page', fi: 'Sivu' },
+  navDashboard: { en: 'Dashboard', fi: 'Kojelauta' },
+  navFindings: { en: 'Findings', fi: 'Havainnot' },
+  navApps: { en: 'Applications', fi: 'Sovellukset' },
+  appFindings: { en: 'findings', fi: 'havaintoa' },
+  filterLocation: { en: 'Location', fi: 'Toimipiste' },
+  filterOwasp: { en: 'OWASP', fi: 'OWASP' },
+  filterSeverity: { en: 'Severity', fi: 'Vakavuus' },
+  filterAll: { en: 'All', fi: 'Kaikki' },
+  filterReset: { en: 'Reset all', fi: 'Nollaa kaikki' },
+  filterApp: { en: 'Application', fi: 'Sovellus' },
+  filtersShow: { en: 'Filters', fi: 'Suodattimet' },
+  filtersHide: { en: 'Hide filters', fi: 'Piilota suodattimet' },
+  filteredFindings: { en: 'Filtered findings', fi: 'Suodatetut havainnot' },
+  showAllFindings: { en: 'Show all in table', fi: 'Näytä kaikki taulukossa' },
+  andMore: { en: 'more...', fi: 'lisää...' }
+};
+
+function t(key) { return T[key]?.[lang] || T[key]?.en || key; }
+
+function calcRiskScore(findings) {
+  const w = { Critical: 10, High: 5, Medium: 2, Low: 0.5, Info: 0 };
+  let s = 0; findings.forEach(f => { s += w[f.severity] || 0; });
+  const max = findings.length * 10;
+  const pct = max > 0 ? Math.round((s / max) * 100) : 0;
+  if (pct >= 60) return { score: pct, level: 'critical', label: { en: 'Critical Risk', fi: 'Kriittinen riski' } };
+  if (pct >= 40) return { score: pct, level: 'high', label: { en: 'High Risk', fi: 'Korkea riski' } };
+  if (pct >= 20) return { score: pct, level: 'medium', label: { en: 'Medium Risk', fi: 'Keskitason riski' } };
+  return { score: pct, level: 'low', label: { en: 'Low Risk', fi: 'Matala riski' } };
+}
+
+// ── Computed ──
+let activeCity = null; // city filter (separate from app filter)
+let filtersVisible = true;
+
+function getFiltered() {
+  return FINDINGS.filter(f => {
+    if (activeSeverities.size > 0 && !activeSeverities.has(f.severity)) return false;
+    if (activeApps.size > 0 && !activeApps.has(f.app)) return false;
+    if (activeCity && getCity(f.app) !== activeCity) return false;
+    if (activeOwasp.size > 0 && !activeOwasp.has(f.owasp)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return f.title.toLowerCase().includes(q) || f.description.toLowerCase().includes(q) ||
+             f.app.toLowerCase().includes(q) || f.file.toLowerCase().includes(q) ||
+             f.owasp.toLowerCase().includes(q) || f.owaspName.toLowerCase().includes(q);
+    }
+    return true;
+  });
+}
+function getSorted(data) {
+  return [...data].sort((a, b) => {
+    let va, vb;
+    switch (sortCol) {
+      case 'severity': va = SEV_ORDER[a.severity]||9; vb = SEV_ORDER[b.severity]||9; break;
+      default: va = a[sortCol]||''; vb = b[sortCol]||'';
+    }
+    if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortDir === 'asc' ? va - vb : vb - va;
+  });
+}
+function countBy(arr, key) { const m = {}; arr.forEach(f => { m[f[key]] = (m[f[key]]||0)+1; }); return m; }
+
+// ── Charts ──
+let chartOwasp, chartSev, chartApp, chartStacked;
+const SEV_COLORS = { Critical: '#dc2626', High: '#ea580c', Medium: '#ca8a04', Low: '#0891b2', Info: '#94a3b8' };
+
+function destroyCharts() { [chartOwasp, chartSev, chartApp, chartStacked].forEach(c => c && c.destroy()); }
+function buildCharts(filtered) {
+  destroyCharts();
+  const tc = '#64748b';
+  const owaspCounts = countBy(filtered, 'owasp');
+  const owaspLabels = Object.keys(OWASP_CATS).filter(k => owaspCounts[k]);
+  const owaspColors = ['#3b82f6','#6366f1','#8b5cf6','#a855f7','#d946ef','#ec4899','#f43f5e','#f97316','#eab308','#06b6d4'];
+
+  chartOwasp = new Chart(document.getElementById('chartOwasp'), {
+    type: 'doughnut',
+    data: { labels: owaspLabels.map(k => k + ' ' + (OWASP_CATS[k]?.[lang]||'')), datasets: [{ data: owaspLabels.map(k => owaspCounts[k]||0), backgroundColor: owaspColors, borderWidth: 2, borderColor: '#fff' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: tc, font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 8 } } }, onClick: (e, els) => { if (els.length) filterByOwasp(owaspLabels[els[0].index]); } }
+  });
+
+  const sevCounts = countBy(filtered, 'severity');
+  const sevLabels = ['Critical','High','Medium','Low','Info'].filter(s => sevCounts[s]);
+  chartSev = new Chart(document.getElementById('chartSev'), {
+    type: 'doughnut',
+    data: { labels: sevLabels.map(s => t(s.toLowerCase())), datasets: [{ data: sevLabels.map(s => sevCounts[s]||0), backgroundColor: sevLabels.map(s => SEV_COLORS[s]), borderWidth: 2, borderColor: '#fff' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: tc, font: { size: 11, family: 'Inter' }, boxWidth: 12, padding: 8 } } }, onClick: (e, els) => { if (els.length) filterBySeverity(sevLabels[els[0].index]); } }
+  });
+
+  const appCounts = countBy(filtered, 'app');
+  const appLabels = Object.keys(appCounts).sort((a,b) => appCounts[b]-appCounts[a]);
+  chartApp = new Chart(document.getElementById('chartApp'), {
+    type: 'bar',
+    data: { labels: appLabels.map(l => l.replace(/_/g,' ')), datasets: [{ data: appLabels.map(a => appCounts[a]), backgroundColor: '#3b82f6', borderRadius: 4 }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: '#e2e8f0' }, ticks: { color: tc } }, y: { grid: { display: false }, ticks: { color: tc, font: { size: 11 } } } }, plugins: { legend: { display: false } }, onClick: (e, els) => { if (els.length) filterByApp(appLabels[els[0].index]); } }
+  });
+
+  const apps = [...new Set(filtered.map(f => f.app))].sort();
+  const sevTypes = ['Critical','High','Medium','Low','Info'];
+  const sDs = sevTypes.map(sev => ({ label: t(sev.toLowerCase()), data: apps.map(app => filtered.filter(f => f.app===app && f.severity===sev).length), backgroundColor: SEV_COLORS[sev], borderRadius: 2 })).filter(ds => ds.data.some(v => v>0));
+  chartStacked = new Chart(document.getElementById('chartStacked'), {
+    type: 'bar',
+    data: { labels: apps.map(a => a.replace(/_/g,' ')), datasets: sDs },
+    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false }, ticks: { color: tc, font: { size: 10 }, maxRotation: 45 } }, y: { stacked: true, grid: { color: '#e2e8f0' }, ticks: { color: tc } } }, plugins: { legend: { labels: { color: tc, font: { size: 11 }, boxWidth: 12 } } }, onClick: (e, els) => { if (els.length) filterByApp(apps[els[0].index]); } }
+  });
+}
+
+// ── Drill-down ──
+function drillOwasp(o) { showDrillModal(o + ' ' + (OWASP_CATS[o]?.[lang]||''), getFiltered().filter(f => f.owasp===o)); }
+function drillSeverity(s) { showDrillModal(t(s.toLowerCase()), getFiltered().filter(f => f.severity===s)); }
+function drillApp(a) { showDrillModal(a.replace(/_/g,' '), getFiltered().filter(f => f.app===a)); }
+
+function showDrillModal(title, items) {
+  document.getElementById('modalContent').innerHTML = `<h2>${t('drillTitle')}: ${esc(title)} (${items.length})</h2>
+    <ul class="modal-list">${items.map(f => `<li onclick="closeModal();openDrawer(${FINDINGS.indexOf(f)})">
+        <span class="sev-badge sev-badge-${f.severity}">${f.severity}</span>
+        <span class="owasp-tag">${f.owasp}</span>
+        <span>${esc(f.title)}</span></li>`).join('')}</ul>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+// ── View switching ──
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + view));
+  render();
+}
+
+// ── Render ──
+function render() {
+  const all = FINDINGS;
+  const filtered = getFiltered();
+  const sorted = getSorted(filtered);
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  if (currentPage > totalPages) currentPage = totalPages || 1;
+  const paged = sorted.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Header
+  const uniqueApps = [...new Set(all.map(f => f.app))];
+  const risk = calcRiskScore(filtered);
+  document.getElementById('headerTitle').textContent = t('appTitle');
+  document.getElementById('headerSubtitle').innerHTML =
+    `${t('scanDate')}: 2026-04-16 &middot; ${all.length} ${t('totalFindings')} &middot; ${uniqueApps.length} ${t('apps')} <span class="risk-score risk-${risk.level}">${risk.label[lang]} ${risk.score}%</span>`;
+  document.getElementById('navDashboard').textContent = t('navDashboard');
+  document.getElementById('navFindings').textContent = t('navFindings') + ` (${filtered.length})`;
+  document.getElementById('navApps').textContent = t('navApps');
+
+  // ── Pill filters (matching parent page) ──
+  const cities = [...new Set(all.map(f => getCity(f.app)))].sort();
+  const owaspUsed = [...new Set(all.map(f => f.owasp))].sort();
+  const hasAnyFilter = activeSeverities.size > 0 || activeApps.size > 0 || activeOwasp.size > 0 || activeCity;
+
+  document.getElementById('filtersArea').innerHTML = `
+    <div class="filter-group">
+      <span class="filter-label">${t('filterLocation')}</span>
+      <button class="filter-btn ${!activeCity?'active':''}" onclick="setCity(null)">${t('filterAll')}</button>
+      ${cities.map(c => `<button class="filter-btn ${activeCity===c?'active':''}" onclick="setCity('${c}')">${c}</button>`).join('')}
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">${t('filterApp')}</span>
+      <button class="filter-btn ${activeApps.size===0?'active':''}" onclick="activeApps.clear();currentPage=1;render()">${t('filterAll')}</button>
+      ${uniqueApps.sort().map(a => `<button class="filter-btn ${activeApps.has(a)?'active':''}" onclick="filterByApp('${a}')">${a.replace(/_/g,' ')}</button>`).join('')}
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">${t('filterOwasp')}</span>
+      <button class="filter-btn ${activeOwasp.size===0?'active':''}" onclick="activeOwasp.clear();currentPage=1;render()">${t('filterAll')}</button>
+      ${owaspUsed.map(id => `<button class="filter-btn ${activeOwasp.has(id)?'active':''}" onclick="toggleOwasp('${id}')" title="${OWASP_TIPS[id]?.[lang]||''}">${id} ${OWASP_CATS[id]?.[lang]||''}</button>`).join('')}
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">${t('filterSeverity')}</span>
+      <button class="filter-btn ${activeSeverities.size===0?'active':''}" onclick="activeSeverities.clear();currentPage=1;render()">${t('filterAll')}</button>
+      ${['Critical','High','Medium','Low','Info'].map(s => `<button class="filter-btn ${activeSeverities.has(s)?'active':''}" onclick="toggleSeverity('${s}')">${t(s.toLowerCase())}</button>`).join('')}
+    </div>
+    ${hasAnyFilter ? `<div class="filter-group"><button class="filter-btn" onclick="resetFilters()" style="border-color:#dc2626;color:#dc2626;">${t('filterReset')}</button></div>` : ''}`;
+  document.getElementById('filtersBody').classList.toggle('collapsed', !filtersVisible);
+  document.getElementById('filtersChevron').classList.toggle('collapsed', !filtersVisible);
+  updateFiltersToggleLabel();
+
+  // Severity strip
+  const sevMap = countBy(all, 'severity');
+  const sevFilt = countBy(filtered, 'severity');
+  document.getElementById('severityStrip').innerHTML = ['Critical','High','Medium','Low','Info'].map(s =>
+    `<div class="sev-card sev-${s.toLowerCase()} ${activeSeverities.has(s)?'active':''}" onclick="toggleSeverity('${s}')">
+      <div class="sev-count">${sevFilt[s]||0}</div>
+      <div class="sev-label">${t(s.toLowerCase())} (${sevMap[s]||0})</div>
+    </div>`).join('');
+
+  // Dashboard
+  document.getElementById('chartsGrid').innerHTML = `
+    <div class="chart-card"><h3>${t('byOwasp')}</h3><div class="chart-canvas-wrap"><canvas id="chartOwasp"></canvas></div></div>
+    <div class="chart-card"><h3>${t('bySeverity')}</h3><div class="chart-canvas-wrap"><canvas id="chartSev"></canvas></div></div>
+    <div class="chart-card"><h3>${t('byApp')}</h3><div class="chart-canvas-wrap"><canvas id="chartApp"></canvas></div></div>
+    <div class="chart-card"><h3>${t('sevByApp')}</h3><div class="chart-canvas-wrap"><canvas id="chartStacked"></canvas></div></div>`;
+  if (currentView === 'dashboard') buildCharts(filtered);
+
+  // Dashboard findings list (shown when filters active)
+  const dashEl = document.getElementById('dashboardFindings');
+  if (hasAnyFilter && filtered.length > 0) {
+    const MAX_DASH = 10;
+    const dashSorted = [...filtered].sort((a,b) => (SEV_ORDER[a.severity]||9) - (SEV_ORDER[b.severity]||9));
+    const dashItems = dashSorted.slice(0, MAX_DASH);
+    dashEl.innerHTML = `<div class="dash-findings">
+      <div class="dash-findings-header">
+        <h3>${t('filteredFindings')} (${filtered.length})</h3>
+        <button class="dash-findings-link" onclick="switchView('findings')">${t('showAllFindings')} &rarr;</button>
+      </div>
+      <ul class="dash-findings-list">
+        ${dashItems.map(f => `<li onclick="openDrawer(${FINDINGS.indexOf(f)})">
+          <span class="sev-badge sev-badge-${f.severity}">${f.severity}</span>
+          <span class="owasp-tag">${f.owasp}</span>
+          <span class="finding-app">${esc(f.app.replace(/_/g,' '))}</span>
+          <span class="finding-title">${esc(f.title)}</span>
+        </li>`).join('')}
+        ${filtered.length > MAX_DASH ? `<li onclick="switchView('findings')" style="justify-content:center;color:var(--accent);font-weight:500;">+${filtered.length - MAX_DASH} ${t('andMore')}</li>` : ''}
+      </ul>
+    </div>`;
+  } else {
+    dashEl.innerHTML = '';
+  }
+
+  // Findings table
+  document.getElementById('findingsContent').innerHTML = `
+    <div class="findings-header">
+      <h2>${t('findings')} (${filtered.length})</h2>
+      <input class="search-box" type="text" placeholder="${t('search')}" value="${esc(searchQuery)}" oninput="searchQuery=this.value;currentPage=1;render()">
+    </div>
+    ${paged.length === 0 ? `<div class="empty-state"><div class="icon">&#128269;</div><p>${t('noResults')}</p></div>` : `
+    <table class="findings-table">
+      <thead><tr>
+        ${['severity','owasp','app','file','title'].map(col =>
+          `<th class="${sortCol===col?'sorted':''}" onclick="setSort('${col}')">${t(col==='app'?'application':col==='title'?'titleCol':col)} <span class="sort-icon">${sortCol===col?(sortDir==='asc'?'&#9650;':'&#9660;'):''}</span></th>`
+        ).join('')}
+      </tr></thead>
+      <tbody>
+        ${paged.map(f => `<tr onclick="openDrawer(${FINDINGS.indexOf(f)})">
+            <td><span class="sev-badge sev-badge-${f.severity}">${f.severity}</span></td>
+            <td><span class="owasp-tag">${f.owasp}</span></td>
+            <td>${esc(f.app.replace(/_/g,' '))}</td>
+            <td><code>${esc(f.file)}:${f.line}</code></td>
+            <td>${esc(f.title)}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    ${totalPages > 1 ? `<div class="pagination">
+      <button ${currentPage<=1?'disabled':''} onclick="currentPage--;render()">${t('prev')}</button>
+      ${buildPagination(currentPage, totalPages)}
+      <button ${currentPage>=totalPages?'disabled':''} onclick="currentPage++;render()">${t('next')}</button>
+      <span>${t('page')} ${currentPage} / ${totalPages}</span>
+    </div>` : ''}`}`;
+
+  // Applications cards
+  const appsList = Object.keys(countBy(all, 'app')).sort();
+  document.getElementById('appsContent').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+      ${appsList.map(app => {
+        const af = FINDINGS.filter(f => f.app === app);
+        const ar = calcRiskScore(af);
+        const as = countBy(af, 'severity');
+        return `<div class="chart-card" onclick="activeApps.clear();activeApps.add('${app}');switchView('findings');" style="cursor:pointer;">
+          <h3 style="color:var(--text);font-size:0.95rem;margin-bottom:8px;">${app.replace(/_/g,' ')}</h3>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:1.4rem;font-weight:700;color:var(--accent);">${af.length}</span>
+            <span style="font-size:0.78rem;color:var(--text-secondary);">${t('appFindings')}</span>
+            <span class="risk-score risk-${ar.level}" style="margin-left:auto;">${ar.label[lang]}</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${['Critical','High','Medium','Low','Info'].filter(s => as[s]).map(s =>
+              `<span class="sev-badge sev-badge-${s}">${s}: ${as[s]}</span>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function buildPagination(cur, tot) {
+  let p = [];
+  for (let i = 1; i <= tot; i++) {
+    if (i===1||i===tot||(i>=cur-2&&i<=cur+2)) p.push(`<button class="${i===cur?'active':''}" onclick="currentPage=${i};render()">${i}</button>`);
+    else if (p[p.length-1]!=='...') p.push('...');
+  }
+  return p.map(x => x==='...' ? '<span>...</span>' : x).join('');
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Interactions ──
+function toggleSeverity(s) { activeSeverities.has(s)?activeSeverities.delete(s):activeSeverities.add(s); currentPage=1; render(); }
+function toggleApp(a) { activeApps.has(a)?activeApps.delete(a):activeApps.add(a); currentPage=1; render(); }
+function toggleOwasp(o) { activeOwasp.has(o)?activeOwasp.delete(o):activeOwasp.add(o); currentPage=1; render(); }
+function setCity(c) { activeCity = c; currentPage=1; render(); }
+function toggleFiltersPanel() {
+  filtersVisible = !filtersVisible;
+  document.getElementById('filtersBody').classList.toggle('collapsed', !filtersVisible);
+  document.getElementById('filtersChevron').classList.toggle('collapsed', !filtersVisible);
+  updateFiltersToggleLabel();
+}
+function updateFiltersToggleLabel() {
+  const activeCount = (activeSeverities.size > 0 ? 1 : 0) + (activeApps.size > 0 ? 1 : 0) + (activeOwasp.size > 0 ? 1 : 0) + (activeCity ? 1 : 0);
+  const label = filtersVisible ? t('filtersHide') : t('filtersShow');
+  const countBadge = activeCount > 0 ? ` <span class="filter-count">${activeCount}</span>` : '';
+  document.getElementById('filtersToggleLabel').innerHTML = label + countBadge;
+}
+function filterByApp(a) {
+  if (activeApps.has(a) && activeApps.size === 1) { activeApps.clear(); }
+  else { activeApps.clear(); activeApps.add(a); }
+  currentPage=1; render();
+}
+function filterByOwasp(o) {
+  if (activeOwasp.has(o) && activeOwasp.size === 1) { activeOwasp.clear(); }
+  else { activeOwasp.clear(); activeOwasp.add(o); }
+  currentPage=1; render();
+}
+function filterBySeverity(s) {
+  if (activeSeverities.has(s) && activeSeverities.size === 1) { activeSeverities.clear(); }
+  else { activeSeverities.clear(); activeSeverities.add(s); }
+  currentPage=1; render();
+}
+function setSort(col) { if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc'; else {sortCol=col;sortDir='asc';} render(); }
+function resetFilters() { activeSeverities.clear(); activeApps.clear(); activeOwasp.clear(); activeCity=null; searchQuery=''; currentPage=1; render(); }
+function switchLang(l) {
+  lang = l; localStorage.setItem('siteTourLang', l);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  render();
+}
+
+// ── Detail drawer ──
+function openDrawer(idx) {
+  const f = FINDINGS[idx]; if (!f) return;
+  let desc = f.description, rec = '';
+  const m = desc.match(/(?:Fix|Remediation|Recommended fix)[:\s]+(.+)/i);
+  if (m) { rec = m[1].trim(); desc = desc.replace(m[0], '').trim().replace(/\.\s*$/, '.'); }
+  const tip = OWASP_TIPS[f.owasp]?.[lang] || '';
+
+  document.getElementById('drawerContent').innerHTML = `
+    <h2>${esc(f.title)}</h2>
+    <div class="detail-row"><div class="detail-label">${t('severity')}</div><div class="detail-value"><span class="sev-badge sev-badge-${f.severity}">${f.severity}</span></div></div>
+    <div class="detail-row"><div class="detail-label">${t('owasp')}</div><div class="detail-value"><span class="owasp-tag">${f.owasp}</span> ${OWASP_CATS[f.owasp]?.[lang]||f.owaspName}${tip?`<div style="margin-top:6px;font-size:0.75rem;color:var(--text-muted);font-style:italic;">${esc(tip)}</div>`:''}${OWASP_URLS[f.owasp]?`<div style="margin-top:8px;"><a href="${OWASP_URLS[f.owasp]}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:5px;font-size:0.78rem;color:var(--accent);text-decoration:none;font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>${lang==='fi'?'OWASP-lähde':'OWASP source'} &rarr;</a></div>`:''}</div></div>
+    <div class="detail-row"><div class="detail-label">${t('application')}</div><div class="detail-value">${esc(f.app.replace(/_/g,' '))}</div></div>
+    <div class="detail-row"><div class="detail-label">${t('file')}</div><div class="detail-value"><code>${esc(f.file)}:${f.line}</code></div></div>
+    <div class="detail-row"><div class="detail-label">${t('description')}</div><div class="detail-value">${esc(desc)}</div></div>
+    ${rec?`<div class="recommendation"><div class="rec-title">${lang==='fi'?'Suositus':'Recommendation'}</div><div class="rec-body">${esc(rec)}</div></div>`:''}`;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+// ── Excel export ──
+function exportExcel() {
+  const filtered = getSorted(getFiltered());
+  const hdr = ['Severity','OWASP','OWASP Category','Application','File','Line','Title','Description'];
+  const rows = filtered.map(f => [f.severity, f.owasp, f.owaspName, f.app, f.file, f.line, f.title, f.description]);
+  let x = '<?xml version="1.0" encoding="UTF-8"?>\n<?mso-application progid="Excel.Sheet"?>\n';
+  x += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n<Styles>\n';
+  x += ' <Style ss:ID="hdr"><Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/><Interior ss:Color="#1a1a2e" ss:Pattern="Solid"/></Style>\n';
+  x += ' <Style ss:ID="crit"><Interior ss:Color="#FEE2E2" ss:Pattern="Solid"/></Style>\n';
+  x += ' <Style ss:ID="high"><Interior ss:Color="#FFEDD5" ss:Pattern="Solid"/></Style>\n';
+  x += ' <Style ss:ID="med"><Interior ss:Color="#FEF9C3" ss:Pattern="Solid"/></Style>\n';
+  x += ' <Style ss:ID="low"><Interior ss:Color="#ECFEFF" ss:Pattern="Solid"/></Style>\n';
+  x += ' <Style ss:ID="def"></Style>\n</Styles>\n';
+  x += '<Worksheet ss:Name="Security Findings"><Table>\n';
+  x += ' <Column ss:Width="70"/><Column ss:Width="50"/><Column ss:Width="200"/><Column ss:Width="180"/><Column ss:Width="150"/><Column ss:Width="50"/><Column ss:Width="300"/><Column ss:Width="500"/>\n';
+  x += '<Row ss:StyleID="hdr">' + hdr.map(h => `<Cell><Data ss:Type="String">${escX(h)}</Data></Cell>`).join('') + '</Row>\n';
+  rows.forEach(r => {
+    const st = r[0]==='Critical'?'crit':r[0]==='High'?'high':r[0]==='Medium'?'med':r[0]==='Low'?'low':'def';
+    x += `<Row ss:StyleID="${st}">` + r.map((c,i) => `<Cell><Data ss:Type="${i===5?'Number':'String'}">${escX(String(c))}</Data></Cell>`).join('') + '</Row>\n';
+  });
+  x += '</Table></Worksheet>\n<Worksheet ss:Name="Summary"><Table>\n<Column ss:Width="250"/><Column ss:Width="80"/>\n';
+  x += '<Row ss:StyleID="hdr"><Cell><Data ss:Type="String">Category</Data></Cell><Cell><Data ss:Type="String">Count</Data></Cell></Row>\n';
+  x += '<Row><Cell><Data ss:Type="String">--- By Severity ---</Data></Cell><Cell></Cell></Row>\n';
+  ['Critical','High','Medium','Low','Info'].forEach(s => { const c=filtered.filter(f=>f.severity===s).length; if(c) x+=`<Row><Cell><Data ss:Type="String">${s}</Data></Cell><Cell><Data ss:Type="Number">${c}</Data></Cell></Row>\n`; });
+  x += '<Row><Cell></Cell><Cell></Cell></Row>\n<Row><Cell><Data ss:Type="String">--- By OWASP ---</Data></Cell><Cell></Cell></Row>\n';
+  Object.keys(OWASP_CATS).forEach(id => { const c=filtered.filter(f=>f.owasp===id).length; if(c) x+=`<Row><Cell><Data ss:Type="String">${id} ${OWASP_CATS[id].en}</Data></Cell><Cell><Data ss:Type="Number">${c}</Data></Cell></Row>\n`; });
+  x += '</Table></Worksheet></Workbook>';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+x],{type:'application/vnd.ms-excel;charset=utf-8'}));
+  a.download='security_findings_'+new Date().toISOString().slice(0,10)+'.xls'; a.click(); URL.revokeObjectURL(a.href);
+}
+function escX(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;'); }
+
+// ── Init ──
+document.querySelectorAll('.nav-tab').forEach(tab => tab.addEventListener('click', () => switchView(tab.dataset.view)));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawer(); closeModal(); } });
+window.addEventListener('scroll', () => { const b=document.getElementById('scrollTop'); if(window.scrollY>400) b.classList.add('visible'); else b.classList.remove('visible'); });
+document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+render();
+</script>
+
+<script data-goatcounter="https://site-tour-2026.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

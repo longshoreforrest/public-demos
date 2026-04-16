@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käyttöohje — Kuka tulee toimistolle?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127970;</text></svg>">
+  <style>
+    :root {
+      --primary: #0891b2;
+      --primary-dark: #0e7490;
+      --primary-light: #e0f7fa;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo { font-size: 1.4rem; }
+
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .back-link {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .lang-tab {
+      padding: 8px 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 100px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .lang-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .guide-section { display: none; }
+    .guide-section.active { display: block; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+      font-size: 0.92rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      margin: 16px 0 8px;
+    }
+
+    p, li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: var(--text);
+    }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+
+    .tip {
+      background: #fefce8;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      color: #92400e;
+    }
+
+    .tip strong { color: #78350f; }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">&#127970;</span>
+      <div>
+        <div class="header-title">Käyttöohje</div>
+        <div class="header-subtitle">Kuka tulee toimistolle? — Siili Jyväskylä</div>
+      </div>
+    </div>
+    <a class="back-link" href="index.html">&larr; Takaisin</a>
+  </header>
+
+  <div class="content">
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="showGuide('fi', this)">Suomeksi</button>
+      <button class="lang-tab" onclick="showGuide('en', this)">In English</button>
+    </div>
+
+    <!-- FINNISH -->
+    <div class="guide-section active" id="guide-fi">
+      <h1>Käyttöohje</h1>
+      <p class="intro">Kuka tulee toimistolle? on Siili Jyväskylän tiimin työkalu, joka näyttää kuka on milloinkin toimistolla. Sovellus kerää kalenterimerkinnöistä tiedot ja tarjoaa analytiikan, kalenterinäkymän ja muistutusjärjestelmän.</p>
+
+      <h2>Analytiikka-näkymä</h2>
+      <p>Analytiikka on sovelluksen oletusnäkymä ja tarjoaa kokonaiskuvan toimiston käytöstä.</p>
+
+      <div class="card">
+        <h3>Henkilöfiltteri</h3>
+        <p>Ylälaidan chipseillä voit suodattaa kaiken analytiikan tietyille henkilöille. Oletuksena kaikki ovat valittuina. Klikkaa henkilön nimeä pois/päälle, tai käytä <code>Kaikki</code>-painiketta.</p>
+      </div>
+
+      <div class="card">
+        <h3>Tämän viikon katsaus</h3>
+        <p>Ensimmäinen graafi näyttää kuinka monta henkilöä on tulossa toimistolle kullakin päivällä tällä viikolla. Tänään on korostettuna tummemmalla värillä, menneet päivät harmaana. Klikkaa palkkia nähdäksesi ketkä ovat paikalla.</p>
+      </div>
+
+      <div class="card">
+        <h3>Yhteenveto-kortit</h3>
+        <p>Neljä korttia näyttävät: toimistokäyntien kokonaismäärän, keskiarvon per päivä, eri henkilöiden lukumäärän ja suosituimman viikonpäivän.</p>
+      </div>
+
+      <div class="card">
+        <h3>Heatmap — toimiston käyttöaste</h3>
+        <p>Lämpökartta näyttää toimistokäynnit viikko kerrallaan. Mitä tummempi solu, sitä enemmän ihmisiä oli paikalla.</p>
+        <ul>
+          <li><strong>Tämä viikko</strong> on korostettu teal-reunuksella ja viikkolabelissa on nuolimerkki</li>
+          <li><strong>Tänään</strong> erottuu keltaisella reunuksella ja "NYT"-merkinnällä</li>
+          <li><strong>Sliderit:</strong> Säädä kuinka monta viikkoa taaksepäin ja eteenpäin näet (oletus 2+2)</li>
+          <li>Klikkaa mitä tahansa solua nähdäksesi ketkä olivat/ovat paikalla</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Viikonpäivä- ja henkilöjakaumat</h3>
+        <p>Kaksi rinnakkaista graafia: suosituimmat toimistopäivät (palkkikaavio) ja aktiivisimmat kävijät (horisontaalinen palkkikaavio). Klikkaa palkkia nähdäksesi lisätiedot.</p>
+      </div>
+
+      <div class="card">
+        <h3>Viikkotrendi</h3>
+        <p>Linjakaavio näyttää käyntikerrat ja uniikit henkilöt viikottain. Klikkaa datapistettä porautuaksesi viikon tietoihin.</p>
+      </div>
+
+      <div class="card">
+        <h3>Aikasuodatin</h3>
+        <p>Ylälaidan painikkeilla voit rajata analytiikan: <code>Menneisyys</code>, <code>Kaikki</code> tai <code>Tuleva</code>.</p>
+      </div>
+
+      <h2>Kalenteri-näkymä</h2>
+      <div class="card">
+        <h3>Taulukkonäkymä</h3>
+        <p>Näyttää henkilöt riveillä ja päivät sarakkeissa. Vihreä merkki tarkoittaa "toimistolla", piste tarkoittaa etäpäivää. Tänään-sarake on korostettu.</p>
+        <ul>
+          <li>Valitse näytettävä ajanjakso: 2, 3 tai 4 viikkoa</li>
+          <li>Hae henkilöä nimellä tai roolilla hakukentällä</li>
+          <li>Suodata henkilöitä chipseillä</li>
+          <li>Klikkaa mitä tahansa solua nähdäksesi kaikki kyseisen päivän kävijät</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <strong>Vinkki:</strong> Perjantai on tiimin yhteinen etäpäivä — toimisto on silloin tyhjä. Maanantaisin paikalla ovat yleensä vain PM ja Tech Lead.
+      </div>
+
+      <h2>Muistutukset</h2>
+      <div class="card">
+        <h3>Slack-muistutukset</h3>
+        <p>Maanantaisin klo 8:50 (ja satunnaisesti torstaisin) <code>#jkl-toimisto</code> -kanavalle lähetetään yhteinen lempeä muistutus merkitä toimistopäivät kalenteriin.</p>
+        <p>Selaa eri viikkojen muistutuksia viikkopainikkeilla.</p>
+      </div>
+
+      <div class="card">
+        <h3>Kalenterimuistutus</h3>
+        <p>Jokaisella on 10 minuutin kalenterimuistutus maanantaiaamulle klo 9:00.</p>
+      </div>
+
+      <div class="card">
+        <h3>Miten toimii -osio</h3>
+        <p>Neljän askeleen visuaalinen kuvaus prosessista: Slack-muistutus, kalenterimuistutus, oma merkintä kalenteriin ja yhteinen näkymä.</p>
+      </div>
+
+      <h2>Kielivalinta</h2>
+      <p>Vaihda kieltä oikeasta yläkulmasta FI/EN-painikkeilla.</p>
+    </div>
+
+    <!-- ENGLISH -->
+    <div class="guide-section" id="guide-en">
+      <h1>User Guide</h1>
+      <p class="intro">Who's coming to the office? is a tool for the Siili Jyväskylä team that shows who will be at the office and when. The app collects calendar entries and provides analytics, a calendar view, and a reminder system.</p>
+
+      <h2>Analytics View</h2>
+      <p>Analytics is the default view and provides an overview of office usage.</p>
+
+      <div class="card">
+        <h3>Person Filter</h3>
+        <p>Use the chips at the top to filter all analytics to specific people. Everyone is selected by default. Click a person's name to toggle them on/off, or use the <code>Kaikki</code> (All) button.</p>
+      </div>
+
+      <div class="card">
+        <h3>This Week Overview</h3>
+        <p>The first chart shows how many people are coming to the office each day this week. Today is highlighted in a darker colour, past days are greyed out. Click a bar to see who is present.</p>
+      </div>
+
+      <div class="card">
+        <h3>Summary Cards</h3>
+        <p>Four cards display: total office visits, average per day, number of different people, and the most popular weekday.</p>
+      </div>
+
+      <div class="card">
+        <h3>Heatmap — Office Utilisation</h3>
+        <p>The heatmap shows office visits week by week. The darker the cell, the more people were present.</p>
+        <ul>
+          <li><strong>This week</strong> is highlighted with a teal outline and an arrow marker in the week label</li>
+          <li><strong>Today</strong> stands out with a yellow border and a "NYT" (NOW) label</li>
+          <li><strong>Sliders:</strong> Adjust how many weeks back and forward you can see (default 2+2)</li>
+          <li>Click any cell to see who was/will be at the office</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Weekday and Person Distributions</h3>
+        <p>Two side-by-side charts: most popular office days (bar chart) and most active visitors (horizontal bar chart). Click a bar for details.</p>
+      </div>
+
+      <div class="card">
+        <h3>Weekly Trend</h3>
+        <p>A line chart showing visits and unique people per week. Click a data point to drill down into that week's details.</p>
+      </div>
+
+      <div class="card">
+        <h3>Time Filter</h3>
+        <p>Use the buttons at the top to filter analytics: <code>Menneisyys</code> (Past), <code>Kaikki</code> (All) or <code>Tuleva</code> (Future).</p>
+      </div>
+
+      <h2>Calendar View</h2>
+      <div class="card">
+        <h3>Table View</h3>
+        <p>Shows people as rows and days as columns. A green check means "at the office", a dot means remote. Today's column is highlighted.</p>
+        <ul>
+          <li>Select the time range: 2, 3 or 4 weeks</li>
+          <li>Search by name or role using the search field</li>
+          <li>Filter people using the chips</li>
+          <li>Click any cell to see all visitors for that day</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <strong>Tip:</strong> Friday is the team's shared remote day — the office is empty. On Mondays, typically only the PM and Tech Lead are present.
+      </div>
+
+      <h2>Reminders</h2>
+      <div class="card">
+        <h3>Slack Reminders</h3>
+        <p>On Mondays at 8:50 (and occasionally on Thursdays) a friendly reminder is sent to the <code>#jkl-toimisto</code> channel to mark office days in the calendar.</p>
+        <p>Browse different weeks' reminders using the week buttons.</p>
+      </div>
+
+      <div class="card">
+        <h3>Calendar Reminder</h3>
+        <p>Everyone has a 10-minute calendar reminder on Monday morning at 9:00.</p>
+      </div>
+
+      <div class="card">
+        <h3>How It Works</h3>
+        <p>A four-step visual explanation of the process: Slack reminder, calendar reminder, personal calendar entry, and shared view.</p>
+      </div>
+
+      <h2>Language</h2>
+      <p>Switch language using the FI/EN buttons in the top-right corner.</p>
+    </div>
+  </div>
+
+  <div class="footer">Siili Solutions — Kuka tulee toimistolle? — Siili Jyväskylä</div>
+
+  <script>
+    function showGuide(lang, btn) {
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('guide-' + lang).classList.add('active');
+    }
+  </script>
+
+  <!-- Analytics -->
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

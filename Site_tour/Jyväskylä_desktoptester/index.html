@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop-sovellusten automaatiotestaus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --primary-lighter: #eff6ff;
+            --bg: #f5f7fa;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #5a5a7a;
+            --text-light: #8888a0;
+            --border: #e2e8f0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* === HEADER === */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .header-logo {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .header-subtitle {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.55);
+            font-weight: 400;
+            margin-top: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* === LANG SWITCHER === */
+        .lang-switcher {
+            display: flex;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .lang-btn.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .lang-btn:hover:not(.active) {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        .lang-flag { font-size: 0.85rem; line-height: 1; }
+
+        .btn-guide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-guide:hover {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+        }
+
+        /* === NAV TABS === */
+        .nav {
+            display: flex;
+            gap: 2px;
+            padding: 0 24px 0;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .nav-tab:hover {
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-tab.active {
+            color: #fff;
+            border-bottom-color: var(--primary);
+            background: rgba(255,255,255,0.08);
+        }
+
+        /* === MAIN === */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .view-header {
+            margin-bottom: 20px;
+        }
+        .view-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        .view-header p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            margin-top: 4px;
+        }
+
+        h3 { font-size: 1.1rem; margin: 20px 0 10px; color: var(--text); font-weight: 600; }
+        p { line-height: 1.7; margin-bottom: 12px; color: var(--text-secondary); font-size: 0.92rem; }
+
+        /* === CARDS === */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: var(--shadow-hover); }
+        .card h3 { margin-top: 0; }
+
+        /* === BADGES === */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-blue { background: var(--primary-light); color: #1e40af; }
+        .badge-orange { background: #ffedd5; color: #9a3412; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; }
+
+        /* === TABLE === */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.85rem;
+        }
+        .comparison-table th {
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .comparison-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .comparison-table tr:nth-child(even) { background: #f8fafc; }
+        .comparison-table tr:hover { background: var(--primary-lighter); }
+
+        /* === CODE BLOCKS === */
+        .code-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            margin: 12px 0;
+            position: relative;
+        }
+        .code-block .comment { color: #6c7086; }
+        .code-block .keyword { color: #cba6f7; }
+        .code-block .string { color: #a6e3a1; }
+        .code-block .function { color: #89b4fa; }
+        .code-block .number { color: #fab387; }
+        .code-block .decorator { color: #f9e2af; }
+        .code-block .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #cdd6f4;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            transition: all 0.2s;
+        }
+        .code-block .copy-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* === WORKFLOW === */
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+        .step-content { flex: 1; }
+
+        /* === PROS/CONS === */
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 12px 0;
+        }
+        .pros, .cons {
+            padding: 16px;
+            border-radius: var(--radius-sm);
+        }
+        .pros { background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .cons { background: #fef2f2; border: 1px solid #fecaca; }
+        .pros h4 { color: #166534; margin-bottom: 8px; font-size: 0.85rem; }
+        .cons h4 { color: #991b1b; margin-bottom: 8px; font-size: 0.85rem; }
+        .pros li, .cons li { margin-left: 16px; margin-bottom: 4px; line-height: 1.5; font-size: 0.85rem; }
+
+        /* === SIMULATOR === */
+        .simulator {
+            background: #1a1a2e;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 16px 0;
+            box-shadow: var(--shadow-hover);
+        }
+        .sim-titlebar {
+            background: #0f0f23;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sim-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .sim-dot.red { background: #ff5f56; }
+        .sim-dot.yellow { background: #ffbd2e; }
+        .sim-dot.green { background: #27c93f; }
+        .sim-titlebar span { color: #888; font-size: 0.78rem; margin-left: 8px; }
+
+        .sim-desktop {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 400px;
+            padding: 24px;
+            position: relative;
+            display: flex;
+            gap: 16px;
+        }
+
+        .sim-window {
+            background: white;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            overflow: hidden;
+            flex: 1;
+            max-width: 500px;
+        }
+        .sim-window-title {
+            background: #f0f0f0;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .sim-window-body { padding: 16px; font-size: 0.82rem; }
+
+        .sim-log {
+            background: rgba(0,0,0,0.4);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            flex: 1;
+            max-width: 400px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.75rem;
+            color: #a6e3a1;
+            overflow-y: auto;
+            max-height: 360px;
+        }
+        .sim-log .log-line {
+            margin-bottom: 4px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        .sim-log .log-info { color: #89b4fa; }
+        .sim-log .log-action { color: #f9e2af; }
+        .sim-log .log-success { color: #a6e3a1; }
+        .sim-log .log-error { color: #f38ba8; }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .sim-controls {
+            background: #0f0f23;
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .sim-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .sim-btn-primary { background: var(--primary); color: white; }
+        .sim-btn-primary:hover { background: var(--primary-dark); }
+        .sim-btn-primary:disabled { background: #555; cursor: not-allowed; }
+        .sim-btn-secondary { background: #333; color: #ccc; }
+        .sim-btn-secondary:hover { background: #444; }
+        .sim-status { color: #888; font-size: 0.78rem; margin-left: auto; }
+
+        /* Outlook simulator */
+        .outlook-toolbar {
+            background: #0078d4;
+            padding: 8px 12px;
+            display: flex;
+            gap: 12px;
+        }
+        .outlook-toolbar button {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: default;
+        }
+        .outlook-sidebar {
+            width: 180px;
+            background: #f3f3f3;
+            border-right: 1px solid #ddd;
+            padding: 8px 0;
+            float: left;
+            min-height: 200px;
+        }
+        .outlook-sidebar-item {
+            padding: 8px 16px;
+            font-size: 0.78rem;
+            color: #333;
+            cursor: default;
+        }
+        .outlook-sidebar-item.active { background: #e8f0fe; color: #0078d4; font-weight: 600; }
+        .outlook-inbox {
+            margin-left: 180px;
+            padding: 8px;
+        }
+        .outlook-email {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.78rem;
+        }
+        .outlook-email strong { display: block; margin-bottom: 2px; }
+        .outlook-email .preview { color: #666; }
+
+        .highlight-box {
+            outline: 3px solid #ff0000;
+            outline-offset: 2px;
+            animation: pulse-outline 1s infinite;
+        }
+        @keyframes pulse-outline {
+            0%, 100% { outline-color: #ff0000; }
+            50% { outline-color: #ff6666; }
+        }
+
+        /* === ARCHITECTURE DIAGRAM === */
+        .arch-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+        .arch-box {
+            background: var(--card);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            text-align: center;
+            min-width: 140px;
+        }
+        .arch-box.highlight { background: var(--primary-lighter); }
+        .arch-box .icon { font-size: 1.5rem; margin-bottom: 6px; }
+        .arch-box .label { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+        .arch-box .sublabel { font-size: 0.68rem; color: var(--text-light); margin-top: 4px; }
+        .arch-arrow { font-size: 1.5rem; color: var(--primary); }
+
+        /* === INFO BOX === */
+        .info-box {
+            background: var(--primary-lighter);
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin: 12px 0;
+            font-size: 0.88rem;
+        }
+        .info-box.warning {
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        /* === CHECKLIST === */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 0.88rem;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text-secondary);
+        }
+        .checklist li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+        }
+        .checklist li.done::before {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .checklist li.done::after {
+            content: '\2713';
+            position: absolute;
+            left: 3px;
+            top: 8px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* === FOOTER === */
+        footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-light);
+            font-size: 0.78rem;
+        }
+
+        /* === TWO-COL GRID === */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .header-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .header-actions { width: 100%; justify-content: flex-end; }
+            .sim-desktop { flex-direction: column; }
+            .sim-window, .sim-log { max-width: 100%; }
+            .pros-cons, .two-col { grid-template-columns: 1fr; }
+            .arch-diagram { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+            .nav-tab { padding: 8px 14px; font-size: 0.78rem; }
+            .main { padding: 16px 12px 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <div class="header-brand">
+                <span class="header-logo">🖥️</span>
+                <div>
+                    <div class="header-title" data-i18n="title">Desktop-sovellusten automaatiotestaus</div>
+                    <div class="header-subtitle" data-i18n="subtitle">Kuvantunnistuksella toimiva testausautomaatio</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="lang-switcher">
+                    <button class="lang-btn active" data-lang="fi" onclick="setLang('fi')"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+                    <button class="lang-btn" data-lang="en" onclick="setLang('en')"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+                </div>
+                <a href="guide.html" class="btn-guide" title="Käyttöohje">?</a>
+            </div>
+        </div>
+        <nav class="nav" id="nav">
+            <button class="nav-tab active" data-tab="simulator" data-i18n="tab_simulator">Simulaattori</button>
+            <button class="nav-tab" data-tab="overview" data-i18n="tab_overview">Yleiskatsaus</button>
+            <button class="nav-tab" data-tab="approaches" data-i18n="tab_approaches">Lähestymistavat</button>
+            <button class="nav-tab" data-tab="example" data-i18n="tab_example">Esimerkki</button>
+            <button class="nav-tab" data-tab="workflow" data-i18n="tab_workflow">Testaajan työnkulku</button>
+            <button class="nav-tab" data-tab="limits" data-i18n="tab_limits">Rajoitteet</button>
+        </nav>
+    </header>
+
+    <main class="main">
+
+    <!-- OVERVIEW -->
+    <div class="view" id="view-overview">
+        <div class="view-header">
+            <h2 data-i18n="overview_title">Miten testata desktop-sovelluksia automaattisesti?</h2>
+            <p data-i18n="overview_intro">Desktop-sovellusten (Outlook, SAP, Excel, Teams) automaatiotestaus on perinteisesti ollut vaikeaa, koska sovelluksilla ei ole standardoitua API:a testaukseen kuten web-sovelluksilla. Tämä sivu esittelee modernit ratkaisut tähän ongelmaan.</p>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="overview_problem_title">Ongelma</h3>
+            <p data-i18n="overview_problem">Web-sovelluksia voi testata Seleniumilla tai Playwrightilla, koska ne manipuloivat DOM-puuta. Desktop-sovelluksilla ei ole vastaavaa universaalia rajapintaa. Miten siis automatisoida esimerkiksi: "Avaa Outlook, kirjaudu sisään, avaa ensimmäinen sähköposti, klikkaa Vastaa"?</p>
+        </div>
+
+        <h3 data-i18n="overview_solution_title">Kaksi päälähestymistapaa</h3>
+
+        <div class="two-col" style="margin-top: 12px;">
+            <div class="card">
+                <h3>🖼️ <span data-i18n="approach_visual">Kuvantunnistus (Visual)</span></h3>
+                <p data-i18n="approach_visual_desc">Automaatio "näkee" ruudun kuvakaappauksena ja etsii nappeja, kenttiä ja ikkunoita kuvatunnistuksella (template matching tai AI). Ei tarvitse tietää sovelluksen sisäistä rakennetta.</p>
+                <div>
+                    <span class="badge badge-green" data-i18n="badge_universal">Universaali</span>
+                    <span class="badge badge-blue" data-i18n="badge_no_api">Ei vaadi API:a</span>
+                    <span class="badge badge-orange" data-i18n="badge_fragile">Herkempi muutoksille</span>
+                </div>
+            </div>
+            <div class="card">
+                <h3>🌳 <span data-i18n="approach_tree">Saavutettavuuspuu (Accessibility)</span></h3>
+                <p data-i18n="approach_tree_desc">Käytetään käyttöjärjestelmän saavutettavuusrajapintaa (UI Automation, AT-SPI) elementtien löytämiseen. Toimii kuin Selenium, mutta desktop-sovelluksille.</p>
+                <div>
+                    <span class="badge badge-green" data-i18n="badge_stable">Vakaampi</span>
+                    <span class="badge badge-blue" data-i18n="badge_fast">Nopea</span>
+                    <span class="badge badge-red" data-i18n="badge_not_all">Ei toimi kaikille</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 4px;">
+            <h3 data-i18n="overview_arch_title">Arkkitehtuuri</h3>
+            <div class="arch-diagram">
+                <div class="arch-box">
+                    <div class="icon">📝</div>
+                    <div class="label" data-i18n="arch_test">Testiskripti</div>
+                    <div class="sublabel">Python / YAML</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box highlight">
+                    <div class="icon">🤖</div>
+                    <div class="label" data-i18n="arch_engine">Automaatiomoottori</div>
+                    <div class="sublabel">PyAutoGUI / Claude</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box">
+                    <div class="icon">📸</div>
+                    <div class="label" data-i18n="arch_screen">Kuvakaappaus</div>
+                    <div class="sublabel">Screenshot + OCR</div>
+                </div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-box">
+                    <div class="icon">🖥️</div>
+                    <div class="label" data-i18n="arch_app">Desktop-sovellus</div>
+                    <div class="sublabel">Outlook, SAP...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPROACHES -->
+    <div class="view" id="view-approaches">
+        <div class="view-header">
+            <h2 data-i18n="approaches_title">Teknologiat vertailussa</h2>
+            <p data-i18n="approaches_subtitle">Vertaile eri työkaluja ja valitse projektiisi sopivin lähestymistapa.</p>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th data-i18n="col_tool">Työkalu</th>
+                        <th data-i18n="col_method">Menetelmä</th>
+                        <th data-i18n="col_platform">Alusta</th>
+                        <th data-i18n="col_difficulty">Vaikeustaso</th>
+                        <th data-i18n="col_best_for">Paras käyttökohde</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>PyAutoGUI + OpenCV</strong></td>
+                        <td data-i18n="method_img">Kuvantunnistus</td>
+                        <td>Win / Mac / Linux</td>
+                        <td><span class="badge badge-green" data-i18n="diff_easy">Helppo</span></td>
+                        <td data-i18n="best_pyautogui">Yksinkertaiset testitapaukset, nopea aloitus</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Claude Computer Use</strong></td>
+                        <td data-i18n="method_ai">AI-pohjainen</td>
+                        <td>Win / Mac / Linux</td>
+                        <td><span class="badge badge-green" data-i18n="diff_easy">Helppo</span></td>
+                        <td data-i18n="best_claude">Monimutkaiset, muuttuvat UI:t</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SikuliX</strong></td>
+                        <td data-i18n="method_img">Kuvantunnistus</td>
+                        <td>Win / Mac / Linux</td>
+                        <td><span class="badge badge-orange" data-i18n="diff_medium">Keskitaso</span></td>
+                        <td data-i18n="best_sikuli">Monipuoliset visuaaliset testit</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WinAppDriver</strong></td>
+                        <td data-i18n="method_acc">Saavutettavuuspuu</td>
+                        <td>Windows</td>
+                        <td><span class="badge badge-orange" data-i18n="diff_medium">Keskitaso</span></td>
+                        <td data-i18n="best_winapp">Windows-natiivisovellukset</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Appium Desktop</strong></td>
+                        <td data-i18n="method_acc">Saavutettavuuspuu</td>
+                        <td>Win / Mac</td>
+                        <td><span class="badge badge-orange" data-i18n="diff_medium">Keskitaso</span></td>
+                        <td data-i18n="best_appium">Cross-platform desktop</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Power Automate Desktop</strong></td>
+                        <td data-i18n="method_rpa">RPA (molemmat)</td>
+                        <td>Windows</td>
+                        <td><span class="badge badge-green" data-i18n="diff_easy">Helppo</span></td>
+                        <td data-i18n="best_power">Microsoft-ympäristöt, ei-koodaajat</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PyAutoGUI details -->
+        <div class="card">
+            <h3>🐍 PyAutoGUI + OpenCV</h3>
+            <p data-i18n="pyautogui_desc">Python-kirjasto joka hallitsee hiirtä ja näppäimistöä sekä ottaa kuvakaappauksia. OpenCV lisää kuvatunnistuksen: voit etsiä ruudulta tiettyä nappia tai ikonia kuvan perusteella.</p>
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4 data-i18n="pros">Vahvuudet</h4>
+                    <ul>
+                        <li data-i18n="pyautogui_pro1">Helppo asentaa: pip install pyautogui</li>
+                        <li data-i18n="pyautogui_pro2">Cross-platform (Win/Mac/Linux)</li>
+                        <li data-i18n="pyautogui_pro3">Toimii kaikkien sovellusten kanssa</li>
+                        <li data-i18n="pyautogui_pro4">Hyvä dokumentaatio ja yhteisö</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4 data-i18n="cons">Heikkoudet</h4>
+                    <ul>
+                        <li data-i18n="pyautogui_con1">Herkkä resoluutio- ja teemamuutoksille</li>
+                        <li data-i18n="pyautogui_con2">Ei ymmärrä mitä näkee (ei AI:ta)</li>
+                        <li data-i18n="pyautogui_con3">Tarvitsee referenssikuvia ylläpidettäväksi</li>
+                        <li data-i18n="pyautogui_con4">Yksi näyttö kerrallaan</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claude Computer Use -->
+        <div class="card">
+            <h3>🧠 Claude Computer Use</h3>
+            <p data-i18n="claude_desc">Anthropicin Claude-mallin computer use -ominaisuus: AI näkee ruudun kuvakaappauksena ja osaa päätellä mitä klikata, minne kirjoittaa ja miten navigoida. Ei tarvitse referenssikuvia - AI ymmärtää UI:n semanttisesti.</p>
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4 data-i18n="pros">Vahvuudet</h4>
+                    <ul>
+                        <li data-i18n="claude_pro1">Ymmärtää UI:n merkityksen, ei vain pikseleitä</li>
+                        <li data-i18n="claude_pro2">Ei tarvitse referenssikuvia</li>
+                        <li data-i18n="claude_pro3">Sopeutuu UI-muutoksiin automaattisesti</li>
+                        <li data-i18n="claude_pro4">Voi suorittaa monimutkaisia tehtäviä luonnollisella kielellä</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4 data-i18n="cons">Heikkoudet</h4>
+                    <ul>
+                        <li data-i18n="claude_con1">API-kustannukset (kuvakaappaus per pyyntö)</li>
+                        <li data-i18n="claude_con2">Hitaampi kuin perinteinen automaatio</li>
+                        <li data-i18n="claude_con3">Vaatii internet-yhteyden (API)</li>
+                        <li data-i18n="claude_con4">Tulos ei ole 100% deterministinen</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- WinAppDriver -->
+        <div class="card">
+            <h3>🪟 WinAppDriver / Appium</h3>
+            <p data-i18n="winapp_desc">Microsoftin WinAppDriver käyttää Windows UI Automation -rajapintaa: sovelluksen elementit löydetään saavutettavuuspuusta nimen, AutomationId:n tai ControlType:n perusteella. Toimii kuin Selenium, mutta natiivisovelluksille.</p>
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4 data-i18n="pros">Vahvuudet</h4>
+                    <ul>
+                        <li data-i18n="winapp_pro1">Vakaa - ei riipu pikselikoordinaateista</li>
+                        <li data-i18n="winapp_pro2">Nopea suoritus</li>
+                        <li data-i18n="winapp_pro3">Integroituu Selenium-ekosysteemiin</li>
+                        <li data-i18n="winapp_pro4">Tarkka elementtien tunnistus</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4 data-i18n="cons">Heikkoudet</h4>
+                    <ul>
+                        <li data-i18n="winapp_con1">Vain Windows</li>
+                        <li data-i18n="winapp_con2">Ei toimi kaikilla sovelluksilla (esim. legacy)</li>
+                        <li data-i18n="winapp_con3">Tarvitsee Inspect-työkalun elementtien löytämiseen</li>
+                        <li data-i18n="winapp_con4">Jotkut sovellukset piilottavat elementit</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAMPLE -->
+    <div class="view" id="view-example">
+        <div class="view-header">
+            <h2 data-i18n="example_title">Konkreettinen esimerkki: Outlook-testaus</h2>
+            <p data-i18n="example_scenario_desc">Alla on kolme eri tapaa toteuttaa sama testitapaus. Jokainen lähestymistapa ratkaisee saman ongelman eri tavalla.</p>
+        </div>
+
+        <div class="info-box" style="margin-bottom:16px;">
+            <strong data-i18n="example_scenario">Testitapaus:</strong>
+            <span>"Avaa Outlook, kirjaudu sisään, lue ensimmäinen sähköposti"</span>
+        </div>
+
+        <!-- Approach 1: PyAutoGUI -->
+        <div class="card">
+            <h3>1. PyAutoGUI + OpenCV</h3>
+            <p data-i18n="example_pyautogui_desc">Perinteinen kuvantunnistuspohjainen lähestymistapa. Tarvitsee referenssikuvat UI-elementeistä.</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)" data-i18n="copy">Kopioi</button>
+<span class="comment"># outlook_test.py - Desktop-testaus PyAutoGUI:lla</span>
+<span class="keyword">import</span> pyautogui
+<span class="keyword">import</span> time
+<span class="keyword">import</span> subprocess
+
+<span class="comment"># Aseta turvamekanismi: siirrä hiiri nurkkaan pysäyttääksesi</span>
+pyautogui.FAILSAFE = <span class="keyword">True</span>
+pyautogui.PAUSE = <span class="number">0.5</span>  <span class="comment"># 0.5s viive jokaisen toiminnon väliin</span>
+
+<span class="keyword">def</span> <span class="function">wait_for_image</span>(image_path, timeout=<span class="number">30</span>, confidence=<span class="number">0.8</span>):
+    <span class="string">"""Odota kunnes kuva löytyy ruudulta."""</span>
+    start = time.time()
+    <span class="keyword">while</span> time.time() - start &lt; timeout:
+        location = pyautogui.<span class="function">locateOnScreen</span>(
+            image_path, confidence=confidence
+        )
+        <span class="keyword">if</span> location:
+            <span class="keyword">return</span> pyautogui.<span class="function">center</span>(location)
+        time.<span class="function">sleep</span>(<span class="number">1</span>)
+    <span class="keyword">raise</span> <span class="function">TimeoutError</span>(<span class="string">f"Kuvaa {image_path} ei löytynyt {timeout}s sisällä"</span>)
+
+<span class="keyword">def</span> <span class="function">test_outlook_read_email</span>():
+    <span class="comment"># 1. Käynnistä Outlook</span>
+    subprocess.<span class="function">Popen</span>(<span class="string">"outlook.exe"</span>)
+    <span class="function">print</span>(<span class="string">"[INFO] Käynnistetään Outlook..."</span>)
+
+    <span class="comment"># 2. Odota että Outlook avautuu (etsi tunnettua ikonia)</span>
+    inbox_btn = <span class="function">wait_for_image</span>(<span class="string">"images/outlook_inbox_icon.png"</span>)
+    <span class="function">print</span>(<span class="string">"[OK] Outlook avautui"</span>)
+
+    <span class="comment"># 3. Klikkaa Saapuneet-kansiota</span>
+    pyautogui.<span class="function">click</span>(inbox_btn)
+    time.<span class="function">sleep</span>(<span class="number">2</span>)
+
+    <span class="comment"># 4. Jos kirjautumisikkuna ilmestyy</span>
+    <span class="keyword">try</span>:
+        login_field = <span class="function">wait_for_image</span>(
+            <span class="string">"images/email_field.png"</span>, timeout=<span class="number">5</span>
+        )
+        pyautogui.<span class="function">click</span>(login_field)
+        pyautogui.<span class="function">typewrite</span>(<span class="string">"testaaja@firma.fi"</span>, interval=<span class="number">0.05</span>)
+        pyautogui.<span class="function">press</span>(<span class="string">"enter"</span>)
+        <span class="function">print</span>(<span class="string">"[OK] Kirjautumistiedot syötetty"</span>)
+    <span class="keyword">except</span> TimeoutError:
+        <span class="function">print</span>(<span class="string">"[INFO] Kirjautumista ei tarvittu"</span>)
+
+    <span class="comment"># 5. Klikkaa ensimmäistä sähköpostia</span>
+    first_email = <span class="function">wait_for_image</span>(<span class="string">"images/unread_email_icon.png"</span>)
+    pyautogui.<span class="function">click</span>(first_email)
+    time.<span class="function">sleep</span>(<span class="number">1</span>)
+    <span class="function">print</span>(<span class="string">"[OK] Ensimmäinen sähköposti avattu"</span>)
+
+    <span class="comment"># 6. Ota kuvakaappaus todisteeksi</span>
+    screenshot = pyautogui.<span class="function">screenshot</span>()
+    screenshot.<span class="function">save</span>(<span class="string">"test_results/outlook_email_opened.png"</span>)
+    <span class="function">print</span>(<span class="string">"[OK] Kuvakaappaus tallennettu"</span>)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    <span class="function">test_outlook_read_email</span>()
+            </div>
+        </div>
+
+        <!-- Approach 2: Claude Computer Use -->
+        <div class="card">
+            <h3>2. Claude Computer Use</h3>
+            <p data-i18n="example_claude_desc">AI-pohjainen lähestymistapa: kerro luonnollisella kielellä mitä haluat tehdä, ja Claude suorittaa sen.</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)" data-i18n="copy">Kopioi</button>
+<span class="comment"># outlook_test_claude.py - Desktop-testaus Claude Computer Use:lla</span>
+<span class="keyword">import</span> anthropic
+<span class="keyword">import</span> base64
+<span class="keyword">import</span> subprocess
+<span class="keyword">from</span> PIL <span class="keyword">import</span> ImageGrab
+
+client = anthropic.<span class="function">Anthropic</span>()
+
+<span class="keyword">def</span> <span class="function">take_screenshot</span>():
+    <span class="string">"""Ota kuvakaappaus ja palauta base64-muodossa."""</span>
+    img = ImageGrab.<span class="function">grab</span>()
+    <span class="keyword">import</span> io
+    buffer = io.<span class="function">BytesIO</span>()
+    img.<span class="function">save</span>(buffer, format=<span class="string">"PNG"</span>)
+    <span class="keyword">return</span> base64.<span class="function">b64encode</span>(buffer.<span class="function">getvalue</span>()).<span class="function">decode</span>()
+
+<span class="keyword">def</span> <span class="function">execute_action</span>(action):
+    <span class="string">"""Suorita Clauden ehdottama toiminto."""</span>
+    <span class="keyword">if</span> action[<span class="string">"type"</span>] == <span class="string">"click"</span>:
+        <span class="keyword">import</span> pyautogui
+        pyautogui.<span class="function">click</span>(action[<span class="string">"x"</span>], action[<span class="string">"y"</span>])
+    <span class="keyword">elif</span> action[<span class="string">"type"</span>] == <span class="string">"type"</span>:
+        <span class="keyword">import</span> pyautogui
+        pyautogui.<span class="function">typewrite</span>(action[<span class="string">"text"</span>])
+    <span class="keyword">elif</span> action[<span class="string">"type"</span>] == <span class="string">"key"</span>:
+        <span class="keyword">import</span> pyautogui
+        pyautogui.<span class="function">press</span>(action[<span class="string">"key"</span>])
+
+<span class="keyword">def</span> <span class="function">test_outlook_with_claude</span>():
+    <span class="comment"># 1. Käynnistä Outlook</span>
+    subprocess.<span class="function">Popen</span>(<span class="string">"outlook.exe"</span>)
+
+    <span class="comment"># 2. Anna tehtävä Claudelle luonnollisella kielellä</span>
+    task = <span class="string">"""
+    Olet testausautomaatiobotti. Suorita seuraavat askeleet:
+    1. Odota että Outlook on avautunut
+    2. Jos kirjautumisikkuna näkyy, kirjaudu sisään
+    3. Klikkaa Saapuneet-kansiota (Inbox)
+    4. Avaa ensimmäinen lukematon sähköposti
+    5. Raportoi sähköpostin otsikko ja lähettäjä
+    """</span>
+
+    messages = [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: [
+        {<span class="string">"type"</span>: <span class="string">"text"</span>, <span class="string">"text"</span>: task},
+        {<span class="string">"type"</span>: <span class="string">"image"</span>, <span class="string">"source"</span>: {
+            <span class="string">"type"</span>: <span class="string">"base64"</span>,
+            <span class="string">"media_type"</span>: <span class="string">"image/png"</span>,
+            <span class="string">"data"</span>: <span class="function">take_screenshot</span>()
+        }}
+    ]}]
+
+    <span class="comment"># 3. Claude analysoi ruudun ja ehdottaa toimintoja</span>
+    response = client.messages.<span class="function">create</span>(
+        model=<span class="string">"claude-sonnet-4-20250514"</span>,
+        max_tokens=<span class="number">1024</span>,
+        tools=[{
+            <span class="string">"type"</span>: <span class="string">"computer_20250124"</span>,
+            <span class="string">"name"</span>: <span class="string">"computer"</span>,
+            <span class="string">"display_width_px"</span>: <span class="number">1920</span>,
+            <span class="string">"display_height_px"</span>: <span class="number">1080</span>,
+            <span class="string">"display_number"</span>: <span class="number">1</span>
+        }],
+        messages=messages
+    )
+    <span class="function">print</span>(<span class="string">"Claude vastasi:"</span>, response.content)
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    <span class="function">test_outlook_with_claude</span>()
+            </div>
+        </div>
+
+        <!-- Approach 3: WinAppDriver -->
+        <div class="card">
+            <h3>3. WinAppDriver (saavutettavuuspuu)</h3>
+            <p data-i18n="example_winapp_desc">Selenium-tyylinen lähestymistapa: elementit löydetään nimellä ja AutomationId:lla.</p>
+
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)" data-i18n="copy">Kopioi</button>
+<span class="comment"># outlook_test_winappdriver.py - WinAppDriver</span>
+<span class="keyword">from</span> appium <span class="keyword">import</span> webdriver
+<span class="keyword">from</span> appium.options.windows <span class="keyword">import</span> WindowsOptions
+
+<span class="keyword">def</span> <span class="function">test_outlook_winappdriver</span>():
+    <span class="comment"># 1. Yhdistä WinAppDriveriin</span>
+    options = <span class="function">WindowsOptions</span>()
+    options.app = <span class="string">"Microsoft.Office.OUTLOOK_8wekyb3d8bbwe!microsoft.outlook"</span>
+
+    driver = webdriver.<span class="function">Remote</span>(
+        command_executor=<span class="string">"http://127.0.0.1:4723"</span>,
+        options=options
+    )
+
+    <span class="comment"># 2. Odota ja etsi Saapuneet-kansio nimellä</span>
+    inbox = driver.<span class="function">find_element</span>(
+        by=<span class="string">"name"</span>, value=<span class="string">"Inbox"</span>
+    )
+    inbox.<span class="function">click</span>()
+
+    <span class="comment"># 3. Etsi ensimmäinen sähköposti listasta</span>
+    emails = driver.<span class="function">find_elements</span>(
+        by=<span class="string">"class name"</span>, value=<span class="string">"LeafRow"</span>
+    )
+    <span class="keyword">if</span> emails:
+        emails[<span class="number">0</span>].<span class="function">click</span>()
+        <span class="function">print</span>(<span class="string">"[OK] Ensimmäinen sähköposti avattu"</span>)
+
+    <span class="comment"># 4. Lue sähköpostin sisältö</span>
+    body = driver.<span class="function">find_element</span>(
+        by=<span class="string">"automation id"</span>, value=<span class="string">"ReadingPaneContents"</span>
+    )
+    <span class="function">print</span>(<span class="string">f"Sisältö: {body.text[:200]}"</span>)
+
+    driver.<span class="function">quit</span>()
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    <span class="function">test_outlook_winappdriver</span>()
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong data-i18n="example_note_title">Huomaa ero:</strong>
+            <span data-i18n="example_note">PyAutoGUI etsii kuvia pikselitasolla, Claude ymmärtää mitä ruudulla näkyy, ja WinAppDriver löytää elementtejä nimillä. Valinta riippuu käyttötapauksesta: PyAutoGUI on nopein aloittaa, Claude joustavin, ja WinAppDriver vakain.</span>
+        </div>
+    </div>
+
+    <!-- SIMULATOR -->
+    <div class="view active" id="view-simulator">
+        <div class="view-header">
+            <h2 data-i18n="sim_title">Interaktiivinen simulaattori</h2>
+            <p data-i18n="sim_desc">Katso miten desktop-testausautomaatio toimii käytännössä. Paina "Aloita testi" nähdäksesi miten PyAutoGUI-pohjainen botti automatisoi Outlook-sovellusta.</p>
+        </div>
+
+        <div class="simulator">
+            <div class="sim-titlebar">
+                <div class="sim-dot red"></div>
+                <div class="sim-dot yellow"></div>
+                <div class="sim-dot green"></div>
+                <span data-i18n="sim_window_title">Desktop-automaatio simulaattori</span>
+            </div>
+            <div class="sim-desktop" id="simDesktop">
+                <div class="sim-window" id="simOutlook" style="display:none;">
+                    <div class="sim-window-title">
+                        <span>📧</span> Microsoft Outlook
+                    </div>
+                    <div id="outlookContent"></div>
+                </div>
+                <div class="sim-log" id="simLog">
+                    <div class="log-line log-info" data-i18n="sim_log_ready">[ VALMIS ] Paina "Aloita testi" aloittaaksesi simulaation</div>
+                </div>
+            </div>
+            <div class="sim-controls">
+                <button class="sim-btn sim-btn-primary" id="simStartBtn" onclick="startSimulation()" data-i18n="sim_start">Aloita testi</button>
+                <button class="sim-btn sim-btn-secondary" onclick="resetSimulation()" data-i18n="sim_reset">Nollaa</button>
+                <div class="sim-status" id="simStatus" data-i18n="sim_status_ready">Valmis</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+            <h3 data-i18n="sim_what_happens">Mitä simulaatiossa tapahtuu?</h3>
+            <ol style="margin-left: 20px; line-height: 2; font-size: 0.88rem; color: var(--text-secondary);">
+                <li data-i18n="sim_step1">Botti käynnistää Outlook-sovelluksen</li>
+                <li data-i18n="sim_step2">Odottaa kunnes Outlook-ikkuna ilmestyy (kuvakaappaus + tunnistus)</li>
+                <li data-i18n="sim_step3">Tunnistaa kirjautumiskentän ja syöttää sähköpostiosoitteen</li>
+                <li data-i18n="sim_step4">Klikkaa "Saapuneet"-kansiota sivupalkissa</li>
+                <li data-i18n="sim_step5">Etsii ensimmäisen lukemattoman sähköpostin ja klikkaa sitä</li>
+                <li data-i18n="sim_step6">Ottaa kuvakaappauksen todisteeksi ja raportoi tuloksen</li>
+            </ol>
+        </div>
+
+        <!-- OIKEAN SKRIPTIN AJO-OHJEET -->
+        <div class="card" style="margin-top: 8px; border-left: 4px solid var(--primary);">
+            <h3 data-i18n="real_title">Kokeile oikeasti: aja skriptit omalla koneellasi</h3>
+            <p data-i18n="real_desc">Yllä oleva demo on selainsimulatio. Mukana tulee myös oikeat Python-skriptit jotka automatisoivat Laskin-sovellusta oikeasti. Alla ohjeet niiden ajamiseen.</p>
+
+            <div class="info-box warning" style="margin-top:12px;">
+                <strong data-i18n="real_warn_title">Huom:</strong>
+                <span data-i18n="real_warn">Skriptit ottavat koneen hiiren ja näppäimistön haltuunsa ajon ajaksi. Turvamekanismi: siirrä hiiri ruudun nurkkaan, niin skripti pysähtyy välittömästi.</span>
+            </div>
+
+            <h3 style="margin-top:20px;" data-i18n="real_prereq_title">Esitiedot</h3>
+            <ul class="checklist" style="margin-bottom: 16px;">
+                <li class="done" data-i18n="real_prereq1">Python 3.8+ asennettu</li>
+                <li data-i18n="real_prereq2">pip install pyautogui pillow (perusdemo)</li>
+                <li data-i18n="real_prereq3">pip install anthropic pyautogui pillow (Claude-demo)</li>
+                <li data-i18n="real_prereq4">macOS: Screen Recording -oikeus terminaalille (System Settings → Privacy → Screen Recording)</li>
+            </ul>
+
+            <!-- Vaihtoehto 1: PyAutoGUI -->
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px;">
+                <h3 style="margin-top:0;">Vaihtoehto 1: PyAutoGUI <span class="badge badge-green" data-i18n="real_no_key">Ei vaadi API-avainta</span></h3>
+                <p data-i18n="real_pyautogui_desc">Avaa Laskin-sovelluksen, syöttää 42 + 58 näppäimistöllä, tarkistaa tuloksen ja ottaa kuvakaappauksen.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)" data-i18n="copy">Kopioi</button>
+<span class="comment"># 1. Asenna riippuvuudet</span>
+pip install pyautogui pillow
+
+<span class="comment"># 2. Aja demo (avaa Laskimen ja laskee 42+58)</span>
+python scripts/demo_pyautogui.py
+                </div>
+            </div>
+
+            <!-- Vaihtoehto 2: Claude Computer Use -->
+            <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px;">
+                <h3 style="margin-top:0;">Vaihtoehto 2: Claude Computer Use <span class="badge badge-purple">AI-pohjainen</span></h3>
+                <p data-i18n="real_claude_desc">Sama testitapaus, mutta Claude AI analysoi ruudun visuaalisesti ja päättää itse mitä klikata. Ei tarvitse kovakoodata koordinaatteja tai referenssikuvia.</p>
+
+                <div style="margin: 12px 0;">
+                    <label style="display:block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;" data-i18n="real_api_label">Anthropic API-avain</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..."
+                            style="flex:1; padding: 10px 14px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-family: monospace; font-size: 0.85rem; outline:none; transition: border-color 0.2s;"
+                            onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
+                        <button onclick="toggleApiKey()" style="padding: 10px 14px; background: var(--card); border: 2px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem;" title="Näytä/piilota">👁️</button>
+                    </div>
+                    <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 4px;" data-i18n="real_api_hint">Avain ei tallennu mihinkään. Käytetään vain kopiointiin alla olevaan komentoon.</div>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCmdWithKey(this)" data-i18n="copy">Kopioi</button>
+<span class="comment"># 1. Asenna riippuvuudet</span>
+pip install anthropic pyautogui pillow
+
+<span class="comment"># 2. Aseta API-avain ja aja</span>
+<span class="keyword">export</span> ANTHROPIC_API_KEY=<span class="string" id="apiKeyDisplay">"&lt;syötä avain yllä&gt;"</span>
+python scripts/demo_claude_computeruse.py
+                </div>
+
+                <p style="margin-top:8px;" data-i18n="real_claude_custom">Voit myös antaa oman tehtävän:</p>
+                <div class="code-block">
+python scripts/demo_claude_computeruse.py \
+  --task <span class="string">"Avaa TextEdit, kirjoita 'Hello World' ja tallenna tiedosto nimellä testi.txt"</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mitä skriptit tekevät -->
+        <div class="card">
+            <h3 data-i18n="real_what_title">Mitä oikeat skriptit tekevät?</h3>
+            <div class="two-col">
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 16px;">
+                    <h4 style="color: #166534; margin-bottom: 8px;">demo_pyautogui.py</h4>
+                    <ol style="margin-left: 16px; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary);">
+                        <li data-i18n="real_pyautogui_s1">Avaa Laskin-sovelluksen (Calculator)</li>
+                        <li data-i18n="real_pyautogui_s2">Syöttää näppäimistöllä: 4, 2, +, 5, 8, Enter</li>
+                        <li data-i18n="real_pyautogui_s3">Kopioi tuloksen leikepöydälle (Cmd+C)</li>
+                        <li data-i18n="real_pyautogui_s4">Tarkistaa onko tulos 100</li>
+                        <li data-i18n="real_pyautogui_s5">Ottaa kuvakaappaukset todisteiksi</li>
+                        <li data-i18n="real_pyautogui_s6">Sulkee Laskimen</li>
+                    </ol>
+                </div>
+                <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: var(--radius-sm); padding: 16px;">
+                    <h4 style="color: #6b21a8; margin-bottom: 8px;">demo_claude_computeruse.py</h4>
+                    <ol style="margin-left: 16px; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary);">
+                        <li data-i18n="real_claude_s1">Avaa Laskin-sovelluksen</li>
+                        <li data-i18n="real_claude_s2">Ottaa kuvakaappauksen ja lähettää Claudelle</li>
+                        <li data-i18n="real_claude_s3">Claude analysoi ruudun ja päättää mitä klikata</li>
+                        <li data-i18n="real_claude_s4">Suorittaa Clauden ehdottamat klikkaukset</li>
+                        <li data-i18n="real_claude_s5">Toistaa: kuvakaappaus → analyysi → toiminto</li>
+                        <li data-i18n="real_claude_s6">Claude raportoi tuloksen: PASS/FAIL</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKFLOW -->
+    <div class="view" id="view-workflow">
+        <div class="view-header">
+            <h2 data-i18n="workflow_title">Testaajan työnkulku</h2>
+            <p data-i18n="workflow_desc">Näin testaaja ottaa desktop-automaation käyttöön projektissa.</p>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content card">
+                <h3 data-i18n="wf_step1_title">Asenna työkalut</h3>
+                <div class="code-block">
+<span class="comment"># Perusasennus (PyAutoGUI-lähestymistapa)</span>
+pip install pyautogui opencv-python pillow
+
+<span class="comment"># TAI Claude Computer Use -lähestymistapa</span>
+pip install anthropic pyautogui pillow
+                </div>
+                <p data-i18n="wf_step1_desc">PyAutoGUI vaatii myös näytön käyttöoikeuden (macOS: System Preferences → Privacy → Screen Recording).</p>
+            </div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content card">
+                <h3 data-i18n="wf_step2_title">Ota referenssikuvat</h3>
+                <p data-i18n="wf_step2_desc">Kuvakaappaa UI-elementit joita testi tarvitsee: napit, kentät, ikonit. Tallenna ne images/-kansioon. Kuvien tulee olla tarkkoja leikkauksia halutuista elementeistä.</p>
+                <div class="info-box">
+                    <strong data-i18n="wf_step2_tip_title">Vinkki:</strong>
+                    <span data-i18n="wf_step2_tip">Claude Computer Use -lähestymistavalla et tarvitse referenssikuvia ollenkaan! AI tunnistaa UI-elementit automaattisesti.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content card">
+                <h3 data-i18n="wf_step3_title">Kirjoita testiskripti</h3>
+                <p data-i18n="wf_step3_desc">Määrittele testitapaus askeleina: mitä avataan, mitä klikataan, mitä syötetään, mitä tarkistetaan. Käytä wait_for_image()-funktioita odottamaan sovellusten latautumista.</p>
+            </div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content card">
+                <h3 data-i18n="wf_step4_title">Aja testit ja analysoi tulokset</h3>
+                <p data-i18n="wf_step4_desc">Aja testiskripti ja tarkista tulokset. Kuvakaappaukset toimivat todisteina. Virhetilanteissa botti tallentaa kuvakaappauksen virheen hetkeltä diagnosointia varten.</p>
+                <div class="code-block">
+<span class="comment"># Aja testi</span>
+python outlook_test.py
+
+<span class="comment"># Tulosteet:</span>
+<span class="string">[INFO] Käynnistetään Outlook...</span>
+<span class="string">[OK] Outlook avautui</span>
+<span class="string">[OK] Kirjautumistiedot syötetty</span>
+<span class="string">[OK] Ensimmäinen sähköposti avattu</span>
+<span class="string">[OK] Kuvakaappaus tallennettu</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-number">5</div>
+            <div class="step-content card">
+                <h3 data-i18n="wf_step5_title">Integroi CI/CD-putkeen (valinnainen)</h3>
+                <p data-i18n="wf_step5_desc">Desktop-testit voidaan ajaa CI/CD:ssä käyttäen virtuaalikoneita tai dedikoituja testikoneita. Huomaa: testikoneella täytyy olla aktiivinen näyttösessio (ei headless).</p>
+                <div class="info-box warning">
+                    <strong data-i18n="wf_step5_warn_title">Tärkeää:</strong>
+                    <span data-i18n="wf_step5_warn">Desktop-testejä EI voi ajaa headless-moodissa kuten web-testejä. Tarvitaan joko fyysinen näyttö, VNC-sessio, tai virtuaalinen framebuffer (Xvfb Linuxilla).</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 8px;">
+            <h3 data-i18n="wf_checklist_title">Käyttöönottotarkistuslista</h3>
+            <ul class="checklist">
+                <li class="done" data-i18n="wf_check1">Python 3.8+ asennettu</li>
+                <li class="done" data-i18n="wf_check2">PyAutoGUI ja riippuvuudet asennettu</li>
+                <li class="done" data-i18n="wf_check3">Näytön käyttöoikeudet myönnetty</li>
+                <li data-i18n="wf_check4">Referenssikuvat otettu (jos PyAutoGUI)</li>
+                <li data-i18n="wf_check5">Testiskripti kirjoitettu ja testattu manuaalisesti</li>
+                <li data-i18n="wf_check6">Virheenkäsittely ja kuvakaappaukset virheen hetkellä</li>
+                <li data-i18n="wf_check7">CI/CD-ympäristö konfiguroitu (näyttösessio)</li>
+                <li data-i18n="wf_check8">Testidatan hallinta suunniteltu</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- LIMITS -->
+    <div class="view" id="view-limits">
+        <div class="view-header">
+            <h2 data-i18n="limits_title">Rajoitteet ja haasteet</h2>
+            <p data-i18n="limits_subtitle">Mitä on hyvä tietää ennen desktop-testausautomaation käyttöönottoa.</p>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_resolution_title">1. Resoluutio- ja teemariippuvuus</h3>
+            <p data-i18n="limit_resolution">Kuvantunnistuspohjaiset testit ovat herkkiä näytön resoluutiolle, DPI-asetuksille ja käyttöjärjestelmän teemalle. Jos testikoneen näytön asetukset muuttuvat, referenssikuvat eivät enää täsmää.</p>
+            <div class="info-box">
+                <strong data-i18n="limit_resolution_fix_title">Ratkaisu:</strong>
+                <span data-i18n="limit_resolution_fix">Käytä alempaa confidence-tasoa (0.7-0.8), standardisoi testikone, tai siirry Claude Computer Use -pohjaiseen ratkaisuun joka sopeutuu muutoksiin.</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_headless_title">2. Ei headless-tukea</h3>
+            <p data-i18n="limit_headless">Desktop-testejä ei voi ajaa ilman näyttöä. Tarvitaan aina aktiivinen näyttösessio - joko fyysinen, VNC, RDP tai virtuaalinen framebuffer.</p>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_timing_title">3. Ajoitusongelmat</h3>
+            <p data-i18n="limit_timing">Sovellukset latautuvat eri nopeuksilla eri koneilla. Kiinteät sleep()-kutsut ovat hauraita. Parempi tapa: odota kunnes tietty UI-elementti ilmestyy (polling).</p>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_maintenance_title">4. Ylläpitokustannukset</h3>
+            <p data-i18n="limit_maintenance">Referenssikuvat vanhenevat sovelluspäivitysten myötä. Jokainen Outlook-päivitys voi rikkoa testit. AI-pohjaiset ratkaisut (Claude Computer Use) ovat tässä robustimpia.</p>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_parallel_title">5. Rinnakkaistestaus</h3>
+            <p data-i18n="limit_parallel">Kuvantunnistustestit hallitsevat koko näytön: hiiri ja näppäimistö ovat "varattuja". Rinnakkaisajoa varten tarvitaan erillisiä virtuaalikoneita tai -sessioita.</p>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_security_title">6. Tietoturva</h3>
+            <p data-i18n="limit_security">Testiskriptit sisältävät usein kirjautumistietoja. Käytä aina ympäristömuuttujia tai salaisuudenhallintaa (vault) - älä kovakoodaa salasanoja skripteihin!</p>
+            <div class="code-block">
+<span class="comment"># Turvallinen tapa: käytä ympäristömuuttujia</span>
+<span class="keyword">import</span> os
+username = os.environ[<span class="string">"TEST_USER"</span>]
+password = os.environ[<span class="string">"TEST_PASS"</span>]
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 data-i18n="limit_when_title">Milloin desktop-testausautomaatio kannattaa?</h3>
+            <div class="two-col" style="margin-top: 12px;">
+                <div class="pros">
+                    <h4 data-i18n="limit_when_yes">Kannattaa kun:</h4>
+                    <ul>
+                        <li data-i18n="limit_yes1">Toistuva manuaalinen testaus vie paljon aikaa</li>
+                        <li data-i18n="limit_yes2">Testataan kriittisiä liiketoimintaprosesseja</li>
+                        <li data-i18n="limit_yes3">Sovelluksella ei ole API:a tai web-käyttöliittymää</li>
+                        <li data-i18n="limit_yes4">Regressiotestaus on tärkeää</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4 data-i18n="limit_when_no">Ei kannata kun:</h4>
+                    <ul>
+                        <li data-i18n="limit_no1">Sovellus muuttuu jatkuvasti ja nopeasti</li>
+                        <li data-i18n="limit_no2">Testaus on kertaluontoista</li>
+                        <li data-i18n="limit_no3">Sama testaus voidaan tehdä API-tasolla</li>
+                        <li data-i18n="limit_no4">Ylläpitoresursseja ei ole saatavilla</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </main>
+
+    <footer>
+        <span data-i18n="footer">Rakennettu Claude Code:lla - Siili Solutions, Jyväskylä 2026</span>
+    </footer>
+
+<script>
+// ── i18n ──
+const translations = {
+    fi: {
+        title: "Desktop-sovellusten automaatiotestaus",
+        subtitle: "Kuvantunnistuksella toimiva testausautomaatio",
+        tab_overview: "Yleiskatsaus",
+        tab_approaches: "Lähestymistavat",
+        tab_example: "Esimerkki",
+        tab_simulator: "Simulaattori",
+        tab_workflow: "Testaajan työnkulku",
+        tab_limits: "Rajoitteet",
+        overview_title: "Miten testata desktop-sovelluksia automaattisesti?",
+        overview_intro: "Desktop-sovellusten (Outlook, SAP, Excel, Teams) automaatiotestaus on perinteisesti ollut vaikeaa, koska sovelluksilla ei ole standardoitua API:a testaukseen kuten web-sovelluksilla. Tämä sivu esittelee modernit ratkaisut tähän ongelmaan.",
+        overview_problem_title: "Ongelma",
+        overview_problem: 'Web-sovelluksia voi testata Seleniumilla tai Playwrightilla, koska ne manipuloivat DOM-puuta. Desktop-sovelluksilla ei ole vastaavaa universaalia rajapintaa. Miten siis automatisoida esimerkiksi: "Avaa Outlook, kirjaudu sisään, avaa ensimmäinen sähköposti, klikkaa Vastaa"?',
+        overview_solution_title: "Kaksi päälähestymistapaa",
+        approach_visual: "Kuvantunnistus (Visual)",
+        approach_visual_desc: "Automaatio \"näkee\" ruudun kuvakaappauksena ja etsii nappeja, kenttiä ja ikkunoita kuvatunnistuksella (template matching tai AI). Ei tarvitse tietää sovelluksen sisäistä rakennetta.",
+        approach_tree: "Saavutettavuuspuu (Accessibility)",
+        approach_tree_desc: "Käytetään käyttöjärjestelmän saavutettavuusrajapintaa (UI Automation, AT-SPI) elementtien löytämiseen. Toimii kuin Selenium, mutta desktop-sovelluksille.",
+        badge_universal: "Universaali",
+        badge_no_api: "Ei vaadi API:a",
+        badge_fragile: "Herkempi muutoksille",
+        badge_stable: "Vakaampi",
+        badge_fast: "Nopea",
+        badge_not_all: "Ei toimi kaikille",
+        overview_arch_title: "Arkkitehtuuri",
+        arch_test: "Testiskripti",
+        arch_engine: "Automaatiomoottori",
+        arch_screen: "Kuvakaappaus",
+        arch_app: "Desktop-sovellus",
+        approaches_title: "Teknologiat vertailussa",
+        approaches_subtitle: "Vertaile eri työkaluja ja valitse projektiisi sopivin lähestymistapa.",
+        col_tool: "Työkalu",
+        col_method: "Menetelmä",
+        col_platform: "Alusta",
+        col_difficulty: "Vaikeustaso",
+        col_best_for: "Paras käyttökohde",
+        method_img: "Kuvantunnistus",
+        method_ai: "AI-pohjainen",
+        method_acc: "Saavutettavuuspuu",
+        method_rpa: "RPA (molemmat)",
+        diff_easy: "Helppo",
+        diff_medium: "Keskitaso",
+        best_pyautogui: "Yksinkertaiset testitapaukset, nopea aloitus",
+        best_claude: "Monimutkaiset, muuttuvat UI:t",
+        best_sikuli: "Monipuoliset visuaaliset testit",
+        best_winapp: "Windows-natiivisovellukset",
+        best_appium: "Cross-platform desktop",
+        best_power: "Microsoft-ympäristöt, ei-koodaajat",
+        pyautogui_desc: "Python-kirjasto joka hallitsee hiirtä ja näppäimistöä sekä ottaa kuvakaappauksia. OpenCV lisää kuvatunnistuksen: voit etsiä ruudulta tiettyä nappia tai ikonia kuvan perusteella.",
+        pros: "Vahvuudet",
+        cons: "Heikkoudet",
+        pyautogui_pro1: "Helppo asentaa: pip install pyautogui",
+        pyautogui_pro2: "Cross-platform (Win/Mac/Linux)",
+        pyautogui_pro3: "Toimii kaikkien sovellusten kanssa",
+        pyautogui_pro4: "Hyvä dokumentaatio ja yhteisö",
+        pyautogui_con1: "Herkkä resoluutio- ja teemamuutoksille",
+        pyautogui_con2: "Ei ymmärrä mitä näkee (ei AI:ta)",
+        pyautogui_con3: "Tarvitsee referenssikuvia ylläpidettäväksi",
+        pyautogui_con4: "Yksi näyttö kerrallaan",
+        claude_desc: "Anthropicin Claude-mallin computer use -ominaisuus: AI näkee ruudun kuvakaappauksena ja osaa päätellä mitä klikata, minne kirjoittaa ja miten navigoida. Ei tarvitse referenssikuvia - AI ymmärtää UI:n semanttisesti.",
+        claude_pro1: "Ymmärtää UI:n merkityksen, ei vain pikseleitä",
+        claude_pro2: "Ei tarvitse referenssikuvia",
+        claude_pro3: "Sopeutuu UI-muutoksiin automaattisesti",
+        claude_pro4: "Voi suorittaa monimutkaisia tehtäviä luonnollisella kielellä",
+        claude_con1: "API-kustannukset (kuvakaappaus per pyyntö)",
+        claude_con2: "Hitaampi kuin perinteinen automaatio",
+        claude_con3: "Vaatii internet-yhteyden (API)",
+        claude_con4: "Tulos ei ole 100% deterministinen",
+        winapp_desc: "Microsoftin WinAppDriver käyttää Windows UI Automation -rajapintaa: sovelluksen elementit löydetään saavutettavuuspuusta nimen, AutomationId:n tai ControlType:n perusteella. Toimii kuin Selenium, mutta natiivisovelluksille.",
+        winapp_pro1: "Vakaa - ei riipu pikselikoordinaateista",
+        winapp_pro2: "Nopea suoritus",
+        winapp_pro3: "Integroituu Selenium-ekosysteemiin",
+        winapp_pro4: "Tarkka elementtien tunnistus",
+        winapp_con1: "Vain Windows",
+        winapp_con2: "Ei toimi kaikilla sovelluksilla (esim. legacy)",
+        winapp_con3: "Tarvitsee Inspect-työkalun elementtien löytämiseen",
+        winapp_con4: "Jotkut sovellukset piilottavat elementit",
+        example_title: "Konkreettinen esimerkki: Outlook-testaus",
+        example_scenario: "Testitapaus:",
+        example_scenario_desc: "Alla on kolme eri tapaa toteuttaa sama testitapaus. Jokainen lähestymistapa ratkaisee saman ongelman eri tavalla.",
+        example_pyautogui_desc: "Perinteinen kuvantunnistuspohjainen lähestymistapa. Tarvitsee referenssikuvat UI-elementeistä.",
+        example_claude_desc: "AI-pohjainen lähestymistapa: kerro luonnollisella kielellä mitä haluat tehdä, ja Claude suorittaa sen.",
+        example_winapp_desc: "Selenium-tyylinen lähestymistapa: elementit löydetään nimellä ja AutomationId:lla.",
+        copy: "Kopioi",
+        example_note_title: "Huomaa ero:",
+        example_note: "PyAutoGUI etsii kuvia pikselitasolla, Claude ymmärtää mitä ruudulla näkyy, ja WinAppDriver löytää elementtejä nimillä. Valinta riippuu käyttötapauksesta: PyAutoGUI on nopein aloittaa, Claude joustavin, ja WinAppDriver vakain.",
+        sim_title: "Interaktiivinen simulaattori",
+        sim_desc: 'Katso miten desktop-testausautomaatio toimii käytännössä. Paina "Aloita testi" nähdäksesi miten PyAutoGUI-pohjainen botti automatisoi Outlook-sovellusta.',
+        sim_window_title: "Desktop-automaatio simulaattori",
+        sim_log_ready: '[ VALMIS ] Paina "Aloita testi" aloittaaksesi simulaation',
+        sim_start: "Aloita testi",
+        sim_reset: "Nollaa",
+        sim_status_ready: "Valmis",
+        sim_what_happens: "Mitä simulaatiossa tapahtuu?",
+        sim_step1: "Botti käynnistää Outlook-sovelluksen",
+        sim_step2: "Odottaa kunnes Outlook-ikkuna ilmestyy (kuvakaappaus + tunnistus)",
+        sim_step3: "Tunnistaa kirjautumiskentän ja syöttää sähköpostiosoitteen",
+        sim_step4: 'Klikkaa "Saapuneet"-kansiota sivupalkissa',
+        sim_step5: "Etsii ensimmäisen lukemattoman sähköpostin ja klikkaa sitä",
+        sim_step6: "Ottaa kuvakaappauksen todisteeksi ja raportoi tuloksen",
+        workflow_title: "Testaajan työnkulku",
+        workflow_desc: "Näin testaaja ottaa desktop-automaation käyttöön projektissa.",
+        wf_step1_title: "Asenna työkalut",
+        wf_step1_desc: "PyAutoGUI vaatii myös näytön käyttöoikeuden (macOS: System Preferences → Privacy → Screen Recording).",
+        wf_step2_title: "Ota referenssikuvat",
+        wf_step2_desc: "Kuvakaappaa UI-elementit joita testi tarvitsee: napit, kentät, ikonit. Tallenna ne images/-kansioon. Kuvien tulee olla tarkkoja leikkauksia halutuista elementeistä.",
+        wf_step2_tip_title: "Vinkki:",
+        wf_step2_tip: "Claude Computer Use -lähestymistavalla et tarvitse referenssikuvia ollenkaan! AI tunnistaa UI-elementit automaattisesti.",
+        wf_step3_title: "Kirjoita testiskripti",
+        wf_step3_desc: "Määrittele testitapaus askeleina: mitä avataan, mitä klikataan, mitä syötetään, mitä tarkistetaan. Käytä wait_for_image()-funktioita odottamaan sovellusten latautumista.",
+        wf_step4_title: "Aja testit ja analysoi tulokset",
+        wf_step4_desc: "Aja testiskripti ja tarkista tulokset. Kuvakaappaukset toimivat todisteina. Virhetilanteissa botti tallentaa kuvakaappauksen virheen hetkeltä diagnosointia varten.",
+        wf_step5_title: "Integroi CI/CD-putkeen (valinnainen)",
+        wf_step5_desc: "Desktop-testit voidaan ajaa CI/CD:ssä käyttäen virtuaalikoneita tai dedikoituja testikoneita. Huomaa: testikoneella täytyy olla aktiivinen näyttösessio (ei headless).",
+        wf_step5_warn_title: "Tärkeää:",
+        wf_step5_warn: "Desktop-testejä EI voi ajaa headless-moodissa kuten web-testejä. Tarvitaan joko fyysinen näyttö, VNC-sessio, tai virtuaalinen framebuffer (Xvfb Linuxilla).",
+        wf_checklist_title: "Käyttöönottotarkistuslista",
+        wf_check1: "Python 3.8+ asennettu",
+        wf_check2: "PyAutoGUI ja riippuvuudet asennettu",
+        wf_check3: "Näytön käyttöoikeudet myönnetty",
+        wf_check4: "Referenssikuvat otettu (jos PyAutoGUI)",
+        wf_check5: "Testiskripti kirjoitettu ja testattu manuaalisesti",
+        wf_check6: "Virheenkäsittely ja kuvakaappaukset virheen hetkellä",
+        wf_check7: "CI/CD-ympäristö konfiguroitu (näyttösessio)",
+        wf_check8: "Testidatan hallinta suunniteltu",
+        limits_title: "Rajoitteet ja haasteet",
+        limits_subtitle: "Mitä on hyvä tietää ennen desktop-testausautomaation käyttöönottoa.",
+        limit_resolution_title: "1. Resoluutio- ja teemariippuvuus",
+        limit_resolution: "Kuvantunnistuspohjaiset testit ovat herkkiä näytön resoluutiolle, DPI-asetuksille ja käyttöjärjestelmän teemalle. Jos testikoneen näytön asetukset muuttuvat, referenssikuvat eivät enää täsmää.",
+        limit_resolution_fix_title: "Ratkaisu:",
+        limit_resolution_fix: "Käytä alempaa confidence-tasoa (0.7-0.8), standardisoi testikone, tai siirry Claude Computer Use -pohjaiseen ratkaisuun joka sopeutuu muutoksiin.",
+        limit_headless_title: "2. Ei headless-tukea",
+        limit_headless: "Desktop-testejä ei voi ajaa ilman näyttöä. Tarvitaan aina aktiivinen näyttösessio - joko fyysinen, VNC, RDP tai virtuaalinen framebuffer.",
+        limit_timing_title: "3. Ajoitusongelmat",
+        limit_timing: "Sovellukset latautuvat eri nopeuksilla eri koneilla. Kiinteät sleep()-kutsut ovat hauraita. Parempi tapa: odota kunnes tietty UI-elementti ilmestyy (polling).",
+        limit_maintenance_title: "4. Ylläpitokustannukset",
+        limit_maintenance: "Referenssikuvat vanhenevat sovelluspäivitysten myötä. Jokainen Outlook-päivitys voi rikkoa testit. AI-pohjaiset ratkaisut (Claude Computer Use) ovat tässä robustimpia.",
+        limit_parallel_title: "5. Rinnakkaistestaus",
+        limit_parallel: 'Kuvantunnistustestit hallitsevat koko näytön: hiiri ja näppäimistö ovat "varattuja". Rinnakkaisajoa varten tarvitaan erillisiä virtuaalikoneita tai -sessioita.',
+        limit_security_title: "6. Tietoturva",
+        limit_security: "Testiskriptit sisältävät usein kirjautumistietoja. Käytä aina ympäristömuuttujia tai salaisuudenhallintaa (vault) - älä kovakoodaa salasanoja skripteihin!",
+        limit_when_title: "Milloin desktop-testausautomaatio kannattaa?",
+        limit_when_yes: "Kannattaa kun:",
+        limit_yes1: "Toistuva manuaalinen testaus vie paljon aikaa",
+        limit_yes2: "Testataan kriittisiä liiketoimintaprosesseja",
+        limit_yes3: "Sovelluksella ei ole API:a tai web-käyttöliittymää",
+        limit_yes4: "Regressiotestaus on tärkeää",
+        limit_when_no: "Ei kannata kun:",
+        limit_no1: "Sovellus muuttuu jatkuvasti ja nopeasti",
+        limit_no2: "Testaus on kertaluontoista",
+        limit_no3: "Sama testaus voidaan tehdä API-tasolla",
+        limit_no4: "Ylläpitoresursseja ei ole saatavilla",
+        footer: "Rakennettu Claude Code:lla - Siili Solutions, Jyväskylä 2026"
+    },
+    en: {
+        title: "Desktop Application Test Automation",
+        subtitle: "Image recognition-based test automation",
+        tab_overview: "Overview",
+        tab_approaches: "Approaches",
+        tab_example: "Example",
+        tab_simulator: "Simulator",
+        tab_workflow: "Tester Workflow",
+        tab_limits: "Limitations",
+        overview_title: "How to automatically test desktop applications?",
+        overview_intro: "Automated testing of desktop applications (Outlook, SAP, Excel, Teams) has traditionally been difficult because these applications lack a standardized testing API like web applications have. This page presents modern solutions to this problem.",
+        overview_problem_title: "The Problem",
+        overview_problem: 'Web applications can be tested with Selenium or Playwright because they manipulate the DOM tree. Desktop applications have no equivalent universal interface. So how do you automate something like: "Open Outlook, log in, open the first email, click Reply"?',
+        overview_solution_title: "Two Main Approaches",
+        approach_visual: "Image Recognition (Visual)",
+        approach_visual_desc: 'Automation "sees" the screen as a screenshot and searches for buttons, fields, and windows using image recognition (template matching or AI). No need to know the application\'s internal structure.',
+        approach_tree: "Accessibility Tree",
+        approach_tree_desc: "Uses the operating system's accessibility API (UI Automation, AT-SPI) to find elements. Works like Selenium, but for desktop applications.",
+        badge_universal: "Universal",
+        badge_no_api: "No API needed",
+        badge_fragile: "More fragile",
+        badge_stable: "More stable",
+        badge_fast: "Fast",
+        badge_not_all: "Not for all apps",
+        overview_arch_title: "Architecture",
+        arch_test: "Test Script",
+        arch_engine: "Automation Engine",
+        arch_screen: "Screenshot",
+        arch_app: "Desktop App",
+        approaches_title: "Technology Comparison",
+        approaches_subtitle: "Compare different tools and choose the best approach for your project.",
+        col_tool: "Tool",
+        col_method: "Method",
+        col_platform: "Platform",
+        col_difficulty: "Difficulty",
+        col_best_for: "Best For",
+        method_img: "Image Recognition",
+        method_ai: "AI-based",
+        method_acc: "Accessibility Tree",
+        method_rpa: "RPA (both)",
+        diff_easy: "Easy",
+        diff_medium: "Medium",
+        best_pyautogui: "Simple test cases, quick start",
+        best_claude: "Complex, changing UIs",
+        best_sikuli: "Versatile visual tests",
+        best_winapp: "Windows native applications",
+        best_appium: "Cross-platform desktop",
+        best_power: "Microsoft environments, non-coders",
+        pyautogui_desc: "Python library that controls mouse and keyboard and takes screenshots. OpenCV adds image recognition: you can search the screen for a specific button or icon by image.",
+        pros: "Strengths",
+        cons: "Weaknesses",
+        pyautogui_pro1: "Easy to install: pip install pyautogui",
+        pyautogui_pro2: "Cross-platform (Win/Mac/Linux)",
+        pyautogui_pro3: "Works with all applications",
+        pyautogui_pro4: "Good documentation and community",
+        pyautogui_con1: "Sensitive to resolution and theme changes",
+        pyautogui_con2: "Doesn't understand what it sees (no AI)",
+        pyautogui_con3: "Needs reference images to maintain",
+        pyautogui_con4: "One screen at a time",
+        claude_desc: "Anthropic's Claude model computer use feature: AI sees the screen as a screenshot and can determine what to click, where to type, and how to navigate. No reference images needed - AI understands the UI semantically.",
+        claude_pro1: "Understands UI meaning, not just pixels",
+        claude_pro2: "No reference images needed",
+        claude_pro3: "Adapts to UI changes automatically",
+        claude_pro4: "Can perform complex tasks with natural language",
+        claude_con1: "API costs (screenshot per request)",
+        claude_con2: "Slower than traditional automation",
+        claude_con3: "Requires internet connection (API)",
+        claude_con4: "Result is not 100% deterministic",
+        winapp_desc: "Microsoft's WinAppDriver uses the Windows UI Automation API: application elements are found from the accessibility tree by name, AutomationId, or ControlType. Works like Selenium, but for native applications.",
+        winapp_pro1: "Stable - doesn't depend on pixel coordinates",
+        winapp_pro2: "Fast execution",
+        winapp_pro3: "Integrates with Selenium ecosystem",
+        winapp_pro4: "Precise element identification",
+        winapp_con1: "Windows only",
+        winapp_con2: "Doesn't work with all applications (e.g., legacy)",
+        winapp_con3: "Needs Inspect tool to find elements",
+        winapp_con4: "Some apps hide their elements",
+        example_title: "Concrete Example: Outlook Testing",
+        example_scenario: "Test case:",
+        example_scenario_desc: "Below are three different ways to implement the same test case. Each approach solves the same problem differently.",
+        example_pyautogui_desc: "Traditional image recognition-based approach. Needs reference images of UI elements.",
+        example_claude_desc: "AI-based approach: tell in natural language what you want to do, and Claude executes it.",
+        example_winapp_desc: "Selenium-style approach: elements are found by name and AutomationId.",
+        copy: "Copy",
+        example_note_title: "Note the difference:",
+        example_note: "PyAutoGUI searches images at pixel level, Claude understands what's on screen, and WinAppDriver finds elements by name. The choice depends on the use case: PyAutoGUI is quickest to start, Claude is most flexible, and WinAppDriver is most stable.",
+        sim_title: "Interactive Simulator",
+        sim_desc: 'See how desktop test automation works in practice. Press "Start Test" to see how a PyAutoGUI-based bot automates the Outlook application.',
+        sim_window_title: "Desktop Automation Simulator",
+        sim_log_ready: '[ READY ] Press "Start Test" to begin the simulation',
+        sim_start: "Start Test",
+        sim_reset: "Reset",
+        sim_status_ready: "Ready",
+        sim_what_happens: "What happens in the simulation?",
+        sim_step1: "Bot launches the Outlook application",
+        sim_step2: "Waits until the Outlook window appears (screenshot + recognition)",
+        sim_step3: "Recognizes the login field and enters the email address",
+        sim_step4: 'Clicks the "Inbox" folder in the sidebar',
+        sim_step5: "Finds the first unread email and clicks it",
+        sim_step6: "Takes a screenshot as evidence and reports the result",
+        workflow_title: "Tester Workflow",
+        workflow_desc: "This is how a tester adopts desktop automation in a project.",
+        wf_step1_title: "Install Tools",
+        wf_step1_desc: "PyAutoGUI also requires screen access permission (macOS: System Preferences → Privacy → Screen Recording).",
+        wf_step2_title: "Capture Reference Images",
+        wf_step2_desc: "Screenshot the UI elements your test needs: buttons, fields, icons. Save them in the images/ folder. Images should be precise crops of the desired elements.",
+        wf_step2_tip_title: "Tip:",
+        wf_step2_tip: "With Claude Computer Use approach, you don't need reference images at all! AI recognizes UI elements automatically.",
+        wf_step3_title: "Write Test Script",
+        wf_step3_desc: "Define the test case as steps: what to open, what to click, what to type, what to verify. Use wait_for_image() functions to wait for applications to load.",
+        wf_step4_title: "Run Tests and Analyze Results",
+        wf_step4_desc: "Run the test script and check results. Screenshots serve as evidence. On errors, the bot saves a screenshot at the moment of failure for diagnosis.",
+        wf_step5_title: "Integrate into CI/CD Pipeline (optional)",
+        wf_step5_desc: "Desktop tests can be run in CI/CD using virtual machines or dedicated test machines. Note: the test machine must have an active display session (not headless).",
+        wf_step5_warn_title: "Important:",
+        wf_step5_warn: "Desktop tests CANNOT be run in headless mode like web tests. You need either a physical display, VNC session, or virtual framebuffer (Xvfb on Linux).",
+        wf_checklist_title: "Adoption Checklist",
+        wf_check1: "Python 3.8+ installed",
+        wf_check2: "PyAutoGUI and dependencies installed",
+        wf_check3: "Screen access permissions granted",
+        wf_check4: "Reference images captured (if PyAutoGUI)",
+        wf_check5: "Test script written and manually tested",
+        wf_check6: "Error handling and screenshots on failure",
+        wf_check7: "CI/CD environment configured (display session)",
+        wf_check8: "Test data management planned",
+        limits_title: "Limitations and Challenges",
+        limits_subtitle: "What you should know before adopting desktop test automation.",
+        limit_resolution_title: "1. Resolution and Theme Dependency",
+        limit_resolution: "Image recognition-based tests are sensitive to screen resolution, DPI settings, and OS theme. If the test machine's display settings change, reference images no longer match.",
+        limit_resolution_fix_title: "Solution:",
+        limit_resolution_fix: "Use lower confidence level (0.7-0.8), standardize the test machine, or switch to Claude Computer Use-based solution that adapts to changes.",
+        limit_headless_title: "2. No Headless Support",
+        limit_headless: "Desktop tests cannot run without a display. An active display session is always needed - either physical, VNC, RDP, or virtual framebuffer.",
+        limit_timing_title: "3. Timing Issues",
+        limit_timing: "Applications load at different speeds on different machines. Fixed sleep() calls are fragile. Better approach: wait until a specific UI element appears (polling).",
+        limit_maintenance_title: "4. Maintenance Costs",
+        limit_maintenance: "Reference images become outdated with application updates. Every Outlook update can break tests. AI-based solutions (Claude Computer Use) are more robust here.",
+        limit_parallel_title: "5. Parallel Testing",
+        limit_parallel: 'Image recognition tests control the entire screen: mouse and keyboard are "occupied". For parallel execution, separate virtual machines or sessions are needed.',
+        limit_security_title: "6. Security",
+        limit_security: "Test scripts often contain login credentials. Always use environment variables or secret management (vault) - never hardcode passwords in scripts!",
+        limit_when_title: "When is desktop test automation worthwhile?",
+        limit_when_yes: "Worthwhile when:",
+        limit_yes1: "Repetitive manual testing takes a lot of time",
+        limit_yes2: "Testing critical business processes",
+        limit_yes3: "Application has no API or web interface",
+        limit_yes4: "Regression testing is important",
+        limit_when_no: "Not worthwhile when:",
+        limit_no1: "Application changes constantly and rapidly",
+        limit_no2: "Testing is one-time only",
+        limit_no3: "Same testing can be done at API level",
+        limit_no4: "Maintenance resources are not available",
+        footer: "Built with Claude Code - Siili Solutions, Jyväskylä 2026"
+    }
+};
+
+let currentLang = 'fi';
+
+function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.lang-btn[data-lang="${lang}"]`).classList.add('active');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
+
+// ── Nav Tabs ──
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('view-' + tab.dataset.tab).classList.add('active');
+    });
+});
+
+// ── Copy Code ──
+function copyCode(btn) {
+    const block = btn.parentElement;
+    const text = block.textContent.replace('Kopioi', '').replace('Copy', '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '\u2713';
+        setTimeout(() => btn.textContent = orig, 1500);
+    });
+}
+
+function toggleApiKey() {
+    const input = document.getElementById('apiKeyInput');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function copyCmdWithKey(btn) {
+    const key = document.getElementById('apiKeyInput').value || '<YOUR_API_KEY>';
+    const text = `pip install anthropic pyautogui pillow\nexport ANTHROPIC_API_KEY="${key}"\npython scripts/demo_claude_computeruse.py`;
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '\u2713';
+        setTimeout(() => btn.textContent = orig, 1500);
+    });
+}
+
+// Päivitä API-avain näyttöön reaaliaikaisesti
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('apiKeyInput');
+    if (input) {
+        input.addEventListener('input', () => {
+            const display = document.getElementById('apiKeyDisplay');
+            if (display) {
+                const val = input.value;
+                display.textContent = val ? `"${val}"` : '"<syötä avain yllä>"';
+            }
+        });
+    }
+});
+
+// ── Simulator ──
+let simRunning = false;
+
+function addLog(msg, cls = '') {
+    const log = document.getElementById('simLog');
+    const line = document.createElement('div');
+    line.className = 'log-line ' + cls;
+    line.textContent = msg;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+}
+
+function setStatus(msg) {
+    document.getElementById('simStatus').textContent = msg;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function startSimulation() {
+    if (simRunning) return;
+    simRunning = true;
+    const btn = document.getElementById('simStartBtn');
+    btn.disabled = true;
+    const log = document.getElementById('simLog');
+    log.innerHTML = '';
+    const outlook = document.getElementById('simOutlook');
+    const content = document.getElementById('outlookContent');
+    const isFi = currentLang === 'fi';
+
+    // Step 1: Launch
+    setStatus(isFi ? 'Käynnistetään...' : 'Launching...');
+    addLog('> subprocess.Popen("outlook.exe")', 'log-action');
+    addLog(isFi ? '[INFO] Käynnistetään Outlook...' : '[INFO] Launching Outlook...', 'log-info');
+    await sleep(1500);
+
+    // Step 2: Window appears
+    outlook.style.display = 'block';
+    content.innerHTML = `
+        <div style="padding:40px 30px; text-align:center;">
+            <div style="font-size:2rem; margin-bottom:12px;">📧</div>
+            <div style="font-size:1.1rem; font-weight:600; margin-bottom:16px;">Microsoft Outlook</div>
+            <div style="margin-bottom:8px; font-size:0.82rem; color:#666;">${isFi ? 'Kirjaudu sisään' : 'Sign in'}</div>
+            <input type="text" id="simEmailField" placeholder="${isFi ? 'Sähköpostiosoite' : 'Email address'}"
+                style="width:220px; padding:8px 12px; border:1px solid #ccc; border-radius:4px; font-size:0.82rem; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto;">
+            <button id="simLoginBtn" style="padding:8px 24px; background:#0078d4; color:white; border:none; border-radius:4px; font-size:0.82rem; cursor:default;">
+                ${isFi ? 'Seuraava' : 'Next'}
+            </button>
+        </div>`;
+
+    addLog('> wait_for_image("outlook_window.png")', 'log-action');
+    addLog(isFi ? '  ...etsitään...(1s)' : '  ...searching...(1s)', '');
+    await sleep(1000);
+    addLog(isFi ? '  ...etsitään...(2s)' : '  ...searching...(2s)', '');
+    await sleep(1000);
+    addLog(isFi ? '[OK] Outlook-ikkuna löytyi!' : '[OK] Outlook window found!', 'log-success');
+
+    // Step 3: Type email
+    setStatus(isFi ? 'Kirjautuminen...' : 'Logging in...');
+    await sleep(800);
+    addLog('> wait_for_image("email_field.png")', 'log-action');
+    await sleep(600);
+
+    const emailField = document.getElementById('simEmailField');
+    if (emailField) {
+        emailField.classList.add('highlight-box');
+        addLog(isFi ? '[OK] Kirjautumiskenttä löytyi, koord: (285, 164)' : '[OK] Login field found, coords: (285, 164)', 'log-success');
+        await sleep(800);
+
+        addLog('> pyautogui.click(285, 164)', 'log-action');
+        await sleep(400);
+
+        addLog('> pyautogui.typewrite("testaaja@firma.fi")', 'log-action');
+        const email = "testaaja@firma.fi";
+        for (let i = 0; i < email.length; i++) {
+            emailField.value = email.substring(0, i + 1);
+            await sleep(50);
+        }
+        emailField.classList.remove('highlight-box');
+        await sleep(500);
+
+        addLog('> pyautogui.press("enter")', 'log-action');
+        await sleep(300);
+        addLog(isFi ? '[OK] Kirjautumistiedot syötetty' : '[OK] Login credentials entered', 'log-success');
+    }
+
+    // Step 4: Show inbox
+    await sleep(1200);
+    setStatus(isFi ? 'Navigoidaan...' : 'Navigating...');
+    content.innerHTML = `
+        <div class="outlook-toolbar">
+            <button>${isFi ? 'Uusi viesti' : 'New Email'}</button>
+            <button>${isFi ? 'Vastaa' : 'Reply'}</button>
+            <button>${isFi ? 'Välitä' : 'Forward'}</button>
+        </div>
+        <div class="outlook-sidebar">
+            <div class="outlook-sidebar-item active" id="simInboxItem">📥 ${isFi ? 'Saapuneet' : 'Inbox'} (3)</div>
+            <div class="outlook-sidebar-item">📤 ${isFi ? 'Lähetetyt' : 'Sent'}</div>
+            <div class="outlook-sidebar-item">📝 ${isFi ? 'Luonnokset' : 'Drafts'}</div>
+            <div class="outlook-sidebar-item">🗑️ ${isFi ? 'Poistetut' : 'Deleted'}</div>
+        </div>
+        <div class="outlook-inbox" id="simInbox">
+            <div class="outlook-email" id="simEmail1" style="font-weight:bold; border-left: 3px solid #0078d4;">
+                <strong>Anna Virtanen</strong>
+                <div>${isFi ? 'Q2 sprint-katselmus huomenna' : 'Q2 sprint review tomorrow'}</div>
+                <div class="preview">${isFi ? 'Hei, muistattehan sprint-katselmuksen...' : "Hi, remember the sprint review..."}</div>
+            </div>
+            <div class="outlook-email">
+                <strong>Mikko Korhonen</strong>
+                <div>${isFi ? 'Testausraportti valmis' : 'Test report ready'}</div>
+                <div class="preview">${isFi ? 'Liitteenä viimeisimmät testitulokset...' : 'Latest test results attached...'}</div>
+            </div>
+            <div class="outlook-email">
+                <strong>HR Team</strong>
+                <div>${isFi ? 'Kuukausipalaverin muistio' : 'Monthly meeting notes'}</div>
+                <div class="preview">${isFi ? 'Tässä yhteenveto tämän kuun...' : "Here's a summary of this month's..."}</div>
+            </div>
+        </div>`;
+
+    addLog('> wait_for_image("inbox_icon.png")', 'log-action');
+    await sleep(800);
+
+    const inboxItem = document.getElementById('simInboxItem');
+    if (inboxItem) {
+        inboxItem.classList.add('highlight-box');
+        addLog(isFi ? '[OK] Saapuneet-kansio löytyi' : '[OK] Inbox folder found', 'log-success');
+        await sleep(600);
+        addLog('> pyautogui.click(90, 220)', 'log-action');
+        await sleep(400);
+        inboxItem.classList.remove('highlight-box');
+    }
+
+    // Step 5: Click first email
+    setStatus(isFi ? 'Avataan sähköposti...' : 'Opening email...');
+    addLog('> wait_for_image("unread_email_icon.png")', 'log-action');
+    await sleep(800);
+
+    const email1 = document.getElementById('simEmail1');
+    if (email1) {
+        email1.classList.add('highlight-box');
+        addLog(isFi ? '[OK] Lukematon sähköposti löytyi' : '[OK] Unread email found', 'log-success');
+        await sleep(600);
+        addLog('> pyautogui.click(380, 195)', 'log-action');
+        await sleep(400);
+        email1.classList.remove('highlight-box');
+        email1.style.background = '#e8f0fe';
+    }
+
+    // Step 6: Show email content
+    await sleep(600);
+    const inbox = document.getElementById('simInbox');
+    if (inbox) {
+        inbox.innerHTML = `
+            <div style="padding: 12px;">
+                <div style="font-size: 1rem; font-weight: 600; margin-bottom: 8px;">${isFi ? 'Q2 sprint-katselmus huomenna' : 'Q2 sprint review tomorrow'}</div>
+                <div style="font-size: 0.78rem; color: #666; margin-bottom: 12px;">
+                    <strong>Anna Virtanen</strong> &lt;anna.virtanen@firma.fi&gt;<br>
+                    ${isFi ? 'Vastaanottaja' : 'To'}: testaaja@firma.fi
+                </div>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 8px 0;">
+                <div style="font-size: 0.82rem; line-height: 1.5;">
+                    ${isFi ? 'Hei,<br><br>Muistattehan sprint-katselmuksen huomenna klo 14:00. Valmistelkaa lyhyt demo testausautomaation edistymisestä.<br><br>Ystävällisin terveisin,<br>Anna' : 'Hi,<br><br>Remember the sprint review tomorrow at 2:00 PM. Please prepare a short demo of the test automation progress.<br><br>Best regards,<br>Anna'}
+                </div>
+            </div>`;
+    }
+
+    addLog(isFi ? '[OK] Sähköposti avattu' : '[OK] Email opened', 'log-success');
+    await sleep(500);
+
+    // Step 7: Screenshot
+    addLog('> pyautogui.screenshot()', 'log-action');
+    await sleep(600);
+    addLog(isFi ? '[OK] Kuvakaappaus tallennettu: test_results/outlook_email_opened.png' : '[OK] Screenshot saved: test_results/outlook_email_opened.png', 'log-success');
+    await sleep(400);
+
+    // Done
+    addLog('\u2500'.repeat(40), '');
+    addLog(isFi ? '[VALMIS] Testi suoritettu onnistuneesti!' : '[DONE] Test completed successfully!', 'log-success');
+    addLog(isFi ? '  Kesto: 8.4s | Askeleet: 6/6 | Virheet: 0' : '  Duration: 8.4s | Steps: 6/6 | Errors: 0', 'log-info');
+
+    setStatus(isFi ? 'Testi valmis - onnistui!' : 'Test complete - passed!');
+    btn.disabled = false;
+    simRunning = false;
+}
+
+function resetSimulation() {
+    simRunning = false;
+    const btn = document.getElementById('simStartBtn');
+    btn.disabled = false;
+    document.getElementById('simOutlook').style.display = 'none';
+    const log = document.getElementById('simLog');
+    const isFi = currentLang === 'fi';
+    log.innerHTML = `<div class="log-line log-info">${isFi ? '[ VALMIS ] Paina "Aloita testi" aloittaaksesi simulaation' : '[ READY ] Press "Start Test" to begin the simulation'}</div>`;
+    setStatus(isFi ? 'Valmis' : 'Ready');
+}
+</script>
+</body>
+</html>

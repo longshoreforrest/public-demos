@@ -296,6 +296,30 @@
         .card--invoices .card__icon { background: #f8fafc; color: #475569; }
         .card--invoices .card__tag { background: #f8fafc; color: #334155; }
 
+        /* Jyväskylä Desktop Tester */
+        .card--desktop::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+        .card--desktop:hover { border-color: rgba(37, 99, 235, 0.25); }
+        .card--desktop .card__icon { background: #dbeafe; color: #2563eb; }
+        .card--desktop .card__tag { background: #dbeafe; color: #1d4ed8; }
+
+        /* Jyväskylä Events */
+        .card--jklevents::before { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+        .card--jklevents:hover { border-color: rgba(8, 145, 178, 0.25); }
+        .card--jklevents .card__icon { background: #ecfeff; color: #0891b2; }
+        .card--jklevents .card__tag { background: #ecfeff; color: #0e7490; }
+
+        /* Jyväskylä Office */
+        .card--office::before { background: linear-gradient(90deg, #0d9488, #5eead4); }
+        .card--office:hover { border-color: rgba(13, 148, 136, 0.25); }
+        .card--office .card__icon { background: #f0fdfa; color: #0d9488; }
+        .card--office .card__tag { background: #f0fdfa; color: #0f766e; }
+
+        /* Jyväskylä Security */
+        .card--security::before { background: linear-gradient(90deg, #dc2626, #f87171); }
+        .card--security:hover { border-color: rgba(220, 38, 38, 0.25); }
+        .card--security .card__icon { background: #fef2f2; color: #dc2626; }
+        .card--security .card__tag { background: #fef2f2; color: #b91c1c; }
+
         /* ---- Filters ---- */
         .filters {
             display: flex;
@@ -385,6 +409,10 @@
 </head>
 <body>
     <div class="lang-bar">
+        <a href="guide.html" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.9rem;border-radius:100px;background:#eff6ff;border:1px solid #bfdbfe;color:#2563eb;font-size:0.8rem;font-weight:500;text-decoration:none;transition:all 0.2s ease;margin-right:auto;" data-i18n-title="guideLink" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span data-i18n="guideLink">Kokonaiskuva &amp; Analytiikka</span>
+        </a>
         <div class="lang-switcher">
             <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
             <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
@@ -410,6 +438,7 @@
                 <button class="filter-btn" data-city="seinajoki">Seinäjoki</button>
                 <button class="filter-btn" data-city="tampere">Tampere</button>
                 <button class="filter-btn" data-city="joensuu">Joensuu</button>
+                <button class="filter-btn" data-city="jyvaskyla">Jyväskylä</button>
             </div>
             <div class="filter-group">
                 <span class="filter-label" data-i18n="filterCategory">Kategoria</span>
@@ -777,6 +806,76 @@
                 </div>
             </a>
 
+            <!-- ========== JYVÄSKYLÄ ========== -->
+
+            <a class="card card--desktop" href="Jyv%C3%A4skyl%C3%A4_desktoptester/index.html" data-city="jyvaskyla" data-cat="kehitys">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                </div>
+                <div class="card__location">Jyväskylä &bull; Testaus</div>
+                <h2 data-i18n="desktopTitle">Desktop-testausautomaatio</h2>
+                <p data-i18n="desktopDesc">Desktop-sovellusten automaatiotestauksen hallinta &mdash; testiskenaariot, suoritukset, raportointi ja Python-demoskriptit.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Python</span>
+                    <span class="card__tag">PyAutoGUI</span>
+                    <span class="card__tag" data-i18n="tagQA">QA</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <a class="card card--jklevents" href="Jyv%C3%A4skyl%C3%A4_events/index.html" data-city="jyvaskyla" data-cat="toimisto">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="card__location">Jyväskylä &bull; Tapahtumat</div>
+                <h2 data-i18n="jklEventsTitle">Tapahtumat &amp; Kalenteri</h2>
+                <p data-i18n="jklEventsDesc">Jyväskylän toimiston tapahtumakalenteri &mdash; karttanäkymä, filtteröinti ja monipuolinen kalenterinäkymä.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Leaflet.js</span>
+                    <span class="card__tag" data-i18n="tagCalendar">Kalenteri</span>
+                    <span class="card__tag" data-i18n="tagMap">Kartta</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <a class="card card--office" href="Jyv%C3%A4skyl%C3%A4_kukatuleetoimistolle/index.html" data-city="jyvaskyla" data-cat="toimisto">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="card__location">Jyväskylä &bull; Hybridityö</div>
+                <h2 data-i18n="officeTitle">Kuka tulee toimistolle?</h2>
+                <p data-i18n="officeDesc">Toimiston läsnäoloseuranta &mdash; analytiikka, kalenteri ja muistutukset hybridityön tueksi.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag" data-i18n="tagCalendar">Kalenteri</span>
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <a class="card card--security" href="Jyv%C3%A4skyl%C3%A4_security_scan/index.html" data-city="jyvaskyla" data-cat="kehitys">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="card__location">Jyväskylä &bull; Tietoturva</div>
+                <h2 data-i18n="securityTitle">OWASP Security Scanner</h2>
+                <p data-i18n="securityDesc">Tietoturvaskannerin dashboard &mdash; OWASP-haavoittuvuudet, löydökset, riskitasot ja korjaussuositukset.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag">OWASP</span>
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
         </div>
 
         <footer>
@@ -856,6 +955,15 @@
             eventsDesc: 'Toimiston tapahtumakalenteri \u2014 klubit, site monthly, vierailijat ja muut tilaisuudet yhdessä paikassa filtteröitynä ja kalenteriin lisättävinä.',
             invoicesTitle: 'Laskujen tarkastus',
             invoicesDesc: 'Laskujen älykäs tarkastusjärjestelmä \u2014 vertaa toimittajahistoriaan, tunnista poikkeamat ja saa hyväksymissuositukset automaattisesti.',
+            guideLink: 'Kokonaiskuva & Analytiikka',
+            desktopTitle: 'Desktop-testausautomaatio',
+            desktopDesc: 'Desktop-sovellusten automaatiotestauksen hallinta \u2014 testiskenaariot, suoritukset, raportointi ja Python-demoskriptit.',
+            jklEventsTitle: 'Tapahtumat & Kalenteri',
+            jklEventsDesc: 'Jyväskylän toimiston tapahtumakalenteri \u2014 karttanäkymä, filtteröinti ja monipuolinen kalenterinäkymä.',
+            officeTitle: 'Kuka tulee toimistolle?',
+            officeDesc: 'Toimiston läsnäoloseuranta \u2014 analytiikka, kalenteri ja muistutukset hybridityön tueksi.',
+            securityTitle: 'OWASP Security Scanner',
+            securityDesc: 'Tietoturvaskannerin dashboard \u2014 OWASP-haavoittuvuudet, löydökset, riskitasot ja korjaussuositukset.',
         },
         en: {
             badge: 'AI-Assisted Prototypes',
@@ -926,6 +1034,15 @@
             eventsDesc: 'Office event calendar \u2014 clubs, site monthly, visitors and other gatherings in one place with filters and calendar integration.',
             invoicesTitle: 'Invoice Review',
             invoicesDesc: 'Smart invoice review system \u2014 compare supplier history, detect anomalies and get automatic approval recommendations.',
+            guideLink: 'Overview & Analytics',
+            desktopTitle: 'Desktop Test Automation',
+            desktopDesc: 'Desktop application automated testing management \u2014 test scenarios, executions, reporting and Python demo scripts.',
+            jklEventsTitle: 'Events & Calendar',
+            jklEventsDesc: 'Jyväskylä office event calendar \u2014 map view, filtering and versatile calendar views.',
+            officeTitle: 'Who\u2019s coming to the office?',
+            officeDesc: 'Office presence tracking \u2014 analytics, calendar and reminders to support hybrid work.',
+            securityTitle: 'OWASP Security Scanner',
+            securityDesc: 'Security scanner dashboard \u2014 OWASP vulnerabilities, findings, risk levels and remediation recommendations.',
         }
     };
 

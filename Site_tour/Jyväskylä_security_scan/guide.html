@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWASP-tietoturvaskannaaja - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d52 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #94a3b8; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #3b82f6; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #3b82f6; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #3b82f6; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #1a1a2e; }
+        .feature-card .tag {
+            display: inline-block; background: #eff6ff; color: #1d4ed8;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #3b82f6; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .shortcut-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .shortcut-table th, .shortcut-table td {
+            text-align: left; padding: 0.6rem 0.8rem; font-size: 0.88rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .shortcut-table th { color: #64748b; font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .owasp-ref {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: baseline; gap: 0.5rem;
+        }
+        .owasp-ref .code { font-weight: 700; color: #1d4ed8; min-width: 2.5rem; }
+        .owasp-ref a { color: #3b82f6; text-decoration: none; font-size: 0.88rem; }
+        .owasp-ref a:hover { text-decoration: underline; }
+
+        .sev-legend { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
+        .sev-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; }
+        .sev-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="hero">
+        <h1 data-i18n-fi="OWASP-tietoturvaskannaaja - Käyttöohje" data-i18n-en="OWASP Security Scanner - User Guide">OWASP-tietoturvaskannaaja - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Sovellusten tietoturva-analytiikka OWASP Top 10 -viitekehyksellä" data-i18n-en="Application security analytics using the OWASP Top 10 framework">Sovellusten tietoturva-analytiikka OWASP Top 10 -viitekehyksellä</p>
+        <a class="back" href="index.html" data-i18n-fi="&larr; Takaisin sovellukseen" data-i18n-en="&larr; Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <!-- ═══════ FINNISH ═══════ -->
+        <div class="lang-content" data-lang="fi">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Site Tour -kokonaisuus sisältää kymmeniä erillisiä web-sovelluksia, mutta niiden tietoturvaa ei ole systemaattisesti arvioitu. Tämä sovellus käy läpi kaikkien sovellusten lähdekoodin ja raportoi löydökset OWASP Top 10 -viitekehyksen mukaisesti &mdash; niin tietoturvatilanne selviää yhdellä silmäyksellä ilman manuaalista koodiauditointia.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol>
+            <li>Sovellus avautuu <strong>Kojelauta</strong>-näkymään, jossa näet yhteenvedon tietoturvalöydöksistä interaktiivisina kaavioina.</li>
+            <li>Vaihda näkymää yläosan <strong>välilehdillä</strong>: Kojelauta, Havainnot tai Sovellukset.</li>
+            <li>Käytä <strong>suodatinpainikkeita</strong> rajataksesi näkymää toimipisteen, sovelluksen, OWASP-kategorian tai vakavuuden mukaan.</li>
+            <li>Klikkaa mitä tahansa <strong>kaaviota</strong> porautuaksesi syvemmälle &mdash; filtterit päivittyvät automaattisesti.</li>
+        </ol>
+
+        <h2>Näkymät</h2>
+
+        <div class="feature-card">
+            <span class="tag">Välilehti 1</span>
+            <h3>Kojelauta</h3>
+            <p>Interaktiivinen analytiikkanäkymä neljällä kaaviolla:</p>
+            <ul>
+                <li><strong>OWASP-kategorialla</strong> &mdash; donitsikaavio, joka näyttää löydösten jakauman OWASP Top 10 -kategorioittain.</li>
+                <li><strong>Vakavuudella</strong> &mdash; donitsikaavio vakavuustasojen mukaan (Kriittinen, Korkea, Keskitaso, Matala, Info).</li>
+                <li><strong>Sovelluksella</strong> &mdash; vaakapalkki, jossa jokainen sovellus näkyy löydösmäärän mukaan.</li>
+                <li><strong>Vakavuus sovelluksittain</strong> &mdash; pinottu palkki, joka näyttää vakavuusjakauman sovelluksittain.</li>
+            </ul>
+            <p><strong>Porautuminen:</strong> Klikkaa mitä tahansa kaavion segmenttiä &rarr; vastaava suodatin asettuu ja kaikki kaaviot päivittyvät. Klikkaa samaa segmenttiä uudelleen poistaaksesi suodattimen.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Välilehti 2</span>
+            <h3>Havainnot</h3>
+            <p>Yksityiskohtainen taulukkonäkymä kaikista löydöksistä:</p>
+            <ul>
+                <li>Sarakkeet: vakavuus, OWASP-kategoria, sovellus, tiedosto ja otsikko.</li>
+                <li><strong>Lajittele</strong> klikkaamalla sarakeotsikkoa.</li>
+                <li><strong>Hae</strong> vapaatekstihaulla löydösten sisällöstä.</li>
+                <li><strong>Klikkaa riviä</strong> &rarr; avautuu yksityiskohtainen sivupaneeli, jossa kuvaus, suositus ja linkki OWASP-lähteeseen.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Välilehti 3</span>
+            <h3>Sovellukset</h3>
+            <p>Korttinäkymä kaikista skannatuista sovelluksista:</p>
+            <ul>
+                <li>Jokainen kortti näyttää sovelluksen nimen, löydösmäärän ja <strong>riskipisteytyksen</strong>.</li>
+                <li>Värikoodatut vakavuusbadget kertovat löydösten jakauman.</li>
+                <li><strong>Klikkaa korttia</strong> &rarr; siirryt Havainnot-näkymään suodatettuna kyseiseen sovellukseen.</li>
+            </ul>
+        </div>
+
+        <h2>Suodattimet</h2>
+        <p>Sovelluksessa on neljä suodatinriviä, jotka voi piilottaa ja näyttää yläosan toggle-painikkeella:</p>
+        <table class="shortcut-table">
+            <tr><th>Suodatin</th><th>Toiminto</th></tr>
+            <tr><td>Toimipiste</td><td>Rajaa löydökset kaupungin mukaan (Helsinki, Joensuu, Kuopio, jne.)</td></tr>
+            <tr><td>Sovellus</td><td>Valitse yksittäinen sovellus tarkasteltavaksi</td></tr>
+            <tr><td>OWASP</td><td>Rajaa tiettyyn OWASP Top 10 -kategoriaan</td></tr>
+            <tr><td>Vakavuus</td><td>Rajaa vakavuustason mukaan</td></tr>
+        </table>
+        <p>Jokainen suodatinrivi sisältää <strong>"Kaikki"</strong>-painikkeen, joka poistaa kyseisen suodattimen. <strong>"Nollaa kaikki"</strong> -painike poistaa kaikki aktiiviset suodattimet kerralla.</p>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Voit suodattaa myös klikkaamalla vakavuuskortteja kojelaudan yläosassa. Aktiiviset suodattimet näkyvät myös suodatinpaneelin piilotuspainikkeessa numerobadgena.
+        </div>
+
+        <h2>Vakavuustasot</h2>
+        <div class="sev-legend">
+            <div class="sev-item"><span class="sev-dot" style="background:#dc2626"></span> <strong>Kriittinen</strong> &mdash; Välitöntä toimenpidettä vaativa</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#ea580c"></span> <strong>Korkea</strong> &mdash; Merkittävä tietoturvariski</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#ca8a04"></span> <strong>Keskitaso</strong> &mdash; Korjattava kohtuullisessa ajassa</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#0891b2"></span> <strong>Matala</strong> &mdash; Parannettavissa oleva kohde</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#94a3b8"></span> <strong>Info</strong> &mdash; Tiedoksi, ei välitöntä riskiä</div>
+        </div>
+
+        <h2>OWASP Top 10 -kategoriat</h2>
+        <div class="owasp-ref"><span class="code">A01</span> <span>Puutteellinen pääsynhallinta &mdash; <a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A02</span> <span>Tietoturvan virheasetukset &mdash; <a href="https://owasp.org/Top10/A05_2021-Security_Misconfiguration/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A03</span> <span>Toimitusketjun haavoittuvuudet &mdash; <a href="https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A04</span> <span>Salauksen puutteet &mdash; <a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A05</span> <span>Injektiohyökkäykset &mdash; <a href="https://owasp.org/Top10/A03_2021-Injection/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A06</span> <span>Turvaton suunnittelu &mdash; <a href="https://owasp.org/Top10/A04_2021-Insecure_Design/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A07</span> <span>Todennuksen puutteet &mdash; <a href="https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A08</span> <span>Datan eheyspuutteet &mdash; <a href="https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A09</span> <span>Lokituksen puutteet &mdash; <a href="https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A10</span> <span>Poikkeustilanteiden käsittely &mdash; <a href="https://owasp.org/Top10/" target="_blank">OWASP-lähde &rarr;</a></span></div>
+
+        <h2>Excel-vienti</h2>
+        <p>Klikkaa otsikkorivin <strong>Excel</strong>-painiketta ladataksesi suodatetut löydökset Excel-muodossa. Tiedosto sisältää kaksi välilehteä:</p>
+        <ul>
+            <li><strong>Security Findings</strong> &mdash; kaikki löydökset värikoodattuna vakavuuden mukaan.</li>
+            <li><strong>Summary</strong> &mdash; yhteenveto vakavuus- ja OWASP-kategorioittain.</li>
+        </ul>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Tietoturvavastaava</div>
+            <h3>"Mikä on sovellusten tietoturvatilanne?"</h3>
+            <p>Avaa kojelauta &rarr; tarkastele riskipisteytystä ja vakavuusjakaumaa. Poraudu kriittisiin ja korkeisiin löydöksiin. Vie Excel-raportti johdolle.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Kehittäjä</div>
+            <h3>"Mitä minun sovelluksessani pitää korjata?"</h3>
+            <p>Valitse sovelluksesi Sovellus-suodattimesta &rarr; näet kaikki kyseisen sovelluksen löydökset. Klikkaa löydöstä &rarr; lue kuvaus, suositus ja OWASP-lähde.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Projektipäällikkö</div>
+            <h3>"Minkä tiimin sovelluksissa on eniten riskejä?"</h3>
+            <p>Käytä Toimipiste-suodatinta rajataksesi kaupungin mukaan &rarr; vertaile sovelluksia Sovellukset-näkymässä riskipisteytyksen perusteella.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Auditoija</div>
+            <h3>"Tarvitsen kattavan raportin löydöksistä"</h3>
+            <p>Vie kaikki löydökset Exceliin &rarr; saat värikoodatun taulukon ja yhteenvedon. Suodata tarvittaessa tiettyihin kategorioihin ennen vientiä.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li><strong>Riskipisteytys</strong> lasketaan painottamalla vakavuustasoja: Kriittinen = 10, Korkea = 5, Keskitaso = 2, Matala = 0.5, Info = 0.</li>
+            <li><strong>Kielivalinta</strong> (FI/EN) tallentuu selaimen muistiin ja pysyy samana kaikissa Site Tour -sovelluksissa.</li>
+            <li><strong>Kaavioiden porautuminen</strong> toimii toggle-periaatteella: ensimmäinen klikkaus suodattaa, toinen klikkaus poistaa suodattimen.</li>
+            <li>Löydösten yksityiskohtanäkymässä on suora linkki alkuperäiseen OWASP-lähteeseen.</li>
+            <li>Sovellus toimii kokonaan selaimessa &mdash; tietoja ei lähetetä mihinkään palvelimelle.</li>
+        </ul>
+
+        </div><!-- /lang-content fi -->
+
+        <!-- ═══════ ENGLISH ═══════ -->
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why does this app exist?</h2>
+            <p>The Site Tour collection includes dozens of separate web applications, but their security has not been systematically assessed. This application scans the source code of all applications and reports findings using the OWASP Top 10 framework &mdash; giving you a complete security overview at a glance without manual code auditing.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol>
+            <li>The app opens in the <strong>Dashboard</strong> view, showing a summary of security findings as interactive charts.</li>
+            <li>Switch views using the <strong>tabs</strong> at the top: Dashboard, Findings or Applications.</li>
+            <li>Use the <strong>filter buttons</strong> to narrow the view by location, application, OWASP category or severity.</li>
+            <li>Click any <strong>chart segment</strong> to drill down &mdash; filters update automatically.</li>
+        </ol>
+
+        <h2>Views</h2>
+
+        <div class="feature-card">
+            <span class="tag">Tab 1</span>
+            <h3>Dashboard</h3>
+            <p>An interactive analytics view with four charts:</p>
+            <ul>
+                <li><strong>By OWASP Category</strong> &mdash; doughnut chart showing findings distributed across OWASP Top 10 categories.</li>
+                <li><strong>By Severity</strong> &mdash; doughnut chart by severity level (Critical, High, Medium, Low, Info).</li>
+                <li><strong>By Application</strong> &mdash; horizontal bar chart showing finding counts per application.</li>
+                <li><strong>Severity per Application</strong> &mdash; stacked bar chart showing severity breakdown per app.</li>
+            </ul>
+            <p><strong>Drill-down:</strong> Click any chart segment &rarr; the corresponding filter is set and all charts update. Click the same segment again to remove the filter.</p>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Tab 2</span>
+            <h3>Findings</h3>
+            <p>A detailed table view of all findings:</p>
+            <ul>
+                <li>Columns: severity, OWASP category, application, file and title.</li>
+                <li><strong>Sort</strong> by clicking column headers.</li>
+                <li><strong>Search</strong> with free-text across finding content.</li>
+                <li><strong>Click a row</strong> &rarr; opens a detail panel with description, recommendation and a link to the OWASP source.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Tab 3</span>
+            <h3>Applications</h3>
+            <p>A card view of all scanned applications:</p>
+            <ul>
+                <li>Each card shows the application name, finding count and <strong>risk score</strong>.</li>
+                <li>Colour-coded severity badges show the distribution of findings.</li>
+                <li><strong>Click a card</strong> &rarr; navigates to the Findings view filtered to that application.</li>
+            </ul>
+        </div>
+
+        <h2>Filters</h2>
+        <p>The application has four filter rows that can be hidden and shown with the toggle button at the top:</p>
+        <table class="shortcut-table">
+            <tr><th>Filter</th><th>Function</th></tr>
+            <tr><td>Location</td><td>Filter findings by city (Helsinki, Joensuu, Kuopio, etc.)</td></tr>
+            <tr><td>Application</td><td>Select a specific application to examine</td></tr>
+            <tr><td>OWASP</td><td>Filter by a specific OWASP Top 10 category</td></tr>
+            <tr><td>Severity</td><td>Filter by severity level</td></tr>
+        </table>
+        <p>Each filter row includes an <strong>"All"</strong> button that removes that filter. The <strong>"Reset all"</strong> button clears all active filters at once.</p>
+
+        <div class="tip">
+            <strong>Tip:</strong> You can also filter by clicking the severity cards at the top of the dashboard. When filters are collapsed, the active filter count is shown as a badge on the toggle button.
+        </div>
+
+        <h2>Severity levels</h2>
+        <div class="sev-legend">
+            <div class="sev-item"><span class="sev-dot" style="background:#dc2626"></span> <strong>Critical</strong> &mdash; Requires immediate action</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#ea580c"></span> <strong>High</strong> &mdash; Significant security risk</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#ca8a04"></span> <strong>Medium</strong> &mdash; Should be fixed in reasonable time</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#0891b2"></span> <strong>Low</strong> &mdash; Improvement opportunity</div>
+            <div class="sev-item"><span class="sev-dot" style="background:#94a3b8"></span> <strong>Info</strong> &mdash; Informational, no immediate risk</div>
+        </div>
+
+        <h2>OWASP Top 10 categories</h2>
+        <div class="owasp-ref"><span class="code">A01</span> <span>Broken Access Control &mdash; <a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A02</span> <span>Security Misconfiguration &mdash; <a href="https://owasp.org/Top10/A05_2021-Security_Misconfiguration/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A03</span> <span>Supply Chain Failures &mdash; <a href="https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A04</span> <span>Cryptographic Failures &mdash; <a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A05</span> <span>Injection &mdash; <a href="https://owasp.org/Top10/A03_2021-Injection/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A06</span> <span>Insecure Design &mdash; <a href="https://owasp.org/Top10/A04_2021-Insecure_Design/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A07</span> <span>Authentication Failures &mdash; <a href="https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A08</span> <span>Data Integrity Failures &mdash; <a href="https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A09</span> <span>Logging Failures &mdash; <a href="https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/" target="_blank">OWASP source &rarr;</a></span></div>
+        <div class="owasp-ref"><span class="code">A10</span> <span>Exception Handling &mdash; <a href="https://owasp.org/Top10/" target="_blank">OWASP source &rarr;</a></span></div>
+
+        <h2>Excel export</h2>
+        <p>Click the <strong>Excel</strong> button in the header to download the filtered findings in Excel format. The file contains two sheets:</p>
+        <ul>
+            <li><strong>Security Findings</strong> &mdash; all findings colour-coded by severity.</li>
+            <li><strong>Summary</strong> &mdash; summary by severity and OWASP category.</li>
+        </ul>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Security officer</div>
+            <h3>"What is the security posture of our applications?"</h3>
+            <p>Open the dashboard &rarr; review the risk score and severity distribution. Drill into critical and high findings. Export an Excel report for management.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Developer</div>
+            <h3>"What needs fixing in my application?"</h3>
+            <p>Select your application from the Application filter &rarr; see all findings for that app. Click a finding &rarr; read the description, recommendation and OWASP source.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Project manager</div>
+            <h3>"Which team's applications have the most risk?"</h3>
+            <p>Use the Location filter to narrow by city &rarr; compare applications in the Applications view by risk score.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Auditor</div>
+            <h3>"I need a comprehensive report of findings"</h3>
+            <p>Export all findings to Excel &rarr; you get a colour-coded table and summary. Filter to specific categories before exporting if needed.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li><strong>Risk score</strong> is calculated by weighting severity levels: Critical = 10, High = 5, Medium = 2, Low = 0.5, Info = 0.</li>
+            <li><strong>Language selection</strong> (FI/EN) is saved in the browser and persists across all Site Tour applications.</li>
+            <li><strong>Chart drill-down</strong> works as a toggle: first click filters, second click removes the filter.</li>
+            <li>The finding detail panel includes a direct link to the original OWASP source.</li>
+            <li>The application runs entirely in the browser &mdash; no data is sent to any server.</li>
+        </ul>
+
+        </div><!-- /lang-content en -->
+
+    </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.innerHTML = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.innerHTML = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
+<script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

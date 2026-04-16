@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Käyttöohje & Analytiikka — Site Tour</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        /* Language bar */
+        .lang-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .lang-switcher {
+            display: flex;
+            border: 1px solid #e2e8f0;
+            border-radius: 100px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .lang-btn.active { background: #1e293b; color: #fff; }
+        .lang-btn:hover:not(.active) { color: #334155; background: #f1f5f9; }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e3a5f 100%);
+            color: white;
+            padding: 5rem 1.5rem 3rem;
+            text-align: center;
+        }
+        .hero .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #93c5fd;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+        .hero .back:hover { color: #bfdbfe; text-decoration: underline; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; margin-bottom: 0.75rem; }
+        .hero p { color: #94a3b8; font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+
+        /* Main content */
+        .content { max-width: 1200px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+
+        /* Section headings */
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 3rem 0 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #3b82f6;
+            display: inline-block;
+        }
+        .section-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Summary stats */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .summary-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .summary-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.1;
+        }
+        .summary-card .number.blue { color: #3b82f6; }
+        .summary-card .number.green { color: #10b981; }
+        .summary-card .number.orange { color: #f59e0b; }
+        .summary-card .number.purple { color: #8b5cf6; }
+        .summary-card .number.pink { color: #ec4899; }
+        .summary-card .label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+        }
+
+        /* City sections */
+        .city-section {
+            margin-bottom: 2.5rem;
+        }
+        .city-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .city-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .city-count {
+            background: #eff6ff;
+            color: #3b82f6;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+        }
+
+        /* App list */
+        .app-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        @media (min-width: 768px) { .app-list { grid-template-columns: repeat(2, 1fr); } }
+
+        .app-item {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.25s ease;
+            align-items: flex-start;
+        }
+        .app-item:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+        .app-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .app-info { flex: 1; min-width: 0; }
+        .app-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+        .app-info p {
+            font-size: 0.82rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .app-meta .loc {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #3b82f6;
+            background: #eff6ff;
+            padding: 0.15rem 0.5rem;
+            border-radius: 100px;
+        }
+        .app-meta .tech {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            background: #f8fafc;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+        .app-arrow {
+            color: #cbd5e1;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            align-self: center;
+            transition: color 0.2s ease;
+        }
+        .app-item:hover .app-arrow { color: #3b82f6; }
+
+        /* Charts section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        @media (min-width: 768px) { .charts-grid { grid-template-columns: repeat(2, 1fr); } }
+        .charts-grid.full { grid-template-columns: 1fr; }
+
+        .chart-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .chart-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+        }
+        .chart-container.tall { height: 500px; }
+        .chart-container.medium { height: 380px; }
+
+        /* Effort table */
+        .effort-table-wrap {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+        .effort-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .effort-table th, .effort-table td {
+            padding: 0.65rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .effort-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            position: sticky;
+            top: 0;
+        }
+        .effort-table tr:hover td { background: #fafbff; }
+        .effort-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+        .effort-table .bold { font-weight: 600; color: #1e293b; }
+        .effort-table .savings { color: #10b981; font-weight: 600; }
+        .effort-table tfoot td {
+            font-weight: 700;
+            background: #f0f9ff;
+            border-top: 2px solid #3b82f6;
+            color: #1e293b;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            font-size: 0.82rem;
+            color: #92400e;
+            margin-bottom: 2rem;
+        }
+        .disclaimer strong { color: #78350f; }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-bar">
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi">&#127467;&#127470; FI</button>
+            <button class="lang-btn" data-lang="en">&#127468;&#127463; EN</button>
+        </div>
+    </div>
+
+    <div class="hero">
+        <a class="back" href="index.html" data-i18n="back">&larr; Takaisin etusivulle</a>
+        <h1 data-i18n="heroTitle">Site Tour &mdash; Kokonaiskuva &amp; Analytiikka</h1>
+        <p data-i18n="heroSubtitle">24 tekoälyavusteista prototyyppisovellusta, 7 toimipisteestä &mdash; toteutettu Siili Solutions Site Tour -kiertueella 2026.</p>
+    </div>
+
+    <div class="content">
+
+        <!-- ===== SUMMARY STATS ===== -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="number blue">24</div>
+                <div class="label" data-i18n="statApps">Sovellusta</div>
+            </div>
+            <div class="summary-card">
+                <div class="number green">7</div>
+                <div class="label" data-i18n="statCities">Toimipistettä</div>
+            </div>
+            <div class="summary-card">
+                <div class="number orange">81 707</div>
+                <div class="label" data-i18n="statLoc">Koodiriviä yhteensä</div>
+            </div>
+            <div class="summary-card">
+                <div class="number purple">210</div>
+                <div class="label" data-i18n="statFiles">Lähdetiedostoa</div>
+            </div>
+            <div class="summary-card">
+                <div class="number pink">~95 %</div>
+                <div class="label" data-i18n="statSavings">Arvioitu aikasäästö</div>
+            </div>
+        </div>
+
+        <!-- ===== APPLICATION CATALOG ===== -->
+        <h2 class="section-title" data-i18n="catalogTitle">Sovellusluettelo</h2>
+        <p class="section-subtitle" data-i18n="catalogSubtitle">Kaikki Site Tour -kiertueen aikana toteutetut prototyypit. Klikkaa sovellusta siirtyäksesi siihen.</p>
+
+        <!-- Helsinki -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Helsinki</h3>
+                <span class="city-count" data-i18n="countApp1">1 sovellus</span>
+                <span class="city-count">4 740 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Helsinki_food/index.html">
+                    <div class="app-icon" style="background:#fef2f2;color:#dc2626;">&#127858;</div>
+                    <div class="app-info">
+                        <h4>Siili Lounas</h4>
+                        <p data-i18n="app_helsinki_food">Ruoholahden ja Kampin lähialueen ravintoloiden lounaslistat, hinnat ja sijainnit kartalla. Scraper hakee tiedot automaattisesti.</p>
+                        <div class="app-meta">
+                            <span class="loc">4 740 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Leaflet.js</span>
+                            <span class="tech">Vanilla JS</span>
+                            <span class="tech">Scraper</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Oulu -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Oulu</h3>
+                <span class="city-count" data-i18n="countApp2">2 sovellusta</span>
+                <span class="city-count">4 754 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Oulu_kulttuuripaakaupunki/index.html">
+                    <div class="app-icon" style="background:#fff7ed;color:#ea580c;">&#127912;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_oulu_culture_title">Oulu Kulttuuripääkaupunki 2026</h4>
+                        <p data-i18n="app_oulu_culture">Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana. Python-skripti prosessoi tapahtumatiedon.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 236 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Leaflet.js</span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">Python</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Oulu_personal_trainer/koutsi/out/index.html">
+                    <div class="app-icon" style="background:#ecfdf5;color:#059669;">&#128170;</div>
+                    <div class="app-info">
+                        <h4>Koutsi</h4>
+                        <p data-i18n="app_oulu_koutsi">Personal trainer -sovellus: tavoitteet, treenikalenteri ja treenikaverit. Rakennettu modernilla React-stackillä.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 518 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Next.js</span>
+                            <span class="tech">React</span>
+                            <span class="tech">TypeScript</span>
+                            <span class="tech">Zustand</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Kuopio -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Kuopio</h3>
+                <span class="city-count" data-i18n="countApp4">4 sovellusta</span>
+                <span class="city-count">19 026 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Kuopio_lounas/index.html">
+                    <div class="app-icon" style="background:#fff7ed;color:#ea580c;">&#127858;</div>
+                    <div class="app-info">
+                        <h4>Siili Lounas Kuopio</h4>
+                        <p data-i18n="app_kuopio_lounas">Kuopion keskustan lounasravintolat kartalla: päivän menut, hinnat ja aukioloajat.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 523 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Leaflet.js</span>
+                            <span class="tech">Scraper</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Kuopio_haastattelija/index.html">
+                    <div class="app-icon" style="background:#f5f3ff;color:#7c3aed;">&#128172;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_kuopio_interview_title">Verkkouudistuksen haastattelija</h4>
+                        <p data-i18n="app_kuopio_interview">Ministeriön verkkouudistuksen sidosryhmähaastattelut, kansalaispalaute, organisaatiokartta ja tietoverkosto.</p>
+                        <div class="app-meta">
+                            <span class="loc">6 787 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Vanilla JS</span>
+                            <span class="tech">Knowledge Graph</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Kuopio_pienkehitt%C3%A4j%C3%A4/index.html">
+                    <div class="app-icon" style="background:#f0fdfa;color:#0d9488;">&#128187;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_kuopio_wpdev_title">WordPress Tukiagentti</h4>
+                        <p data-i18n="app_kuopio_wpdev">AI-agentti WordPress-pienkehitykseen: tiketit, koodikatselmukset, pipeline ja saavutettavuusauditointi.</p>
+                        <div class="app-meta">
+                            <span class="loc">5 803 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">AI-agentti</span>
+                            <span class="tech">Chat UI</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Kuopio_testausagentit/index.html">
+                    <div class="app-icon" style="background:#eff6ff;color:#1e40af;">&#128737;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_kuopio_qa_title">Testiautomaation havaintokeskus</h4>
+                        <p data-i18n="app_kuopio_qa">QA-havaintokeskus: testiautomaation tulokset, juurisyyanalyysit, trendit ja AI-suositukset.</p>
+                        <div class="app-meta">
+                            <span class="loc">3 913 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">Analytics</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Seinäjoki -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Seinäjoki</h3>
+                <span class="city-count" data-i18n="countApp2">2 sovellusta</span>
+                <span class="city-count">6 317 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Seinajoki_ruokabotti/index.html">
+                    <div class="app-icon" style="background:#f5f3ff;color:#7c3aed;">&#127860;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_seinajoki_vote_title">Lounasäänestys</h4>
+                        <p data-i18n="app_seinajoki_vote">Tiimin lounaspaikka-äänestys analytiikalla: ennusteet, kartta, ruokalistat ja ryhmädynamiikan visualisointi.</p>
+                        <div class="app-meta">
+                            <span class="loc">4 232 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Leaflet.js</span>
+                            <span class="tech">Chart.js</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Seinajoki_tuntikirjanpito/index.html">
+                    <div class="app-icon" style="background:#eff6ff;color:#2563eb;">&#9201;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_seinajoki_time_title">Tuntikirjanpito</h4>
+                        <p data-i18n="app_seinajoki_time">Projektien tuntiseuranta visuaalisilla raporteilla ja kaavioilla.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 085 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Tampere -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Tampere</h3>
+                <span class="city-count" data-i18n="countApp4">4 sovellusta</span>
+                <span class="city-count">15 666 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Tampere_golfapuri/index.html">
+                    <div class="app-icon" style="background:#f0fdf4;color:#16a34a;">&#9971;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_tampere_golf_title">Golf-apuri</h4>
+                        <p data-i18n="app_tampere_golf">Seudun golfkentät, vapaat ajat, kalenterinäkymä, kaveriäänestys ja kartta.</p>
+                        <div class="app-meta">
+                            <span class="loc">4 171 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Leaflet.js</span>
+                            <span class="tech">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Tampere_muistuttaja/index.html">
+                    <div class="app-icon" style="background:#fdf2f8;color:#db2777;">&#128276;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_tampere_reminder_title">Lempeä Muistuttaja</h4>
+                        <p data-i18n="app_tampere_reminder">Kokousmuistioista automaattisesti tehtävät ja muistutukset, monikielinen.</p>
+                        <div class="app-meta">
+                            <span class="loc">4 365 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">i18n</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Tampere_myyntitavoittet/index.html">
+                    <div class="app-icon" style="background:#fffbeb;color:#d97706;">&#128176;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_tampere_sales_title">Myyntitavoitteet 2026</h4>
+                        <p data-i18n="app_tampere_sales">Myyntijohtajan dashboard: liikevaihto, pipeline, ennusteet ja porautumisnäkymät.</p>
+                        <div class="app-meta">
+                            <span class="loc">4 230 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">Dashboard</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Tampere_serttiapuri/index.html">
+                    <div class="app-icon" style="background:#ecfeff;color:#0891b2;">&#127891;</div>
+                    <div class="app-info">
+                        <h4>SerttiApuri</h4>
+                        <p data-i18n="app_tampere_cert">Sertifikaattien hallinta: tiimin osaamisen seuranta, oppimispolut ja strategiset tavoitteet.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 900 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">SVG Charts</span>
+                            <span class="tech">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Joensuu -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Joensuu</h3>
+                <span class="city-count" data-i18n="countApp7">7 sovellusta</span>
+                <span class="city-count">21 448 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Joensuu_asiakas_projektireferenssit/index.html">
+                    <div class="app-icon" style="background:#eef2ff;color:#4f46e5;">&#128203;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_projref_title">Projektireferenssit</h4>
+                        <p data-i18n="app_joensuu_projref">CV-tiedoista kootut projektihistoriat ja teknologiakartoitukset, porautuvat graafit.</p>
+                        <div class="app-meta">
+                            <span class="loc">3 505 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Analytics</span>
+                            <span class="tech">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Joensuu_asiakasreferenssit/index.html">
+                    <div class="app-icon" style="background:#f0fdfa;color:#0d9488;">&#128101;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_custref_title">Asiakasreferenssit</h4>
+                        <p data-i18n="app_joensuu_custref">Interaktiivinen referenssihallinta filtterein ja porautuvin graafehin.</p>
+                        <div class="app-meta">
+                            <span class="loc">3 211 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Drill-down</span>
+                            <span class="tech">JSON data</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Joensuu_biljardip%C3%B6yt%C3%A4/index.html">
+                    <div class="app-icon" style="background:#ecfdf5;color:#059669;">&#127921;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_billiard_title">Biljardipöytä</h4>
+                        <p data-i18n="app_joensuu_billiard">Varauskalenteri, turnausjärjestelmä, pelaajatilastot ja haastekutsut.</p>
+                        <div class="app-meta">
+                            <span class="loc">3 566 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Calendar</span>
+                            <span class="tech">Tournaments</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Joensuu_myynnist%C3%A4_projektiin/index.html">
+                    <div class="app-icon" style="background:#fffbeb;color:#d97706;">&#128196;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_sales2proj_title">Myynnistä projektiin</h4>
+                        <p data-i18n="app_joensuu_sales2proj">Myynnin ja asiantuntijoiden yhteistyöalusta dokumentaatioineen.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 074 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Workflow</span>
+                            <span class="tech">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Joensuu_neukkarit/index.html">
+                    <div class="app-icon" style="background:#f0f9ff;color:#0284c7;">&#128197;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_meeting_title">Neukkarihallinta</h4>
+                        <p data-i18n="app_joensuu_meeting">Neukkareiden reaaliaikainen varaustilanne aikajananäkymällä.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 500 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Timeline</span>
+                            <span class="tech">Vanilla JS</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Joensuu_site_tapahtumat/index.html">
+                    <div class="app-icon" style="background:#fff1f2;color:#e11d48;">&#127881;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_events_title">Site-tapahtumat</h4>
+                        <p data-i18n="app_joensuu_events">Tapahtumakalenteri: klubit, site monthly, vierailijat ja tilaisuudet.</p>
+                        <div class="app-meta">
+                            <span class="loc">3 463 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Calendar</span>
+                            <span class="tech">Slack</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Joensuu_toimiston_laskut/index.html">
+                    <div class="app-icon" style="background:#f8fafc;color:#475569;">&#128196;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_joensuu_invoices_title">Laskujen tarkastus</h4>
+                        <p data-i18n="app_joensuu_invoices">Älykäs laskujen tarkastusjärjestelmä: poikkeamat ja hyväksymissuositukset.</p>
+                        <div class="app-meta">
+                            <span class="loc">3 129 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">PDF</span>
+                            <span class="tech">Automation</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Jyväskylä -->
+        <div class="city-section">
+            <div class="city-header">
+                <h3>Jyväskylä</h3>
+                <span class="city-count" data-i18n="countApp4">4 sovellusta</span>
+                <span class="city-count">10 665 <span data-i18n="loc">riviä</span></span>
+            </div>
+            <div class="app-list">
+                <a class="app-item" href="Jyv%C3%A4skyl%C3%A4_desktoptester/index.html">
+                    <div class="app-icon" style="background:#dbeafe;color:#2563eb;">&#128421;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_jkl_desktop_title">Desktop-testausautomaatio</h4>
+                        <p data-i18n="app_jkl_desktop">Desktop-sovellusten automaatiotestauksen hallintatyökalu: testiskenaariot, suoritukset ja raportointi.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 855 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Python</span>
+                            <span class="tech">PyAutoGUI</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Jyv%C3%A4skyl%C3%A4_events/index.html">
+                    <div class="app-icon" style="background:#e0f7fa;color:#0891b2;">&#127970;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_jkl_events_title">Tapahtumat &amp; Kalenteri</h4>
+                        <p data-i18n="app_jkl_events">Jyväskylän toimiston tapahtumakalenteri karttanäkymällä ja filtteröinnillä.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 725 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Leaflet.js</span>
+                            <span class="tech">Calendar</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Jyv%C3%A4skyl%C3%A4_kukatuleetoimistolle/index.html">
+                    <div class="app-icon" style="background:#e0f7fa;color:#0891b2;">&#128100;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_jkl_office_title">Kuka tulee toimistolle?</h4>
+                        <p data-i18n="app_jkl_office">Toimiston läsnäoloseuranta: analytiikka, kalenteri ja muistutukset hybridityön tueksi.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 823 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">Calendar</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+                <a class="app-item" href="Jyv%C3%A4skyl%C3%A4_security_scan/index.html">
+                    <div class="app-icon" style="background:#fef2f2;color:#dc2626;">&#128274;</div>
+                    <div class="app-info">
+                        <h4 data-i18n="app_jkl_security_title">OWASP Security Scanner</h4>
+                        <p data-i18n="app_jkl_security">Tietoturvaskannerin dashboard: OWASP-haavoittuvuudet, löydökset ja korjaussuositukset.</p>
+                        <div class="app-meta">
+                            <span class="loc">2 262 <span data-i18n="locShort">riviä</span></span>
+                            <span class="tech">Chart.js</span>
+                            <span class="tech">Security</span>
+                        </div>
+                    </div>
+                    <span class="app-arrow">&rarr;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== TECHNICAL METRICS ===== -->
+        <h2 class="section-title" data-i18n="metricsTitle">Tekniset metriikat</h2>
+        <p class="section-subtitle" data-i18n="metricsSubtitle">Koodirivimäärät, tiedostomäärät ja teknologiajakaumat kaikkien 24 sovelluksen osalta.</p>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h4 data-i18n="chartLocByCity">Koodirivit toimipisteittäin</h4>
+                <div class="chart-container medium">
+                    <canvas id="chartLocByCity"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h4 data-i18n="chartLocByApp">Koodirivit sovelluksittain (Top 10)</h4>
+                <div class="chart-container medium">
+                    <canvas id="chartLocByApp"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h4 data-i18n="chartAppsPerCity">Sovellusten lukumäärä toimipisteittäin</h4>
+                <div class="chart-container medium">
+                    <canvas id="chartAppsPerCity"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h4 data-i18n="chartAvgLoc">Keskimääräinen sovelluskoko (rivejä)</h4>
+                <div class="chart-container medium">
+                    <canvas id="chartAvgLoc"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== EFFORT ESTIMATES ===== -->
+        <h2 class="section-title" data-i18n="effortTitle">Työmääräarviot</h2>
+        <p class="section-subtitle" data-i18n="effortSubtitle">Arviot perinteisellä kehityksellä vaadittavasta ajasta vs. tekoälyavusteinen toteutus.</p>
+
+        <div class="disclaimer" data-i18n="effortDisclaimer">
+            <strong>Huomio:</strong> Työmääräarviot ovat suuntaa antavia ja perustuvat kokemukseen vastaavien sovellusten kehityksestä perinteisillä menetelmillä (suunnittelu, toteutus, testaus, iterointi). Tekoälyavusteisessa kehityksessä ihminen määrittelee tarpeen ja ohjaa, tekoäly toteuttaa &mdash; iterointisyklit ovat minuutteja tuntien sijaan.
+        </div>
+
+        <div class="effort-table-wrap">
+            <table class="effort-table" id="effortTable">
+                <thead>
+                    <tr>
+                        <th data-i18n="thApp">Sovellus</th>
+                        <th data-i18n="thCity">Toimipiste</th>
+                        <th class="num" data-i18n="thLoc">Koodirivit</th>
+                        <th class="num" data-i18n="thTraditional">Perinteinen (htp)</th>
+                        <th class="num" data-i18n="thAi">Tekoälyavusteinen (h)</th>
+                        <th class="num" data-i18n="thSavings">Säästö (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="effortBody"></tbody>
+                <tfoot id="effortFoot"></tfoot>
+            </table>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h4 data-i18n="chartEffortComparison">Työmäärä: Perinteinen vs. Tekoälyavusteinen (henkilötyöpäiviä)</h4>
+                <div class="chart-container tall">
+                    <canvas id="chartEffortComparison"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h4 data-i18n="chartSavingsPerApp">Aikasäästö sovelluksittain (%)</h4>
+                <div class="chart-container tall">
+                    <canvas id="chartSavingsPerApp"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h4 data-i18n="chartEffortByCity">Kokonaistyömäärä toimipisteittäin (htp)</h4>
+                <div class="chart-container medium">
+                    <canvas id="chartEffortByCity"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h4 data-i18n="chartCumulativeSavings">Kumulatiivinen aikasäästö (htp)</h4>
+                <div class="chart-container medium">
+                    <canvas id="chartCumulativeSavings"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid full">
+            <div class="chart-card">
+                <h4 data-i18n="chartProductivity">Tuottavuuskerroin (perinteinen aika / AI-aika)</h4>
+                <div class="chart-container tall">
+                    <canvas id="chartProductivity"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Rapid Agent Prototypes &mdash; Site Tour 2026
+        </footer>
+    </div>
+
+    <script>
+    // ========== DATA ==========
+    const apps = [
+        { name: 'Siili Lounas',               city: 'Helsinki',   loc: 4740,  files: 10, tradDays: 12, aiHours: 4, cat: 'lounas' },
+        { name: 'Kulttuuripääkaupunki 2026',   city: 'Oulu',       loc: 2236,  files: 6,  tradDays: 8,  aiHours: 3, cat: 'vapaaaika' },
+        { name: 'Koutsi',                      city: 'Oulu',       loc: 2518,  files: 31, tradDays: 10, aiHours: 4, cat: 'vapaaaika' },
+        { name: 'Siili Lounas Kuopio',         city: 'Kuopio',     loc: 2523,  files: 8,  tradDays: 10, aiHours: 3, cat: 'lounas' },
+        { name: 'Verkkouudistuksen haastattelija', city: 'Kuopio', loc: 6787,  files: 6,  tradDays: 20, aiHours: 6, cat: 'kehitys' },
+        { name: 'WordPress Tukiagentti',       city: 'Kuopio',     loc: 5803,  files: 5,  tradDays: 18, aiHours: 5, cat: 'kehitys' },
+        { name: 'Testiautomaation havaintokeskus', city: 'Kuopio', loc: 3913,  files: 4,  tradDays: 12, aiHours: 4, cat: 'kehitys' },
+        { name: 'Lounasäänestys',              city: 'Seinäjoki',  loc: 4232,  files: 9,  tradDays: 14, aiHours: 4, cat: 'lounas' },
+        { name: 'Tuntikirjanpito',             city: 'Seinäjoki',  loc: 2085,  files: 8,  tradDays: 8,  aiHours: 3, cat: 'toimisto' },
+        { name: 'Golf-apuri',                  city: 'Tampere',    loc: 4171,  files: 7,  tradDays: 14, aiHours: 4, cat: 'vapaaaika' },
+        { name: 'Lempeä Muistuttaja',          city: 'Tampere',    loc: 4365,  files: 9,  tradDays: 14, aiHours: 4, cat: 'toimisto' },
+        { name: 'Myyntitavoitteet 2026',       city: 'Tampere',    loc: 4230,  files: 4,  tradDays: 15, aiHours: 4, cat: 'myynti' },
+        { name: 'SerttiApuri',                 city: 'Tampere',    loc: 2900,  files: 4,  tradDays: 10, aiHours: 3, cat: 'kehitys' },
+        { name: 'Projektireferenssit',         city: 'Joensuu',    loc: 3505,  files: 9,  tradDays: 12, aiHours: 4, cat: 'myynti' },
+        { name: 'Asiakasreferenssit',          city: 'Joensuu',    loc: 3211,  files: 37, tradDays: 10, aiHours: 4, cat: 'myynti' },
+        { name: 'Biljardipöytä',               city: 'Joensuu',    loc: 3566,  files: 5,  tradDays: 12, aiHours: 4, cat: 'toimisto' },
+        { name: 'Myynnistä projektiin',        city: 'Joensuu',    loc: 2074,  files: 6,  tradDays: 8,  aiHours: 3, cat: 'myynti' },
+        { name: 'Neukkarihallinta',            city: 'Joensuu',    loc: 2500,  files: 5,  tradDays: 8,  aiHours: 3, cat: 'toimisto' },
+        { name: 'Site-tapahtumat',             city: 'Joensuu',    loc: 3463,  files: 6,  tradDays: 12, aiHours: 4, cat: 'toimisto' },
+        { name: 'Laskujen tarkastus',          city: 'Joensuu',    loc: 3129,  files: 4,  tradDays: 10, aiHours: 3, cat: 'toimisto' },
+        { name: 'Desktop-testausautomaatio',   city: 'Jyväskylä',  loc: 2855,  files: 5,  tradDays: 10, aiHours: 3, cat: 'kehitys' },
+        { name: 'Tapahtumat & Kalenteri',      city: 'Jyväskylä',  loc: 2725,  files: 6,  tradDays: 10, aiHours: 3, cat: 'toimisto' },
+        { name: 'Kuka tulee toimistolle?',     city: 'Jyväskylä',  loc: 2823,  files: 6,  tradDays: 10, aiHours: 3, cat: 'toimisto' },
+        { name: 'OWASP Security Scanner',      city: 'Jyväskylä',  loc: 2262,  files: 4,  tradDays: 8,  aiHours: 3, cat: 'kehitys' },
+    ];
+
+    const cityOrder = ['Helsinki', 'Oulu', 'Kuopio', 'Seinäjoki', 'Tampere', 'Joensuu', 'Jyväskylä'];
+    const cityColors = {
+        'Helsinki':   { bg: '#fef2f2', border: '#ef4444', main: '#dc2626' },
+        'Oulu':       { bg: '#fff7ed', border: '#f97316', main: '#ea580c' },
+        'Kuopio':     { bg: '#f5f3ff', border: '#8b5cf6', main: '#7c3aed' },
+        'Seinäjoki':  { bg: '#eff6ff', border: '#3b82f6', main: '#2563eb' },
+        'Tampere':    { bg: '#f0fdf4', border: '#22c55e', main: '#16a34a' },
+        'Joensuu':    { bg: '#eef2ff', border: '#6366f1', main: '#4f46e5' },
+        'Jyväskylä':  { bg: '#ecfeff', border: '#06b6d4', main: '#0891b2' },
+    };
+
+    // ========== i18n ==========
+    const translations = {
+        fi: {
+            back: '\u2190 Takaisin etusivulle',
+            heroTitle: 'Site Tour \u2014 Kokonaiskuva & Analytiikka',
+            heroSubtitle: '24 tekoälyavusteista prototyyppisovellusta, 7 toimipisteestä \u2014 toteutettu Siili Solutions Site Tour -kiertueella 2026.',
+            statApps: 'Sovellusta', statCities: 'Toimipistettä', statLoc: 'Koodiriviä yhteensä', statFiles: 'Lähdetiedostoa', statSavings: 'Arvioitu aikasäästö',
+            catalogTitle: 'Sovellusluettelo', catalogSubtitle: 'Kaikki Site Tour -kiertueen aikana toteutetut prototyypit. Klikkaa sovellusta siirtyäksesi siihen.',
+            metricsTitle: 'Tekniset metriikat', metricsSubtitle: 'Koodirivimäärät, tiedostomäärät ja teknologiajakaumat kaikkien 24 sovelluksen osalta.',
+            effortTitle: 'Työmääräarviot', effortSubtitle: 'Arviot perinteisellä kehityksellä vaadittavasta ajasta vs. tekoälyavusteinen toteutus.',
+            effortDisclaimer: '<strong>Huomio:</strong> Työmääräarviot ovat suuntaa antavia ja perustuvat kokemukseen vastaavien sovellusten kehityksestä perinteisillä menetelmillä (suunnittelu, toteutus, testaus, iterointi). Tekoälyavusteisessa kehityksessä ihminen määrittelee tarpeen ja ohjaa, tekoäly toteuttaa \u2014 iterointisyklit ovat minuutteja tuntien sijaan.',
+            thApp: 'Sovellus', thCity: 'Toimipiste', thLoc: 'Koodirivit', thTraditional: 'Perinteinen (htp)', thAi: 'Tekoälyavusteinen (h)', thSavings: 'Säästö (%)',
+            totalLabel: 'YHTEENSÄ',
+            chartLocByCity: 'Koodirivit toimipisteittäin', chartLocByApp: 'Koodirivit sovelluksittain (Top 10)',
+            chartAppsPerCity: 'Sovellusten lukumäärä toimipisteittäin', chartAvgLoc: 'Keskimääräinen sovelluskoko (rivejä)',
+            chartEffortComparison: 'Työmäärä: Perinteinen vs. Tekoälyavusteinen (henkilötyöpäiviä)',
+            chartSavingsPerApp: 'Aikasäästö sovelluksittain (%)',
+            chartEffortByCity: 'Kokonaistyömäärä toimipisteittäin (htp)',
+            chartCumulativeSavings: 'Kumulatiivinen aikasäästö (htp)',
+            chartProductivity: 'Tuottavuuskerroin (perinteinen aika / AI-aika)',
+            loc: 'riviä', locShort: 'riviä',
+            countApp1: '1 sovellus', countApp2: '2 sovellusta', countApp4: '4 sovellusta', countApp7: '7 sovellusta',
+            // app descriptions (already in HTML as defaults)
+        },
+        en: {
+            back: '\u2190 Back to front page',
+            heroTitle: 'Site Tour \u2014 Overview & Analytics',
+            heroSubtitle: '24 AI-assisted prototype applications from 7 offices \u2014 built during the Siili Solutions Site Tour 2026.',
+            statApps: 'Applications', statCities: 'Offices', statLoc: 'Lines of code total', statFiles: 'Source files', statSavings: 'Estimated time savings',
+            catalogTitle: 'Application Catalog', catalogSubtitle: 'All prototypes built during the Site Tour. Click an application to open it.',
+            metricsTitle: 'Technical Metrics', metricsSubtitle: 'Lines of code, file counts and technology distributions across all 24 applications.',
+            effortTitle: 'Effort Estimates', effortSubtitle: 'Estimated effort using traditional development vs. AI-assisted development.',
+            effortDisclaimer: '<strong>Note:</strong> Effort estimates are indicative and based on experience developing similar applications with traditional methods (design, implementation, testing, iteration). With AI-assisted development, a human defines the need and guides, AI implements \u2014 iteration cycles are minutes instead of hours.',
+            thApp: 'Application', thCity: 'Office', thLoc: 'Lines of code', thTraditional: 'Traditional (person-days)', thAi: 'AI-assisted (hours)', thSavings: 'Savings (%)',
+            totalLabel: 'TOTAL',
+            chartLocByCity: 'Lines of code by office', chartLocByApp: 'Lines of code by application (Top 10)',
+            chartAppsPerCity: 'Number of applications by office', chartAvgLoc: 'Average application size (lines)',
+            chartEffortComparison: 'Effort: Traditional vs. AI-assisted (person-days)',
+            chartSavingsPerApp: 'Time savings per application (%)',
+            chartEffortByCity: 'Total effort by office (person-days)',
+            chartCumulativeSavings: 'Cumulative time savings (person-days)',
+            chartProductivity: 'Productivity multiplier (traditional time / AI time)',
+            loc: 'lines', locShort: 'lines',
+            countApp1: '1 app', countApp2: '2 apps', countApp4: '4 apps', countApp7: '7 apps',
+            app_helsinki_food: 'Lunch menus, prices and locations of nearby restaurants on a map. Scraper fetches data automatically.',
+            app_oulu_culture_title: 'Oulu European Capital of Culture 2026',
+            app_oulu_culture: 'Over 560 cultural events on a map, calendar and list. Python script processes event data.',
+            app_oulu_koutsi: 'Personal trainer app: goals, workout calendar and workout buddies. Built with modern React stack.',
+            app_kuopio_lounas: 'Kuopio city center lunch restaurants on a map: daily menus, prices and opening hours.',
+            app_kuopio_interview_title: 'Web Renewal Interviewer',
+            app_kuopio_interview: 'Government web modernization stakeholder interviews, citizen feedback, org chart and knowledge graph.',
+            app_kuopio_wpdev_title: 'WordPress Support Agent',
+            app_kuopio_wpdev: 'AI agent for WordPress development: tickets, code reviews, pipeline and accessibility auditing.',
+            app_kuopio_qa_title: 'Test Automation Observatory',
+            app_kuopio_qa: 'QA observation center: test results, root cause analyses, trends and AI recommendations.',
+            app_seinajoki_vote_title: 'Lunch Vote',
+            app_seinajoki_vote: 'Team lunch place voting with analytics: predictions, map, menus and group dynamics.',
+            app_seinajoki_time_title: 'Time Tracking',
+            app_seinajoki_time: 'Project time tracking with visual reports and charts.',
+            app_tampere_golf_title: 'Golf Assistant',
+            app_tampere_golf: 'Local golf courses, available tee times, calendar view, buddy voting and map.',
+            app_tampere_reminder_title: 'Gentle Reminder',
+            app_tampere_reminder: 'Automatic tasks and reminders from meeting notes, multilingual.',
+            app_tampere_sales_title: 'Sales Targets 2026',
+            app_tampere_sales: 'Sales director dashboard: revenue, pipeline, forecasts and drill-down views.',
+            app_tampere_cert: 'Certification management: team competency tracking, learning paths and strategic goals.',
+            app_joensuu_projref_title: 'Project References',
+            app_joensuu_projref: 'Project histories and technology maps compiled from CV data with drill-down charts.',
+            app_joensuu_custref_title: 'Customer References',
+            app_joensuu_custref: 'Interactive reference management with filters and drill-down charts.',
+            app_joensuu_billiard_title: 'Billiard Table',
+            app_joensuu_billiard: 'Booking calendar, tournament system, player stats and challenge invitations.',
+            app_joensuu_sales2proj_title: 'Sales to Project',
+            app_joensuu_sales2proj: 'Collaboration platform for sales and experts with documentation.',
+            app_joensuu_meeting_title: 'Meeting Rooms',
+            app_joensuu_meeting: 'Real-time meeting room availability with timeline view.',
+            app_joensuu_events_title: 'Site Events',
+            app_joensuu_events: 'Event calendar: clubs, site monthly, visitors and gatherings.',
+            app_joensuu_invoices_title: 'Invoice Review',
+            app_joensuu_invoices: 'Smart invoice review: anomaly detection and approval recommendations.',
+            app_jkl_desktop_title: 'Desktop Test Automation',
+            app_jkl_desktop: 'Desktop application automated testing management: scenarios, executions and reporting.',
+            app_jkl_events_title: 'Events & Calendar',
+            app_jkl_events: 'Jyväskylä office event calendar with map view and filtering.',
+            app_jkl_office_title: 'Who\'s coming to the office?',
+            app_jkl_office: 'Office presence tracking: analytics, calendar and reminders for hybrid work.',
+            app_jkl_security_title: 'OWASP Security Scanner',
+            app_jkl_security: 'Security scanner dashboard: OWASP vulnerabilities, findings and remediation recommendations.',
+        }
+    };
+
+    let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+
+    function applyLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('siteTourLang', lang);
+        document.documentElement.lang = lang;
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.dataset.i18n;
+            if (translations[lang] && translations[lang][key]) {
+                if (el.querySelector('strong') || key === 'effortDisclaimer') {
+                    el.innerHTML = translations[lang][key];
+                } else {
+                    el.textContent = translations[lang][key];
+                }
+            }
+        });
+        buildEffortTable();
+        buildCharts();
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => applyLanguage(b.dataset.lang));
+    });
+
+    // ========== EFFORT TABLE ==========
+    function buildEffortTable() {
+        const tbody = document.getElementById('effortBody');
+        const tfoot = document.getElementById('effortFoot');
+        let html = '';
+        let totLoc = 0, totTrad = 0, totAiDays = 0;
+
+        apps.forEach(a => {
+            const aiDays = (a.aiHours / 7.5).toFixed(1);
+            const savings = ((1 - (a.aiHours / 7.5) / a.tradDays) * 100).toFixed(0);
+            totLoc += a.loc;
+            totTrad += a.tradDays;
+            totAiDays += a.aiHours / 7.5;
+            html += `<tr>
+                <td class="bold">${a.name}</td>
+                <td>${a.city}</td>
+                <td class="num">${a.loc.toLocaleString('fi-FI')}</td>
+                <td class="num">${a.tradDays}</td>
+                <td class="num">${aiDays}</td>
+                <td class="num savings">${savings} %</td>
+            </tr>`;
+        });
+
+        const totalSavings = ((1 - totAiDays / totTrad) * 100).toFixed(0);
+        const totalLabel = translations[currentLang]?.totalLabel || 'YHTEENSÄ';
+        tfoot.innerHTML = `<tr>
+            <td>${totalLabel}</td>
+            <td></td>
+            <td class="num">${totLoc.toLocaleString('fi-FI')}</td>
+            <td class="num">${totTrad}</td>
+            <td class="num">${totAiDays.toFixed(1)}</td>
+            <td class="num savings">${totalSavings} %</td>
+        </tr>`;
+        tbody.innerHTML = html;
+    }
+
+    // ========== CHARTS ==========
+    const chartInstances = {};
+
+    function destroyCharts() {
+        Object.values(chartInstances).forEach(c => c.destroy());
+        Object.keys(chartInstances).forEach(k => delete chartInstances[k]);
+    }
+
+    function buildCharts() {
+        destroyCharts();
+        const t = translations[currentLang] || translations.fi;
+
+        // === LOC by City (doughnut) ===
+        const cityLocData = {};
+        cityOrder.forEach(c => cityLocData[c] = 0);
+        apps.forEach(a => cityLocData[a.city] += a.loc);
+
+        chartInstances.locByCity = new Chart(document.getElementById('chartLocByCity'), {
+            type: 'doughnut',
+            data: {
+                labels: cityOrder,
+                datasets: [{
+                    data: cityOrder.map(c => cityLocData[c]),
+                    backgroundColor: cityOrder.map(c => cityColors[c].border),
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 12, usePointStyle: true, font: { size: 12 } } }
+                }
+            }
+        });
+
+        // === LOC by App (Top 10 horizontal bar) ===
+        const sorted = [...apps].sort((a, b) => b.loc - a.loc).slice(0, 10);
+        chartInstances.locByApp = new Chart(document.getElementById('chartLocByApp'), {
+            type: 'bar',
+            data: {
+                labels: sorted.map(a => a.name),
+                datasets: [{
+                    data: sorted.map(a => a.loc),
+                    backgroundColor: sorted.map(a => cityColors[a.city].border),
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                    y: { ticks: { font: { size: 11 } } }
+                }
+            }
+        });
+
+        // === Apps per City ===
+        const cityAppCount = {};
+        cityOrder.forEach(c => cityAppCount[c] = 0);
+        apps.forEach(a => cityAppCount[a.city]++);
+
+        chartInstances.appsPerCity = new Chart(document.getElementById('chartAppsPerCity'), {
+            type: 'bar',
+            data: {
+                labels: cityOrder,
+                datasets: [{
+                    data: cityOrder.map(c => cityAppCount[c]),
+                    backgroundColor: cityOrder.map(c => cityColors[c].border),
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#f1f5f9' } },
+                    x: { ticks: { font: { size: 12 } } }
+                }
+            }
+        });
+
+        // === Avg LOC per city ===
+        chartInstances.avgLoc = new Chart(document.getElementById('chartAvgLoc'), {
+            type: 'bar',
+            data: {
+                labels: cityOrder,
+                datasets: [{
+                    data: cityOrder.map(c => cityAppCount[c] ? Math.round(cityLocData[c] / cityAppCount[c]) : 0),
+                    backgroundColor: cityOrder.map(c => cityColors[c].border + '99'),
+                    borderColor: cityOrder.map(c => cityColors[c].border),
+                    borderWidth: 2,
+                    borderRadius: 6,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                    x: { ticks: { font: { size: 12 } } }
+                }
+            }
+        });
+
+        // === Effort Comparison (grouped horizontal bar) ===
+        const tradLabel = currentLang === 'en' ? 'Traditional (person-days)' : 'Perinteinen (htp)';
+        const aiLabel = currentLang === 'en' ? 'AI-assisted (person-days)' : 'Tekoälyavusteinen (htp)';
+
+        chartInstances.effortComparison = new Chart(document.getElementById('chartEffortComparison'), {
+            type: 'bar',
+            data: {
+                labels: apps.map(a => a.name),
+                datasets: [
+                    {
+                        label: tradLabel,
+                        data: apps.map(a => a.tradDays),
+                        backgroundColor: '#f87171',
+                        borderRadius: 3,
+                    },
+                    {
+                        label: aiLabel,
+                        data: apps.map(a => +(a.aiHours / 7.5).toFixed(1)),
+                        backgroundColor: '#34d399',
+                        borderRadius: 3,
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } } },
+                scales: {
+                    x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+                    y: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // === Savings per app (horizontal bar) ===
+        const savingsData = apps.map(a => +((1 - (a.aiHours / 7.5) / a.tradDays) * 100).toFixed(0));
+        chartInstances.savingsPerApp = new Chart(document.getElementById('chartSavingsPerApp'), {
+            type: 'bar',
+            data: {
+                labels: apps.map(a => a.name),
+                datasets: [{
+                    data: savingsData,
+                    backgroundColor: savingsData.map(v => v >= 95 ? '#10b981' : v >= 90 ? '#34d399' : '#6ee7b7'),
+                    borderRadius: 3,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { min: 80, max: 100, grid: { color: '#f1f5f9' }, ticks: { callback: v => v + '%', font: { size: 10 } } },
+                    y: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // === Effort by City (stacked bar) ===
+        const cityTradDays = {}, cityAiDays = {};
+        cityOrder.forEach(c => { cityTradDays[c] = 0; cityAiDays[c] = 0; });
+        apps.forEach(a => { cityTradDays[a.city] += a.tradDays; cityAiDays[a.city] += a.aiHours / 7.5; });
+
+        chartInstances.effortByCity = new Chart(document.getElementById('chartEffortByCity'), {
+            type: 'bar',
+            data: {
+                labels: cityOrder,
+                datasets: [
+                    { label: tradLabel, data: cityOrder.map(c => cityTradDays[c]), backgroundColor: '#f87171', borderRadius: 4 },
+                    { label: aiLabel, data: cityOrder.map(c => +cityAiDays[c].toFixed(1)), backgroundColor: '#34d399', borderRadius: 4 },
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: { size: 12 } } } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                    x: { ticks: { font: { size: 12 } } }
+                }
+            }
+        });
+
+        // === Cumulative Savings (line) ===
+        let cumTrad = 0, cumAi = 0;
+        const cumLabels = [], cumSavingsData = [];
+        apps.forEach(a => {
+            cumTrad += a.tradDays;
+            cumAi += a.aiHours / 7.5;
+            cumLabels.push(a.name);
+            cumSavingsData.push(+(cumTrad - cumAi).toFixed(1));
+        });
+
+        chartInstances.cumulativeSavings = new Chart(document.getElementById('chartCumulativeSavings'), {
+            type: 'line',
+            data: {
+                labels: cumLabels.map((_, i) => (i + 1).toString()),
+                datasets: [{
+                    label: currentLang === 'en' ? 'Cumulative savings (person-days)' : 'Kumulatiivinen säästö (htp)',
+                    data: cumSavingsData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#10b981',
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: true, labels: { font: { size: 12 } } } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                    x: { title: { display: true, text: currentLang === 'en' ? 'Application #' : 'Sovellus #', font: { size: 12 } }, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // === Productivity Multiplier (bar + line) ===
+        const prodMultiplier = apps.map(a => +(a.tradDays / (a.aiHours / 7.5)).toFixed(1));
+        const avgMultiplier = prodMultiplier.reduce((s, v) => s + v, 0) / prodMultiplier.length;
+
+        chartInstances.productivity = new Chart(document.getElementById('chartProductivity'), {
+            type: 'bar',
+            data: {
+                labels: apps.map(a => a.name),
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: currentLang === 'en' ? 'Productivity multiplier' : 'Tuottavuuskerroin',
+                        data: prodMultiplier,
+                        backgroundColor: apps.map(a => cityColors[a.city].border + 'cc'),
+                        borderRadius: 3,
+                    },
+                    {
+                        type: 'line',
+                        label: currentLang === 'en' ? 'Average (' + avgMultiplier.toFixed(1) + 'x)' : 'Keskiarvo (' + avgMultiplier.toFixed(1) + 'x)',
+                        data: apps.map(() => avgMultiplier),
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        borderDash: [6, 3],
+                        pointRadius: 0,
+                        fill: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: { size: 12 } } } },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: '#f1f5f9' }, title: { display: true, text: 'x', font: { size: 14 } }, ticks: { font: { size: 10 } } },
+                    y: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    // ========== INIT ==========
+    applyLanguage(currentLang);
+    </script>
+</body>
+</html>

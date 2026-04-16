@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuka tulee toimistolle? — Siili Jyväskylä</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127970;</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <span class="header-logo">&#127970;</span>
+      <div>
+        <h1>Kuka tulee toimistolle?</h1>
+        <span class="subtitle">Siili Jyväskylä</span>
+      </div>
+    </div>
+    <nav id="main-nav">
+      <button class="tab active" data-view="analytics">Analytiikka</button>
+      <button class="tab" data-view="calendar">Kalenteri</button>
+      <button class="tab" data-view="reminders">Muistutukset</button>
+    </nav>
+    <div class="header-right">
+      <button class="lang-btn active" data-lang="fi" onclick="switchToLang('fi')">FI</button>
+      <button class="lang-btn" data-lang="en" onclick="switchToLang('en')">EN</button>
+      <a class="btn-guide" href="guide.html">?</a>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main>
+
+    <!-- ==================== KALENTERI-NÄKYMÄ ==================== -->
+    <section class="view" id="view-calendar">
+      <div class="view-header">
+        <h2>Toimistokalenteri</h2>
+        <div class="view-controls">
+          <div class="range-selector">
+            <button class="range-btn active" data-weeks="2">2 vko</button>
+            <button class="range-btn" data-weeks="3">3 vko</button>
+            <button class="range-btn" data-weeks="4">4 vko</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtterit -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label class="filter-group-label">Hae</label>
+          <input type="text" id="filterName" placeholder="Nimi tai rooli..." class="search-input">
+        </div>
+        <div class="filter-sep"></div>
+        <div class="filter-group">
+          <label class="filter-group-label">Näytä</label>
+          <div class="filter-chips" id="filterChips">
+            <!-- Generoidaan JS:ssä -->
+          </div>
+        </div>
+        <div class="filter-stats" id="filterStats"></div>
+      </div>
+
+      <!-- Kalenteritaulukko -->
+      <div class="calendar-container" id="calendarContainer">
+        <!-- Generoidaan JS:ssä -->
+      </div>
+
+      <!-- Päivän tiedot -modaali -->
+      <div class="modal-overlay" id="dayModal">
+        <div class="modal">
+          <button class="modal-close" id="dayModalClose">&times;</button>
+          <div class="modal-header" id="dayModalHeader"></div>
+          <div class="modal-body" id="dayModalBody"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ANALYTIIKKA-NÄKYMÄ ==================== -->
+    <section class="view active" id="view-analytics">
+      <div class="view-header">
+        <h2>Analytiikka</h2>
+        <div class="view-controls">
+          <div class="range-selector">
+            <button class="range-btn" data-period="past">Menneisyys (8 vko)</button>
+            <button class="range-btn active" data-period="all">Kaikki</button>
+            <button class="range-btn" data-period="future">Tuleva (4 vko)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Henkilöfiltteri -->
+      <div class="filter-bar" id="analyticsFilterBar">
+        <div class="filter-group">
+          <label class="filter-group-label">Henkilöt</label>
+          <div class="filter-chips" id="analyticsFilterChips"></div>
+        </div>
+      </div>
+
+      <!-- Tämän viikon katsaus — ensimmäisenä -->
+      <div class="analytics-section week-highlight-section">
+        <h3>Tämä viikko — keitä on tulossa toimistolle?</h3>
+        <p class="section-hint">Klikkaa päivää nähdäksesi ketkä ovat paikalla</p>
+        <div class="chart-wrapper" style="height: 220px;">
+          <canvas id="thisWeekChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Yhteenveto-kortit -->
+      <div class="stats-grid" id="statsGrid">
+        <!-- Generoidaan JS:ssä -->
+      </div>
+
+      <!-- Heatmap -->
+      <div class="analytics-section">
+        <div class="heatmap-header">
+          <div>
+            <h3>Toimiston käyttöaste — heatmap</h3>
+            <p class="section-hint">Klikkaa solua nähdäksesi ketkä olivat/ovat paikalla</p>
+          </div>
+          <div class="heatmap-range-control">
+            <label class="filter-group-label">Taakse</label>
+            <input type="range" id="heatmapPastWeeks" min="0" max="12" value="2" class="heatmap-slider">
+            <span id="heatmapPastLabel" class="slider-label">2 vko</span>
+            <div class="slider-sep"></div>
+            <label class="filter-group-label">Eteen</label>
+            <input type="range" id="heatmapFutureWeeks" min="1" max="8" value="2" class="heatmap-slider">
+            <span id="heatmapFutureLabel" class="slider-label">2 vko</span>
+          </div>
+        </div>
+        <div class="heatmap-container" id="heatmapContainer"></div>
+      </div>
+
+      <!-- Viikonpäiväjakauma -->
+      <div class="analytics-row">
+        <div class="analytics-section chart-section">
+          <h3>Suosituimmat toimistopäivät</h3>
+          <p class="section-hint">Klikkaa palkkia nähdäksesi ketkä tulevat</p>
+          <div class="chart-wrapper">
+            <canvas id="dayChart"></canvas>
+          </div>
+        </div>
+        <div class="analytics-section chart-section">
+          <h3>Aktiivisimmat toimistokävijät</h3>
+          <p class="section-hint">Klikkaa palkkia nähdäksesi henkilön päivät</p>
+          <div class="chart-wrapper">
+            <canvas id="personChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Viikkotrendi -->
+      <div class="analytics-section">
+        <h3>Viikkotrendi — toimistolla käyneet / viikko</h3>
+        <p class="section-hint">Klikkaa datapistettä nähdäksesi viikon tiedot</p>
+        <div class="chart-wrapper chart-wide">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Drill-down modaali analytiikalle -->
+      <div class="modal-overlay" id="analyticsModal">
+        <div class="modal">
+          <button class="modal-close" id="analyticsModalClose">&times;</button>
+          <div class="modal-header" id="analyticsModalHeader"></div>
+          <div class="modal-body" id="analyticsModalBody"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MUISTUTUKSET-NÄKYMÄ ==================== -->
+    <section class="view" id="view-reminders">
+      <div class="view-header">
+        <h2>Viikkomuistutukset</h2>
+        <p>Maanantaisin klo 8:50 (ja satunnaisesti torstaisin) Slack-kanava <strong>#jkl-toimisto</strong> saa yhteisen rakkaudellisen muistutuksen. Lisäksi jokaisella on 10 min kalenterimuistutus maanantaiaamulle.</p>
+      </div>
+
+      <!-- Viikon valinta -->
+      <div class="reminder-week-selector" id="reminderWeekSelector">
+        <!-- Generoidaan JS:ssä -->
+      </div>
+
+      <!-- Slack-esikatselu -->
+      <div class="slack-preview" id="slackPreview">
+        <!-- Generoidaan JS:ssä -->
+      </div>
+
+      <!-- Kalenteri-muistutus esimerkki -->
+      <div class="calendar-reminder-preview">
+        <h3>Kalenterimuistutus (10 min, maanantai klo 9:00)</h3>
+        <div class="cal-reminder-card" id="calReminderCard">
+          <!-- Generoidaan JS:ssä -->
+        </div>
+      </div>
+
+      <!-- Miten toimii -osio -->
+      <div class="how-it-works">
+        <h3>Miten tämä toimii?</h3>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-icon">💬</div>
+            <div class="step-title">Slack-muistutus</div>
+            <div class="step-desc">Maanantaisin (ja välillä torstaisin) Slack-botti lähettää lempeän muistutuksen #jkl-toimisto -kanavalle</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-icon">📅</div>
+            <div class="step-title">Kalenterimuistutus</div>
+            <div class="step-desc">10 minuutin muistutus maanantaille klo 9:00 — merkkaa toimistopäivät kalenteriin</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-icon">✅</div>
+            <div class="step-title">Merkintä kalenteriin</div>
+            <div class="step-desc">Jokainen merkitsee kalenteriinsa "Toimistolla" -tapahtuman niille päiville kun tulee</div>
+          </div>
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-icon">🏢</div>
+            <div class="step-title">Yhteinen näkymä</div>
+            <div class="step-desc">Sovellus kerää kalentereista tiedot ja näyttää kuka on milloinkin toimistolla</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast-notifikaatio -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script data-goatcounter="https://site-tour-2026.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
