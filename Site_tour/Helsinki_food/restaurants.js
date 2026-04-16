@@ -247,8 +247,8 @@ const restaurants = [
         lng: 24.9206189,
         hours: "ma-pe 10:45-13:45",
         price: "14.00 \u20ac",
-        website: "https://gvcravintolat.fi/gresa/",
-        description: "Skandinaavinen buffetravintola Ruoholahdessa. 92% suosittelee. Monipuolinen buffet sisältäen kasvisvaihtoehtoja.",
+        website: "https://nordrest.fi/restaurang/gresa/",
+        description: "Nordrestin lounasravintola Ruoholahdessa. Lounas 14€ sisältää salaattibuffetin, leivän, pääruoan, juoman, jälkiruoan ja kahvin/teen. Kolme vaihtoehtoa päivittäin.",
         menu: {
             maanantai: ["Suljettu (pääsiäinen)"],
             tiistai: ["Skandinaavinen buffet: päivittäin vaihtuva (katso gvcravintolat.fi)"],
@@ -598,6 +598,61 @@ const restaurants = [
             keskiviikko: ["Katkarapupasta \u2013 kermainen tomaattipasta ja katkarapuja 13.90\u20ac", "Kana-tagine \u2013 marokkolaista kanaa sitruunakastikkeessa ja bulgurpilaffia 13.90\u20ac", "Linssisosekeitto valkosipulilla (V) 13.90\u20ac"],
             torstai: ["P\u00e4ivitt\u00e4in vaihtuva lounas, salaattibuffet, kahvi/tee ja j\u00e4lkiruoka 13.90\u20ac (katso facebook.com/AmosCafeHelsinki)"],
             perjantai: ["P\u00e4ivitt\u00e4in vaihtuva lounas, salaattibuffet, kahvi/tee ja j\u00e4lkiruoka 13.90\u20ac (katso facebook.com/AmosCafeHelsinki)"]
+        }
+    },
+    // --- LOUNASSIILI-RAVINTOLAT ---
+    {
+        id: 34,
+        name: "Ravintola Oasis",
+        address: "Mechelininkatu 1a, 00180 Helsinki",
+        lat: 60.1668,
+        lng: 24.9218,
+        hours: "ma-pe 11:00-14:00",
+        price: "14.00 \u20ac",
+        website: "https://nordrest.fi/restaurang/ravintola-oasis/",
+        description: "Nordrestin lounasravintola Mechelininkadulla. Lounas 14\u20ac sis\u00e4lt\u00e4\u00e4 alkusalaatin, leiv\u00e4n, p\u00e4\u00e4ruoan, j\u00e4lkiruoan ja kahvin/teen. Kolme vaihtoehtoa: liha, kala ja kasvis.",
+        menu: {
+            maanantai: ["Paahdettua Hot honey kananpoikaa & tyrni-voikastiketta (L, G)", "Paistettua turskaa & tyrni-voikastiketta (L, G)", "Tuorejuustot\u00e4ytteiset pinaatti-kasvispihvit & punasipulihilloketta (L, G)"],
+            tiistai: ["Oluessa haudutettua possua & omenakompottia (L, G)", "Ndujalla maustettua kalapataa & aiolia (M, G)", "Mifu-juureswokkia ja riisinuudelia (L, G)"],
+            keskiviikko: ["Oasiksen lihapullat & konjakkikermakastiketta (L, G)", "J\u00e4ttikatkarapurisottoa & seesamimajoneesia (L, G)", "Panko-kuorrutettua savutofua & hernepestoa (V)"],
+            torstai: ["Vuohenjuustolla kuorrutettua kanaa & basilika-tomaattikastiketta (L, G)", "Paahdettua lohta & tzatzikia (L, G)", "Linssi masala (V, G)"],
+            perjantai: ["Porsaan Wienerschnitzel & kapris-anjovismajoneesia (L)", "Paistettua punakampelaa & kapris-anjovismajoneesia (L)", "Tofuskagen t\u00e4ytteinen uuniperuna (V, G)"]
+        }
+    },
+    {
+        id: 35,
+        name: "Pompier Albertinkatu",
+        address: "Albertinkatu 29, 00180 Helsinki",
+        lat: 60.1629,
+        lng: 24.9327,
+        hours: "ma-pe 10:45-14:00",
+        price: "14.50-19.00 \u20ac",
+        website: "https://pompier.fi/albertinkatu/",
+        description: "Ranskalaistyylinen lounasravintola Albertinkadulla. P\u00e4iv\u00e4n annos 14.50\u20ac tai salaattibuffet keiton kera 14.50\u20ac. Kokonaisvalikoima 19\u20ac.",
+        menu: {
+            maanantai: ["Rapeaksi paistettua kampelaa 'Dukkah', lime-jogurttikastiketta ja maustepaahdettuja varhaisperunoita 14.50\u20ac", "Salaattibuffet ja bataattikeittoa 14.50\u20ac"],
+            tiistai: ["Pannupihvej\u00e4 h\u00e4r\u00e4n paistista, escabechekastiketta ja Mac & Cheese 14.50\u20ac", "Salaattibuffet ja perinteist\u00e4 kirjolohikeittoa 14.50\u20ac"],
+            keskiviikko: ["Paahdettua kreikkalaista kananpoikaa, tsatsikia ja feta-oreganoriisi\u00e4 14.50\u20ac", "Salaattibuffet ja mausteista tomaattikeittoa 14.50\u20ac"],
+            torstai: ["Haukiwallenbergej\u00e4, ruohosipuli-kermaviilikastiketta ja tilliperunoita 14.50\u20ac", "Salaattibuffet ja hernekeittoa, pannukakkua 14.50\u20ac"],
+            perjantai: ["Y\u00f6n yli paahdettua porsaan paistia 'BBQ', Ranch-kastiketta ja Loaded Potatoes 14.50\u20ac", "Salaattibuffet ja savukirjolohikeittoa 14.50\u20ac"]
+        }
+    },
+    {
+        id: 36,
+        name: "Salve",
+        address: "Hietalahdenranta 5, 00120 Helsinki",
+        lat: 60.1622,
+        lng: 24.9313,
+        hours: "ma-pe 11:00-14:00",
+        price: "11.90-14.60 \u20ac",
+        website: "https://www.raflaamo.fi/fi/ravintola/helsinki/salve/menu/lounas",
+        description: "Perinteik\u00e4s suomalainen ravintola Hietalahden hallin vieress\u00e4. Lounas sis\u00e4lt\u00e4\u00e4 salaatin, leiv\u00e4n ja kahvin/teen. Tunnettu kotiruoasta ja oopperaleikkeest\u00e4\u00e4n.",
+        menu: {
+            maanantai: ["P\u00e4iv\u00e4n lounas (katso raflaamo.fi/salve)"],
+            tiistai: ["P\u00e4iv\u00e4n lounas (katso raflaamo.fi/salve)"],
+            keskiviikko: ["P\u00e4iv\u00e4n lounas (katso raflaamo.fi/salve)"],
+            torstai: ["Hernekeitto 11.90\u20ac", "Kirjolohta, hollandaisekastike ja perunamuusia (G, L) 14.60\u20ac", "Jauhemaksapihvej\u00e4, pekonikastiketta ja perunamuusia (L) 14.00\u20ac"],
+            perjantai: ["Lounaskeitto 11.90\u20ac", "Pariloidut muikut, tilli-kurkkukastiketta ja perunamuusia (L) 14.60\u20ac", "Omenaista porsaanposkea ja valkosipuliperunoita (G, L) 14.00\u20ac", "Kermainen pekonipasta (L) 13.50\u20ac", "Falafelpullat, tsatsiki ja riisi (G, VE) 14.00\u20ac"]
         }
     }
 ];
