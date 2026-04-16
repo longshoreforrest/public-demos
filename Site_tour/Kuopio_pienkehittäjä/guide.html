@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Tukiagentti - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #115e59 0%, #0d9488 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #99f6e4; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #5eead4; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #0d9488; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #0d9488; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #115e59; }
+        .feature-card .tag {
+            display: inline-block; background: #f0fdfa; color: #115e59;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #0d9488; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #0d9488; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1 data-i18n-fi="WordPress Tukiagentti - Käyttöohje" data-i18n-en="WordPress Support Agent - User Guide">WordPress Tukiagentti - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="WordPress-pienkehityksen AI-agentti" data-i18n-en="AI agent for WordPress small-scale development">WordPress-pienkehityksen AI-agentti</p>
+        <a class="back" href="index.html" data-i18n-fi="&larr; Takaisin sovellukseen" data-i18n-en="&larr; Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="lang-content" data-lang="fi">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Julkishallinnon WordPress-multisite-ympäristön pienkehitys vaatii tikettien hallintaa, koodikatselmuksia, deploy-pipeline-seurantaa ja saavutettavuusauditointia. Tämä sovellus simuloi AI-avusteista kehittäjäagenttia, joka auttaa hallitsemaan kaikki nämä tehtävät yhden chat-käyttöliittymän kautta.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>Chat</strong>-näkymään, jossa taustalla näkyy simuloitu WordPress-sivusto ja kelluva chat-widget.</li>
+            <li>Kokeile <strong>chat-widgetiä</strong> &mdash; valitse konteksti (virasto, sivu, osio) ja keskustele agentin kanssa.</li>
+            <li>Siirry <strong>Tiketit</strong>-välilehteen nähdäksesi kehityspyynnöt ja bugiraportit.</li>
+            <li>Tarkastele koodimuutoksia <strong>Koodimuutokset</strong>-näkymässä diff-katseluna.</li>
+            <li>Seuraa julkaisuprosessia <strong>Pipeline</strong>-näkymässä.</li>
+            <li>Tarkista saavutettavuus <strong>Auditointi</strong>-välilehdellä.</li>
+        </ol>
+
+        <h2>Kuusi näkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 1</span>
+            <h3>Chat</h3>
+            <p>AI-agentin kanssa keskustelu simuloidun WordPress-sivuston kontekstissa.</p>
+            <ul>
+                <li><strong>Kontekstivalitsin</strong> &mdash; valitse virasto, sivu ja osio johon viittaat.</li>
+                <li><strong>Kelluva chat-widget</strong> kirjoitusanimaatiolla ja reaktioilla.</li>
+                <li>Taustalla näkyy simuloitu sivusto joka havainnollistaa muutoskohteita.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 2</span>
+            <h3>Tiketit</h3>
+            <p>Kehityspyynnöt ja bugiraportit tilasuodattimilla.</p>
+            <ul>
+                <li>Suodata tikettejä: <strong>uudet, työn alla, katselmoitavat, hyväksytyt, julkaistut</strong>.</li>
+                <li>Tikettistatistiikka ja yhteenveto dashboardina.</li>
+                <li>Keskustelumodaali yksittäisen tiketin käsittelyyn.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 3</span>
+            <h3>Koodimuutokset</h3>
+            <p>PR- ja merge-request-katselmointinäkymä.</p>
+            <ul>
+                <li><strong>Diff-näkymä</strong> koodimuutoksista rivi riviltä.</li>
+                <li>Katselmointikommentit ja hyväksymisprosessi.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 4</span>
+            <h3>Pipeline</h3>
+            <p>CI/CD-pipeline ja julkaisuprosessin seuranta.</p>
+            <ul>
+                <li><strong>Kanban-tyylinen</strong> pipeline-näkymä vaiheittain.</li>
+                <li>Julkaisun tila ja eteneminen visuaalisesti.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 5</span>
+            <h3>Auditointi</h3>
+            <p>Saavutettavuus- ja käytettävyysauditoinnin tulokset.</p>
+            <ul>
+                <li>Auditointitulosten <strong>tuonti ja visualisointi</strong>.</li>
+                <li>WCAG-yhteensopivuuden tarkistus sivukohtaisesti.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 6</span>
+            <h3>Analytiikka</h3>
+            <p>Kehitysmetriikat ja porautuvat kaaviot.</p>
+            <ul>
+                <li>Tikettien <strong>käsittelyajat, volyymi ja trendit</strong>.</li>
+                <li>Porautuvat kaaviot yksityiskohtaisempaan analyysiin.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Aloita Chat-näkymästä &mdash; valitse konteksti ja kysy agentilta. Agentti osaa neuvoa tikettien tilasta, koodimuutoksista ja saavutettavuusongelmista.
+        </div>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Pienkehittäjä</div>
+            <h3>"Mitä tikettejä minulle on osoitettu?"</h3>
+            <p>Avaa <strong>Tiketit</strong> &rarr; suodata "työn alla" &rarr; näet omat aktiiviset kehityspyynnöt ja bugit.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Projektikoordinaattori</div>
+            <h3>"Mikä on julkaisun tilanne?"</h3>
+            <p>Avaa <strong>Pipeline</strong> &rarr; näet missä vaiheessa kukin muutos on matkalla tuotantoon.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Saavutettavuusasiantuntija</div>
+            <h3>"Onko sivustolla saavutettavuusongelmia?"</h3>
+            <p>Avaa <strong>Auditointi</strong> &rarr; tarkista WCAG-tulokset sivukohtaisesti ja priorisoi korjaukset.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus simuloi <strong>oikeusministeriön hallinnonalan WordPress-multisite-ympäristöä</strong>.</li>
+            <li>Chat-agentti, tiketit ja auditointitulokset ovat <strong>demoa varten generoituja</strong>.</li>
+            <li>Chat tukee myös <strong>puhesyötettä</strong> (WebkitSpeechRecognition).</li>
+            <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
+        </ul>
+
+        </div>
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>Managing small-scale development for a government WordPress multisite environment requires ticket management, code reviews, deploy pipeline tracking and accessibility auditing. This app simulates an AI-assisted developer agent that helps manage all these tasks through a single chat interface.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>Chat</strong> view with a simulated WordPress site and floating chat widget.</li>
+            <li>Try the <strong>chat widget</strong> &mdash; select context (agency, page, section) and talk to the agent.</li>
+            <li>Navigate to <strong>Tickets</strong> to see development requests and bug reports.</li>
+            <li>Review code changes in the <strong>Code Changes</strong> view with diff display.</li>
+            <li>Follow the release process in the <strong>Pipeline</strong> view.</li>
+            <li>Check accessibility on the <strong>Audit</strong> tab.</li>
+        </ol>
+
+        <h2>Six views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Chat</h3>
+            <p>Conversation with the AI agent in the context of a simulated WordPress site.</p>
+            <ul>
+                <li><strong>Context selector</strong> &mdash; choose agency, page and section you're referring to.</li>
+                <li><strong>Floating chat widget</strong> with typing animation and reactions.</li>
+                <li>Background shows a simulated site illustrating the change targets.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Tickets</h3>
+            <p>Development requests and bug reports with status filters.</p>
+            <ul>
+                <li>Filter tickets: <strong>new, in progress, review, approved, deployed</strong>.</li>
+                <li>Ticket statistics and summary dashboard.</li>
+                <li>Conversation modal for individual ticket handling.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>Code Changes</h3>
+            <p>PR and merge request review view.</p>
+            <ul>
+                <li><strong>Diff view</strong> of code changes line by line.</li>
+                <li>Review comments and approval process.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 4</span>
+            <h3>Pipeline</h3>
+            <p>CI/CD pipeline and release process tracking.</p>
+            <ul>
+                <li><strong>Kanban-style</strong> pipeline view by stage.</li>
+                <li>Release status and progress visually displayed.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 5</span>
+            <h3>Audit</h3>
+            <p>Accessibility and usability audit results.</p>
+            <ul>
+                <li>Audit result <strong>import and visualization</strong>.</li>
+                <li>WCAG compliance check per page.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 6</span>
+            <h3>Analytics</h3>
+            <p>Development metrics and drill-down charts.</p>
+            <ul>
+                <li>Ticket <strong>processing times, volume and trends</strong>.</li>
+                <li>Drill-down charts for deeper analysis.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Start with the Chat view &mdash; select a context and ask the agent. The agent can advise on ticket status, code changes and accessibility issues.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Developer</div>
+            <h3>"What tickets are assigned to me?"</h3>
+            <p>Open <strong>Tickets</strong> &rarr; filter "in progress" &rarr; see your active development requests and bugs.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Project coordinator</div>
+            <h3>"What's the release status?"</h3>
+            <p>Open <strong>Pipeline</strong> &rarr; see where each change is on its way to production.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Accessibility specialist</div>
+            <h3>"Are there accessibility issues on the site?"</h3>
+            <p>Open <strong>Audit</strong> &rarr; check WCAG results per page and prioritize fixes.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app simulates the <strong>Justice Ministry WordPress multisite environment</strong>.</li>
+            <li>The chat agent, tickets and audit results are <strong>generated for demo purposes</strong>.</li>
+            <li>Chat also supports <strong>voice input</strong> (WebkitSpeechRecognition).</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div>
+
+    </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
+<script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

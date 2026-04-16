@@ -1,0 +1,235 @@
+const SIILI_LOCATION = { lat: 62.8921266, lng: 27.6859297 };
+
+const DAYS = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai'];
+const DAYS_SHORT = ['ma', 'ti', 'ke', 'to', 'pe'];
+
+const restaurants = [
+    {
+        id: 1,
+        name: "Isä Camillo",
+        address: "Kauppakatu 25-27, 70100 Kuopio",
+        lat: 62.8921266,
+        lng: 27.6859297,
+        hours: "ma-pe 11:00-14:00",
+        price: "14.00 \u20ac",
+        website: "https://isacamillo.net/en/food/lunch/",
+        description: "Laadukas lounas- ja illallisravintola Siilin kanssa samassa rakennuksessa, Suomen Pankin entisessä rakennuksessa Snellmanin puiston laidalla. Lounas buffetpöydästä ja keittolounasvaihtoehto.",
+        menu: {}
+    },
+    {
+        id: 2,
+        name: "Ramin Konditoria",
+        address: "Puijonkatu 23, 70100 Kuopio",
+        lat: 62.8928474,
+        lng: 27.6802771,
+        hours: "ma-pe 10:30-14:00",
+        price: "10.50-12.50 \u20ac",
+        website: "https://www.raminkonditoria.fi/rami-sektori-lounas",
+        description: "Kauppakeskus Sektorissa sijaitseva leipomo-konditoria ja lounasravintola. Runsas salaattipöytä, oman leipomon leivät, päivittäin vaihtuva keitto ja lämmin ruoka.",
+        menu: {}
+    },
+    {
+        id: 3,
+        name: "Viikinkiravintola Harald",
+        address: "Tulliportinkatu 44, 70110 Kuopio",
+        lat: 62.8927672,
+        lng: 27.6762283,
+        hours: "ma-pe 11:00-14:00",
+        price: "14.00 \u20ac",
+        website: "https://www.ravintolaharald.fi/kuopio/lounas/",
+        description: "Viikinkiteemainen ravintola Kuopion keskustassa torin laidalla. Lounasbuffet sisältää päivittäin vaihtuvat lämpimät ruoat, keiton, salaattipöydän ja jälkiruoan.",
+        menu: {}
+    },
+    {
+        id: 4,
+        name: "Amarillo Kuopio",
+        address: "Käsityökatu 23, 70100 Kuopio",
+        lat: 62.8923324,
+        lng: 27.6812438,
+        hours: "ma-pe 11:00-13:00",
+        price: "13.90 \u20ac",
+        website: "https://www.raflaamo.fi/fi/ravintola/kuopio/amarillo-kuopio/menu/lounas",
+        description: "Tex-mex-henkinen ravintola Kuopion keskustassa. Lounas sisältää runsaan salaattipöydän, veden ja kahvin/teen pienellä makealla.",
+        menu: {}
+    },
+    {
+        id: 5,
+        name: "SalaCavala",
+        address: "Kauppakatu 45, 70110 Kuopio",
+        lat: 62.8919229,
+        lng: 27.6787197,
+        hours: "ma-pe 10:30-14:00",
+        price: "13.70-14.90 \u20ac",
+        website: "https://www.lounaat.info/lounas/salacavala/kuopio",
+        description: "Kahvila-ravintola Apaja-paviljongissa kauppahallin vieressä. Keittolounasta ja ruokaisaa lounasta salaattibuffetin, kahvin ja pienen makean kera.",
+        menu: {}
+    },
+    {
+        id: 6,
+        name: "Mairella",
+        address: "Puijonkatu 30, 70100 Kuopio",
+        lat: 62.8958939,
+        lng: 27.6784684,
+        hours: "ma-pe 10:30-14:30",
+        price: "13.50 \u20ac",
+        website: "https://www.mairella.fi/",
+        description: "Suosittu lounasravintola Kuopion keskustassa. Laadukas kotiruokalounas buffetlinjastosta, päivittäin vaihtuvat ruoat.",
+        menu: {}
+    },
+    {
+        id: 7,
+        name: "Hygge Bro",
+        address: "Kauppakatu 28, Kauppakeskus Aapeli 2. krs, 70100 Kuopio",
+        lat: 62.8912795,
+        lng: 27.6780348,
+        hours: "ma-pe 10:30-15:00",
+        price: "14.00 \u20ac",
+        website: "https://www.hyggebro.fi/",
+        description: "Monesti Kuopion ja Suomen parhaaksi palkittu lounasravintola Kauppakeskus Aapelissa. Runsas noutopöytä, jossa päivittäin vaihtuvat lämpimät ruoat, salaattipöytä, uuniperunoita ja leipää.",
+        menu: {}
+    },
+    {
+        id: 8,
+        name: "Ravintola Skilla",
+        address: "Savonkatu 24, 70110 Kuopio",
+        lat: 62.8925824,
+        lng: 27.6735021,
+        hours: "ma-pe 10:30-14:00",
+        price: "14.30 \u20ac",
+        website: "https://ravintolaskilla.fi/lounas/",
+        description: "Viihtyisä seurustelu- ja ruokaravintola Kuopion ydinkeskustassa. Lounasbuffet sisältää lämpimän ruoan, keiton, salaattipöydän ja kahvin.",
+        menu: {}
+    },
+    {
+        id: 9,
+        name: "Kahvila-konditoria Houkutus",
+        address: "Kauppakatu 49, 70110 Kuopio",
+        lat: 62.8915674,
+        lng: 27.6750692,
+        hours: "ma-pe 10:30-14:00",
+        price: "12.00 \u20ac",
+        website: "https://houkutus.fi/",
+        description: "Perinteinen kahvila-konditoria Kuopion kävelykadulla. Päivittäin vaihtuva keitto- ja salaattilounas sekä oman konditoriapuolen leivonnaiset.",
+        menu: {}
+    },
+    {
+        id: 10,
+        name: "Urban",
+        address: "Puijonkatu 15, 70100 Kuopio",
+        lat: 62.8909739,
+        lng: 27.6804271,
+        hours: "ma-pe 11:00-14:00",
+        price: "15.00 \u20ac",
+        website: "https://www.lounaat.info/lounas/urban/kuopio",
+        description: "TopChef Anssi Kantelisen luotsaama persoonallinen ravintola vanhassa arvokiinteistössä torin tuntumassa. Lautasannoksia ja yllättäviä makuyhdistelmiä.",
+        menu: {}
+    },
+    {
+        id: 11,
+        name: "Ravintola Kreeta",
+        address: "Maaherrankatu 23, 70100 Kuopio",
+        lat: 62.8933545,
+        lng: 27.6875735,
+        hours: "ma-pe 11:00-14:00",
+        price: "14.00-17.90 \u20ac",
+        website: "https://ravintolakreeta.fi/kuopio/lounas/",
+        description: "Kreikkalainen ravintola Kuopion sataman läheisyydessä. Perinteistä kreikkalaista kotiruokaa, mezejä ja grilliherkkuja.",
+        menu: {}
+    },
+    {
+        id: 12,
+        name: "Rosso Kuopio",
+        address: "Haapaniemenkatu 24, 70100 Kuopio",
+        lat: 62.8921965,
+        lng: 27.6763146,
+        hours: "ma-pe 11:00-13:00",
+        price: "14.00-16.90 \u20ac",
+        website: "https://www.raflaamo.fi/fi/ravintola/kuopio/rosso-kuopio/menu/lounas",
+        description: "Sokos-hotellin yhteydessä toimiva Rosso. Lounas tarjoillaan lautasannoksina, ja siihen kuuluu Rosson raastepöytä, kahvi/tee ja pieni makea.",
+        menu: {}
+    },
+    {
+        id: 13,
+        name: "Sfizieria Sorrento",
+        address: "Kauppakatu 63, 70110 Kuopio",
+        lat: 62.8913290,
+        lng: 27.6709177,
+        hours: "ma-to 10:30-14:00, pe 10:30-15:00",
+        price: "13.80-14.00 \u20ac",
+        website: "https://www.sorrento.fi/sfizieria/",
+        description: "Italialainen street food -ravintola Kauppakadulla. Lounas sisältää italialaisen salaattibuffetin, napoli-roomalaisen pizzabuffetin ja jälkiruokabuffetin.",
+        menu: {}
+    },
+    {
+        id: 14,
+        name: "Lounasravintola Remar Portti",
+        address: "Puutarhakatu 9, 70300 Kuopio",
+        lat: 62.8980187,
+        lng: 27.6812873,
+        hours: "ma-la 10:30-14:30",
+        price: "13.00 \u20ac",
+        website: "https://remar.fi/ravintola-portti/",
+        description: "Matkakeskuksessa sijaitseva lounasravintola. Kaikki lounasvaihtoehdot sisältävät runsaan salaattibuffetin, juomat sekä kahvin/teen ja jälkiruoan.",
+        menu: {}
+    },
+    {
+        id: 15,
+        name: "Cafe Mandariini",
+        address: "Puistokatu 20, 70110 Kuopio",
+        lat: 62.8951671,
+        lng: 27.6683240,
+        hours: "ma-pe 11:00-14:00",
+        price: "9.90-12.90 \u20ac",
+        website: "https://www.lounaat.info/lounas/cafe-mandariini/kuopio",
+        description: "Puistokartanossa sijaitseva lounaskahvila kansalaisopiston yhteydessä. Täysi lounas, keittolounas ja salaattilounas. Alle 4-vuotiaat syövät ilmaiseksi.",
+        menu: {}
+    },
+    {
+        id: 16,
+        name: "Ehta",
+        address: "Minna Canthin katu 16, 70100 Kuopio",
+        lat: 62.8907517,
+        lng: 27.6884766,
+        hours: "ma-pe 11:00-14:00",
+        price: "13.70 \u20ac",
+        website: "https://www.raflaamo.fi/fi/ravintola/kuopio/ehta/menu/lounas",
+        description: "S-ryhmän ravintola Kuopion satamassa. Lounas sisältää salaattipöydän, leivän, kahvin/teen ja pienen makean. Pääruoka tarjoillaan lautasannoksena.",
+        menu: {}
+    },
+    {
+        id: 17,
+        name: "Pancho Villa",
+        address: "Puijonkatu 19, 70110 Kuopio",
+        lat: 62.8923720,
+        lng: 27.6800962,
+        hours: "ma-pe 11:00-14:00",
+        price: "12.50 \u20ac",
+        website: "https://panchovilla.fi/en/restaurants/kuopio/",
+        description: "Meksikolainen ravintola Kuopion keskustassa. Lounas sisältää alkusalaattibuffetin, veden ja kahvin/teen pienellä makealla. Perjantaisin tortillabuffet.",
+        menu: {}
+    },
+    {
+        id: 18,
+        name: "Lounas-Salonki",
+        address: "Kasarmikatu 12, 70110 Kuopio",
+        lat: 62.8915733,
+        lng: 27.6679136,
+        hours: "ma-pe 11:00-14:00, la 11:00-14:00",
+        price: "12.00 \u20ac",
+        website: "https://www.lounassalonki.fi/",
+        description: "Laktoositon ja gluteeniton noutopöytälounas arkisin ja lauantaisin. Alkoholiton ja savuton ravintola. Oman konditoriapuolen leivonnaiset ja tuore kahvi.",
+        menu: {}
+    },
+    {
+        id: 19,
+        name: "Maido Sushi & Wok",
+        address: "Kauppakatu 29, 70100 Kuopio",
+        lat: 62.8920833,
+        lng: 27.6847810,
+        hours: "ma-to 10:30-20:00, pe 10:30-21:00",
+        price: "10.90-14.90 \u20ac",
+        website: "https://wolt.com/en/fin/kuopio/restaurant/maido-restaurant",
+        description: "Aasialainen buffetravintola aivan Siilin vieressä Kauppakadulla. Tuoretta sushia, kuumia wok-annoksia, dim sumia, teppanyaki-kanaa ja -pihviä, poke bowleja ja jälkiruokia.",
+        menu: {}
+    }
+];

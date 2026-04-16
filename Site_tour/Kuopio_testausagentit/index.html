@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testiautomaation havaintojen hallinta - Oikeusministeriö WP</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8f9fc;
+      --bg-input: #ffffff;
+      --border: #e0e0e0;
+      --text: #333333;
+      --text-dim: #666666;
+      --text-bright: #1a1a2e;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-dim: rgba(37,99,235,0.08);
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --info: #3b82f6;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .app-header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .app-header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .app-header h1 .logo {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #fff;
+    }
+    .header-meta {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-meta .env-badge {
+      background: rgba(16,185,129,0.2);
+      color: #34d399;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* NAV */
+    .app-nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      gap: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .nav-tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .nav-tab:hover { color: var(--text-bright); background: #f8f9fc; }
+    .nav-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+    .nav-tab .badge {
+      background: #eef2ff;
+      color: var(--accent);
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      margin-left: 6px;
+    }
+
+    /* MAIN LAYOUT */
+    .app-main { padding: 24px; max-width: 1600px; margin: 0 auto; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* CARDS */
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    /* STAT CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .stat-card.selected {
+      box-shadow: 0 0 0 2px var(--accent);
+      background: #eef2ff;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-bright);
+      line-height: 1.2;
+      margin: 4px 0;
+    }
+    .stat-card .sub {
+      font-size: 12px;
+      color: #888;
+    }
+    .stat-card .trend {
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+    .stat-card .trend.up { color: var(--danger); }
+    .stat-card .trend.down { color: var(--success); }
+
+    /* CHART GRID */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    .chart-card { cursor: pointer; transition: all 0.2s; }
+    .chart-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    /* DATA TABLE */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid #e8e8f0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: #f8f9fc;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e8e8f0;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    thead th:hover { color: var(--text-bright); }
+    thead th .sort-arrow { margin-left: 4px; opacity: 0.3; }
+    thead th.sorted .sort-arrow { opacity: 1; color: var(--accent); }
+    tbody tr {
+      border-bottom: 1px solid #f0f0f5;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: #f8f9fc; }
+    tbody td {
+      padding: 10px 12px;
+      vertical-align: top;
+    }
+
+    /* BADGES */
+    .badge-sev {
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-sev.kriittinen { background: #fef2f2; color: #dc2626; }
+    .badge-sev.korkea { background: #fffbeb; color: #d97706; }
+    .badge-sev.keskitaso { background: #eff6ff; color: #2563eb; }
+    .badge-sev.matala { background: #ecfdf5; color: #059669; }
+
+    .badge-status {
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-status.uusi { background: #eef2ff; color: #6366f1; }
+    .badge-status.tutkinnassa { background: #fffbeb; color: #d97706; }
+    .badge-status.ratkaistu { background: #ecfdf5; color: #059669; }
+    .badge-status.ei-korjata { background: #f1f5f9; color: #64748b; }
+
+    .badge-cat {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* FILTERS */
+    .filters-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .filter-group label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    select, .search-input {
+      background: #ffffff;
+      border: 1px solid #d0d0d0;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    select:focus, .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .search-input { width: 250px; }
+    .filter-reset {
+      background: #ffffff;
+      border: 1px solid #d0d0d0;
+      color: var(--text-dim);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      align-self: flex-end;
+      transition: all 0.15s;
+    }
+    .filter-reset:hover { border-color: var(--accent); color: var(--accent); background: #eef2ff; }
+
+    /* DETAIL MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 200;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      overflow-y: auto;
+    }
+    .modal-overlay.visible { display: flex; }
+    .modal {
+      background: #ffffff;
+      border-radius: 14px;
+      max-width: 900px;
+      width: 100%;
+      padding: 32px;
+      animation: fadeIn 0.2s ease;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+    .modal-header h2 {
+      font-size: 20px;
+      color: var(--text-bright);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .modal-section {
+      margin-bottom: 20px;
+    }
+    .modal-section h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .modal-section p, .modal-section .analysis-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .analysis-box {
+      background: #f0f4ff;
+      border: 1px solid #c7d6f5;
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .analysis-box .agent-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .analysis-text strong { color: var(--text-bright); }
+
+    .related-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .related-chip {
+      background: #eef2ff;
+      border: 1px solid #c7d6f5;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--accent);
+      transition: all 0.15s;
+    }
+    .related-chip:hover { background: #dbeafe; border-color: var(--accent); }
+
+    /* AGENT VIEW */
+    .agent-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .agent-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid transparent;
+    }
+    .agent-card:hover {
+      box-shadow: var(--shadow-md);
+      border-left-color: var(--accent);
+    }
+    .agent-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .agent-card-header h3 {
+      font-size: 15px;
+      color: var(--text-bright);
+    }
+    .agent-card .agent-summary {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .agent-card .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* TREND VIEW */
+    .trend-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .trend-chart-container {
+      height: 350px;
+      position: relative;
+    }
+
+    /* PATTERN CARDS */
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .pattern-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 4px solid var(--accent);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .pattern-card:hover { box-shadow: var(--shadow-md); }
+    .pattern-card h4 {
+      color: var(--text-bright);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .pattern-card p {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+    .pattern-card .impact {
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* PAGINATION */
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .pagination button {
+      background: #ffffff;
+      border: 1px solid #d0d0d0;
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .pagination button:hover { border-color: var(--accent); color: var(--accent); background: #eef2ff; }
+    .pagination button:disabled { opacity: 0.4; cursor: default; background: #f5f5f7; }
+
+    /* LANGUAGE SWITCHER */
+    .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden}
+    .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+    .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+    .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+    .lang-flag{font-size:0.85rem;line-height:1}
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f0f0f0; }
+    ::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #999; }
+
+    /* VIEW DESCRIPTION */
+    .view-description {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--accent);
+    }
+    .view-description h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 6px;
+    }
+    .view-description p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      max-width: 900px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .chart-grid, .trend-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      .app-nav { overflow-x: auto; }
+      .filters-bar { flex-direction: column; }
+      .search-input { width: 100%; }
+      .app-main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <h1>
+      <span class="logo">QA</span>
+      <span data-i18n="header_title">Testiautomaation havaintokeskus</span>
+    </h1>
+    <div class="header-meta">
+      <span data-i18n="header_org">Oikeusministeriön hallinnonala - WordPress</span>
+      <span class="env-badge">Staging</span>
+      <span id="obs-count-header"></span>
+      <a href="guide.html" data-i18n="header_guide" style="color:rgba(255,255,255,0.9);font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+        <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="nav-tab active" data-view="dashboard">
+      <span data-i18n="nav_dashboard">Dashboard</span>
+    </div>
+    <div class="nav-tab" data-view="observations">
+      <span data-i18n="nav_observations">Havainnot</span> <span class="badge" id="nav-obs-count"></span>
+    </div>
+    <div class="nav-tab" data-view="agent">
+      <span data-i18n="nav_agent">Agenttianalyysi</span> <span class="badge" id="nav-agent-count"></span>
+    </div>
+    <div class="nav-tab" data-view="trends">
+      <span data-i18n="nav_trends">Trendit ja korrelaatiot</span>
+    </div>
+  </nav>
+
+  <main class="app-main">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <div class="view active" id="view-dashboard">
+      <div class="view-description">
+        <h2 data-i18n="dashboard_title">Tilannekuva</h2>
+        <p data-i18n="dashboard_desc">Yleiskatsaus testiautomaation havaintoihin Oikeusministeriön hallinnonalan WordPress-sivustoilla. Numerot ja graafit kertovat testauksen nykytilan yhdellä silmäyksellä. Klikkaa mitä tahansa korttia tai graafin segmenttiä porautuaksesi kyseisen joukon havaintoihin.</p>
+      </div>
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="chart-grid">
+        <div class="card chart-card" id="chart-category-card">
+          <div class="card-title" data-i18n="chart_by_category">Havainnot kategorioittain</div>
+          <div class="chart-container"><canvas id="chart-category"></canvas></div>
+        </div>
+        <div class="card chart-card" id="chart-severity-card">
+          <div class="card-title" data-i18n="chart_severity_dist">Vakavuusjakauma</div>
+          <div class="chart-container"><canvas id="chart-severity"></canvas></div>
+        </div>
+        <div class="card chart-card" id="chart-site-card">
+          <div class="card-title" data-i18n="chart_by_agency">Havainnot virastoittain</div>
+          <div class="chart-container"><canvas id="chart-site"></canvas></div>
+        </div>
+        <div class="card chart-card" id="chart-status-card">
+          <div class="card-title" data-i18n="chart_status_dist">Tilajakauma</div>
+          <div class="chart-container"><canvas id="chart-status"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title" data-i18n="chart_timeline">Havaintojen aikajana</div>
+        <div style="height:250px;position:relative"><canvas id="chart-timeline"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" data-i18n="recent_observations">Viimeisimmät havainnot</div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th data-i18n="th_time">Aika</th><th data-i18n="th_test">Testi</th><th data-i18n="th_category">Kategoria</th><th data-i18n="th_severity">Vakavuus</th><th data-i18n="th_status">Tila</th><th data-i18n="th_agency">Virasto</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== OBSERVATIONS ===================== -->
+    <div class="view" id="view-observations">
+      <div class="view-description">
+        <h2 data-i18n="obs_title">Havainnot</h2>
+        <p data-i18n="obs_desc">Kaikki testiautomaation löytämät havainnot listattuna. Suodata kategorialla, vakavuudella, tilalla, virastolla tai vapaalla haulla löytääksesi juuri tarvitsemasi tiedot. Klikkaa havaintoriviä nähdäksesi yksityiskohtaisen kuvauksen, AI-agentin juurisyyanalyysin ja korjaussuosituksen.</p>
+      </div>
+
+      <div id="custom-filter-banner" style="display:none;align-items:center;gap:12px;background:#eef2ff;border:1px solid #c7d6f5;border-radius:10px;padding:12px 20px;margin-bottom:16px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <span style="font-size:14px;color:#1a1a2e;font-weight:600" data-i18n="active_drill_filter">Aktiivinen porautumissuodatin:</span>
+        <span class="custom-filter-label" style="font-size:14px;color:#2563eb"></span>
+        <button onclick="resetFilters()" style="margin-left:auto;background:#fff;border:1px solid #c7d6f5;color:#2563eb;padding:5px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500" data-i18n="btn_clear">Tyhjenna</button>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label data-i18n="filter_search">Haku</label>
+          <input type="text" class="search-input" id="filter-search" data-i18n-placeholder="filter_search_placeholder" placeholder="Hae havainnoista...">
+        </div>
+        <div class="filter-group">
+          <label data-i18n="filter_category">Kategoria</label>
+          <select id="filter-category"><option value="" data-i18n="filter_all">Kaikki</option></select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="filter_severity">Vakavuus</label>
+          <select id="filter-severity"><option value="" data-i18n="filter_all">Kaikki</option></select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="filter_status">Tila</label>
+          <select id="filter-status"><option value="" data-i18n="filter_all">Kaikki</option></select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="filter_agency">Virasto</label>
+          <select id="filter-site"><option value="" data-i18n="filter_all">Kaikki</option></select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="filter_tool">Testityokalu</label>
+          <select id="filter-tool"><option value="" data-i18n="filter_all">Kaikki</option></select>
+        </div>
+        <div class="filter-group">
+          <label data-i18n="filter_component">Komponentti</label>
+          <select id="filter-component"><option value="" data-i18n="filter_all">Kaikki</option></select>
+        </div>
+        <button class="filter-reset" onclick="resetFilters()" data-i18n="btn_reset_filters">Tyhjenna suodattimet</button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="card-title" style="margin-bottom:0" id="obs-table-count" data-i18n="obs_table_title">Havainnot</span>
+          <span style="font-size:12px;color:var(--text-dim)" data-i18n="obs_click_hint">Klikkaa riviä nähdäksesi agenttianalyysin</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead id="obs-thead"></thead>
+            <tbody id="obs-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span id="page-info"></span>
+          <div style="display:flex;gap:8px">
+            <button id="page-prev" onclick="changePage(-1)" data-i18n="btn_previous">Edellinen</button>
+            <button id="page-next" onclick="changePage(1)" data-i18n="btn_next">Seuraava</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== AGENT ANALYSIS ===================== -->
+    <div class="view" id="view-agent">
+      <div class="view-description">
+        <h2 data-i18n="agent_title">Agenttianalyysi</h2>
+        <p data-i18n="agent_desc">AI-agentti analysoi testiautomaation havainnot, tunnistaa toistuvat kuviot ja selvittää virheiden juurisyyt. Agentti ymmärtää WordPress-konfiguraation, integraatiot ja ulkoisten kumppanien (Salesforce, DVV, Suomi.fi) muutosten vaikutukset. Agentti luokittelee onko kyse ulkoisesta muutoksesta, päivitysongelmasta vai sisäisestä virheestä ja antaa konkreettisen korjaussuosituksen.</p>
+      </div>
+      <div class="stats-grid" style="margin-bottom:24px">
+        <div class="stat-card" onclick="filterAgentByType('all')">
+          <div class="label" data-i18n="agent_analyzed">Analysoidut havainnot</div>
+          <div class="value" id="agent-total">0</div>
+        </div>
+        <div class="stat-card" onclick="filterAgentByType('ulkoinen')">
+          <div class="label" data-i18n="agent_external">Ulkoiset muutokset</div>
+          <div class="value" id="agent-external">0</div>
+          <div class="sub" data-i18n="agent_external_sub">Vaatii koordinointia kumppanien kanssa</div>
+        </div>
+        <div class="stat-card" onclick="filterAgentByType('paivitys')">
+          <div class="label" data-i18n="agent_updates">Päivitysongelmat</div>
+          <div class="value" id="agent-update">0</div>
+          <div class="sub" data-i18n="agent_updates_sub">WP-ydin, lisäosat, teemat</div>
+        </div>
+        <div class="stat-card" onclick="filterAgentByType('kriittinen')">
+          <div class="label" data-i18n="agent_critical">Kriittiset havainnot</div>
+          <div class="value" id="agent-critical">0</div>
+          <div class="sub" data-i18n="agent_critical_sub">Vaatii välitöntä toimintaa</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title" data-i18n="agent_patterns">Agentti: Havaitut kuviot ja korrelaatiot</div>
+        <div class="pattern-grid" id="patterns-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" data-i18n="agent_root_cause_analyses">Agentin juurisyyanalyysit</div>
+        <div class="agent-feed" id="agent-feed"></div>
+      </div>
+    </div>
+
+    <!-- ===================== TRENDS ===================== -->
+    <div class="view" id="view-trends">
+      <div class="view-description">
+        <h2 data-i18n="trends_title">Trendit ja korrelaatiot</h2>
+        <p data-i18n="trends_desc">Seuraa testiautomaation havaintojen kehitystä ajan yli. Näetkö virhemäärien kasautuvan tiettyyn ajankohtaan? Ovatko ulkoiset muutokset lisääntyneet? Miten nopeasti eri kategorioiden virheet ratkaistaan? Tämä näkymä auttaa tunnistamaan systemaattisia ongelmia ja arvioimaan testauksen tehokkuutta ennen tuotantoon siirtymistä.</p>
+      </div>
+      <div class="trend-grid">
+        <div class="card">
+          <div class="card-title" data-i18n="chart_weekly">Havaintojen kehitys viikottain</div>
+          <div class="trend-chart-container"><canvas id="chart-weekly"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="chart_cat_monthly">Kategorioiden kehitys kuukausittain</div>
+          <div class="trend-chart-container"><canvas id="chart-cat-trend"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="chart_resolution">Ratkaisuaika kategorioittain (pvä)</div>
+          <div class="trend-chart-container"><canvas id="chart-resolution"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="chart_int_ext">Ulkoinen vs. sisäinen juurisyy</div>
+          <div class="trend-chart-container"><canvas id="chart-internal-external"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-title" data-i18n="chart_agency_compare">Virastojen välinen vertailu</div>
+        <div style="height:350px;position:relative"><canvas id="chart-site-compare"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" data-i18n="chart_tool_coverage">Testityökalujen kattavuus</div>
+        <div style="height:300px;position:relative"><canvas id="chart-tools"></canvas></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    // =======================================================================
+    // TRANSLATIONS
+    // =======================================================================
+    const translations = {
+      fi: {
+        // Header
+        header_title: 'Testiautomaation havaintokeskus',
+        header_guide: 'Käyttöohje \u2192',
+        header_org: 'Oikeusministeriön hallinnonala - WordPress',
+        header_obs_count: '{count} havaintoa',
+        // Nav tabs
+        nav_dashboard: 'Dashboard',
+        nav_observations: 'Havainnot',
+        nav_agent: 'Agenttianalyysi',
+        nav_trends: 'Trendit ja korrelaatiot',
+        // Dashboard
+        dashboard_title: 'Tilannekuva',
+        dashboard_desc: 'Yleiskatsaus testiautomaation havaintoihin Oikeusministeriön hallinnonalan WordPress-sivustoilla. Numerot ja graafit kertovat testauksen nykytilan yhdellä silmäyksellä. Klikkaa mitä tahansa korttia tai graafin segmenttiä porautuaksesi kyseisen joukon havaintoihin.',
+        // Stat cards
+        stat_total: 'Havaintoja yhteensä',
+        stat_testing_period: 'Testausjakso 1/2026 - 4/2026',
+        stat_critical: 'Kriittiset',
+        stat_of_all: '{pct}% kaikista',
+        stat_open: 'Avoimet',
+        stat_open_sub: 'Uudet + tutkinnassa',
+        stat_open_drill: 'Avoimet havainnot (uudet + tutkinnassa)',
+        stat_resolved: 'Ratkaistut',
+        stat_resolved_pct: '{pct}% ratkaistu',
+        stat_external: 'Ulkoiset muutokset',
+        stat_external_sub: 'Salesforce, DVV, Suomi.fi...',
+        // Chart titles
+        chart_by_category: 'Havainnot kategorioittain',
+        chart_severity_dist: 'Vakavuusjakauma',
+        chart_by_agency: 'Havainnot virastoittain',
+        chart_status_dist: 'Tilajakauma',
+        chart_timeline: 'Havaintojen aikajana',
+        recent_observations: 'Viimeisimmät havainnot',
+        // Table headers
+        th_time: 'Aika',
+        th_test: 'Testi',
+        th_category: 'Kategoria',
+        th_severity: 'Vakavuus',
+        th_status: 'Tila',
+        th_agency: 'Virasto',
+        th_test_case: 'Testitapaus',
+        th_component: 'Komponentti',
+        th_tool: 'Työkalu',
+        // Observations view
+        obs_title: 'Havainnot',
+        obs_desc: 'Kaikki testiautomaation löytämät havainnot listattuna. Suodata kategorialla, vakavuudella, tilalla, virastolla tai vapaalla haulla löytääksesi juuri tarvitsemasi tiedot. Klikkaa havaintoriviä nähdäksesi yksityiskohtaisen kuvauksen, AI-agentin juurisyyanalyysin ja korjaussuosituksen.',
+        obs_table_title: 'Havainnot',
+        obs_table_count: 'Havainnot ({filtered}{total})',
+        obs_click_hint: 'Klikkaa riviä nähdäksesi agenttianalyysin',
+        // Filters
+        filter_search: 'Haku',
+        filter_search_placeholder: 'Hae havainnoista...',
+        filter_category: 'Kategoria',
+        filter_severity: 'Vakavuus',
+        filter_status: 'Tila',
+        filter_agency: 'Virasto',
+        filter_tool: 'Testityokalu',
+        filter_component: 'Komponentti',
+        filter_all: 'Kaikki',
+        btn_reset_filters: 'Tyhjenna suodattimet',
+        btn_clear: 'Tyhjenna',
+        btn_previous: 'Edellinen',
+        btn_next: 'Seuraava',
+        active_drill_filter: 'Aktiivinen porautumissuodatin:',
+        page_info: 'Sivu {current} / {total} ({count} havaintoa)',
+        // Agent view
+        agent_title: 'Agenttianalyysi',
+        agent_desc: 'AI-agentti analysoi testiautomaation havainnot, tunnistaa toistuvat kuviot ja selvittää virheiden juurisyyt. Agentti ymmärtää WordPress-konfiguraation, integraatiot ja ulkoisten kumppanien (Salesforce, DVV, Suomi.fi) muutosten vaikutukset. Agentti luokittelee onko kyse ulkoisesta muutoksesta, päivitysongelmasta vai sisäisestä virheestä ja antaa konkreettisen korjaussuosituksen.',
+        agent_analyzed: 'Analysoidut havainnot',
+        agent_external: 'Ulkoiset muutokset',
+        agent_external_sub: 'Vaatii koordinointia kumppanien kanssa',
+        agent_updates: 'Päivitysongelmat',
+        agent_updates_sub: 'WP-ydin, lisäosat, teemat',
+        agent_critical: 'Kriittiset havainnot',
+        agent_critical_sub: 'Vaatii välitöntä toimintaa',
+        agent_patterns: 'Agentti: Havaitut kuviot ja korrelaatiot',
+        agent_root_cause_analyses: 'Agentin juurisyyanalyysit',
+        agent_recommendation: 'Suositus:',
+        agent_agencies: '{count} virastoa',
+        // Pattern cards
+        pattern_sf_title: 'Salesforce-integraatioketju',
+        pattern_sf_desc: 'Havaittu {count} Salesforce-integraatioon liittyvää virhettä. Ulkoinen kumppani (Accenture) on tehnyt useita muutoksia SF-skeemaan ilman ennakkoilmoitusta. Tämä on aiheuttanut ketjureaktion joka vaikuttaa {sites} virastosivustoon.',
+        pattern_sf_impact: '{count} havaintoa - {critical} kriittistä',
+        pattern_a11y_title: 'Saavutettavuusvelka kasvaa',
+        pattern_a11y_desc: '{count} avointa saavutettavuushavaintoa. WCAG 2.1 AA -vaatimusten noudattaminen on EU-direktiivin 2016/2102 mukainen lakisääteinen velvoite. Havainnoista {high} on vakavuudeltaan korkea tai kriittinen.',
+        pattern_a11y_impact: '{count} avointa - lakisääteinen riski',
+        pattern_perf_title: 'Core Web Vitals -ongelmat',
+        pattern_perf_desc: '{count} suorituskykyongelmaa havaittu. LCP, FID ja CLS ylittävät Google-tavoitteet useilla sivuilla. Pääsyy: puuttuva kuvaoptimointi, liian suuri JS-bundle ja N+1 tietokantakyselyt.',
+        pattern_perf_impact: '{count} havaintoa - SEO-vaikutus',
+        pattern_om_title: 'Oikeusministeriö - eniten havaintoja',
+        pattern_om_desc: 'Oikeusministeriön sivustolla on {count} havaintoa ({pct}% kaikista). Tämä johtuu siitä, että OM:n sivusto on laajin ja monimutkaisin - palvelee pääsivustona koko hallinnonalalle.',
+        pattern_om_impact: '{count} havaintoa - {open} avointa',
+        pattern_sec_title: 'Tietoturva-auditoinnin löydökset',
+        pattern_sec_desc: '{count} tietoturvalöydöstä OWASP ZAP -skannauksessa. Kriittisimmät: XSS-haavoittuvuus hakukentässä ja SQL Injection custom API:ssa. Molemmat vaativat välitöntä korjausta ennen tuotantoon siirtymistä.',
+        pattern_sec_impact: '{count} kriittistä tietoturvalöydöstä',
+        pattern_wp_title: 'WP 6.7 -päivityksen vaikutukset',
+        pattern_wp_desc: 'WordPress 6.7 -ydinpäivitys aiheutti {count} havaintoa. Suurimmat vaikutukset: Block API -muutos, REST API -autentikointi ja multisite-käyttöoikeudet. Lisäksi useat lisäosat vaativat päivityksiä yhteensopivuuden varmistamiseksi.',
+        pattern_wp_impact: '{count} päivitykseen liittyvää havaintoa',
+        pattern_sf_drill: 'Salesforce-integraatiovirheet',
+        pattern_a11y_drill: 'Avoimet saavutettavuuspuutteet',
+        pattern_perf_drill: 'Suorituskykyongelmat',
+        pattern_om_drill: 'Oikeusministeriön havainnot',
+        // Trends
+        trends_title: 'Trendit ja korrelaatiot',
+        trends_desc: 'Seuraa testiautomaation havaintojen kehitystä ajan yli. Näetkö virhemäärien kasautuvan tiettyyn ajankohtaan? Ovatko ulkoiset muutokset lisääntyneet? Miten nopeasti eri kategorioiden virheet ratkaistaan? Tämä näkymä auttaa tunnistamaan systemaattisia ongelmia ja arvioimaan testauksen tehokkuutta ennen tuotantoon siirtymistä.',
+        chart_weekly: 'Havaintojen kehitys viikottain',
+        chart_cat_monthly: 'Kategorioiden kehitys kuukausittain',
+        chart_resolution: 'Ratkaisuaika kategorioittain (pvä)',
+        chart_int_ext: 'Ulkoinen vs. sisäinen juurisyy',
+        chart_agency_compare: 'Virastojen välinen vertailu',
+        chart_tool_coverage: 'Testityökalujen kattavuus',
+        // Chart labels
+        chart_label_new_obs: 'Uudet havainnot',
+        chart_label_resolved: 'Ratkaistut',
+        chart_label_open_cum: 'Avoimet (kumulatiivinen)',
+        chart_label_per_week: 'Per viikko',
+        chart_label_cumulative: 'Kumulatiivinen',
+        chart_label_avg_resolution: 'Keskimääräinen ratkaisuaika (pvä)',
+        chart_label_days: 'Päiviä',
+        chart_label_ext_root: 'Ulkoinen juurisyy',
+        chart_label_int_root: 'Sisäinen juurisyy',
+        chart_label_week: 'Viikko',
+        // Severity names
+        sev_kriittinen: 'Kriittinen',
+        sev_korkea: 'Korkea',
+        sev_keskitaso: 'Keskitaso',
+        sev_matala: 'Matala',
+        // Status names
+        status_uusi: 'Uusi',
+        status_tutkinnassa: 'Tutkinnassa',
+        status_ratkaistu: 'Ratkaistu',
+        status_ei_korjata: 'Ei korjata',
+        // Category names
+        cat_ulkoinen_muutos: 'Ulkoinen muutos',
+        cat_wordpress_ydin: 'WP-ydinpäivitys',
+        cat_lisaosa_paivitys: 'Lisäosapäivitys',
+        cat_teemavirhe: 'Teemavirhe',
+        cat_integraatiovirhe: 'Integraatiovirhe',
+        cat_konfiguraatio: 'Konfiguraatiovirhe',
+        cat_suorituskyky: 'Suorituskyky',
+        cat_saavutettavuus: 'Saavutettavuus',
+        cat_tietoturva: 'Tietoturva',
+        cat_lomakevirhe: 'Lomakevirhe',
+        cat_sisaltovirhe: 'Sisältövirhe',
+        cat_hakutoiminto: 'Hakutoiminto',
+        // Modal labels
+        modal_agency: 'VIRASTO',
+        modal_component: 'KOMPONENTTI',
+        modal_test_suite: 'TESTISARJA',
+        modal_test_tool: 'TESTITYÖKALU',
+        modal_environment: 'YMPÄRISTÖ',
+        modal_site: 'SIVUSTO',
+        modal_error_desc: 'Virheen kuvaus',
+        modal_root_cause: 'Juurisyy',
+        modal_recommendation: 'Suositus',
+        modal_ai_analysis: 'AI-agentin analyysi',
+        modal_related: 'Liittyvät havainnot ({count})',
+        modal_related_note: 'Sama juurisyy havaittu usealla virastosivustolla',
+        // Month names
+        month_short: ['Tammi','Helmi','Maalis','Huhti','Touko','Kesä','Heinä','Elo','Syys','Loka','Marras','Joulu']
+      },
+      en: {
+        // Header
+        header_title: 'Test Automation Observation Center',
+        header_guide: 'User Guide \u2192',
+        header_org: 'Ministry of Justice Administration - WordPress',
+        header_obs_count: '{count} observations',
+        // Nav tabs
+        nav_dashboard: 'Dashboard',
+        nav_observations: 'Observations',
+        nav_agent: 'Agent Analysis',
+        nav_trends: 'Trends & Correlations',
+        // Dashboard
+        dashboard_title: 'Overview',
+        dashboard_desc: 'An overview of test automation observations across the Ministry of Justice WordPress sites. Numbers and charts show the current testing status at a glance. Click any card or chart segment to drill down into that subset of observations.',
+        // Stat cards
+        stat_total: 'Total observations',
+        stat_testing_period: 'Testing period 1/2026 - 4/2026',
+        stat_critical: 'Critical',
+        stat_of_all: '{pct}% of all',
+        stat_open: 'Open',
+        stat_open_sub: 'New + under investigation',
+        stat_open_drill: 'Open observations (new + under investigation)',
+        stat_resolved: 'Resolved',
+        stat_resolved_pct: '{pct}% resolved',
+        stat_external: 'External changes',
+        stat_external_sub: 'Salesforce, DVV, Suomi.fi...',
+        // Chart titles
+        chart_by_category: 'Observations by category',
+        chart_severity_dist: 'Severity distribution',
+        chart_by_agency: 'Observations by agency',
+        chart_status_dist: 'Status distribution',
+        chart_timeline: 'Observation timeline',
+        recent_observations: 'Recent observations',
+        // Table headers
+        th_time: 'Time',
+        th_test: 'Test',
+        th_category: 'Category',
+        th_severity: 'Severity',
+        th_status: 'Status',
+        th_agency: 'Agency',
+        th_test_case: 'Test case',
+        th_component: 'Component',
+        th_tool: 'Tool',
+        // Observations view
+        obs_title: 'Observations',
+        obs_desc: 'All observations found by test automation listed here. Filter by category, severity, status, agency, or free text search to find exactly what you need. Click an observation row to see the detailed description, AI agent root cause analysis and fix recommendation.',
+        obs_table_title: 'Observations',
+        obs_table_count: 'Observations ({filtered}{total})',
+        obs_click_hint: 'Click a row to view agent analysis',
+        // Filters
+        filter_search: 'Search',
+        filter_search_placeholder: 'Search observations...',
+        filter_category: 'Category',
+        filter_severity: 'Severity',
+        filter_status: 'Status',
+        filter_agency: 'Agency',
+        filter_tool: 'Test tool',
+        filter_component: 'Component',
+        filter_all: 'All',
+        btn_reset_filters: 'Reset filters',
+        btn_clear: 'Clear',
+        btn_previous: 'Previous',
+        btn_next: 'Next',
+        active_drill_filter: 'Active drill-down filter:',
+        page_info: 'Page {current} / {total} ({count} observations)',
+        // Agent view
+        agent_title: 'Agent Analysis',
+        agent_desc: 'The AI agent analyzes test automation observations, identifies recurring patterns and investigates root causes of errors. The agent understands WordPress configuration, integrations, and the impact of changes by external partners (Salesforce, DVV, Suomi.fi). It classifies whether the issue is an external change, update problem, or internal error and provides a concrete fix recommendation.',
+        agent_analyzed: 'Analyzed observations',
+        agent_external: 'External changes',
+        agent_external_sub: 'Requires partner coordination',
+        agent_updates: 'Update issues',
+        agent_updates_sub: 'WP core, plugins, themes',
+        agent_critical: 'Critical observations',
+        agent_critical_sub: 'Requires immediate action',
+        agent_patterns: 'Agent: Detected patterns and correlations',
+        agent_root_cause_analyses: 'Agent root cause analyses',
+        agent_recommendation: 'Recommendation:',
+        agent_agencies: '{count} agencies',
+        // Pattern cards
+        pattern_sf_title: 'Salesforce integration chain',
+        pattern_sf_desc: 'Detected {count} Salesforce integration-related errors. An external partner (Accenture) has made several changes to the SF schema without prior notice. This has caused a chain reaction affecting {sites} agency sites.',
+        pattern_sf_impact: '{count} observations - {critical} critical',
+        pattern_a11y_title: 'Growing accessibility debt',
+        pattern_a11y_desc: '{count} open accessibility observations. WCAG 2.1 AA compliance is a legal obligation under EU Directive 2016/2102. Of these, {high} are high or critical severity.',
+        pattern_a11y_impact: '{count} open - legal compliance risk',
+        pattern_perf_title: 'Core Web Vitals issues',
+        pattern_perf_desc: '{count} performance issues detected. LCP, FID, and CLS exceed Google targets on multiple pages. Root cause: missing image optimization, oversized JS bundle, and N+1 database queries.',
+        pattern_perf_impact: '{count} observations - SEO impact',
+        pattern_om_title: 'Ministry of Justice - most observations',
+        pattern_om_desc: 'The Ministry of Justice site has {count} observations ({pct}% of all). This is because the MoJ site is the largest and most complex - serving as the main site for the entire administrative branch.',
+        pattern_om_impact: '{count} observations - {open} open',
+        pattern_sec_title: 'Security audit findings',
+        pattern_sec_desc: '{count} security findings from OWASP ZAP scanning. Most critical: XSS vulnerability in search field and SQL Injection in custom API. Both require immediate remediation before production deployment.',
+        pattern_sec_impact: '{count} critical security findings',
+        pattern_wp_title: 'WP 6.7 update impact',
+        pattern_wp_desc: 'WordPress 6.7 core update caused {count} observations. Major impacts: Block API change, REST API authentication, and multisite permissions. Additionally, several plugins require updates for compatibility.',
+        pattern_wp_impact: '{count} update-related observations',
+        pattern_sf_drill: 'Salesforce integration errors',
+        pattern_a11y_drill: 'Open accessibility issues',
+        pattern_perf_drill: 'Performance issues',
+        pattern_om_drill: 'Ministry of Justice observations',
+        // Trends
+        trends_title: 'Trends & Correlations',
+        trends_desc: 'Track how test automation observations evolve over time. Are error counts clustering around specific dates? Have external changes increased? How quickly are different categories resolved? This view helps identify systematic issues and evaluate testing effectiveness before production deployment.',
+        chart_weekly: 'Weekly observation trend',
+        chart_cat_monthly: 'Category trend by month',
+        chart_resolution: 'Resolution time by category (days)',
+        chart_int_ext: 'External vs. internal root cause',
+        chart_agency_compare: 'Cross-agency comparison',
+        chart_tool_coverage: 'Test tool coverage',
+        // Chart labels
+        chart_label_new_obs: 'New observations',
+        chart_label_resolved: 'Resolved',
+        chart_label_open_cum: 'Open (cumulative)',
+        chart_label_per_week: 'Per week',
+        chart_label_cumulative: 'Cumulative',
+        chart_label_avg_resolution: 'Average resolution time (days)',
+        chart_label_days: 'Days',
+        chart_label_ext_root: 'External root cause',
+        chart_label_int_root: 'Internal root cause',
+        chart_label_week: 'Week',
+        // Severity names
+        sev_kriittinen: 'Critical',
+        sev_korkea: 'High',
+        sev_keskitaso: 'Medium',
+        sev_matala: 'Low',
+        // Status names
+        status_uusi: 'New',
+        status_tutkinnassa: 'Investigating',
+        status_ratkaistu: 'Resolved',
+        status_ei_korjata: 'Won\'t fix',
+        // Category names
+        cat_ulkoinen_muutos: 'External change',
+        cat_wordpress_ydin: 'WP core update',
+        cat_lisaosa_paivitys: 'Plugin update',
+        cat_teemavirhe: 'Theme error',
+        cat_integraatiovirhe: 'Integration error',
+        cat_konfiguraatio: 'Configuration error',
+        cat_suorituskyky: 'Performance',
+        cat_saavutettavuus: 'Accessibility',
+        cat_tietoturva: 'Security',
+        cat_lomakevirhe: 'Form error',
+        cat_sisaltovirhe: 'Content error',
+        cat_hakutoiminto: 'Search function',
+        // Modal labels
+        modal_agency: 'AGENCY',
+        modal_component: 'COMPONENT',
+        modal_test_suite: 'TEST SUITE',
+        modal_test_tool: 'TEST TOOL',
+        modal_environment: 'ENVIRONMENT',
+        modal_site: 'SITE',
+        modal_error_desc: 'Error description',
+        modal_root_cause: 'Root cause',
+        modal_recommendation: 'Recommendation',
+        modal_ai_analysis: 'AI agent analysis',
+        modal_related: 'Related observations ({count})',
+        modal_related_note: 'Same root cause detected across multiple agency sites',
+        // Month names
+        month_short: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+      }
+    };
+
+    // Category key to translation key mapping
+    const CAT_I18N_MAP = {
+      'ulkoinen-muutos': 'cat_ulkoinen_muutos',
+      'wordpress-ydin': 'cat_wordpress_ydin',
+      'lisaosa-paivitys': 'cat_lisaosa_paivitys',
+      'teemavirhe': 'cat_teemavirhe',
+      'integraatiovirhe': 'cat_integraatiovirhe',
+      'konfiguraatio': 'cat_konfiguraatio',
+      'suorituskyky': 'cat_suorituskyky',
+      'saavutettavuus': 'cat_saavutettavuus',
+      'tietoturva': 'cat_tietoturva',
+      'lomakevirhe': 'cat_lomakevirhe',
+      'sisaltovirhe': 'cat_sisaltovirhe',
+      'hakutoiminto': 'cat_hakutoiminto'
+    };
+
+    const SEV_I18N_MAP = {
+      'kriittinen': 'sev_kriittinen',
+      'korkea': 'sev_korkea',
+      'keskitaso': 'sev_keskitaso',
+      'matala': 'sev_matala'
+    };
+
+    const STATUS_I18N_MAP = {
+      'uusi': 'status_uusi',
+      'tutkinnassa': 'status_tutkinnassa',
+      'ratkaistu': 'status_ratkaistu',
+      'ei-korjata': 'status_ei_korjata'
+    };
+
+    let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+
+    function t(key, params) {
+      const str = (translations[currentLang] && translations[currentLang][key]) || (translations.fi[key]) || key;
+      if (!params) return str;
+      return str.replace(/\{(\w+)\}/g, (_, k) => params[k] !== undefined ? params[k] : `{${k}}`);
+    }
+
+    function tCat(catKey) {
+      return t(CAT_I18N_MAP[catKey] || catKey);
+    }
+
+    function tSev(sevKey) {
+      return t(SEV_I18N_MAP[sevKey] || sevKey);
+    }
+
+    function tStatus(statusKey) {
+      return t(STATUS_I18N_MAP[statusKey] || statusKey);
+    }
+
+    function getMonthNames() {
+      return translations[currentLang].month_short;
+    }
+
+    function applyLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('siteTourLang', lang);
+      document.documentElement.lang = lang;
+
+      // Update language button states
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+
+      // Update all static data-i18n elements
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+
+      // Update placeholder attributes
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        if (translations[lang] && translations[lang][key]) {
+          el.placeholder = translations[lang][key];
+        }
+      });
+
+      // Update "All" options in filter selects
+      document.querySelectorAll('select option[data-i18n="filter_all"]').forEach(el => {
+        el.textContent = t('filter_all');
+      });
+
+      // Re-render all dynamic content if data is loaded
+      if (allData.length > 0) {
+        updateHeaderCounts();
+        rebuildFilterOptions();
+        renderDashboard();
+        renderObservations();
+        renderAgentView();
+        renderTrends();
+      }
+
+      // Update page title
+      document.title = lang === 'fi'
+        ? 'Testiautomaation havaintojen hallinta - Oikeusministeriö WP'
+        : 'Test Automation Observation Management - Ministry of Justice WP';
+    }
+
+    // =======================================================================
+    // APP STATE
+    // =======================================================================
+    let allData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+    let currentSort = { field: 'timestamp', dir: 'desc' };
+    let charts = {};
+    let customFilter = null; // { label: string, fn: function }
+    let agentTypeFilter = 'all';
+
+    // =======================================================================
+    // INIT
+    // =======================================================================
+    function init() {
+      allData = generateTestData();
+      filteredData = [...allData];
+
+      // Init language buttons
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+      });
+
+      updateHeaderCounts();
+      initFilters();
+      initNavigation();
+      renderDashboard();
+      renderObservations();
+      renderAgentView();
+      renderTrends();
+
+      // Apply saved language
+      applyLanguage(currentLang);
+    }
+
+    function updateHeaderCounts() {
+      document.getElementById('obs-count-header').textContent = t('header_obs_count', { count: allData.length });
+      document.getElementById('nav-obs-count').textContent = allData.length;
+      document.getElementById('nav-agent-count').textContent = allData.filter(o => o.severity === 'kriittinen' || o.severity === 'korkea').length;
+    }
+
+    // =======================================================================
+    // NAVIGATION
+    // =======================================================================
+    function initNavigation() {
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById('view-' + tab.dataset.view).classList.add('active');
+        });
+      });
+    }
+
+    // =======================================================================
+    // FILTERS
+    // =======================================================================
+    function initFilters() {
+      rebuildFilterOptions();
+
+      // Bind events
+      ['filter-search', 'filter-category', 'filter-severity', 'filter-status', 'filter-site', 'filter-tool', 'filter-component'].forEach(id => {
+        document.getElementById(id).addEventListener(id === 'filter-search' ? 'input' : 'change', applyFilters);
+      });
+    }
+
+    function rebuildFilterOptions() {
+      const catSelect = document.getElementById('filter-category');
+      const savedCat = catSelect.value;
+      catSelect.innerHTML = `<option value="" data-i18n="filter_all">${t('filter_all')}</option>`;
+      Object.entries(KATEGORIAT).forEach(([key, val]) => {
+        catSelect.innerHTML += `<option value="${key}">${tCat(key)}</option>`;
+      });
+      catSelect.value = savedCat;
+
+      const sevSelect = document.getElementById('filter-severity');
+      const savedSev = sevSelect.value;
+      sevSelect.innerHTML = `<option value="" data-i18n="filter_all">${t('filter_all')}</option>`;
+      Object.entries(VAKAVUUDET).forEach(([key, val]) => {
+        sevSelect.innerHTML += `<option value="${key}">${tSev(key)}</option>`;
+      });
+      sevSelect.value = savedSev;
+
+      const statSelect = document.getElementById('filter-status');
+      const savedStat = statSelect.value;
+      statSelect.innerHTML = `<option value="" data-i18n="filter_all">${t('filter_all')}</option>`;
+      Object.entries(TILAT).forEach(([key, val]) => {
+        statSelect.innerHTML += `<option value="${key}">${tStatus(key)}</option>`;
+      });
+      statSelect.value = savedStat;
+
+      const siteSelect = document.getElementById('filter-site');
+      const savedSite = siteSelect.value;
+      siteSelect.innerHTML = `<option value="" data-i18n="filter_all">${t('filter_all')}</option>`;
+      VIRASTOT.forEach(v => {
+        siteSelect.innerHTML += `<option value="${v.name}">${v.name}</option>`;
+      });
+      siteSelect.value = savedSite;
+
+      const tools = [...new Set(allData.map(o => o.testTool))].sort();
+      const toolSelect = document.getElementById('filter-tool');
+      const savedTool = toolSelect.value;
+      toolSelect.innerHTML = `<option value="" data-i18n="filter_all">${t('filter_all')}</option>`;
+      tools.forEach(tl => {
+        toolSelect.innerHTML += `<option value="${tl}">${tl}</option>`;
+      });
+      toolSelect.value = savedTool;
+
+      const components = [...new Set(allData.map(o => o.component))].sort();
+      const compSelect = document.getElementById('filter-component');
+      const savedComp = compSelect.value;
+      compSelect.innerHTML = `<option value="" data-i18n="filter_all">${t('filter_all')}</option>`;
+      components.forEach(c => {
+        compSelect.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+      compSelect.value = savedComp;
+    }
+
+    function applyFilters() {
+      // Clear custom filter when user manually changes dropdowns
+      if (customFilter) {
+        customFilter = null;
+        renderCustomFilterBanner();
+      }
+      runFilters();
+    }
+
+    function runFilters() {
+      const search = document.getElementById('filter-search').value.toLowerCase();
+      const cat = document.getElementById('filter-category').value;
+      const sev = document.getElementById('filter-severity').value;
+      const stat = document.getElementById('filter-status').value;
+      const site = document.getElementById('filter-site').value;
+      const tool = document.getElementById('filter-tool').value;
+      const comp = document.getElementById('filter-component').value;
+
+      filteredData = allData.filter(o => {
+        if (customFilter && !customFilter.fn(o)) return false;
+        if (search && !JSON.stringify(o).toLowerCase().includes(search)) return false;
+        if (cat && o.category !== cat) return false;
+        if (sev && o.severity !== sev) return false;
+        if (stat && o.status !== stat) return false;
+        if (site && o.site !== site) return false;
+        if (tool && o.testTool !== tool) return false;
+        if (comp && o.component !== comp) return false;
+        return true;
+      });
+
+      currentPage = 1;
+      renderObservations();
+    }
+
+    function resetFilters() {
+      customFilter = null;
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-severity').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-site').value = '';
+      document.getElementById('filter-tool').value = '';
+      document.getElementById('filter-component').value = '';
+      filteredData = [...allData];
+      currentPage = 1;
+      renderCustomFilterBanner();
+      renderObservations();
+    }
+
+    function switchToObservations() {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelector('[data-view="observations"]').classList.add('active');
+      document.getElementById('view-observations').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setFilterAndSwitch(field, value) {
+      customFilter = null;
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-severity').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-site').value = '';
+      document.getElementById('filter-tool').value = '';
+      document.getElementById('filter-component').value = '';
+      const filterMap = {
+        category: 'filter-category',
+        severity: 'filter-severity',
+        status: 'filter-status',
+        site: 'filter-site'
+      };
+      if (filterMap[field]) {
+        document.getElementById(filterMap[field]).value = value;
+      }
+      renderCustomFilterBanner();
+      runFilters();
+      switchToObservations();
+    }
+
+    function setCustomFilterAndSwitch(label, filterFn) {
+      customFilter = { label, fn: filterFn };
+      document.getElementById('filter-search').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-severity').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-site').value = '';
+      document.getElementById('filter-tool').value = '';
+      document.getElementById('filter-component').value = '';
+      renderCustomFilterBanner();
+      runFilters();
+      switchToObservations();
+    }
+
+    function renderCustomFilterBanner() {
+      const el = document.getElementById('custom-filter-banner');
+      if (customFilter) {
+        el.style.display = 'flex';
+        el.querySelector('.custom-filter-label').textContent = customFilter.label;
+      } else {
+        el.style.display = 'none';
+      }
+    }
+
+    // =======================================================================
+    // DASHBOARD
+    // =======================================================================
+    function renderDashboard() {
+      renderStats();
+      renderCategoryChart();
+      renderSeverityChart();
+      renderSiteChart();
+      renderStatusChart();
+      renderTimelineChart();
+      renderRecentTable();
+    }
+
+    function renderStats() {
+      const grid = document.getElementById('stats-grid');
+      const total = allData.length;
+      const critical = allData.filter(o => o.severity === 'kriittinen').length;
+      const open = allData.filter(o => o.status === 'uusi' || o.status === 'tutkinnassa').length;
+      const resolved = allData.filter(o => o.status === 'ratkaistu').length;
+      const external = allData.filter(o => o.category === 'ulkoinen-muutos').length;
+
+      grid.innerHTML = `
+        <div class="stat-card" onclick="resetFilters(); switchToObservations();">
+          <div class="label">${t('stat_total')}</div>
+          <div class="value">${total}</div>
+          <div class="sub">${t('stat_testing_period')}</div>
+        </div>
+        <div class="stat-card" onclick="setFilterAndSwitch('severity','kriittinen')">
+          <div class="label" style="color:#ef4444">${t('stat_critical')}</div>
+          <div class="value" style="color:#ef4444">${critical}</div>
+          <div class="sub">${t('stat_of_all', { pct: Math.round(critical/total*100) })}</div>
+        </div>
+        <div class="stat-card" onclick="setCustomFilterAndSwitch('${t('stat_open_drill').replace(/'/g, "\\'")}', o => o.status === 'uusi' || o.status === 'tutkinnassa')">
+          <div class="label" style="color:#3b82f6">${t('stat_open')}</div>
+          <div class="value" style="color:#3b82f6">${open}</div>
+          <div class="sub">${t('stat_open_sub')}</div>
+        </div>
+        <div class="stat-card" onclick="setFilterAndSwitch('status','ratkaistu')">
+          <div class="label" style="color:#22c55e">${t('stat_resolved')}</div>
+          <div class="value" style="color:#22c55e">${resolved}</div>
+          <div class="sub">${t('stat_resolved_pct', { pct: Math.round(resolved/total*100) })}</div>
+        </div>
+        <div class="stat-card" onclick="setFilterAndSwitch('category','ulkoinen-muutos')">
+          <div class="label" style="color:#e74c3c">${t('stat_external')}</div>
+          <div class="value" style="color:#e74c3c">${external}</div>
+          <div class="sub">${t('stat_external_sub')}</div>
+        </div>
+      `;
+    }
+
+    function renderCategoryChart() {
+      const counts = {};
+      const catKeyByLabel = {};
+      allData.forEach(o => {
+        const name = tCat(o.category);
+        counts[name] = (counts[name] || 0) + 1;
+        catKeyByLabel[name] = o.category;
+      });
+      const labels = Object.keys(counts);
+      const data = Object.values(counts);
+      const colors = labels.map(lbl => KATEGORIAT[catKeyByLabel[lbl]]?.color || '#999');
+
+      if (charts.category) charts.category.destroy();
+      charts.category = new Chart(document.getElementById('chart-category'), {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{ data, backgroundColor: colors, borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const label = labels[elements[0].index];
+              const catKey = catKeyByLabel[label];
+              setFilterAndSwitch('category', catKey);
+            }
+          },
+          plugins: {
+            legend: { position: 'right', labels: { color: '#666', font: { size: 11 }, padding: 8 } }
+          }
+        }
+      });
+    }
+
+    function renderSeverityChart() {
+      const sevOrder = ['kriittinen', 'korkea', 'keskitaso', 'matala'];
+      const counts = {};
+      allData.forEach(o => counts[o.severity] = (counts[o.severity] || 0) + 1);
+      const labels = sevOrder.map(s => tSev(s));
+      const data = sevOrder.map(s => counts[s] || 0);
+      const colors = sevOrder.map(s => VAKAVUUDET[s].color);
+
+      if (charts.severity) charts.severity.destroy();
+      charts.severity = new Chart(document.getElementById('chart-severity'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ data, backgroundColor: colors, borderRadius: 6, barThickness: 40 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const sev = sevOrder[elements[0].index];
+              setFilterAndSwitch('severity', sev);
+            }
+          },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#666' }, grid: { display: false } },
+            y: { ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+          }
+        }
+      });
+    }
+
+    function renderSiteChart() {
+      const counts = {};
+      allData.forEach(o => counts[o.site] = (counts[o.site] || 0) + 1);
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const labels = sorted.map(s => s[0].length > 25 ? s[0].substring(0, 25) + '...' : s[0]);
+      const fullLabels = sorted.map(s => s[0]);
+      const data = sorted.map(s => s[1]);
+
+      if (charts.site) charts.site.destroy();
+      charts.site = new Chart(document.getElementById('chart-site'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ data, backgroundColor: '#2563eb', borderRadius: 4, barThickness: 18 }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const site = fullLabels[elements[0].index];
+              setFilterAndSwitch('site', site);
+            }
+          },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+            y: { ticks: { color: '#666', font: { size: 11 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderStatusChart() {
+      const statusOrder = ['uusi', 'tutkinnassa', 'ratkaistu', 'ei-korjata'];
+      const counts = {};
+      allData.forEach(o => counts[o.status] = (counts[o.status] || 0) + 1);
+      const labels = statusOrder.map(s => tStatus(s));
+      const data = statusOrder.map(s => counts[s] || 0);
+      const colors = statusOrder.map(s => TILAT[s].color);
+
+      if (charts.status) charts.status.destroy();
+      charts.status = new Chart(document.getElementById('chart-status'), {
+        type: 'pie',
+        data: {
+          labels,
+          datasets: [{ data, backgroundColor: colors, borderWidth: 0 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const stat = statusOrder[elements[0].index];
+              setFilterAndSwitch('status', stat);
+            }
+          },
+          plugins: {
+            legend: { position: 'right', labels: { color: '#666', font: { size: 12 }, padding: 12 } }
+          }
+        }
+      });
+    }
+
+    function renderTimelineChart() {
+      const byWeek = {};
+      allData.forEach(o => {
+        const d = new Date(o.timestamp);
+        const weekStart = new Date(d);
+        weekStart.setDate(d.getDate() - d.getDay() + 1);
+        const key = weekStart.toISOString().split('T')[0];
+        if (!byWeek[key]) byWeek[key] = { kriittinen: 0, korkea: 0, keskitaso: 0, matala: 0 };
+        byWeek[key][o.severity]++;
+      });
+
+      const weeks = Object.keys(byWeek).sort();
+      const labels = weeks.map(w => {
+        const d = new Date(w);
+        return `${d.getDate()}.${d.getMonth()+1}`;
+      });
+
+      if (charts.timeline) charts.timeline.destroy();
+      charts.timeline = new Chart(document.getElementById('chart-timeline'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: tSev('kriittinen'), data: weeks.map(w => byWeek[w].kriittinen), backgroundColor: '#ef4444', borderRadius: 2 },
+            { label: tSev('korkea'), data: weeks.map(w => byWeek[w].korkea), backgroundColor: '#f59e0b', borderRadius: 2 },
+            { label: tSev('keskitaso'), data: weeks.map(w => byWeek[w].keskitaso), backgroundColor: '#3b82f6', borderRadius: 2 },
+            { label: tSev('matala'), data: weeks.map(w => byWeek[w].matala), backgroundColor: '#22c55e', borderRadius: 2 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const weekKey = weeks[elements[0].index];
+              const weekStart = new Date(weekKey);
+              const weekEnd = new Date(weekKey);
+              weekEnd.setDate(weekEnd.getDate() + 7);
+              const weekLabel = `${t('chart_label_week')} ${labels[elements[0].index]} (${weekStart.getDate()}.${weekStart.getMonth()+1}. - ${weekEnd.getDate()}.${weekEnd.getMonth()+1}.)`;
+              setCustomFilterAndSwitch(weekLabel, o => {
+                const d = new Date(o.timestamp);
+                return d >= weekStart && d < weekEnd;
+              });
+            }
+          },
+          plugins: {
+            legend: { labels: { color: '#666', font: { size: 11 } } }
+          },
+          scales: {
+            x: { stacked: true, ticks: { color: '#666', font: { size: 10 } }, grid: { display: false } },
+            y: { stacked: true, ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+          }
+        }
+      });
+    }
+
+    function renderRecentTable() {
+      const tbody = document.getElementById('recent-tbody');
+      const recent = [...allData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
+      tbody.innerHTML = recent.map(o => `
+        <tr onclick="openDetail('${o.id}')">
+          <td style="font-weight:600;color:var(--accent)">${o.id}</td>
+          <td style="white-space:nowrap">${formatDate(o.timestamp)}</td>
+          <td>${o.testCase}</td>
+          <td><span class="badge-cat" style="background:${KATEGORIAT[o.category]?.color}22;color:${KATEGORIAT[o.category]?.color}">${tCat(o.category)}</span></td>
+          <td><span class="badge-sev ${o.severity}">${tSev(o.severity)}</span></td>
+          <td><span class="badge-status ${o.status}">${tStatus(o.status)}</span></td>
+          <td style="font-size:12px">${o.site}</td>
+        </tr>
+      `).join('');
+    }
+
+    // =======================================================================
+    // OBSERVATIONS TABLE
+    // =======================================================================
+    function renderObservations() {
+      const sorted = sortData(filteredData);
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageData = sorted.slice(start, start + PAGE_SIZE);
+      const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+
+      const countStr = filteredData.length !== allData.length
+        ? t('obs_table_count', { filtered: filteredData.length, total: ' / ' + allData.length })
+        : t('obs_table_count', { filtered: filteredData.length, total: '' });
+      document.getElementById('obs-table-count').textContent = countStr;
+
+      const columns = [
+        { key: 'id', label: 'ID' },
+        { key: 'timestamp', label: t('th_time') },
+        { key: 'testCase', label: t('th_test_case') },
+        { key: 'category', label: t('th_category') },
+        { key: 'severity', label: t('th_severity') },
+        { key: 'status', label: t('th_status') },
+        { key: 'site', label: t('th_agency') },
+        { key: 'component', label: t('th_component') },
+        { key: 'testTool', label: t('th_tool') }
+      ];
+
+      const thead = document.getElementById('obs-thead');
+      thead.innerHTML = '<tr>' + columns.map(c =>
+        `<th class="${currentSort.field === c.key ? 'sorted' : ''}" onclick="sortBy('${c.key}')">
+          ${c.label} <span class="sort-arrow">${currentSort.field === c.key ? (currentSort.dir === 'asc' ? '&#9650;' : '&#9660;') : '&#9660;'}</span>
+        </th>`
+      ).join('') + '</tr>';
+
+      const tbody = document.getElementById('obs-tbody');
+      tbody.innerHTML = pageData.map(o => `
+        <tr onclick="openDetail('${o.id}')">
+          <td style="font-weight:600;color:var(--accent)">${o.id}</td>
+          <td style="white-space:nowrap">${formatDate(o.timestamp)}</td>
+          <td style="max-width:250px">${o.testCase}</td>
+          <td><span class="badge-cat" style="background:${KATEGORIAT[o.category]?.color}22;color:${KATEGORIAT[o.category]?.color}">${tCat(o.category)}</span></td>
+          <td><span class="badge-sev ${o.severity}">${tSev(o.severity)}</span></td>
+          <td><span class="badge-status ${o.status}">${tStatus(o.status)}</span></td>
+          <td style="font-size:12px">${o.site}</td>
+          <td style="font-size:12px">${o.component}</td>
+          <td style="font-size:12px">${o.testTool}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('page-info').textContent = t('page_info', {
+        current: currentPage,
+        total: totalPages || 1,
+        count: filteredData.length
+      });
+      document.getElementById('page-prev').disabled = currentPage <= 1;
+      document.getElementById('page-next').disabled = currentPage >= totalPages;
+    }
+
+    function sortBy(field) {
+      if (currentSort.field === field) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.field = field;
+        currentSort.dir = 'asc';
+      }
+      renderObservations();
+    }
+
+    function sortData(data) {
+      const { field, dir } = currentSort;
+      return [...data].sort((a, b) => {
+        let va = a[field] || '';
+        let vb = b[field] || '';
+        if (field === 'severity') {
+          va = VAKAVUUDET[va]?.weight || 0;
+          vb = VAKAVUUDET[vb]?.weight || 0;
+        }
+        if (va < vb) return dir === 'asc' ? -1 : 1;
+        if (va > vb) return dir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderObservations();
+    }
+
+    // =======================================================================
+    // DETAIL MODAL
+    // =======================================================================
+    function openDetail(id) {
+      const obs = allData.find(o => o.id === id);
+      if (!obs) return;
+
+      document.getElementById('modal-title').textContent = `${obs.id} - ${obs.testCase}`;
+      const content = document.getElementById('modal-content');
+      content.innerHTML = `
+        <div class="modal-meta">
+          <span class="badge-sev ${obs.severity}">${tSev(obs.severity)}</span>
+          <span class="badge-status ${obs.status}">${tStatus(obs.status)}</span>
+          <span class="badge-cat" style="background:${KATEGORIAT[obs.category]?.color}22;color:${KATEGORIAT[obs.category]?.color}">${tCat(obs.category)}</span>
+          <span style="font-size:12px;color:var(--text-dim)">${formatDate(obs.timestamp)}</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div><span style="font-size:11px;color:var(--text-dim)">${t('modal_agency')}</span><br><strong>${obs.site}</strong></div>
+          <div><span style="font-size:11px;color:var(--text-dim)">${t('modal_component')}</span><br><strong>${obs.component}</strong></div>
+          <div><span style="font-size:11px;color:var(--text-dim)">${t('modal_test_suite')}</span><br><strong>${obs.testSuite}</strong></div>
+          <div><span style="font-size:11px;color:var(--text-dim)">${t('modal_test_tool')}</span><br><strong>${obs.testTool}</strong></div>
+          <div><span style="font-size:11px;color:var(--text-dim)">${t('modal_environment')}</span><br><strong>${obs.environment}</strong></div>
+          <div><span style="font-size:11px;color:var(--text-dim)">${t('modal_site')}</span><br><strong>${obs.siteUrl}</strong></div>
+        </div>
+
+        <div class="modal-section">
+          <h4>${t('modal_error_desc')}</h4>
+          <p>${obs.description}</p>
+        </div>
+
+        <div class="modal-section">
+          <h4>${t('modal_root_cause')}</h4>
+          <p style="color:var(--warning);font-weight:500">${obs.rootCause}</p>
+        </div>
+
+        <div class="modal-section">
+          <h4>${t('modal_recommendation')}</h4>
+          <p style="color:var(--success)">${obs.recommendation}</p>
+        </div>
+
+        <div class="modal-section">
+          <div class="analysis-box">
+            <div class="agent-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              ${t('modal_ai_analysis')}
+            </div>
+            <div class="analysis-text">${formatAnalysis(obs.agentAnalysis)}</div>
+          </div>
+        </div>
+
+        ${obs.relatedIds.length > 0 ? `
+        <div class="modal-section">
+          <h4>${t('modal_related', { count: obs.relatedIds.length })}</h4>
+          <div class="related-list">
+            ${obs.relatedIds.map(rid => `<span class="related-chip" onclick="openDetail('${rid}')">${rid}</span>`).join('')}
+          </div>
+          <p style="font-size:12px;color:var(--text-dim);margin-top:8px">${t('modal_related_note')}</p>
+        </div>
+        ` : ''}
+      `;
+
+      document.getElementById('detail-modal').classList.add('visible');
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.remove('visible');
+    }
+
+    document.getElementById('detail-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('detail-modal')) closeModal();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // =======================================================================
+    // AGENT VIEW
+    // =======================================================================
+    function renderAgentView() {
+      const external = allData.filter(o => o.category === 'ulkoinen-muutos').length;
+      const updates = allData.filter(o => ['wordpress-ydin', 'lisaosa-paivitys', 'teemavirhe'].includes(o.category)).length;
+      const critical = allData.filter(o => o.severity === 'kriittinen').length;
+
+      document.getElementById('agent-total').textContent = allData.length;
+      document.getElementById('agent-external').textContent = external;
+      document.getElementById('agent-update').textContent = updates;
+      document.getElementById('agent-critical').textContent = critical;
+
+      renderPatterns();
+      renderAgentFeed();
+    }
+
+    function renderPatterns() {
+      const grid = document.getElementById('patterns-grid');
+
+      // Detect patterns from data
+      const sfRelated = allData.filter(o => o.testSuite.includes('Salesforce'));
+      const a11yOpen = allData.filter(o => o.category === 'saavutettavuus' && (o.status === 'uusi' || o.status === 'tutkinnassa'));
+      const perfIssues = allData.filter(o => o.category === 'suorituskyky');
+      const omIssues = allData.filter(o => o.siteId === 'om');
+
+      grid.innerHTML = `
+        <div class="pattern-card" style="border-left-color:#e74c3c;cursor:pointer" onclick="drillAndSwitch('${t('pattern_sf_drill').replace(/'/g, "\\'")}', ${JSON.stringify(sfRelated.map(o => o.id)).replace(/"/g, "'")})">
+          <h4>${t('pattern_sf_title')}</h4>
+          <p>${t('pattern_sf_desc', { count: sfRelated.length, sites: [...new Set(sfRelated.map(o => o.site))].length })}</p>
+          <div class="impact" style="color:#e74c3c">${t('pattern_sf_impact', { count: sfRelated.length, critical: sfRelated.filter(o=>o.severity==='kriittinen').length })}</div>
+        </div>
+        <div class="pattern-card" style="border-left-color:#27ae60;cursor:pointer" onclick="drillAndSwitch('${t('pattern_a11y_drill').replace(/'/g, "\\'")}', ${JSON.stringify(a11yOpen.map(o => o.id)).replace(/"/g, "'")})">
+          <h4>${t('pattern_a11y_title')}</h4>
+          <p>${t('pattern_a11y_desc', { count: a11yOpen.length, high: a11yOpen.filter(o=>o.severity==='korkea'||o.severity==='kriittinen').length })}</p>
+          <div class="impact" style="color:#27ae60">${t('pattern_a11y_impact', { count: a11yOpen.length })}</div>
+        </div>
+        <div class="pattern-card" style="border-left-color:#f39c12;cursor:pointer" onclick="drillAndSwitch('${t('pattern_perf_drill').replace(/'/g, "\\'")}', ${JSON.stringify(perfIssues.map(o => o.id)).replace(/"/g, "'")})">
+          <h4>${t('pattern_perf_title')}</h4>
+          <p>${t('pattern_perf_desc', { count: perfIssues.length })}</p>
+          <div class="impact" style="color:#f39c12">${t('pattern_perf_impact', { count: perfIssues.length })}</div>
+        </div>
+        <div class="pattern-card" style="border-left-color:#6366f1;cursor:pointer" onclick="drillAndSwitch('${t('pattern_om_drill').replace(/'/g, "\\'")}', ${JSON.stringify(omIssues.map(o => o.id)).replace(/"/g, "'")})">
+          <h4>${t('pattern_om_title')}</h4>
+          <p>${t('pattern_om_desc', { count: omIssues.length, pct: Math.round(omIssues.length/allData.length*100) })}</p>
+          <div class="impact" style="color:#6366f1">${t('pattern_om_impact', { count: omIssues.length, open: omIssues.filter(o=>o.status==='uusi'||o.status==='tutkinnassa').length })}</div>
+        </div>
+        <div class="pattern-card" style="border-left-color:#c0392b">
+          <h4>${t('pattern_sec_title')}</h4>
+          <p>${t('pattern_sec_desc', { count: allData.filter(o=>o.category==='tietoturva').length })}</p>
+          <div class="impact" style="color:#c0392b">${t('pattern_sec_impact', { count: allData.filter(o=>o.category==='tietoturva'&&o.severity==='kriittinen').length })}</div>
+        </div>
+        <div class="pattern-card" style="border-left-color:#2980b9">
+          <h4>${t('pattern_wp_title')}</h4>
+          <p>${t('pattern_wp_desc', { count: allData.filter(o=>o.category==='wordpress-ydin').length })}</p>
+          <div class="impact" style="color:#2980b9">${t('pattern_wp_impact', { count: allData.filter(o=>['wordpress-ydin','lisaosa-paivitys'].includes(o.category)).length })}</div>
+        </div>
+      `;
+    }
+
+    function drillAndSwitch(title, ids) {
+      const idSet = new Set(ids);
+      setCustomFilterAndSwitch(title, o => idSet.has(o.id));
+    }
+
+    function filterAgentByType(type) {
+      agentTypeFilter = type;
+      renderAgentFeed();
+    }
+
+    function renderAgentFeed() {
+      const feed = document.getElementById('agent-feed');
+      let filtered = [...allData];
+
+      if (agentTypeFilter === 'ulkoinen') {
+        filtered = filtered.filter(o => o.category === 'ulkoinen-muutos');
+      } else if (agentTypeFilter === 'paivitys') {
+        filtered = filtered.filter(o => ['wordpress-ydin', 'lisaosa-paivitys', 'teemavirhe'].includes(o.category));
+      } else if (agentTypeFilter === 'kriittinen') {
+        filtered = filtered.filter(o => o.severity === 'kriittinen');
+      }
+
+      // Group by archetype to avoid duplicate analyses
+      const seen = new Set();
+      const unique = [];
+      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(o => {
+        if (!seen.has(o.arkkityyppiId)) {
+          seen.add(o.arkkityyppiId);
+          unique.push(o);
+        }
+      });
+
+      feed.innerHTML = unique.slice(0, 25).map(o => {
+        const relCount = allData.filter(r => r.arkkityyppiId === o.arkkityyppiId).length;
+        return `
+        <div class="agent-card" onclick="openDetail('${o.id}')">
+          <div class="agent-card-header">
+            <h3>${o.testCase}</h3>
+            <span class="badge-sev ${o.severity}">${tSev(o.severity)}</span>
+          </div>
+          <div class="agent-summary">${o.rootCause}</div>
+          <div class="agent-summary" style="color:var(--success)">${t('agent_recommendation')} ${o.recommendation}</div>
+          <div class="tags">
+            <span class="badge-cat" style="background:${KATEGORIAT[o.category]?.color}22;color:${KATEGORIAT[o.category]?.color}">${tCat(o.category)}</span>
+            <span class="badge-status ${o.status}">${tStatus(o.status)}</span>
+            ${relCount > 1 ? `<span style="font-size:11px;color:var(--text-dim)">${t('agent_agencies', { count: relCount })}</span>` : ''}
+          </div>
+        </div>
+        `;
+      }).join('');
+    }
+
+    // =======================================================================
+    // TRENDS
+    // =======================================================================
+    function renderTrends() {
+      renderWeeklyChart();
+      renderCatTrendChart();
+      renderResolutionChart();
+      renderInternalExternalChart();
+      renderSiteCompareChart();
+      renderToolsChart();
+    }
+
+    function renderWeeklyChart() {
+      const byWeek = {};
+      allData.forEach(o => {
+        const d = new Date(o.timestamp);
+        const weekStart = new Date(d);
+        weekStart.setDate(d.getDate() - d.getDay() + 1);
+        const key = weekStart.toISOString().split('T')[0];
+        if (!byWeek[key]) byWeek[key] = { total: 0, resolved: 0 };
+        byWeek[key].total++;
+        if (o.status === 'ratkaistu') byWeek[key].resolved++;
+      });
+
+      const weeks = Object.keys(byWeek).sort();
+      const labels = weeks.map(w => {
+        const d = new Date(w);
+        return `${d.getDate()}.${d.getMonth()+1}`;
+      });
+
+      // Cumulative open
+      let cumOpen = 0;
+      const cumData = weeks.map(w => {
+        cumOpen += byWeek[w].total - byWeek[w].resolved;
+        return cumOpen;
+      });
+
+      if (charts.weekly) charts.weekly.destroy();
+      charts.weekly = new Chart(document.getElementById('chart-weekly'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: t('chart_label_new_obs'),
+              data: weeks.map(w => byWeek[w].total),
+              borderColor: '#2563eb',
+              backgroundColor: 'rgba(37,99,235,0.08)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 3
+            },
+            {
+              label: t('chart_label_resolved'),
+              data: weeks.map(w => byWeek[w].resolved),
+              borderColor: '#22c55e',
+              backgroundColor: 'rgba(34,197,94,0.1)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 3
+            },
+            {
+              label: t('chart_label_open_cum'),
+              data: cumData,
+              borderColor: '#f59e0b',
+              borderDash: [5, 5],
+              tension: 0.3,
+              pointRadius: 2,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: { legend: { labels: { color: '#666' } } },
+          scales: {
+            x: { ticks: { color: '#666' }, grid: { display: false } },
+            y: { ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' }, title: { display: true, text: t('chart_label_per_week'), color: '#666' } },
+            y1: { position: 'right', ticks: { color: '#f59e0b' }, grid: { display: false }, title: { display: true, text: t('chart_label_cumulative'), color: '#f59e0b' } }
+          }
+        }
+      });
+    }
+
+    function renderCatTrendChart() {
+      const months = {};
+      const catKeys = Object.keys(KATEGORIAT);
+      allData.forEach(o => {
+        const d = new Date(o.timestamp);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        if (!months[key]) months[key] = {};
+        months[key][o.category] = (months[key][o.category] || 0) + 1;
+      });
+
+      const monthKeys = Object.keys(months).sort();
+      const monthNames = getMonthNames();
+      const labels = monthKeys.map(m => {
+        const [y, mon] = m.split('-');
+        return monthNames[parseInt(mon)-1] + ' ' + y;
+      });
+
+      const topCats = catKeys.filter(k => {
+        return allData.filter(o => o.category === k).length >= 5;
+      });
+
+      if (charts.catTrend) charts.catTrend.destroy();
+      charts.catTrend = new Chart(document.getElementById('chart-cat-trend'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: topCats.map(cat => ({
+            label: tCat(cat),
+            data: monthKeys.map(m => months[m][cat] || 0),
+            borderColor: KATEGORIAT[cat].color,
+            backgroundColor: KATEGORIAT[cat].color + '20',
+            tension: 0.3,
+            pointRadius: 4,
+            fill: false
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
+          plugins: { legend: { labels: { color: '#666', font: { size: 10 } }, position: 'bottom' } },
+          scales: {
+            x: { ticks: { color: '#666' }, grid: { display: false } },
+            y: { ticks: { color: '#666', stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.06)' } }
+          }
+        }
+      });
+    }
+
+    function renderResolutionChart() {
+      const catResolution = {};
+      Object.keys(KATEGORIAT).forEach(k => catResolution[k] = []);
+
+      allData.forEach(o => {
+        if (o.status === 'ratkaistu') {
+          // Simulated resolution time based on severity
+          const days = o.severity === 'kriittinen' ? 2 : o.severity === 'korkea' ? 5 : o.severity === 'keskitaso' ? 10 : 15;
+          const jitter = Math.sin(o.id.charCodeAt(4) * 13) * 3;
+          catResolution[o.category].push(Math.max(1, days + jitter));
+        }
+      });
+
+      const cats = Object.keys(catResolution).filter(k => catResolution[k].length > 0);
+      const labels = cats.map(k => tCat(k));
+      const avgData = cats.map(k => {
+        const times = catResolution[k];
+        return Math.round(times.reduce((a, b) => a + b, 0) / times.length * 10) / 10;
+      });
+
+      if (charts.resolution) charts.resolution.destroy();
+      charts.resolution = new Chart(document.getElementById('chart-resolution'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: t('chart_label_avg_resolution'),
+            data: avgData,
+            backgroundColor: cats.map(k => KATEGORIAT[k].color + '80'),
+            borderColor: cats.map(k => KATEGORIAT[k].color),
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' }, title: { display: true, text: t('chart_label_days'), color: '#666' } },
+            y: { ticks: { color: '#666', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderInternalExternalChart() {
+      const externalCats = ['ulkoinen-muutos'];
+      const internalCats = Object.keys(KATEGORIAT).filter(k => !externalCats.includes(k));
+
+      const months = {};
+      allData.forEach(o => {
+        const d = new Date(o.timestamp);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        if (!months[key]) months[key] = { external: 0, internal: 0 };
+        if (externalCats.includes(o.category)) months[key].external++;
+        else months[key].internal++;
+      });
+
+      const monthKeys = Object.keys(months).sort();
+      const monthNames = getMonthNames();
+      const labels = monthKeys.map(m => {
+        const [y, mon] = m.split('-');
+        return monthNames[parseInt(mon)-1];
+      });
+
+      if (charts.intExt) charts.intExt.destroy();
+      charts.intExt = new Chart(document.getElementById('chart-internal-external'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: t('chart_label_ext_root'), data: monthKeys.map(m => months[m].external), backgroundColor: '#e74c3c', borderRadius: 4 },
+            { label: t('chart_label_int_root'), data: monthKeys.map(m => months[m].internal), backgroundColor: '#2563eb', borderRadius: 4 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#666' } } },
+          scales: {
+            x: { stacked: true, ticks: { color: '#666' }, grid: { display: false } },
+            y: { stacked: true, ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+          }
+        }
+      });
+    }
+
+    function renderSiteCompareChart() {
+      const siteData = {};
+      VIRASTOT.forEach(v => {
+        siteData[v.name] = { kriittinen: 0, korkea: 0, keskitaso: 0, matala: 0 };
+      });
+      allData.forEach(o => {
+        if (siteData[o.site]) siteData[o.site][o.severity]++;
+      });
+
+      const sites = VIRASTOT.map(v => v.name);
+      const shortNames = sites.map(s => s.length > 20 ? s.substring(0, 20) + '...' : s);
+
+      if (charts.siteCompare) charts.siteCompare.destroy();
+      charts.siteCompare = new Chart(document.getElementById('chart-site-compare'), {
+        type: 'bar',
+        data: {
+          labels: shortNames,
+          datasets: [
+            { label: tSev('kriittinen'), data: sites.map(s => siteData[s].kriittinen), backgroundColor: '#ef4444', borderRadius: 2 },
+            { label: tSev('korkea'), data: sites.map(s => siteData[s].korkea), backgroundColor: '#f59e0b', borderRadius: 2 },
+            { label: tSev('keskitaso'), data: sites.map(s => siteData[s].keskitaso), backgroundColor: '#3b82f6', borderRadius: 2 },
+            { label: tSev('matala'), data: sites.map(s => siteData[s].matala), backgroundColor: '#22c55e', borderRadius: 2 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const site = sites[elements[0].index];
+              setFilterAndSwitch('site', site);
+            }
+          },
+          plugins: { legend: { labels: { color: '#666' } } },
+          scales: {
+            x: { stacked: true, ticks: { color: '#666', font: { size: 10 }, maxRotation: 45 }, grid: { display: false } },
+            y: { stacked: true, ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+          }
+        }
+      });
+    }
+
+    function renderToolsChart() {
+      const tools = {};
+      allData.forEach(o => {
+        if (!tools[o.testTool]) tools[o.testTool] = { total: 0, cats: {} };
+        tools[o.testTool].total++;
+        tools[o.testTool].cats[o.category] = (tools[o.testTool].cats[o.category] || 0) + 1;
+      });
+
+      const toolNames = Object.keys(tools).sort((a, b) => tools[b].total - tools[a].total);
+      const topCats = ['ulkoinen-muutos', 'wordpress-ydin', 'lisaosa-paivitys', 'integraatiovirhe', 'suorituskyky', 'saavutettavuus', 'tietoturva', 'lomakevirhe'];
+
+      if (charts.tools) charts.tools.destroy();
+      charts.tools = new Chart(document.getElementById('chart-tools'), {
+        type: 'bar',
+        data: {
+          labels: toolNames,
+          datasets: topCats.map(cat => ({
+            label: tCat(cat),
+            data: toolNames.map(tl => tools[tl].cats[cat] || 0),
+            backgroundColor: KATEGORIAT[cat].color + 'cc',
+            borderRadius: 2
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#666', font: { size: 10 } }, position: 'bottom' } },
+          scales: {
+            x: { stacked: true, ticks: { color: '#666' }, grid: { display: false } },
+            y: { stacked: true, ticks: { color: '#666' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+          }
+        }
+      });
+    }
+
+    // =======================================================================
+    // HELPERS
+    // =======================================================================
+    function formatDate(ts) {
+      const d = new Date(ts);
+      return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    function formatAnalysis(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+    }
+
+    // =======================================================================
+    // START
+    // =======================================================================
+    init();
+  </script>
+</body>
+</html>

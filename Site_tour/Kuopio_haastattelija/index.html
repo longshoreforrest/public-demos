@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oikeusministeriö — Verkkouudistuksen haastattelija</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+
+/* ── Header ── */
+header {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+header .left h1 { font-size: 1.35rem; font-weight: 700; }
+header .left p  { font-size: 0.82rem; opacity: .75; margin-top: 2px; }
+header .right   { display: flex; gap: 12px; align-items: center; }
+header .badge   { background: rgba(255,255,255,.15); padding: 4px 12px; border-radius: 16px; font-size: .75rem; }
+
+/* ── Tabs ── */
+.tabs {
+  position: sticky; top: 0; z-index: 1000; background: #fff;
+  display: flex; border-bottom: 2px solid #e0e0e0; padding: 0 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow-x: auto;
+}
+.tabs button {
+  background: none; border: none; padding: 12px 18px; font-size: .88rem; font-weight: 500;
+  color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s;
+  white-space: nowrap;
+}
+.tabs button:hover { color: #333; }
+.tabs button.active { color: #2c3e80; border-bottom-color: #2c3e80; font-weight: 600; }
+
+/* ── Views ── */
+.view { display: none; padding: 20px; max-width: 1400px; margin: 0 auto; }
+.view.active { display: block; }
+
+/* ── Cards ── */
+.card {
+  background: #fff; border-radius: 12px; padding: 18px 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08); transition: box-shadow .2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+.card h3 { font-size: 1rem; margin-bottom: 6px; }
+.card p  { font-size: .85rem; color: #555; line-height: 1.45; }
+
+/* ── Search ── */
+.search-bar { text-align: center; margin-bottom: 16px; }
+.search-bar input {
+  width: 100%; max-width: 600px; padding: 10px 16px; font-size: .9rem;
+  border: 2px solid #d0d0d0; border-radius: 8px; outline: none; transition: border-color .2s;
+}
+.search-bar input:focus { border-color: #2c3e80; }
+
+/* ── Filter pills ── */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; justify-content: center; }
+.filter-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1.5px solid #d0d0d0;
+  background: #fff; font-size: .8rem; cursor: pointer; transition: all .2s; font-weight: 500;
+}
+.filter-btn:hover { border-color: #999; }
+.filter-btn.active { background: #2c3e80; color: #fff; border-color: #2c3e80; }
+
+/* ── Overview ── */
+.overview-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px; margin-top: 16px;
+}
+.agency-card { cursor: pointer; border-left: 4px solid #2c3e80; }
+.agency-card .agency-header { display: flex; justify-content: space-between; align-items: center; }
+.agency-card .dept-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.agency-card .dept-tag {
+  font-size: .72rem; background: #f0f0f0; padding: 2px 8px; border-radius: 10px; color: #555;
+}
+.stat-row { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+.stat-box {
+  background: #fff; border-radius: 12px; padding: 16px 24px; text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08); flex: 1; min-width: 140px;
+}
+.stat-box .num { font-size: 2rem; font-weight: 700; color: #2c3e80; }
+.stat-box .label { font-size: .78rem; color: #888; margin-top: 2px; }
+
+/* ── Feedback list ── */
+.feedback-list { display: flex; flex-direction: column; gap: 10px; }
+.feedback-item {
+  background: #fff; border-radius: 10px; padding: 14px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); border-left: 4px solid #ccc;
+}
+.feedback-item.positiivinen { border-left-color: #27ae60; }
+.feedback-item.negatiivinen { border-left-color: #e74c3c; }
+.feedback-item.neutraali     { border-left-color: #f39c12; }
+.feedback-meta { display: flex; gap: 12px; font-size: .75rem; color: #888; margin-bottom: 6px; flex-wrap: wrap; }
+.feedback-meta .tag {
+  background: #f0f0f5; padding: 1px 8px; border-radius: 8px; font-weight: 500; color: #555;
+}
+.feedback-text { font-size: .88rem; line-height: 1.5; }
+.load-more-btn {
+  display: block; margin: 16px auto 0; padding: 10px 32px; border-radius: 8px;
+  background: #2c3e80; color: #fff; border: none; font-size: .88rem; cursor: pointer;
+  font-weight: 500; transition: background .2s;
+}
+.load-more-btn:hover { background: #1a2a5e; }
+
+/* ── Chat ── */
+.chat-container {
+  max-width: 700px; margin: 0 auto; background: #fff; border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.1); overflow: hidden; display: flex; flex-direction: column;
+  height: 520px;
+}
+.chat-header {
+  background: linear-gradient(135deg, #2c3e80, #1a1a2e); color: #fff; padding: 14px 20px;
+  font-weight: 600; font-size: .95rem; display: flex; align-items: center; gap: 10px;
+}
+.chat-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #27ae60; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg {
+  max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: .85rem; line-height: 1.45;
+  animation: msgIn .3s ease;
+}
+@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.chat-msg.bot  { background: #f0f0f5; align-self: flex-start; border-bottom-left-radius: 4px; }
+.chat-msg.user { background: #2c3e80; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-input-row {
+  display: flex; border-top: 1px solid #e0e0e0; padding: 10px 14px; gap: 8px; background: #fafafa;
+}
+.chat-input-row input {
+  flex: 1; padding: 10px 14px; border: 1.5px solid #d0d0d0; border-radius: 8px;
+  font-size: .88rem; outline: none;
+}
+.chat-input-row input:focus { border-color: #2c3e80; }
+.chat-input-row button {
+  padding: 10px 20px; background: #2c3e80; color: #fff; border: none; border-radius: 8px;
+  font-weight: 600; cursor: pointer; font-size: .88rem;
+}
+.chat-input-row button:hover { background: #1a2a5e; }
+.chat-context-bar {
+  display: flex; gap: 8px; padding: 8px 14px; background: #fafafa; border-top: 1px solid #eee;
+  align-items: center; font-size: .78rem; color: #666;
+}
+.chat-context-bar select {
+  padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: .78rem;
+}
+
+/* ── Interview ── */
+.interview-layout { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+.interview-sidebar { display: flex; flex-direction: column; gap: 8px; }
+.interview-sidebar .sr-item {
+  padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: .85rem;
+  border: 1.5px solid #e0e0e0; transition: all .2s; display: flex; align-items: center; gap: 8px;
+}
+.interview-sidebar .sr-item:hover { border-color: #2c3e80; }
+.interview-sidebar .sr-item.active { background: #2c3e80; color: #fff; border-color: #2c3e80; }
+.interview-main { }
+.config-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px;
+}
+.config-card {
+  background: #fff; border-radius: 10px; padding: 12px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); border: 1.5px solid #e0e0e0;
+  font-size: .82rem; cursor: pointer; transition: all .2s;
+}
+.config-card:hover { border-color: #2c3e80; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+.config-card .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.config-card .status-dot.odottaa   { background: #f39c12; }
+.config-card .status-dot.kaynnissa { background: #3498db; }
+.config-card .status-dot.valmis    { background: #27ae60; }
+.question-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.question-item {
+  background: #fff; border-radius: 8px; padding: 12px 16px;
+  border-left: 3px solid #2c3e80; box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.question-item .q-text { font-size: .88rem; font-weight: 500; }
+.question-item .q-meta { font-size: .75rem; color: #888; margin-top: 4px; }
+
+/* ── Org chart ── */
+.org-chart-container { overflow-x: auto; padding: 20px 0; }
+.org-tree { display: flex; flex-direction: column; align-items: center; }
+.org-root {
+  background: linear-gradient(135deg, #1a1a2e, #2c3e80); color: #fff;
+  padding: 14px 28px; border-radius: 10px; font-weight: 600; font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2); text-align: center;
+}
+.org-vline { width: 2px; background: #bbb; margin: 0 auto; }
+.org-vline.root-stem { height: 28px; }
+/* Horizontal bar spanning from first branch center to last branch center */
+.org-branches-wrap { width: 100%; display: flex; flex-direction: column; align-items: stretch; }
+.org-hbar { height: 2px; background: #bbb; margin: 0 6.25%; /* roughly half of 1/8 for centering */ }
+.org-branches {
+  display: flex; justify-content: center; position: relative;
+}
+.org-branch {
+  display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 0;
+  padding: 0 4px;
+}
+.org-branch .branch-stem { width: 2px; height: 18px; background: #bbb; }
+.org-node {
+  padding: 10px 12px; border-radius: 8px; text-align: center; font-size: .78rem;
+  cursor: pointer; transition: all .25s; border: 2.5px solid #ddd; background: #fff;
+  width: 100%; max-width: 164px; position: relative;
+}
+.org-node:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.13); }
+.org-node.selected { box-shadow: 0 4px 18px rgba(44,62,128,.3); transform: translateY(-2px); }
+.org-node .node-name { font-weight: 600; font-size: .8rem; line-height: 1.2; }
+.org-node .node-dept { font-size: .68rem; color: #888; margin-top: 3px; }
+.org-node .expand-hint {
+  position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 2px solid #ddd;
+  font-size: .65rem; display: flex; align-items: center; justify-content: center;
+  color: #888; transition: all .25s; z-index: 1;
+}
+.org-node:hover .expand-hint { border-color: #2c3e80; color: #2c3e80; }
+.org-node.selected .expand-hint { background: #2c3e80; color: #fff; border-color: #2c3e80; }
+
+/* Sub-branches (departments) */
+.org-subs { overflow: hidden; transition: max-height .4s ease, opacity .3s ease; max-height: 0; opacity: 0; }
+.org-subs.open { max-height: 600px; opacity: 1; }
+.org-subs-inner { display: flex; flex-direction: column; align-items: center; padding-top: 14px; }
+.org-sub-stem { width: 2px; height: 10px; background: #ccc; }
+.org-sub-node {
+  padding: 5px 10px; border-radius: 6px; background: #f8f8fc; width: 100%; max-width: 150px;
+  font-size: .7rem; border: 1.5px solid #e0e0e0; cursor: pointer; transition: all .2s;
+  text-align: center; margin-top: 2px;
+}
+.org-sub-node:hover { background: #e0e0f5; border-color: #7d3c98; }
+.org-sub-node.sub-selected { background: #2c3e80; color: #fff; border-color: #2c3e80; }
+
+/* Detail panel */
+.org-detail-panel {
+  background: #fff; border-radius: 12px; padding: 20px; margin-top: 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08); display: none;
+}
+.org-detail-panel.visible { display: block; animation: msgIn .3s ease; }
+.org-detail-panel h3 { margin-bottom: 8px; }
+.org-legend { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+.org-legend .leg-item { display: flex; align-items: center; gap: 4px; font-size: .72rem; color: #666; }
+.org-legend .leg-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+/* ── Simulation ── */
+.sim-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
+.sim-left { min-width: 0; }
+.sim-right { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 56px; max-height: calc(100vh - 70px); overflow-y: auto; scrollbar-width: thin; }
+.sim-controls {
+  display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.sim-btn {
+  padding: 10px 24px; border-radius: 8px; border: none; font-weight: 600;
+  cursor: pointer; font-size: .9rem; transition: all .2s;
+}
+.sim-btn.primary { background: #2c3e80; color: #fff; }
+.sim-btn.primary:hover { background: #1a2a5e; }
+.sim-btn.secondary { background: #e0e0e0; color: #333; }
+.sim-btn.secondary:hover { background: #ccc; }
+.sim-btn.sm { padding: 6px 14px; font-size: .78rem; }
+.sim-lang-toggle {
+  display: inline-flex; border-radius: 6px; overflow: hidden; border: 1.5px solid #d0d0d0;
+  font-size: .78rem;
+}
+.sim-lang-toggle button {
+  padding: 4px 12px; border: none; background: #fff; cursor: pointer; font-weight: 500;
+  transition: all .2s;
+}
+.sim-lang-toggle button.active { background: #2c3e80; color: #fff; }
+.sim-narrate-btn { display: flex; align-items: center; gap: 4px; }
+.sim-narrate-btn.speaking { color: #2c3e80; }
+.sim-status {
+  font-size: .82rem; color: #888; display: flex; align-items: center; gap: 6px; margin-left: auto;
+}
+.sim-status .pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: #27ae60;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+.sim-progress-bar {
+  width: 100%; height: 6px; background: #e0e0e0; border-radius: 3px; margin-bottom: 16px; overflow: hidden;
+}
+.sim-progress-bar .fill {
+  height: 100%; background: linear-gradient(90deg, #2c3e80, #27ae60);
+  transition: width .3s; border-radius: 3px;
+}
+.sim-timeline { display: flex; flex-direction: column; gap: 0; }
+.sim-phase {
+  display: flex; gap: 16px; padding: 14px 0; border-left: 3px solid #e0e0e0;
+  margin-left: 20px; position: relative; transition: all .4s;
+}
+.sim-phase.active { border-left-color: #2c3e80; }
+.sim-phase.done   { border-left-color: #27ae60; }
+.sim-phase-dot {
+  position: absolute; left: -10px; top: 16px; width: 16px; height: 16px;
+  border-radius: 50%; background: #e0e0e0; border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: all .4s;
+}
+.sim-phase.active .sim-phase-dot { background: #2c3e80; animation: pulse 1.5s infinite; }
+.sim-phase.done .sim-phase-dot   { background: #27ae60; }
+.sim-phase-content { margin-left: 16px; flex: 1; }
+.sim-phase-content h4 { font-size: .92rem; display: flex; align-items: center; gap: 8px; }
+.sim-phase-content .phase-meta { font-size: .75rem; color: #888; margin-top: 2px; }
+.sim-steps { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.sim-step {
+  padding: 8px 12px; border-radius: 8px; background: #fafafa; font-size: .8rem;
+  border: 1px solid #eee; display: flex; align-items: center; gap: 8px; transition: all .3s;
+}
+.sim-step.active { background: #eef; border-color: #2c3e80; }
+.sim-step.done   { background: #efd; border-color: #27ae60; }
+.sim-step .step-icon { font-size: 1rem; }
+.sim-step .step-info { flex: 1; }
+.sim-step .step-info .step-label { font-weight: 500; }
+.sim-step .step-info .step-detail { font-size: .72rem; color: #888; margin-top: 1px; }
+.sim-step .step-dur { font-size: .7rem; color: #999; white-space: nowrap; }
+.sim-step .step-progress {
+  width: 60px; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden;
+}
+.sim-step .step-progress .sp-fill {
+  height: 100%; background: #2c3e80; border-radius: 2px; transition: width .15s;
+}
+.sim-narrative {
+  background: #fff; border-radius: 10px; padding: 14px 18px; margin-top: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08); border-left: 4px solid #2c3e80;
+  font-size: .85rem; line-height: 1.5; animation: msgIn .4s ease;
+}
+.sim-narrative .narrator-label { font-size: .72rem; color: #2c3e80; font-weight: 600; margin-bottom: 4px; }
+
+/* ── Right panel: actors ── */
+.actor-ring {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 12px 0;
+}
+.actor-node {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: all .5s; cursor: default; min-width: 70px;
+}
+.actor-node.dimmed { opacity: .3; transform: scale(.9); }
+.actor-node.active { transform: scale(1.08); }
+.actor-icon {
+  width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 1.4rem; border: 3px solid transparent;
+  transition: all .5s; position: relative;
+}
+.actor-icon.glowing {
+  box-shadow: 0 0 12px rgba(44,62,128,.4);
+  animation: actorPulse 2s infinite;
+}
+@keyframes actorPulse {
+  0%,100% { box-shadow: 0 0 8px rgba(44,62,128,.3); }
+  50% { box-shadow: 0 0 20px rgba(44,62,128,.6); }
+}
+.actor-name { font-size: .68rem; font-weight: 500; text-align: center; color: #555; max-width: 80px; }
+.actor-connections {
+  display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 4px;
+}
+.actor-conn {
+  height: 3px; width: 40px; border-radius: 2px; background: #e0e0e0; transition: all .5s;
+  position: relative; overflow: hidden;
+}
+.actor-conn.active-conn { background: #2c3e80; }
+.actor-conn.active-conn::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* ── Right panel: analytics ── */
+.analytics-card {
+  background: #fff; border-radius: 10px; padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+.analytics-card h4 { font-size: .85rem; margin-bottom: 10px; color: #333; }
+.analytics-sector {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border-radius: 8px; cursor: pointer; transition: all .2s; margin-bottom: 4px;
+}
+.analytics-sector:hover { background: #f0f0f5; }
+.sector-icon { font-size: 1.2rem; }
+.sector-info { flex: 1; }
+.sector-label { font-size: .78rem; font-weight: 500; }
+.sector-bar-bg { height: 6px; background: #eee; border-radius: 3px; margin-top: 3px; overflow: hidden; }
+.sector-bar { height: 100%; border-radius: 3px; transition: width 1s ease-out; }
+.sector-value { font-size: .9rem; font-weight: 700; color: #2c3e80; min-width: 36px; text-align: right; }
+.analytics-popup {
+  position: fixed; z-index: 2500; background: #fff; border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.2); padding: 20px; max-width: 420px; width: 90%;
+  animation: msgIn .25s ease;
+}
+.analytics-popup .ap-close {
+  position: absolute; top: 10px; right: 10px; background: #eee; border: none;
+  width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: .9rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.analytics-popup h3 { font-size: .95rem; margin-bottom: 10px; }
+.ap-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: .82rem; border-bottom: 1px solid #f0f0f0; }
+.ap-bar-bg { flex: 1; height: 8px; background: #eee; border-radius: 4px; margin: 0 10px; overflow: hidden; align-self: center; }
+.ap-bar { height: 100%; border-radius: 4px; transition: width .8s ease-out; }
+
+/* ── Interactive steps ── */
+.sim-step.clickable { cursor: pointer; }
+.sim-step.clickable:hover { background: #e8eaf6; border-color: #2c3e80; }
+.sim-step .step-links {
+  display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;
+}
+.step-link {
+  font-size: .68rem; padding: 2px 8px; border-radius: 10px; background: #2c3e80;
+  color: #fff; cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block;
+}
+.step-link:hover { background: #1a2a5e; transform: scale(1.05); }
+.step-link.green { background: #1e8449; }
+.step-link.purple { background: #7d3c98; }
+.step-link.orange { background: #ca6f1e; }
+
+/* ── Knowledge graph (SVG canvas) ── */
+.kg-card { position: relative; }
+.kg-canvas { width: 100%; height: 240px; }
+.kg-node {
+  cursor: pointer; transition: all .4s;
+}
+.kg-node:hover { filter: brightness(1.15); }
+.kg-node circle { transition: r .6s ease, fill-opacity .5s; }
+.kg-node text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; pointer-events: none; }
+.kg-edge { transition: stroke-opacity .5s, stroke-width .5s; }
+.kg-edge.active { stroke-opacity: .7; }
+.kg-edge.inactive { stroke-opacity: .08; }
+.kg-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; justify-content: center; }
+.kg-legend span { font-size: .65rem; display: flex; align-items: center; gap: 3px; color: #888; }
+.kg-legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+.kg-popup {
+  position: absolute; z-index: 10; background: #fff; border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18); padding: 14px 16px; width: 280px;
+  font-size: .8rem; animation: msgIn .2s ease; pointer-events: auto;
+}
+.kg-popup .kgp-close {
+  position: absolute; top: 6px; right: 8px; background: #eee; border: none;
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: .75rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.kg-popup h4 { font-size: .88rem; margin-bottom: 6px; }
+.kg-popup .kgp-bar-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.kg-popup .kgp-bar-bg { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+.kg-popup .kgp-bar { height: 100%; border-radius: 3px; transition: width .6s ease-out; }
+.kg-popup .kgp-label { font-size: .72rem; min-width: 80px; }
+.kg-popup .kgp-val { font-size: .72rem; font-weight: 600; min-width: 24px; text-align: right; }
+
+/* ── Responsive sim ── */
+@media (max-width: 1024px) {
+  .sim-layout { grid-template-columns: 1fr; }
+  .sim-right { position: static; max-height: none; order: -1; }
+}
+
+/* ── Vaatimukset modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 2000;
+  display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: #fff; border-radius: 14px; max-width: 700px; width: 90%; max-height: 80vh;
+  overflow-y: auto; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  animation: msgIn .3s ease;
+}
+.modal h2 { font-size: 1.15rem; margin-bottom: 12px; }
+.modal .close-btn {
+  position: sticky; top: 0; float: right; background: #eee; border: none; width: 32px; height: 32px;
+  border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.modal .req-item {
+  padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: .85rem;
+}
+.modal .req-item:last-child { border-bottom: none; }
+.modal .req-cat { font-size: .72rem; color: #2c3e80; font-weight: 600; text-transform: uppercase; }
+.modal .req-pri { font-size: .72rem; padding: 1px 8px; border-radius: 8px; }
+.modal .req-pri.kriittinen { background: #fdecea; color: #c0392b; }
+.modal .req-pri.korkea     { background: #fef9e7; color: #d4ac0d; }
+.modal .req-pri.normaali   { background: #eaf2f8; color: #2874a6; }
+.modal .lisatyo-hinta { font-weight: 600; color: #27ae60; }
+
+/* ── Language switcher ── */
+.lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+.lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+.lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+.lang-flag{font-size:0.85rem;line-height:1}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  header { flex-direction: column; text-align: center; gap: 8px; }
+  .tabs button { padding: 10px 12px; font-size: .8rem; }
+  .interview-layout { grid-template-columns: 1fr; }
+  .overview-grid { grid-template-columns: 1fr; }
+  .org-branches { flex-direction: column; align-items: center; }
+  .stat-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="left">
+    <h1 data-i18n="headerTitle">Oikeusministeriö — Verkkouudistuksen haastattelija</h1>
+    <p data-i18n="headerSubtitle">Siili Solutions | Hallinnonalan verkkosivustojen uudistaminen 2026</p>
+  </div>
+  <div class="right">
+    <span class="badge" data-i18n="badgeAgencies">8 virastoa</span>
+    <span class="badge" id="feedback-count-badge" data-i18n="badgeFeedback">300 palautetta</span>
+    <span class="badge" data-i18n="badgeInterviews">64 haastattelua</span>
+    <a href="guide.html" data-i18n="headerGuideLink" style="color:rgba(255,255,255,0.9);font-weight:600;text-decoration:none;font-size:0.82rem;white-space:nowrap">Käyttöohje &rarr;</a>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+      <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="active" data-view="overview" data-i18n="tabOverview">Yleiskatsaus</button>
+  <button data-view="orgchart" data-i18n="tabOrg">Organisaatio</button>
+  <button data-view="interviews" data-i18n="tabInterviews">Haastattelut</button>
+  <button data-view="simulation" data-i18n="tabSimulation">Simulaatio</button>
+  <button data-view="feedback" data-i18n="tabFeedback">Palautteet</button>
+</nav>
+
+<!-- ════════════════════ YLEISKATSAUS ════════════════════ -->
+<div id="overview" class="view active">
+  <div class="stat-row" id="overview-stats"></div>
+  <h2 style="margin-top:24px;font-size:1.1rem;" data-i18n="overviewAgenciesTitle">Hallinnonalan virastot</h2>
+  <div class="overview-grid" id="agency-grid"></div>
+</div>
+
+<!-- ════════════════════ PALAUTTEET ════════════════════ -->
+<div id="feedback" class="view">
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="flex:1;min-width:300px;">
+      <h2 style="font-size:1.1rem;margin-bottom:12px;" data-i18n="feedbackBrowseTitle">Kansalaispalautteen selaaminen</h2>
+      <div class="search-bar" style="text-align:left;">
+        <input type="text" id="feedback-search" data-i18n-placeholder="feedbackSearchPlaceholder" placeholder="Hae palautteista...">
+      </div>
+      <div class="filters" id="feedback-agency-filters" style="justify-content:flex-start;"></div>
+      <div class="filters" id="feedback-cat-filters" style="justify-content:flex-start;"></div>
+      <div class="filters" id="feedback-sentiment-filters" style="justify-content:flex-start;"></div>
+      <div id="feedback-summary" style="font-size:.82rem;color:#888;margin-bottom:12px;"></div>
+      <div class="feedback-list" id="feedback-list"></div>
+      <button class="load-more-btn" id="load-more-btn" data-i18n="loadMore">Lataa lisää</button>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <h2 style="font-size:1.1rem;margin-bottom:12px;" data-i18n="feedbackGiveTitle">Anna palautetta</h2>
+      <div class="chat-container" style="height:480px;">
+        <div class="chat-header"><span class="dot"></span> <span data-i18n="chatAssistantTitle">Palauteassistentti</span></div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-context-bar">
+          <span data-i18n="chatAgencyLabel">Virasto:</span>
+          <select id="chat-agency-select"></select>
+          <span style="margin-left:8px;" data-i18n="chatPageLabel">Sivu:</span>
+          <select id="chat-page-select">
+            <option value="Etusivu" data-i18n="pageHome">Etusivu</option>
+            <option value="Asiointi" data-i18n="pageServices">Asiointi</option>
+            <option value="Yhteystiedot" data-i18n="pageContact">Yhteystiedot</option>
+            <option value="Tiedotteet" data-i18n="pageNews">Tiedotteet</option>
+            <option value="Muu" data-i18n="pageOther">Muu</option>
+          </select>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" data-i18n-placeholder="chatInputPlaceholder" placeholder="Kirjoita palautteesi...">
+          <button id="chat-send" data-i18n="chatSend">Lähetä</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ HAASTATTELUT ════════════════════ -->
+<div id="interviews" class="view">
+  <h2 style="font-size:1.1rem;margin-bottom:16px;" data-i18n="interviewsTitle">Sidosryhmähaastattelut</h2>
+  <div class="interview-layout">
+    <div class="interview-sidebar" id="sr-sidebar"></div>
+    <div class="interview-main" id="interview-main">
+      <div id="interview-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ ORGANISAATIO ════════════════════ -->
+<div id="orgchart" class="view">
+  <h2 style="font-size:1.1rem;margin-bottom:8px;" data-i18n="orgTitle">Organisaatiokaavio</h2>
+  <p style="font-size:.82rem;color:#888;margin-bottom:16px;" data-i18n="orgDescription">Klikkaa virastoa tai osastoa nähdäksesi lisätiedot ja haastattelukonfiguraation</p>
+  <div class="org-legend" id="org-legend"></div>
+  <div class="org-chart-container" id="org-chart"></div>
+  <div class="org-detail-panel" id="org-detail"></div>
+</div>
+
+<!-- ════════════════════ SIMULAATIO ════════════════════ -->
+<div id="simulation" class="view">
+  <h2 style="font-size:1.1rem;margin-bottom:4px;" data-i18n="simTitle">Hankkeen interaktiivinen simulaatio</h2>
+  <p style="font-size:.82rem;color:#888;margin-bottom:16px;" data-i18n="simDescription">Koko verkkouudistusprojektin läpikäynti automaattisesti vaihe vaiheelta</p>
+  <div class="sim-controls">
+    <button class="sim-btn primary" id="sim-play">&#9654; Aloita simulaatio</button>
+    <button class="sim-btn secondary" id="sim-pause" style="display:none;">&#10074;&#10074; Tauko</button>
+    <button class="sim-btn secondary" id="sim-reset" style="display:none;">&#8635; Alusta</button>
+    <button class="sim-btn sm sim-narrate-btn" id="sim-narrate" title="Puhu ääneen">&#128264; Puhu</button>
+    <div class="sim-lang-toggle">
+      <button class="active" data-lang="fi">FI</button>
+      <button data-lang="en">EN</button>
+    </div>
+    <div class="sim-status" id="sim-status"></div>
+  </div>
+  <div class="sim-progress-bar"><div class="fill" id="sim-progress-fill" style="width:0%"></div></div>
+  <div class="sim-layout">
+    <div class="sim-left">
+      <div class="sim-timeline" id="sim-timeline"></div>
+      <div id="sim-narrative-box"></div>
+    </div>
+    <div class="sim-right">
+      <!-- Actors / Stakeholders -->
+      <div class="analytics-card">
+        <h4 data-i18n="simActorsTitle">Toimijat</h4>
+        <div class="actor-ring" id="sim-actors"></div>
+        <div class="actor-connections" id="sim-connections"></div>
+      </div>
+      <!-- Live analytics -->
+      <div class="analytics-card">
+        <h4 data-i18n="simDataTitle">Kerätty data</h4>
+        <div id="sim-analytics-sectors"></div>
+      </div>
+      <!-- Knowledge graph -->
+      <div class="analytics-card kg-card">
+        <h4 data-i18n="simKnowledgeTitle">Tiedon kertyminen</h4>
+        <svg class="kg-canvas" id="kg-canvas"></svg>
+        <div class="kg-legend" id="kg-legend"></div>
+        <div id="kg-popup-container"></div>
+      </div>
+      <!-- Phase summary -->
+      <div class="analytics-card">
+        <h4 data-i18n="simPhaseSummaryTitle">Vaiheen yhteenveto</h4>
+        <div id="sim-phase-summary" style="font-size:.82rem;color:#555;line-height:1.45;">
+          Paina "Aloita simulaatio" käynnistääksesi hankkeen läpikäynnin.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Analytics popup (positioned absolutely) -->
+<div id="analytics-popup" class="analytics-popup" style="display:none;"></div>
+
+<!-- ════════════════════ MODAL ════════════════════ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="feedback-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

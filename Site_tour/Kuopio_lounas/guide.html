@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siili Lounas Kuopio - Käyttöohje</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc; color: #334155; line-height: 1.7;
+        }
+        .hero {
+            background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%);
+            color: white; padding: 3rem 1.5rem 2.5rem; text-align: center;
+        }
+        .hero h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .hero .subtitle { color: #fed7aa; font-size: 1rem; }
+        .hero .back { display: inline-block; margin-top: 1.5rem; color: #fdba74; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+        .hero .back:hover { text-decoration: underline; }
+        .content { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+        .problem-box {
+            background: #fff; border-left: 4px solid #ea580c; border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .problem-box h2 { font-size: 1.1rem; color: #ea580c; margin-bottom: 0.5rem; }
+        .problem-box p { color: #475569; font-size: 0.95rem; }
+
+        h2 { font-size: 1.3rem; color: #1e293b; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 1.05rem; color: #334155; margin: 1.5rem 0 0.5rem; }
+        p, li { font-size: 0.92rem; color: #475569; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        strong { color: #1e293b; }
+
+        .feature-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .feature-card h3 { margin-top: 0; color: #c2410c; }
+        .feature-card .tag {
+            display: inline-block; background: #fff7ed; color: #c2410c;
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-bottom: 0.5rem;
+        }
+
+        .use-case {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+        }
+        .use-case .persona {
+            font-weight: 600; color: #ea580c; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+        }
+        .use-case h3 { margin-top: 0.2rem; }
+
+        .tip {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 0.75rem;
+            padding: 1rem 1.25rem; margin: 1.5rem 0; font-size: 0.88rem; color: #92400e;
+        }
+        .tip strong { color: #78350f; }
+
+        .steps { counter-reset: step; list-style: none; padding-left: 0; }
+        .steps li {
+            counter-increment: step; padding-left: 2.2rem; position: relative; margin-bottom: 1rem;
+        }
+        .steps li::before {
+            content: counter(step); position: absolute; left: 0; top: 0.1rem;
+            width: 1.5rem; height: 1.5rem; border-radius: 50%;
+            background: #ea580c; color: white; font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .lang-switcher{display:inline-flex;border:1px solid rgba(255,255,255,0.3);border-radius:100px;overflow:hidden;margin-top:1rem}
+        .lang-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;font-size:0.8rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.2s}
+        .lang-btn.active{background:rgba(255,255,255,0.2);color:#fff}
+        .lang-btn:hover:not(.active){color:#fff;background:rgba(255,255,255,0.1)}
+        .lang-flag{font-size:0.9rem;line-height:1}
+        .lang-content{display:block}
+        .lang-content.hidden{display:none}
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1 data-i18n-fi="Siili Lounas Kuopio - Käyttöohje" data-i18n-en="Siili Lunch Kuopio - User Guide">Siili Lounas Kuopio - Käyttöohje</h1>
+        <p class="subtitle" data-i18n-fi="Kuopion keskustan lounasravintolat kartalla" data-i18n-en="Kuopio city center lunch restaurants on a map">Kuopion keskustan lounasravintolat kartalla</p>
+        <a class="back" href="index.html" data-i18n-fi="&larr; Takaisin sovellukseen" data-i18n-en="&larr; Back to app">&larr; Takaisin sovellukseen</a>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fi"><span class="lang-flag">&#127467;&#127470;</span> FI</button>
+            <button class="lang-btn" data-lang="en"><span class="lang-flag">&#127468;&#127463;</span> EN</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="lang-content" data-lang="fi">
+
+        <div class="problem-box">
+            <h2>Miksi tämä sovellus on tehty?</h2>
+            <p>Kuopion keskustassa on kymmeniä lounasravintoloita, mutta päivän menun selvittäminen vaatii jokaisen ravintolan oman sivun selaamista. Siili Lounas Kuopio kokoaa lähialueen ravintolat, päivän lounaslistat, hinnat ja aukioloajat yhteen paikkaan &mdash; kartalle ja listalle.</p>
+        </div>
+
+        <h2>Näin pääset alkuun</h2>
+        <ol class="steps">
+            <li>Sovellus avautuu <strong>Päivän lounas</strong> -näkymään, jossa näet tämän päivän lounaslistat.</li>
+            <li>Valitse päivä yläpalkin <strong>päivävalitsimesta</strong> (ma&ndash;pe) nähdäksesi muiden päivien menut.</li>
+            <li>Vaihda <strong>Kartta</strong>-välilehteen nähdäksesi ravintoloiden sijainnit kartalla.</li>
+            <li><strong>Hae</strong> nimellä, osoitteella tai ruokalajilla löytääksesi juuri sinua kiinnostavan vaihtoehdon.</li>
+            <li>Tarkista ravintolan tiedot <strong>Ravintolat</strong>-välilehdeltä.</li>
+        </ol>
+
+        <h2>Kolme näkymää</h2>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 1</span>
+            <h3>Päivän lounas</h3>
+            <p>Oletusnäkymä jossa näet valitun päivän lounasmenut kaikista ravintoloista.</p>
+            <ul>
+                <li><strong>Päivävalitsin</strong> &rarr; vaihda arkipäivien välillä nähdäksesi eri päivien listat.</li>
+                <li>Jokaisesta ravintolasta näytetään <strong>nimi, ruokalajit ja hinnat</strong>.</li>
+                <li><strong>Hakupalkki</strong> suodattaa ravintoloita ja ruokalajeja reaaliaikaisesti.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 2</span>
+            <h3>Kartta</h3>
+            <p>Kuopion keskustan lounasravintolat interaktiivisella kartalla.</p>
+            <ul>
+                <li>Jokainen ravintola näkyy <strong>karttamerkkinä</strong> &mdash; klikkaa nähdäksesi tiedot.</li>
+                <li>Popup näyttää ravintolan nimen, osoitteen ja lounashinnat.</li>
+                <li><strong>Ravintolasuodatin</strong> kartalla &mdash; valitse mitkä ravintolat näytetään.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">Näkymä 3</span>
+            <h3>Ravintolat</h3>
+            <p>Täydellinen lista kaikista ravintoloista perustietoineen.</p>
+            <ul>
+                <li>Ravintolan nimi, osoite, <strong>aukioloajat</strong> ja hintahaarukka.</li>
+                <li>Hakutoiminto listanäkymässä.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Vinkki:</strong> Käytä hakupalkkia etsiäksesi tiettyä ruokalajia (esim. "kasvis" tai "keitto") &mdash; näet heti mitkä ravintolat tarjoavat sitä tänään.
+        </div>
+
+        <h2>Käyttötapaukset</h2>
+
+        <div class="use-case">
+            <div class="persona">Lounastaja</div>
+            <h3>"Mitä tänään on lounaaksi?"</h3>
+            <p>Avaa sovellus &rarr; <strong>Päivän lounas</strong> näyttää suoraan tämän päivän menut. Selaa listaa tai hae tiettyä ruokalajia.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Uusi työntekijä</div>
+            <h3>"Missä lähimmät lounaspaikat sijaitsevat?"</h3>
+            <p>Vaihda <strong>Kartta</strong>-näkymään &rarr; näet kaikki ravintolat sijainnin mukaan. Klikkaa merkintöjä saadaksesi tiedot ja osoitteet.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Etukäteissuunnittelija</div>
+            <h3>"Mitä huomenna on tarjolla?"</h3>
+            <p>Vaihda päivävalitsimesta huomiseen &rarr; näet koko viikon menut etukäteen, joten voit suunnitella lounaasi.</p>
+        </div>
+
+        <h2>Hyödyllistä tietää</h2>
+        <ul>
+            <li>Sovellus sisältää <strong>Kuopion keskustan lounasravintoloita</strong> todellisilla sijainneilla.</li>
+            <li>Lounaslistat ovat <strong>demoa varten koottuja</strong> &mdash; oikeassa käytössä ne haettaisiin ravintoloiden sivuilta automaattisesti.</li>
+            <li>Sovellus tukee <strong>suomea ja englantia</strong> &mdash; vaihda kieltä oikeasta yläkulmasta.</li>
+            <li>Sovellus toimii kokonaan selaimessa ilman palvelinta.</li>
+        </ul>
+
+        </div>
+
+        <div class="lang-content hidden" data-lang="en">
+
+        <div class="problem-box">
+            <h2>Why was this app built?</h2>
+            <p>There are dozens of lunch restaurants in Kuopio city center, but checking the daily menu requires browsing each restaurant's website separately. Siili Lunch Kuopio gathers nearby restaurants, daily lunch menus, prices and opening hours into one place &mdash; on a map and list.</p>
+        </div>
+
+        <h2>Getting started</h2>
+        <ol class="steps">
+            <li>The app opens to the <strong>Daily lunch</strong> view showing today's lunch menus.</li>
+            <li>Select a day from the <strong>day picker</strong> (Mon&ndash;Fri) to see menus for other days.</li>
+            <li>Switch to the <strong>Map</strong> tab to see restaurant locations on the map.</li>
+            <li><strong>Search</strong> by name, address or dish to find exactly what you're looking for.</li>
+            <li>Check restaurant details on the <strong>Restaurants</strong> tab.</li>
+        </ol>
+
+        <h2>Three views</h2>
+
+        <div class="feature-card">
+            <span class="tag">View 1</span>
+            <h3>Daily lunch</h3>
+            <p>The default view showing the selected day's lunch menus from all restaurants.</p>
+            <ul>
+                <li><strong>Day picker</strong> &rarr; switch between weekdays to see different days' menus.</li>
+                <li>Each restaurant shows <strong>name, dishes and prices</strong>.</li>
+                <li><strong>Search bar</strong> filters restaurants and dishes in real time.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 2</span>
+            <h3>Map</h3>
+            <p>Kuopio city center lunch restaurants on an interactive map.</p>
+            <ul>
+                <li>Each restaurant appears as a <strong>map marker</strong> &mdash; click to see details.</li>
+                <li>Popup shows restaurant name, address and lunch prices.</li>
+                <li><strong>Restaurant filter</strong> on the map &mdash; choose which restaurants to display.</li>
+            </ul>
+        </div>
+
+        <div class="feature-card">
+            <span class="tag">View 3</span>
+            <h3>Restaurants</h3>
+            <p>Complete list of all restaurants with basic information.</p>
+            <ul>
+                <li>Restaurant name, address, <strong>opening hours</strong> and price range.</li>
+                <li>Search functionality in the list view.</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <strong>Tip:</strong> Use the search bar to find a specific dish (e.g. "vegetarian" or "soup") &mdash; you'll instantly see which restaurants are serving it today.
+        </div>
+
+        <h2>Use cases</h2>
+
+        <div class="use-case">
+            <div class="persona">Lunch goer</div>
+            <h3>"What's for lunch today?"</h3>
+            <p>Open the app &rarr; <strong>Daily lunch</strong> shows today's menus directly. Browse the list or search for a specific dish.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">New employee</div>
+            <h3>"Where are the nearest lunch spots?"</h3>
+            <p>Switch to the <strong>Map</strong> view &rarr; see all restaurants by location. Click markers to get details and addresses.</p>
+        </div>
+
+        <div class="use-case">
+            <div class="persona">Advance planner</div>
+            <h3>"What's on the menu tomorrow?"</h3>
+            <p>Switch the day picker to tomorrow &rarr; you can see the whole week's menus in advance and plan your lunches.</p>
+        </div>
+
+        <h2>Good to know</h2>
+        <ul>
+            <li>The app includes <strong>Kuopio city center lunch restaurants</strong> with real locations.</li>
+            <li>Lunch menus are <strong>compiled for demo purposes</strong> &mdash; in real use they would be fetched automatically from restaurant websites.</li>
+            <li>The app supports <strong>Finnish and English</strong> &mdash; switch language from the top right corner.</li>
+            <li>The app runs entirely in the browser with no server required.</li>
+        </ul>
+
+        </div>
+
+    </div>
+<script>
+(function(){
+    const lang = localStorage.getItem('siteTourLang') || 'fi';
+    document.querySelectorAll('.lang-content').forEach(el => {
+        el.classList.toggle('hidden', el.dataset.lang !== lang);
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+        el.textContent = lang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.addEventListener('click', () => {
+            const newLang = b.dataset.lang;
+            localStorage.setItem('siteTourLang', newLang);
+            document.querySelectorAll('.lang-content').forEach(el => {
+                el.classList.toggle('hidden', el.dataset.lang !== newLang);
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === newLang);
+            });
+            document.querySelectorAll('[data-i18n-fi]').forEach(el => {
+                el.textContent = newLang === 'en' ? el.dataset.i18nEn : el.dataset.i18nFi;
+            });
+            document.documentElement.lang = newLang;
+        });
+    });
+    document.documentElement.lang = lang;
+})();
+</script>
+<script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

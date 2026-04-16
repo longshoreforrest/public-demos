@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Tour - Rapid Agent Prototypes</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -19,7 +15,6 @@
             overflow-x: hidden;
         }
 
-        /* Subtle background */
         .bg-pattern {
             position: fixed;
             inset: 0;
@@ -33,16 +28,13 @@
         .content {
             position: relative;
             z-index: 1;
-            max-width: 1100px;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 4.5rem 1.5rem 4rem;
         }
 
         /* Header */
-        header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
+        header { text-align: center; margin-bottom: 2.5rem; }
 
         .badge {
             display: inline-block;
@@ -74,39 +66,22 @@
             line-height: 1.6;
         }
 
-        /* Cards grid */
+        /* Cards grid — compact 4-column layout */
         .cards {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 1rem;
         }
+        @media (min-width: 640px)  { .cards { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 900px)  { .cards { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1200px) { .cards { grid-template-columns: repeat(4, 1fr); } }
 
-        @media (min-width: 768px) {
-            .cards {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (min-width: 768px) {
-            .cards--five {
-                grid-template-columns: repeat(6, 1fr);
-            }
-            .cards--five .card:nth-child(-n+3) {
-                grid-column: span 2;
-            }
-            .cards--five .card:nth-child(4) {
-                grid-column: 2 / span 2;
-            }
-            .cards--five .card:nth-child(5) {
-                grid-column: 4 / span 2;
-            }
-        }
-
+        /* Card */
         .card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 1rem;
-            padding: 2rem;
+            border-radius: 0.85rem;
+            padding: 1.25rem;
             display: flex;
             flex-direction: column;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -115,250 +90,248 @@
             text-decoration: none;
             color: inherit;
         }
-
         .card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 3px;
-            border-radius: 1rem 1rem 0 0;
+            border-radius: 0.85rem 0.85rem 0 0;
             opacity: 0;
             transition: opacity 0.35s ease;
         }
-
         .card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-4px);
             border-color: #cbd5e1;
-            box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.1);
         }
-
-        .card:hover::before {
-            opacity: 1;
-        }
-
-        /* Card accent colors */
-        .card--food::before { background: linear-gradient(90deg, #e63946, #ff6b6b); }
-        .card--food:hover { border-color: rgba(230, 57, 70, 0.25); }
-        .card--food .card__icon { background: #fef2f2; color: #dc2626; }
-        .card--food .card__tag { background: #fef2f2; color: #b91c1c; }
-
-        .card--culture::before { background: linear-gradient(90deg, #e8491d, #ff8c42); }
-        .card--culture:hover { border-color: rgba(232, 73, 29, 0.25); }
-        .card--culture .card__icon { background: #fff7ed; color: #ea580c; }
-        .card--culture .card__tag { background: #fff7ed; color: #c2410c; }
-
-        .card--trainer::before { background: linear-gradient(90deg, #10b981, #34d399); }
-        .card--trainer:hover { border-color: rgba(16, 185, 129, 0.25); }
-        .card--trainer .card__icon { background: #ecfdf5; color: #059669; }
-        .card--trainer .card__tag { background: #ecfdf5; color: #047857; }
-
-        .card--vote::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-        .card--vote:hover { border-color: rgba(139, 92, 246, 0.25); }
-        .card--vote .card__icon { background: #f5f3ff; color: #7c3aed; }
-        .card--vote .card__tag { background: #f5f3ff; color: #6d28d9; }
-
-        .card--time::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-        .card--time:hover { border-color: rgba(59, 130, 246, 0.25); }
-        .card--time .card__icon { background: #eff6ff; color: #2563eb; }
-        .card--time .card__tag { background: #eff6ff; color: #1d4ed8; }
-
-        .card--golf::before { background: linear-gradient(90deg, #16a34a, #4ade80); }
-        .card--golf:hover { border-color: rgba(22, 163, 74, 0.25); }
-        .card--golf .card__icon { background: #f0fdf4; color: #16a34a; }
-        .card--golf .card__tag { background: #f0fdf4; color: #15803d; }
-
-        .card--reminder::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
-        .card--reminder:hover { border-color: rgba(236, 72, 153, 0.25); }
-        .card--reminder .card__icon { background: #fdf2f8; color: #db2777; }
-        .card--reminder .card__tag { background: #fdf2f8; color: #be185d; }
-
-        .card--sales::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-        .card--sales:hover { border-color: rgba(245, 158, 11, 0.25); }
-        .card--sales .card__icon { background: #fffbeb; color: #d97706; }
-        .card--sales .card__tag { background: #fffbeb; color: #b45309; }
-
-        .card--cert::before { background: linear-gradient(90deg, #0891b2, #22d3ee); }
-        .card--cert:hover { border-color: rgba(8, 145, 178, 0.25); }
-        .card--cert .card__icon { background: #ecfeff; color: #0891b2; }
-        .card--cert .card__tag { background: #ecfeff; color: #0e7490; }
-
-        /* Joensuu cards */
-        .card--projref::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
-        .card--projref:hover { border-color: rgba(99, 102, 241, 0.25); }
-        .card--projref .card__icon { background: #eef2ff; color: #4f46e5; }
-        .card--projref .card__tag { background: #eef2ff; color: #4338ca; }
-
-        .card--custref::before { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
-        .card--custref:hover { border-color: rgba(13, 148, 136, 0.25); }
-        .card--custref .card__icon { background: #f0fdfa; color: #0d9488; }
-        .card--custref .card__tag { background: #f0fdfa; color: #0f766e; }
-
-        .card--billiard::before { background: linear-gradient(90deg, #059669, #34d399); }
-        .card--billiard:hover { border-color: rgba(5, 150, 105, 0.25); }
-        .card--billiard .card__icon { background: #ecfdf5; color: #059669; }
-        .card--billiard .card__tag { background: #ecfdf5; color: #047857; }
-
-        .card--sales2proj::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
-        .card--sales2proj:hover { border-color: rgba(217, 119, 6, 0.25); }
-        .card--sales2proj .card__icon { background: #fffbeb; color: #d97706; }
-        .card--sales2proj .card__tag { background: #fffbeb; color: #b45309; }
-
-        .card--meeting::before { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-        .card--meeting:hover { border-color: rgba(2, 132, 199, 0.25); }
-        .card--meeting .card__icon { background: #f0f9ff; color: #0284c7; }
-        .card--meeting .card__tag { background: #f0f9ff; color: #0369a1; }
-
-        .card--events::before { background: linear-gradient(90deg, #e11d48, #fb7185); }
-        .card--events:hover { border-color: rgba(225, 29, 72, 0.25); }
-        .card--events .card__icon { background: #fff1f2; color: #e11d48; }
-        .card--events .card__tag { background: #fff1f2; color: #be123c; }
-
-        .card--invoices::before { background: linear-gradient(90deg, #475569, #94a3b8); }
-        .card--invoices:hover { border-color: rgba(71, 85, 105, 0.25); }
-        .card--invoices .card__icon { background: #f8fafc; color: #475569; }
-        .card--invoices .card__tag { background: #f8fafc; color: #334155; }
+        .card:hover::before { opacity: 1; }
+        .card.hidden { display: none; }
 
         .card__icon {
-            width: 3.2rem;
-            height: 3.2rem;
-            border-radius: 0.75rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.6rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
             flex-shrink: 0;
         }
-
         .card__location {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.35rem;
         }
-
         .card h2 {
-            font-size: 1.35rem;
+            font-size: 1.05rem;
             font-weight: 600;
             color: #1e293b;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
             line-height: 1.3;
         }
-
         .card p {
             color: #64748b;
-            font-size: 0.9rem;
-            line-height: 1.65;
+            font-size: 0.82rem;
+            line-height: 1.55;
             flex-grow: 1;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-
         .card__tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
         }
-
         .card__tag {
-            padding: 0.25rem 0.65rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 100px;
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 500;
         }
-
         .card__bottom {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-
         .card__open-label {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
+            gap: 0.4rem;
+            font-size: 0.8rem;
             font-weight: 500;
             color: #94a3b8;
             transition: color 0.2s ease, gap 0.2s ease;
         }
-        .card:hover .card__open-label {
-            color: #334155;
-            gap: 0.7rem;
-        }
-        .card__open-label svg {
-            width: 16px; height: 16px;
-            transition: transform 0.2s ease;
-        }
-        .card:hover .card__open-label svg {
-            transform: translateX(2px);
-        }
+        .card:hover .card__open-label { color: #334155; gap: 0.55rem; }
+        .card__open-label svg { width: 14px; height: 14px; transition: transform 0.2s ease; }
+        .card:hover .card__open-label svg { transform: translateX(2px); }
 
+        /* ---- Card accent colors ---- */
 
+        /* Helsinki Food */
+        .card--food::before { background: linear-gradient(90deg, #e63946, #ff6b6b); }
+        .card--food:hover { border-color: rgba(230, 57, 70, 0.25); }
+        .card--food .card__icon { background: #fef2f2; color: #dc2626; }
+        .card--food .card__tag { background: #fef2f2; color: #b91c1c; }
 
-        /* Features list inside cards */
-        .card__features {
+        /* Oulu Culture */
+        .card--culture::before { background: linear-gradient(90deg, #e8491d, #ff8c42); }
+        .card--culture:hover { border-color: rgba(232, 73, 29, 0.25); }
+        .card--culture .card__icon { background: #fff7ed; color: #ea580c; }
+        .card--culture .card__tag { background: #fff7ed; color: #c2410c; }
+
+        /* Oulu Koutsi */
+        .card--trainer::before { background: linear-gradient(90deg, #10b981, #34d399); }
+        .card--trainer:hover { border-color: rgba(16, 185, 129, 0.25); }
+        .card--trainer .card__icon { background: #ecfdf5; color: #059669; }
+        .card--trainer .card__tag { background: #ecfdf5; color: #047857; }
+
+        /* Kuopio Lounas */
+        .card--kuopiofood::before { background: linear-gradient(90deg, #ea580c, #fb923c); }
+        .card--kuopiofood:hover { border-color: rgba(234, 88, 12, 0.25); }
+        .card--kuopiofood .card__icon { background: #fff7ed; color: #ea580c; }
+        .card--kuopiofood .card__tag { background: #fff7ed; color: #c2410c; }
+
+        /* Kuopio Haastattelija */
+        .card--interview::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+        .card--interview:hover { border-color: rgba(124, 58, 237, 0.25); }
+        .card--interview .card__icon { background: #f5f3ff; color: #7c3aed; }
+        .card--interview .card__tag { background: #f5f3ff; color: #6d28d9; }
+
+        /* Kuopio WordPress Tukiagentti */
+        .card--wpdev::before { background: linear-gradient(90deg, #0d9488, #5eead4); }
+        .card--wpdev:hover { border-color: rgba(13, 148, 136, 0.25); }
+        .card--wpdev .card__icon { background: #f0fdfa; color: #0d9488; }
+        .card--wpdev .card__tag { background: #f0fdfa; color: #0f766e; }
+
+        /* Kuopio Testausagentit */
+        .card--qa::before { background: linear-gradient(90deg, #1e40af, #3b82f6); }
+        .card--qa:hover { border-color: rgba(30, 64, 175, 0.25); }
+        .card--qa .card__icon { background: #eff6ff; color: #1e40af; }
+        .card--qa .card__tag { background: #eff6ff; color: #1e3a8a; }
+
+        /* Seinäjoki Lounasäänestys */
+        .card--vote::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .card--vote:hover { border-color: rgba(139, 92, 246, 0.25); }
+        .card--vote .card__icon { background: #f5f3ff; color: #7c3aed; }
+        .card--vote .card__tag { background: #f5f3ff; color: #6d28d9; }
+
+        /* Seinäjoki Tuntikirjanpito */
+        .card--time::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .card--time:hover { border-color: rgba(59, 130, 246, 0.25); }
+        .card--time .card__icon { background: #eff6ff; color: #2563eb; }
+        .card--time .card__tag { background: #eff6ff; color: #1d4ed8; }
+
+        /* Tampere Golf */
+        .card--golf::before { background: linear-gradient(90deg, #16a34a, #4ade80); }
+        .card--golf:hover { border-color: rgba(22, 163, 74, 0.25); }
+        .card--golf .card__icon { background: #f0fdf4; color: #16a34a; }
+        .card--golf .card__tag { background: #f0fdf4; color: #15803d; }
+
+        /* Tampere Muistuttaja */
+        .card--reminder::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+        .card--reminder:hover { border-color: rgba(236, 72, 153, 0.25); }
+        .card--reminder .card__icon { background: #fdf2f8; color: #db2777; }
+        .card--reminder .card__tag { background: #fdf2f8; color: #be185d; }
+
+        /* Tampere Myyntitavoitteet */
+        .card--sales::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .card--sales:hover { border-color: rgba(245, 158, 11, 0.25); }
+        .card--sales .card__icon { background: #fffbeb; color: #d97706; }
+        .card--sales .card__tag { background: #fffbeb; color: #b45309; }
+
+        /* Tampere SerttiApuri */
+        .card--cert::before { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+        .card--cert:hover { border-color: rgba(8, 145, 178, 0.25); }
+        .card--cert .card__icon { background: #ecfeff; color: #0891b2; }
+        .card--cert .card__tag { background: #ecfeff; color: #0e7490; }
+
+        /* Joensuu Projektireferenssit */
+        .card--projref::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+        .card--projref:hover { border-color: rgba(99, 102, 241, 0.25); }
+        .card--projref .card__icon { background: #eef2ff; color: #4f46e5; }
+        .card--projref .card__tag { background: #eef2ff; color: #4338ca; }
+
+        /* Joensuu Asiakasreferenssit */
+        .card--custref::before { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+        .card--custref:hover { border-color: rgba(13, 148, 136, 0.25); }
+        .card--custref .card__icon { background: #f0fdfa; color: #0d9488; }
+        .card--custref .card__tag { background: #f0fdfa; color: #0f766e; }
+
+        /* Joensuu Biljardipöytä */
+        .card--billiard::before { background: linear-gradient(90deg, #059669, #34d399); }
+        .card--billiard:hover { border-color: rgba(5, 150, 105, 0.25); }
+        .card--billiard .card__icon { background: #ecfdf5; color: #059669; }
+        .card--billiard .card__tag { background: #ecfdf5; color: #047857; }
+
+        /* Joensuu Myynnistä projektiin */
+        .card--sales2proj::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+        .card--sales2proj:hover { border-color: rgba(217, 119, 6, 0.25); }
+        .card--sales2proj .card__icon { background: #fffbeb; color: #d97706; }
+        .card--sales2proj .card__tag { background: #fffbeb; color: #b45309; }
+
+        /* Joensuu Neukkarit */
+        .card--meeting::before { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+        .card--meeting:hover { border-color: rgba(2, 132, 199, 0.25); }
+        .card--meeting .card__icon { background: #f0f9ff; color: #0284c7; }
+        .card--meeting .card__tag { background: #f0f9ff; color: #0369a1; }
+
+        /* Joensuu Site-tapahtumat */
+        .card--events::before { background: linear-gradient(90deg, #e11d48, #fb7185); }
+        .card--events:hover { border-color: rgba(225, 29, 72, 0.25); }
+        .card--events .card__icon { background: #fff1f2; color: #e11d48; }
+        .card--events .card__tag { background: #fff1f2; color: #be123c; }
+
+        /* Joensuu Toimiston laskut */
+        .card--invoices::before { background: linear-gradient(90deg, #475569, #94a3b8); }
+        .card--invoices:hover { border-color: rgba(71, 85, 105, 0.25); }
+        .card--invoices .card__icon { background: #f8fafc; color: #475569; }
+        .card--invoices .card__tag { background: #f8fafc; color: #334155; }
+
+        /* ---- Filters ---- */
+        .filters {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
-            margin-bottom: 1.5rem;
-            flex-grow: 1;
-        }
-
-        .card__feature {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.82rem;
-            color: #64748b;
-        }
-
-        .card__feature-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: #cbd5e1;
-            flex-shrink: 0;
-        }
-
-        /* Filter */
-        .filter {
-            display: flex;
-            justify-content: center;
             gap: 0.5rem;
             margin-bottom: 2.5rem;
+            align-items: center;
         }
-
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .filter-label {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            margin-right: 0.2rem;
+        }
         .filter-btn {
-            padding: 0.45rem 1.2rem;
+            padding: 0.35rem 0.9rem;
             border-radius: 100px;
             border: 1px solid #e2e8f0;
             background: #fff;
             color: #64748b;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
-        .filter-btn:hover {
-            border-color: #cbd5e1;
-            color: #334155;
-        }
-
-        .filter-btn.active {
-            background: #1e293b;
-            color: #fff;
-            border-color: #1e293b;
-        }
-
-        .card.hidden {
-            display: none;
-        }
+        .filter-btn:hover { border-color: #cbd5e1; color: #334155; }
+        .filter-btn.active { background: #1e293b; color: #fff; border-color: #1e293b; }
 
         /* Footer */
         footer {
@@ -373,9 +346,7 @@
         /* Language switcher */
         .lang-bar {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 100;
             display: flex;
             justify-content: flex-end;
@@ -385,7 +356,6 @@
             backdrop-filter: blur(8px);
             border-bottom: 1px solid #e2e8f0;
         }
-
         .lang-switcher {
             display: flex;
             align-items: center;
@@ -395,12 +365,7 @@
             overflow: hidden;
             background: #fff;
         }
-
-        .lang-flag {
-            font-size: 1rem;
-            line-height: 1;
-        }
-
+        .lang-flag { font-size: 1rem; line-height: 1; }
         .lang-btn {
             display: flex;
             align-items: center;
@@ -414,17 +379,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
-        .lang-btn.active {
-            background: #1e293b;
-            color: #fff;
-        }
-
-        .lang-btn:hover:not(.active) {
-            color: #334155;
-            background: #f1f5f9;
-        }
-
+        .lang-btn.active { background: #1e293b; color: #fff; }
+        .lang-btn:hover:not(.active) { color: #334155; background: #f1f5f9; }
     </style>
 </head>
 <body>
@@ -444,26 +400,35 @@
             <p data-i18n="subtitle">Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa &mdash; jokaisesta ideasta toimivaan demoon nopeasti.</p>
         </header>
 
-        <div class="filter">
-            <button class="filter-btn active" data-filter="all" data-i18n="filterAll">Kaikki</button>
-            <button class="filter-btn" data-filter="oulu">Oulu</button>
-            <button class="filter-btn" data-filter="seinajoki">Seinäjoki</button>
-            <button class="filter-btn" data-filter="tampere">Tampere</button>
-            <button class="filter-btn" data-filter="joensuu">Joensuu</button>
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="filterLocation">Toimipiste</span>
+                <button class="filter-btn active" data-city="all" data-i18n="filterAll">Kaikki</button>
+                <button class="filter-btn" data-city="helsinki">Helsinki</button>
+                <button class="filter-btn" data-city="oulu">Oulu</button>
+                <button class="filter-btn" data-city="kuopio">Kuopio</button>
+                <button class="filter-btn" data-city="seinajoki">Seinäjoki</button>
+                <button class="filter-btn" data-city="tampere">Tampere</button>
+                <button class="filter-btn" data-city="joensuu">Joensuu</button>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="filterCategory">Kategoria</span>
+                <button class="filter-btn active" data-cat="all" data-i18n="filterAllCat">Kaikki</button>
+                <button class="filter-btn" data-cat="lounas" data-i18n="catLounas">Lounas</button>
+                <button class="filter-btn" data-cat="myynti" data-i18n="catMyynti">Myynti</button>
+                <button class="filter-btn" data-cat="toimisto" data-i18n="catToimisto">Toimisto</button>
+                <button class="filter-btn" data-cat="kehitys" data-i18n="catKehitys">Kehitys</button>
+                <button class="filter-btn" data-cat="vapaaaika" data-i18n="catVapaaaika">Vapaa-aika</button>
+            </div>
         </div>
 
         <div class="cards" id="cards">
 
-            <!-- Helsinki Food -->
-            <a class="card card--food" href="Helsinki_food/index.html" data-city="helsinki">
+            <!-- ========== HELSINKI ========== -->
+
+            <a class="card card--food" href="Helsinki_food/index.html" data-city="helsinki" data-cat="lounas">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-                        <line x1="6" y1="1" x2="6" y2="4"/>
-                        <line x1="10" y1="1" x2="10" y2="4"/>
-                        <line x1="14" y1="1" x2="14" y2="4"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
                 </div>
                 <div class="card__location">Helsinki &bull; Ruoholahti &amp; Kamppi</div>
                 <h2>Siili Lounas</h2>
@@ -473,27 +438,16 @@
                     <span class="card__tag" data-i18n="tagMap">Kartta</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="foodFeat1">Interaktiivinen karttanäkymä</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="foodFeat2">Viikon lounaslistat</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="foodFeat3">Haku nimellä, osoitteella tai ruokalajilla</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Oulu Culture Capital -->
-            <a class="card card--culture" href="Oulu_kulttuuripaakaupunki/index.html" data-city="oulu">
+            <!-- ========== OULU ========== -->
+
+            <a class="card card--culture" href="Oulu_kulttuuripaakaupunki/index.html" data-city="oulu" data-cat="vapaaaika">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                        <path d="M2 17l10 5 10-5"/>
-                        <path d="M2 12l10 5 10-5"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
                 <div class="card__location">Oulu &bull; Kulttuuripääkaupunki 2026</div>
                 <h2 data-i18n="cultureTitle">Oulu Kulttuuripääkaupunki 2026</h2>
@@ -503,27 +457,14 @@
                     <span class="card__tag">Chart.js</span>
                     <span class="card__tag" data-i18n="tagEvents">560+ tapahtumaa</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="cultureFeat1">Kartta-, lista- ja kalenterinäkymät</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="cultureFeat2">Reittisuunnittelija matkan varrelle</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="cultureFeat3">Dashboard ja analytiikka</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Koutsi Personal Trainer -->
-            <a class="card card--trainer" href="Oulu_personal_trainer/koutsi/out/index.html" data-city="oulu">
+            <a class="card card--trainer" href="Oulu_personal_trainer/koutsi/out/index.html" data-city="oulu" data-cat="vapaaaika">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 20V10"/>
-                        <path d="M12 20V4"/>
-                        <path d="M6 20v-6"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
                 </div>
                 <div class="card__location">Oulu &bull; Hyvinvointi</div>
                 <h2>Koutsi</h2>
@@ -534,28 +475,86 @@
                     <span class="card__tag">Zustand</span>
                     <span class="card__tag">Tailwind</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="trainerFeat1">Päiväkohtainen agenda ja metriikat</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="trainerFeat2">Tavoitteiden ja vaiheiden seuranta</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="trainerFeat3">Treenikaverit ja "laiskottaa"-nappi</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Seinäjoki Lounasäänestys -->
-            <a class="card card--vote" href="Seinajoki_ruokabotti/index.html" data-city="seinajoki">
+            <!-- ========== KUOPIO ========== -->
+
+            <a class="card card--kuopiofood" href="Kuopio_lounas/index.html" data-city="kuopio" data-cat="lounas">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20V10"/>
-                        <path d="M18 20V4"/>
-                        <path d="M6 20v-4"/>
-                        <path d="M2 20h20"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                </div>
+                <div class="card__location">Kuopio &bull; Lounas</div>
+                <h2>Siili Lounas Kuopio</h2>
+                <p data-i18n="kuopioFoodDesc">Kuopion keskustan lounasravintolat kartalla &mdash; päivän menut, hinnat ja aukioloajat helposti löydettävissä.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Leaflet.js</span>
+                    <span class="card__tag" data-i18n="tagMap">Kartta</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <a class="card card--interview" href="Kuopio_haastattelija/index.html" data-city="kuopio" data-cat="kehitys">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="card__location">Kuopio &bull; Julkishallinto</div>
+                <h2 data-i18n="interviewTitle">Verkkouudistuksen haastattelija</h2>
+                <p data-i18n="interviewDesc">Ministeriön verkkouudistuksen sidosryhmähaastattelut, kansalaispalaute ja organisaatiokartta &mdash; tietoverkosto ja analyysit yhdessä paikassa.</p>
+                <div class="card__tags">
+                    <span class="card__tag" data-i18n="tagStakeholders">Sidosryhmät</span>
+                    <span class="card__tag" data-i18n="tagKnowledgeGraph">Tietoverkosto</span>
+                    <span class="card__tag">Vanilla JS</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <a class="card card--wpdev" href="Kuopio_pienkehitt%C3%A4j%C3%A4/index.html" data-city="kuopio" data-cat="kehitys">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <div class="card__location">Kuopio &bull; Kehitys</div>
+                <h2 data-i18n="wpdevTitle">WordPress Tukiagentti</h2>
+                <p data-i18n="wpdevDesc">WordPress-pienkehityksen AI-agentti &mdash; tiketit, koodikatselmukset, pipeline ja saavutettavuusauditointi chat-käyttöliittymällä.</p>
+                <div class="card__tags">
+                    <span class="card__tag">WordPress</span>
+                    <span class="card__tag" data-i18n="tagAiAgent">AI-agentti</span>
+                    <span class="card__tag" data-i18n="tagTickets">Tiketit</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <a class="card card--qa" href="Kuopio_testausagentit/index.html" data-city="kuopio" data-cat="kehitys">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div class="card__location">Kuopio &bull; Laadunvarmistus</div>
+                <h2 data-i18n="qaTitle">Testiautomaation havaintokeskus</h2>
+                <p data-i18n="qaDesc">WordPress-sivustojen QA-havaintokeskus &mdash; testiautomaation tulokset, juurisyyanalyysit, trendit ja AI-suositukset.</p>
+                <div class="card__tags">
+                    <span class="card__tag">Chart.js</span>
+                    <span class="card__tag" data-i18n="tagQA">QA</span>
+                    <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
+                </div>
+                <div class="card__bottom">
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+            </a>
+
+            <!-- ========== SEINÄJOKI ========== -->
+
+            <a class="card card--vote" href="Seinajoki_ruokabotti/index.html" data-city="seinajoki" data-cat="lounas">
+                <div class="card__icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/><path d="M2 20h20"/></svg>
                 </div>
                 <div class="card__location">Seinäjoki &bull; Lounas</div>
                 <h2 data-i18n="voteTitle">Lounasäänestys</h2>
@@ -565,26 +564,14 @@
                     <span class="card__tag">Chart.js</span>
                     <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="voteFeat1">Päivän lounasennuste</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="voteFeat2">Yksilö- ja ryhmäanalyysit</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="voteFeat3">Interaktiivinen karttanäkymä</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Seinäjoki Tuntikirjanpito -->
-            <a class="card card--time" href="Seinajoki_tuntikirjanpito/index.html" data-city="seinajoki">
+            <a class="card card--time" href="Seinajoki_tuntikirjanpito/index.html" data-city="seinajoki" data-cat="toimisto">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
                 <div class="card__location">Seinäjoki &bull; Projektinhallinta</div>
                 <h2 data-i18n="timeTitle">Tuntikirjanpito</h2>
@@ -594,27 +581,16 @@
                     <span class="card__tag">Vanilla JS</span>
                     <span class="card__tag" data-i18n="tagReports">Raportit</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="timeFeat1">Tuntikirjaukset projekteittain</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="timeFeat2">Visuaaliset raportit ja kaaviot</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="timeFeat3">Viikko- ja kuukausinäkymät</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Tampere Golf-apuri -->
-            <a class="card card--golf" href="Tampere_golfapuri/index.html" data-city="tampere">
+            <!-- ========== TAMPERE ========== -->
+
+            <a class="card card--golf" href="Tampere_golfapuri/index.html" data-city="tampere" data-cat="vapaaaika">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="19" cy="19" r="2"/>
-                        <path d="M5 2l7 14"/>
-                        <path d="M5 2l-3 12h8"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="19" cy="19" r="2"/><path d="M5 2l7 14"/><path d="M5 2l-3 12h8"/></svg>
                 </div>
                 <div class="card__location">Tampere &bull; Golf</div>
                 <h2 data-i18n="golfTitle">Golf-apuri</h2>
@@ -624,26 +600,14 @@
                     <span class="card__tag" data-i18n="tagMap">Kartta</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="golfFeat1">Kalenterinäkymä vapaista ajoista</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="golfFeat2">Kaveriäänestys peliajan valintaan</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="golfFeat3">Interaktiivinen karttanäkymä</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Tampere Lempeä Muistuttaja -->
-            <a class="card card--reminder" href="Tampere_muistuttaja/index.html" data-city="tampere">
+            <a class="card card--reminder" href="Tampere_muistuttaja/index.html" data-city="tampere" data-cat="toimisto">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 </div>
                 <div class="card__location">Tampere &bull; Kokoushallinta</div>
                 <h2 data-i18n="reminderTitle">Lempeä Muistuttaja</h2>
@@ -653,26 +617,14 @@
                     <span class="card__tag">i18n</span>
                     <span class="card__tag" data-i18n="tagCalendar">Kalenteri</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="reminderFeat1">Kokousmuistioiden automaattinen analyysi</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="reminderFeat2">Tehtävien seuranta ja muistutukset</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="reminderFeat3">Edistymisen visualisointi</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Tampere Myyntitavoitteet -->
-            <a class="card card--sales" href="Tampere_myyntitavoittet/index.html" data-city="tampere">
+            <a class="card card--sales" href="Tampere_myyntitavoittet/index.html" data-city="tampere" data-cat="myynti">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
                 <div class="card__location">Tampere &bull; Myynti</div>
                 <h2 data-i18n="salesTitle">Myyntitavoitteet 2026</h2>
@@ -682,26 +634,14 @@
                     <span class="card__tag">Font Awesome</span>
                     <span class="card__tag">Dashboard</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="salesFeat1">Pipeline ja painotettu ennuste</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="salesFeat2">KPI-mittarit ja gap-analyysi</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="salesFeat3">Asiakas- ja projektiporautuminen</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Tampere SerttiApuri -->
-            <a class="card card--cert" href="Tampere_serttiapuri/index.html" data-city="tampere">
+            <a class="card card--cert" href="Tampere_serttiapuri/index.html" data-city="tampere" data-cat="kehitys">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                        <path d="M6 12v5c3 3 6 3 6 3s3 0 6-3v-5"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 6 3 6 3s3 0 6-3v-5"/></svg>
                 </div>
                 <div class="card__location">Tampere &bull; Osaaminen</div>
                 <h2>SerttiApuri</h2>
@@ -711,27 +651,16 @@
                     <span class="card__tag">Vanilla JS</span>
                     <span class="card__tag" data-i18n="tagCerts">100+ serttiä</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="certFeat1">Sertifikaattikatalogi ja haku</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="certFeat2">Tavoitteiden hallinta ja seuranta</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="certFeat3">Henkilökohtaiset oppimispolut</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Asiakasprojektireferenssit -->
-            <a class="card card--projref" href="Joensuu_asiakas_projektireferenssit/index.html" data-city="joensuu">
+            <!-- ========== JOENSUU ========== -->
+
+            <a class="card card--projref" href="Joensuu_asiakas_projektireferenssit/index.html" data-city="joensuu" data-cat="myynti">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-                        <path d="M9 14l2 2 4-4"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Myynti &amp; referenssit</div>
                 <h2 data-i18n="projrefTitle">Projektireferenssit</h2>
@@ -741,28 +670,14 @@
                     <span class="card__tag" data-i18n="tagDrilldown">Porautuvat graafit</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="projrefFeat1">CV-pohjainen referenssikooste</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="projrefFeat2">Porautuvat analytiikkagraafit</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="projrefFeat3">Teknologia- ja osaamiskartoitus</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Asiakasreferenssit -->
-            <a class="card card--custref" href="Joensuu_asiakasreferenssit/index.html" data-city="joensuu">
+            <a class="card card--custref" href="Joensuu_asiakasreferenssit/index.html" data-city="joensuu" data-cat="myynti">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Asiakkuudet</div>
                 <h2 data-i18n="custrefTitle">Asiakasreferenssit</h2>
@@ -772,27 +687,14 @@
                     <span class="card__tag" data-i18n="tagDrilldown">Porautuvat graafit</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="custrefFeat1">Monipuoliset kategoriafiltterit</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="custrefFeat2">Porautuvat graafit ja analytiikka</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="custrefFeat3">Kilpailutusmateriaalin tuki</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Biljardipöytä -->
-            <a class="card card--billiard" href="Joensuu_biljardip%C3%B6yt%C3%A4/index.html" data-city="joensuu">
+            <a class="card card--billiard" href="Joensuu_biljardip%C3%B6yt%C3%A4/index.html" data-city="joensuu" data-cat="toimisto">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <circle cx="12" cy="12" r="3"/>
-                        <line x1="12" y1="2" x2="12" y2="5"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Yhteisö</div>
                 <h2 data-i18n="billiardTitle">Biljardipöytä</h2>
@@ -802,28 +704,14 @@
                     <span class="card__tag" data-i18n="tagTournaments">Turnaukset</span>
                     <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="billiardFeat1">Varauskalenteri ja kuukausinäkymä</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="billiardFeat2">Turnausjärjestelmä ja paritus</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="billiardFeat3">Porautuvat pelaajatilastot</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Myynnistä projektiin -->
-            <a class="card card--sales2proj" href="Joensuu_myynnist%C3%A4_projektiin/index.html" data-city="joensuu">
+            <a class="card card--sales2proj" href="Joensuu_myynnist%C3%A4_projektiin/index.html" data-city="joensuu" data-cat="myynti">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Myyntiprosessi</div>
                 <h2 data-i18n="sales2projTitle">Myynnistä projektiin</h2>
@@ -833,31 +721,14 @@
                     <span class="card__tag" data-i18n="tagWorkflow">Työnkulku</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="sales2projFeat1">Myyntimateriaalin muunnos</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="sales2projFeat2">Sidosryhmänäkymät ja dokumentaatio</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="sales2projFeat3">Yhteistyöesimerkit ja mallit</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Neukkarit -->
-            <a class="card card--meeting" href="Joensuu_neukkarit/index.html" data-city="joensuu">
+            <a class="card card--meeting" href="Joensuu_neukkarit/index.html" data-city="joensuu" data-cat="toimisto">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                        <path d="M8 14h.01"/>
-                        <path d="M12 14h.01"/>
-                        <path d="M16 14h.01"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Toimisto</div>
                 <h2 data-i18n="meetingTitle">Neukkarihallinta</h2>
@@ -867,29 +738,14 @@
                     <span class="card__tag" data-i18n="tagBooking">Varaukset</span>
                     <span class="card__tag">Vanilla JS</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="meetingFeat1">Aikajananäkymä 5 neukkarista</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="meetingFeat2">Reaaliaikainen varaustilanne</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="meetingFeat3">Helppo varaus ja henkilöfiltterit</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Site tapahtumat -->
-            <a class="card card--events" href="Joensuu_site_tapahtumat/index.html" data-city="joensuu">
+            <a class="card card--events" href="Joensuu_site_tapahtumat/index.html" data-city="joensuu" data-cat="toimisto">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                        <path d="M12 16l-2-2h4l-2 2z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 16l-2-2h4l-2 2z"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Tapahtumat</div>
                 <h2 data-i18n="eventsTitle">Site-tapahtumat</h2>
@@ -899,29 +755,14 @@
                     <span class="card__tag" data-i18n="tagFilters">Filtterit</span>
                     <span class="card__tag">Slack</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="eventsFeat1">Kalenterinäkymä tapahtumista</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="eventsFeat2">Tapahtumatyyppien filtteröinti</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="eventsFeat3">Excel-export ja Slack-integraatio</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
-            <!-- Joensuu Toimiston laskut -->
-            <a class="card card--invoices" href="Joensuu_toimiston_laskut/index.html" data-city="joensuu">
+            <a class="card card--invoices" href="Joensuu_toimiston_laskut/index.html" data-city="joensuu" data-cat="toimisto">
                 <div class="card__icon">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="8" y1="13" x2="16" y2="13"/>
-                        <line x1="8" y1="17" x2="16" y2="17"/>
-                        <line x1="10" y1="9" x2="10" y2="9"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="10" y2="9"/></svg>
                 </div>
                 <div class="card__location">Joensuu &bull; Taloushallinto</div>
                 <h2 data-i18n="invoicesTitle">Laskujen tarkastus</h2>
@@ -931,16 +772,8 @@
                     <span class="card__tag" data-i18n="tagAnalytics">Analytiikka</span>
                     <span class="card__tag" data-i18n="tagAutomation">Automaatio</span>
                 </div>
-                <div class="card__features">
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="invoicesFeat1">Toimittajahistorian vertailu</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="invoicesFeat2">Poikkeamien automaattinen tunnistus</span></div>
-                    <div class="card__feature"><span class="card__feature-dot"></span> <span data-i18n="invoicesFeat3">Hyväksymissuositukset ja analytiikka</span></div>
-                </div>
                 <div class="card__bottom">
-                    <span class="card__open-label">
-                        <span data-i18n="openApp">Avaa sovellus</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                    </span>
+                    <span class="card__open-label"><span data-i18n="openApp">Avaa sovellus</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                 </div>
             </a>
 
@@ -950,6 +783,7 @@
             Rapid Agent Prototypes &mdash; Site Tour
         </footer>
     </div>
+
     <script>
     // --- i18n translations ---
     const translations = {
@@ -957,6 +791,14 @@
             badge: 'Tekoälyavusteiset prototyypit',
             subtitle: 'Ihminen kertoo idean ja tarpeen, tekoäly toteuttaa \u2014 jokaisesta ideasta toimivaan demoon nopeasti.',
             filterAll: 'Kaikki',
+            filterAllCat: 'Kaikki',
+            filterLocation: 'Toimipiste',
+            filterCategory: 'Kategoria',
+            catLounas: 'Lounas',
+            catMyynti: 'Myynti',
+            catToimisto: 'Toimisto',
+            catKehitys: 'Kehitys',
+            catVapaaaika: 'Vapaa-aika',
             openApp: 'Avaa sovellus',
             tagMap: 'Kartta',
             tagEvents: '560+ tapahtumaa',
@@ -973,104 +815,60 @@
             tagTimeline: 'Aikajana',
             tagBooking: 'Varaukset',
             tagAutomation: 'Automaatio',
-            // Helsinki Food
+            tagStakeholders: 'Sidosryhmät',
+            tagKnowledgeGraph: 'Tietoverkosto',
+            tagAiAgent: 'AI-agentti',
+            tagTickets: 'Tiketit',
+            tagQA: 'QA',
             foodDesc: 'Kymmenien lähialueen ravintoloiden sijainnit, viikon lounaslistat ja hinnat yhdessä paikassa \u2014 ei tarvitse selata jokaista ravintolasivua erikseen.',
-            foodFeat1: 'Interaktiivinen karttanäkymä',
-            foodFeat2: 'Viikon lounaslistat',
-            foodFeat3: 'Haku nimellä, osoitteella tai ruokalajilla',
-            // Oulu Culture
             cultureTitle: 'Oulu Kulttuuripääkaupunki 2026',
             cultureDesc: 'Yli 560 kulttuuritapahtumaa kartalla, kalenterissa ja listana \u2014 löydä juuri sinua kiinnostavat tapahtumat helposti.',
-            cultureFeat1: 'Kartta-, lista- ja kalenterinäkymät',
-            cultureFeat2: 'Reittisuunnittelija matkan varrelle',
-            cultureFeat3: 'Dashboard ja analytiikka',
-            // Koutsi
             trainerDesc: 'Korvaa jääkaapin oveen liimatut treenilaput \u2014 tavoitteet, kalenteri ja treenikaverit yhdessä paikassa ruuhkavuosien hallintaan.',
-            trainerFeat1: 'Päiväkohtainen agenda ja metriikat',
-            trainerFeat2: 'Tavoitteiden ja vaiheiden seuranta',
-            trainerFeat3: 'Treenikaverit ja "laiskottaa"-nappi',
-            // Lounasäänestys
+            kuopioFoodDesc: 'Kuopion keskustan lounasravintolat kartalla \u2014 päivän menut, hinnat ja aukioloajat helposti löydettävissä.',
+            interviewTitle: 'Verkkouudistuksen haastattelija',
+            interviewDesc: 'Ministeriön verkkouudistuksen sidosryhmähaastattelut, kansalaispalaute ja organisaatiokartta \u2014 tietoverkosto ja analyysit yhdessä paikassa.',
+            wpdevTitle: 'WordPress Tukiagentti',
+            wpdevDesc: 'WordPress-pienkehityksen AI-agentti \u2014 tiketit, koodikatselmukset, pipeline ja saavutettavuusauditointi chat-käyttöliittymällä.',
+            qaTitle: 'Testiautomaation havaintokeskus',
+            qaDesc: 'WordPress-sivustojen QA-havaintokeskus \u2014 testiautomaation tulokset, juurisyyanalyysit, trendit ja AI-suositukset.',
             voteTitle: 'Lounasäänestys',
             voteDesc: 'Tiimin lounaspaikka-äänestys analytiikalla \u2014 ennusteet, kartta, ruokalistat ja ryhmädynamiikan visualisointi.',
-            voteFeat1: 'Päivän lounasennuste',
-            voteFeat2: 'Yksilö- ja ryhmäanalyysit',
-            voteFeat3: 'Interaktiivinen karttanäkymä',
-            // Tuntikirjanpito
             timeTitle: 'Tuntikirjanpito',
             timeDesc: 'Projektien tuntiseuranta visuaalisilla raporteilla \u2014 kirjaa tunnit, seuraa projekteja ja tarkastele aikadata kaavioina.',
-            timeFeat1: 'Tuntikirjaukset projekteittain',
-            timeFeat2: 'Visuaaliset raportit ja kaaviot',
-            timeFeat3: 'Viikko- ja kuukausinäkymät',
-            // Golf-apuri
             golfTitle: 'Golf-apuri',
             golfDesc: 'Kaikki seudun kentät ja vapaat ajat yhdellä silmäyksellä \u2014 kalenterinäkymä, kaveriäänestys ja kartta helpottavat pelaamaan pääsyä.',
-            golfFeat1: 'Kalenterinäkymä vapaista ajoista',
-            golfFeat2: 'Kaveriäänestys peliajan valintaan',
-            golfFeat3: 'Interaktiivinen karttanäkymä',
-            // Lempeä Muistuttaja
             reminderTitle: 'Lempeä Muistuttaja',
             reminderDesc: 'Kokousmuistioista automaattisesti tehtävät ja muistutukset \u2014 rakkaudella muistuttaa sovituista asioista.',
-            reminderFeat1: 'Kokousmuistioiden automaattinen analyysi',
-            reminderFeat2: 'Tehtävien seuranta ja muistutukset',
-            reminderFeat3: 'Edistymisen visualisointi',
-            // Myyntitavoitteet
             salesTitle: 'Myyntitavoitteet 2026',
             salesDesc: 'Myyntijohtajan dashboard \u2014 liikevaihto, pipeline, ennusteet ja asiakaskohtaiset porautumisnäkymät yhdessä paikassa.',
-            salesFeat1: 'Pipeline ja painotettu ennuste',
-            salesFeat2: 'KPI-mittarit ja gap-analyysi',
-            salesFeat3: 'Asiakas- ja projektiporautuminen',
-            // SerttiApuri
             certDesc: 'Sertifikaattien hallintajärjestelmä \u2014 seuraa tiimin osaamista, suunnittele oppimispolkuja ja saavuta strategiset tavoitteet.',
-            certFeat1: 'Sertifikaattikatalogi ja haku',
-            certFeat2: 'Tavoitteiden hallinta ja seuranta',
-            certFeat3: 'Henkilökohtaiset oppimispolut',
-            // Projektireferenssit
             projrefTitle: 'Projektireferenssit',
             projrefDesc: 'CV-tiedoista kootut asiakasreferenssit \u2014 konsulttien osaamisprofiileista automaattisesti koostetut projektihistoriat ja teknologiakartoitukset.',
-            projrefFeat1: 'CV-pohjainen referenssikooste',
-            projrefFeat2: 'Porautuvat analytiikkagraafit',
-            projrefFeat3: 'Teknologia- ja osaamiskartoitus',
-            // Asiakasreferenssit
             custrefTitle: 'Asiakasreferenssit',
             custrefDesc: 'Interaktiivinen referenssihallinta \u2014 suodata asiakkaita kategorioittain, poraudu graafeihin ja tarkastele kilpailutusmateriaaleja.',
-            custrefFeat1: 'Monipuoliset kategoriafiltterit',
-            custrefFeat2: 'Porautuvat graafit ja analytiikka',
-            custrefFeat3: 'Kilpailutusmateriaalin tuki',
-            // Biljardipöytä
             billiardTitle: 'Biljardipöytä',
             billiardDesc: 'Toimiston biljardipöydän hallinta \u2014 varauskalenteri, turnausjärjestelmä, pelaajatilastot ja humoristiset haastekutsut.',
-            billiardFeat1: 'Varauskalenteri ja kuukausinäkymä',
-            billiardFeat2: 'Turnausjärjestelmä ja paritus',
-            billiardFeat3: 'Porautuvat pelaajatilastot',
-            // Myynnistä projektiin
             sales2projTitle: 'Myynnistä projektiin',
             sales2projDesc: 'Myyntimateriaalista tekniseen toteutukseen \u2014 myynnin ja asiantuntijoiden yhteistyöalusta dokumentaatioineen ja esimerkkeineen.',
-            sales2projFeat1: 'Myyntimateriaalin muunnos',
-            sales2projFeat2: 'Sidosryhmänäkymät ja dokumentaatio',
-            sales2projFeat3: 'Yhteistyöesimerkit ja mallit',
-            // Neukkarihallinta
             meetingTitle: 'Neukkarihallinta',
             meetingDesc: 'Neukkareiden reaaliaikainen varaustilanne \u2014 aikajananäkymästä näet kuka on varannut minkäkin tilan ja milloin se vapautuu.',
-            meetingFeat1: 'Aikajananäkymä 5 neukkarista',
-            meetingFeat2: 'Reaaliaikainen varaustilanne',
-            meetingFeat3: 'Helppo varaus ja henkilöfiltterit',
-            // Site-tapahtumat
             eventsTitle: 'Site-tapahtumat',
             eventsDesc: 'Toimiston tapahtumakalenteri \u2014 klubit, site monthly, vierailijat ja muut tilaisuudet yhdessä paikassa filtteröitynä ja kalenteriin lisättävinä.',
-            eventsFeat1: 'Kalenterinäkymä tapahtumista',
-            eventsFeat2: 'Tapahtumatyyppien filtteröinti',
-            eventsFeat3: 'Excel-export ja Slack-integraatio',
-            // Laskujen tarkastus
             invoicesTitle: 'Laskujen tarkastus',
             invoicesDesc: 'Laskujen älykäs tarkastusjärjestelmä \u2014 vertaa toimittajahistoriaan, tunnista poikkeamat ja saa hyväksymissuositukset automaattisesti.',
-            invoicesFeat1: 'Toimittajahistorian vertailu',
-            invoicesFeat2: 'Poikkeamien automaattinen tunnistus',
-            invoicesFeat3: 'Hyväksymissuositukset ja analytiikka',
         },
         en: {
             badge: 'AI-Assisted Prototypes',
             subtitle: 'Humans share the idea and need, AI builds it \u2014 from every idea to a working demo, fast.',
             filterAll: 'All',
+            filterAllCat: 'All',
+            filterLocation: 'Location',
+            filterCategory: 'Category',
+            catLounas: 'Lunch',
+            catMyynti: 'Sales',
+            catToimisto: 'Office',
+            catKehitys: 'Development',
+            catVapaaaika: 'Leisure',
             openApp: 'Open app',
             tagMap: 'Map',
             tagEvents: '560+ events',
@@ -1087,115 +885,61 @@
             tagTimeline: 'Timeline',
             tagBooking: 'Bookings',
             tagAutomation: 'Automation',
-            // Helsinki Food
+            tagStakeholders: 'Stakeholders',
+            tagKnowledgeGraph: 'Knowledge graph',
+            tagAiAgent: 'AI agent',
+            tagTickets: 'Tickets',
+            tagQA: 'QA',
             foodDesc: 'Locations, weekly lunch menus and prices of dozens of nearby restaurants in one place \u2014 no need to browse each restaurant site separately.',
-            foodFeat1: 'Interactive map view',
-            foodFeat2: 'Weekly lunch menus',
-            foodFeat3: 'Search by name, address or dish',
-            // Oulu Culture
             cultureTitle: 'Oulu European Capital of Culture 2026',
             cultureDesc: 'Over 560 cultural events on a map, calendar and list \u2014 easily find the events that interest you.',
-            cultureFeat1: 'Map, list & calendar views',
-            cultureFeat2: 'Route planner for your trip',
-            cultureFeat3: 'Dashboard & analytics',
-            // Koutsi
             trainerDesc: 'Replace the workout notes stuck on the fridge door \u2014 goals, calendar and workout buddies in one place for busy life management.',
-            trainerFeat1: 'Daily agenda & metrics',
-            trainerFeat2: 'Goal & milestone tracking',
-            trainerFeat3: 'Workout buddies & "feeling lazy" button',
-            // Lounasäänestys
+            kuopioFoodDesc: 'Kuopio city center lunch restaurants on a map \u2014 daily menus, prices and opening hours easily accessible.',
+            interviewTitle: 'Web Renewal Interviewer',
+            interviewDesc: 'Government web modernization stakeholder interviews, citizen feedback and org chart \u2014 knowledge graph and analytics in one place.',
+            wpdevTitle: 'WordPress Support Agent',
+            wpdevDesc: 'AI agent for WordPress development \u2014 tickets, code reviews, pipeline and accessibility auditing via chat interface.',
+            qaTitle: 'Test Automation Observatory',
+            qaDesc: 'QA observation center for WordPress sites \u2014 test automation results, root cause analyses, trends and AI recommendations.',
             voteTitle: 'Lunch Vote',
             voteDesc: 'Team lunch place voting with analytics \u2014 predictions, map, menus and group dynamics visualization.',
-            voteFeat1: 'Daily lunch prediction',
-            voteFeat2: 'Individual & group analysis',
-            voteFeat3: 'Interactive map view',
-            // Tuntikirjanpito
             timeTitle: 'Time Tracking',
             timeDesc: 'Project time tracking with visual reports \u2014 log hours, follow projects and explore time data as charts.',
-            timeFeat1: 'Time entries by project',
-            timeFeat2: 'Visual reports & charts',
-            timeFeat3: 'Weekly & monthly views',
-            // Golf-apuri
             golfTitle: 'Golf Assistant',
             golfDesc: 'All local courses and available tee times at a glance \u2014 calendar view, buddy voting and map make it easy to get playing.',
-            golfFeat1: 'Calendar view of available tee times',
-            golfFeat2: 'Buddy voting for play time',
-            golfFeat3: 'Interactive map view',
-            // Lempeä Muistuttaja
             reminderTitle: 'Gentle Reminder',
             reminderDesc: 'Automatically extracts tasks and reminders from meeting notes \u2014 lovingly reminds you of agreed actions.',
-            reminderFeat1: 'Automatic meeting notes analysis',
-            reminderFeat2: 'Task tracking & reminders',
-            reminderFeat3: 'Progress visualization',
-            // Myyntitavoitteet
             salesTitle: 'Sales Targets 2026',
             salesDesc: 'Sales director dashboard \u2014 revenue, pipeline, forecasts and customer drill-down views in one place.',
-            salesFeat1: 'Pipeline & weighted forecast',
-            salesFeat2: 'KPI metrics & gap analysis',
-            salesFeat3: 'Customer & project drill-down',
-            // SerttiApuri
             certDesc: 'Certification management system \u2014 track team competencies, plan learning paths and achieve strategic goals.',
-            certFeat1: 'Certification catalog & search',
-            certFeat2: 'Goal management & tracking',
-            certFeat3: 'Personal learning paths',
-            // Project References
             projrefTitle: 'Project References',
             projrefDesc: 'Customer references compiled from CV data \u2014 automatically aggregated project histories and technology maps from consultant expertise profiles.',
-            projrefFeat1: 'CV-based reference compilation',
-            projrefFeat2: 'Drill-down analytics charts',
-            projrefFeat3: 'Technology & competency mapping',
-            // Customer References
             custrefTitle: 'Customer References',
             custrefDesc: 'Interactive reference management \u2014 filter customers by category, drill into charts and explore tender materials.',
-            custrefFeat1: 'Multi-category filters',
-            custrefFeat2: 'Drill-down charts & analytics',
-            custrefFeat3: 'Tender material support',
-            // Billiard Table
             billiardTitle: 'Billiard Table',
             billiardDesc: 'Office billiard table management \u2014 booking calendar, tournament system, player stats and humorous challenge invitations.',
-            billiardFeat1: 'Booking calendar & monthly view',
-            billiardFeat2: 'Tournament system & matchmaking',
-            billiardFeat3: 'Drill-down player statistics',
-            // Sales to Project
             sales2projTitle: 'Sales to Project',
             sales2projDesc: 'From sales material to technical delivery \u2014 a collaboration platform for sales and experts with documentation and examples.',
-            sales2projFeat1: 'Sales material conversion',
-            sales2projFeat2: 'Stakeholder views & documentation',
-            sales2projFeat3: 'Collaboration examples & templates',
-            // Meeting Room Management
             meetingTitle: 'Meeting Rooms',
             meetingDesc: 'Real-time meeting room availability \u2014 see who booked which room and when it becomes free from the timeline view.',
-            meetingFeat1: 'Timeline view of 5 rooms',
-            meetingFeat2: 'Real-time availability status',
-            meetingFeat3: 'Easy booking & person filters',
-            // Site Events
             eventsTitle: 'Site Events',
             eventsDesc: 'Office event calendar \u2014 clubs, site monthly, visitors and other gatherings in one place with filters and calendar integration.',
-            eventsFeat1: 'Calendar view of events',
-            eventsFeat2: 'Event type filtering',
-            eventsFeat3: 'Excel export & Slack integration',
-            // Invoice Review
             invoicesTitle: 'Invoice Review',
             invoicesDesc: 'Smart invoice review system \u2014 compare supplier history, detect anomalies and get automatic approval recommendations.',
-            invoicesFeat1: 'Supplier history comparison',
-            invoicesFeat2: 'Automatic anomaly detection',
-            invoicesFeat3: 'Approval recommendations & analytics',
         }
     };
 
     let currentLang = localStorage.getItem('siteTourLang') || 'fi';
+    let activeCity = 'all';
+    let activeCat = 'all';
 
     function applyLanguage(lang) {
         currentLang = lang;
         localStorage.setItem('siteTourLang', lang);
         document.documentElement.lang = lang;
-
-        // Update lang buttons
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.lang === lang);
         });
-
-        // Update all translatable elements
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
             if (translations[lang] && translations[lang][key]) {
@@ -1204,54 +948,43 @@
         });
     }
 
+    function applyFilters() {
+        document.querySelectorAll('#cards .card').forEach(card => {
+            const cityMatch = activeCity === 'all' || card.dataset.city === activeCity;
+            const catMatch  = activeCat  === 'all' || card.dataset.cat  === activeCat;
+            card.classList.toggle('hidden', !(cityMatch && catMatch));
+        });
+    }
+
     // Language switcher
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
     });
 
-    // Apply saved language on load
-    applyLanguage(currentLang);
-
-    // --- Filter logic ---
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    // City filter
+    document.querySelectorAll('.filter-btn[data-city]').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelector('.filter-btn.active').classList.remove('active');
+            document.querySelectorAll('.filter-btn[data-city]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            const filter = btn.dataset.filter;
-            const grid = document.getElementById('cards');
-            const cards = grid.querySelectorAll('.card');
-
-            cards.forEach(card => {
-                const city = card.dataset.city;
-                if (filter === 'all' || city === filter) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-
-            // Adjust grid layout based on visible count
-            const visible = grid.querySelectorAll('.card:not(.hidden)');
-            grid.classList.remove('cards--five');
-            visible.forEach(c => c.style.gridColumn = '');
-            if (visible.length === 5) {
-                grid.classList.add('cards--five');
-            }
-            // Center the last row if it has fewer than 3 cards
-            if (visible.length % 3 !== 0) {
-                const remainder = visible.length % 3;
-                const startIdx = visible.length - remainder;
-                if (remainder === 1) {
-                    visible[startIdx].style.gridColumn = '2 / 3';
-                } else if (remainder === 2) {
-                    grid.classList.remove('cards--five');
-                    grid.style.gridTemplateColumns = '';
-                }
-            }
+            activeCity = btn.dataset.city;
+            applyFilters();
         });
     });
+
+    // Category filter
+    document.querySelectorAll('.filter-btn[data-cat]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn[data-cat]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCat = btn.dataset.cat;
+            applyFilters();
+        });
+    });
+
+    // Apply saved language on load
+    applyLanguage(currentLang);
     </script>
-<script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+    <script data-goatcounter="https://site-tour-2026.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
