@@ -66,6 +66,26 @@
             margin-top: auto;
             line-height: 1.4;
         }
+        .search-wrap {
+            margin-bottom: 1.5rem;
+        }
+        .search-wrap input {
+            width: 100%;
+            padding: 0.75rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #e8edf3;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .search-wrap input::placeholder { color: #7a9cc6; }
+        .search-wrap input:focus {
+            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .app-card.hidden { display: none; }
         @media (max-width: 900px) {
             .apps { grid-template-columns: repeat(2, 1fr); }
         }
@@ -87,6 +107,9 @@
             <h1>Ilmatieteen laitoksen sovellukset</h1>
             <p class="subtitle">Säädata-pohjaiset demosovellukset</p>
         </header>
+        <div class="search-wrap">
+            <input type="text" id="search" placeholder="Hae sovelluksia..." autocomplete="off">
+        </div>
         <div class="apps">
             <a class="app-card" href="Helsinki_20260504_0603_558/">
                 <div class="app-title">Helsinki Säävertailu — Pyöräilijän sääpalvelu</div>
@@ -165,5 +188,14 @@
             <p>Data: Ilmatieteen laitos (FMI Open Data) | Päivitetty 4.5.2026</p>
         </footer>
     </div>
+    <script>
+    document.getElementById('search').addEventListener('input', function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll('.app-card').forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.classList.toggle('hidden', q && !text.includes(q));
+        });
+    });
+    </script>
 </body>
 </html>
