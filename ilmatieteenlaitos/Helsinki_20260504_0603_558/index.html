@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helsinki Säävertailu — Pyöräilijän sääpalvelu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            color: #fff;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-left h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .header-left .subtitle {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 2px;
+        }
+        .lang-switcher { display: flex; border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; overflow: hidden; }
+        .lang-btn { display: flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; font-weight: 500; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .lang-btn.active { background: rgba(255,255,255,0.2); color: #fff; }
+        .lang-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.1); }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .recommendation-card {
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .recommendation-card.excellent { background: linear-gradient(135deg, #059669, #10b981); }
+        .recommendation-card.good { background: linear-gradient(135deg, #0284c7, #38bdf8); }
+        .recommendation-card.caution { background: linear-gradient(135deg, #d97706, #fbbf24); color: #1e293b; }
+        .recommendation-card.bad { background: linear-gradient(135deg, #dc2626, #f87171); }
+        .recommendation-card .icon { font-size: 3rem; margin-bottom: 8px; }
+        .recommendation-card .verdict { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+        .recommendation-card .reason { font-size: 0.9rem; opacity: 0.9; }
+
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .day-tab {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+            cursor: pointer;
+            text-align: center;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .day-tab.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+        .day-tab .day-name { display: block; font-size: 1rem; }
+        .day-tab .day-date { display: block; font-size: 0.75rem; font-weight: 400; margin-top: 2px; }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #334155;
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 1.2rem; }
+
+        .source-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .source-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .source-card .source-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .source-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #475569;
+        }
+        .source-badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+        .badge-rain { background: #fef2f2; color: #dc2626; }
+        .badge-light { background: #fffbeb; color: #d97706; }
+        .badge-dry { background: #f0fdf4; color: #16a34a; }
+
+        .rain-summary {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .rain-stat {
+            flex: 1;
+        }
+        .rain-stat .label {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rain-stat .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .rain-stat .unit {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .hourly-bars {
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+            height: 60px;
+            margin-top: 8px;
+            padding: 4px 0;
+        }
+        .hour-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .hour-bar {
+            width: 100%;
+            min-height: 2px;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s;
+        }
+        .hour-bar.rain-0 { background: #e2e8f0; }
+        .hour-bar.rain-1 { background: #93c5fd; }
+        .hour-bar.rain-2 { background: #3b82f6; }
+        .hour-bar.rain-3 { background: #1d4ed8; }
+        .hour-label {
+            font-size: 0.55rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .temp-wind-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .tw-item {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .tw-item strong {
+            color: #334155;
+        }
+
+        .comparison-table {
+            width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+        .comparison-table thead th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .comparison-table tbody td {
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .consensus-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .consensus-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+        .consensus-meter {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .consensus-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        .consensus-fill.dry { background: linear-gradient(90deg, #22c55e, #86efac); }
+        .consensus-fill.mixed { background: linear-gradient(90deg, #f59e0b, #fcd34d); }
+        .consensus-fill.rainy { background: linear-gradient(90deg, #ef4444, #fca5a5); }
+        .consensus-text {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .error-msg {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            padding: 20px;
+        }
+
+        @media (max-width: 600px) {
+            main { padding: 12px; }
+            .source-cards { grid-template-columns: 1fr; }
+            .recommendation-card { padding: 20px 16px; }
+            .recommendation-card .icon { font-size: 2.5rem; }
+            .recommendation-card .verdict { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <h1 id="h-title">Helsinki Saavertailu</h1>
+        <div class="subtitle" id="h-subtitle">Pyorailijan saapalvelu</div>
+    </div>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('fi')"><span class="lang-flag">&#x1f1eb;&#x1f1ee;</span> FI</button>
+        <button class="lang-btn" onclick="setLang('en')"><span class="lang-flag">&#x1f1ec;&#x1f1e7;</span> EN</button>
+    </div>
+</header>
+
+<main>
+    <div id="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p id="loading-text">Haetaan säätietoja...</p>
+    </div>
+
+    <div id="content" style="display:none">
+        <div id="recommendation"></div>
+
+        <div class="day-tabs" id="day-tabs"></div>
+
+        <div class="section-title"><span class="icon">&#x1f327;&#xfe0f;</span> <span id="lbl-rain-comparison">Sadevertailu</span></div>
+        <div id="source-cards" class="source-cards"></div>
+
+        <div id="consensus-section"></div>
+
+        <div class="section-title"><span class="icon">&#x1f4ca;</span> <span id="lbl-summary-table">Yhteenveto</span></div>
+        <div id="summary-table"></div>
+
+        <div class="footer-note" id="footer-note">
+            Tiedot: Open-Meteo, MET Norway (Yr), Ilmatieteen laitos (FMI) | Helsinki (60.17&deg;N, 24.94&deg;E)
+        </div>
+    </div>
+</main>
+
+<script>
+const HELSINKI_LAT = 60.1699;
+const HELSINKI_LON = 24.9384;
+
+let currentLang = 'fi';
+let selectedDay = 0;
+let weatherData = {};
+
+const TEXTS = {
+    fi: {
+        title: 'Helsinki Säävertailu',
+        subtitle: 'Pyöräilijän sääpalvelu',
+        loading: 'Haetaan säätietoja...',
+        rainComparison: 'Sadevertailu',
+        summaryTable: 'Yhteenveto',
+        today: 'Tänään',
+        tomorrow: 'Huomenna',
+        totalRain: 'Sade yht.',
+        maxRainH: 'Max sade/h',
+        avgTemp: 'Keskim. lämpö',
+        maxWind: 'Max tuuli',
+        source: 'Lähde',
+        rain: 'Sade (mm)',
+        temp: 'Lämpötila',
+        wind: 'Tuuli',
+        noRain: 'Ei sadetta',
+        lightRain: 'Kevyt sade',
+        rain_label: 'Sadetta',
+        heavyRain: 'Runsas sade',
+        dry: 'Kuiva',
+        mixed: 'Vaihteleva',
+        rainy: 'Sateinen',
+        consensus: 'Palvelujen yksimielisyys',
+        agreeNone: 'Kaikki palvelut: ei merkittävää sadetta',
+        agreeRain: 'Kaikki palvelut: sadetta odotettavissa',
+        disagree: 'Palvelut eivät ole yksimielisiä sateesta',
+        verdictExcellent: 'Ehdottomasti pyöräilemään!',
+        verdictGood: 'Voi pyöräillä',
+        verdictCaution: 'Harkitse vaihtoehtoja',
+        verdictBad: 'Jää kotiin tai mene bussilla',
+        reasonDry: 'Kuiva päivä, sopiva tuuli — täydellinen pyöräilypäivä!',
+        reasonLight: 'Hieman sadetta mahdollista — sadetakki mukaan varmuuden vuoksi.',
+        reasonModerate: 'Sadetta ennustettu useasta lähteestä — auto tai bussi voi olla parempi valinta.',
+        reasonHeavy: 'Runsasta sadetta ennustettu — pysy kuivana sisällä tai valitse bussi.',
+        reasonWind: 'Kova tuuli tekee pyöräilystä epämukavaa.',
+        hourlyRain: 'Tuntisade',
+        fmiNote: 'FMI HARMONIE-malli',
+        error: 'Ei saatu haettua',
+    },
+    en: {
+        title: 'Helsinki Weather Comparison',
+        subtitle: 'Cyclist weather service',
+        loading: 'Fetching weather data...',
+        rainComparison: 'Rain Comparison',
+        summaryTable: 'Summary',
+        today: 'Today',
+        tomorrow: 'Tomorrow',
+        totalRain: 'Total rain',
+        maxRainH: 'Max rain/h',
+        avgTemp: 'Avg temp',
+        maxWind: 'Max wind',
+        source: 'Source',
+        rain: 'Rain (mm)',
+        temp: 'Temperature',
+        wind: 'Wind',
+        noRain: 'No rain',
+        lightRain: 'Light rain',
+        rain_label: 'Rain',
+        heavyRain: 'Heavy rain',
+        dry: 'Dry',
+        mixed: 'Mixed',
+        rainy: 'Rainy',
+        consensus: 'Service agreement',
+        agreeNone: 'All services: no significant rain',
+        agreeRain: 'All services: rain expected',
+        disagree: 'Services disagree on rain',
+        verdictExcellent: 'Definitely go cycling!',
+        verdictGood: 'Good for cycling',
+        verdictCaution: 'Consider alternatives',
+        verdictBad: 'Stay home or take the bus',
+        reasonDry: 'Dry day, comfortable wind — perfect cycling weather!',
+        reasonLight: 'Some rain possible — bring a rain jacket just in case.',
+        reasonModerate: 'Rain forecast by multiple sources — car or bus might be better.',
+        reasonHeavy: 'Heavy rain expected — stay dry indoors or choose the bus.',
+        reasonWind: 'Strong wind makes cycling uncomfortable.',
+        hourlyRain: 'Hourly rain',
+        fmiNote: 'FMI HARMONIE model',
+        error: 'Failed to fetch',
+    }
+};
+
+function T(key) { return TEXTS[currentLang][key] || key; }
+
+function setLang(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim().includes(lang.toUpperCase())));
+    renderAll();
+}
+
+function formatDate(d) {
+    const days_fi = ['su','ma','ti','ke','to','pe','la'];
+    const days_en = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const days = currentLang === 'fi' ? days_fi : days_en;
+    return days[d.getDay()] + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.';
+}
+
+async function fetchOpenMeteo() {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HELSINKI_LAT}&longitude=${HELSINKI_LON}&hourly=temperature_2m,precipitation,weathercode,windspeed_10m&timezone=Europe/Helsinki&forecast_days=3`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Open-Meteo HTTP ' + res.status);
+    const data = await res.json();
+    return {
+        name: 'Open-Meteo',
+        hours: data.hourly.time.map((t, i) => ({
+            time: new Date(t),
+            temp: data.hourly.temperature_2m[i],
+            rain: data.hourly.precipitation[i],
+            wind: data.hourly.windspeed_10m[i],
+            code: data.hourly.weathercode[i]
+        }))
+    };
+}
+
+async function fetchMETNorway() {
+    const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${HELSINKI_LAT}&lon=${HELSINKI_LON}`;
+    const res = await fetch(url, {
+        headers: { 'User-Agent': 'HelsinkiWeatherApp/1.0 github.com/weather-comparison' }
+    });
+    if (!res.ok) throw new Error('MET Norway HTTP ' + res.status);
+    const data = await res.json();
+    const timeseries = data.properties.timeseries;
+    return {
+        name: 'MET Norway (Yr)',
+        hours: timeseries.map(ts => ({
+            time: new Date(ts.time),
+            temp: ts.data.instant.details.air_temperature,
+            rain: ts.data.next_1_hours ? ts.data.next_1_hours.details.precipitation_amount : (ts.data.next_6_hours ? ts.data.next_6_hours.details.precipitation_amount / 6 : 0),
+            wind: ts.data.instant.details.wind_speed * 3.6,
+            code: null
+        }))
+    };
+}
+
+async function fetchFMI() {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0,0,0,0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 3);
+
+    const startStr = start.toISOString().split('.')[0] + 'Z';
+    const endStr = end.toISOString().split('.')[0] + 'Z';
+
+    const url = `https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature&storedquery_id=fmi::forecast::harmonie::surface::point::simple&place=Helsinki&parameters=Precipitation1h,Temperature,WindSpeedMS&starttime=${startStr}&endtime=${endStr}&timestep=60`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('FMI HTTP ' + res.status);
+    const text = await res.text();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'application/xml');
+    const members = xml.querySelectorAll('BsWfs\\:BsWfsElement, BsWfsElement');
+
+    const hourMap = {};
+    members.forEach(m => {
+        const time = (m.querySelector('BsWfs\\:Time, Time') || {}).textContent;
+        const param = (m.querySelector('BsWfs\\:ParameterName, ParameterName') || {}).textContent;
+        const val = parseFloat((m.querySelector('BsWfs\\:ParameterValue, ParameterValue') || {}).textContent);
+        if (!time) return;
+        if (!hourMap[time]) hourMap[time] = { time: new Date(time) };
+        if (param === 'Precipitation1h') hourMap[time].rain = val;
+        if (param === 'Temperature') hourMap[time].temp = val;
+        if (param === 'WindSpeedMS') hourMap[time].wind = val * 3.6;
+    });
+
+    return {
+        name: 'Ilmatieteen laitos (FMI)',
+        hours: Object.values(hourMap).sort((a,b) => a.time - b.time).map(h => ({
+            ...h,
+            rain: h.rain || 0,
+            temp: h.temp || 0,
+            wind: h.wind || 0,
+            code: null
+        }))
+    };
+}
+
+function getDayData(source, dayOffset) {
+    const now = new Date();
+    const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayOffset, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const hours = source.hours.filter(h => h.time >= dayStart && h.time < dayEnd);
+
+    if (hours.length === 0) return null;
+
+    const totalRain = hours.reduce((s, h) => s + (h.rain || 0), 0);
+    const maxRain = Math.max(...hours.map(h => h.rain || 0));
+    const avgTemp = hours.reduce((s, h) => s + h.temp, 0) / hours.length;
+    const maxWind = Math.max(...hours.map(h => h.wind || 0));
+
+    return { hours, totalRain, maxRain, avgTemp, maxWind };
+}
+
+function getRainLevel(totalRain) {
+    if (totalRain < 0.5) return 'dry';
+    if (totalRain < 3) return 'light';
+    if (totalRain < 8) return 'moderate';
+    return 'heavy';
+}
+
+function getBadgeInfo(totalRain) {
+    if (totalRain < 0.5) return { class: 'badge-dry', text: () => T('noRain') };
+    if (totalRain < 3) return { class: 'badge-light', text: () => T('lightRain') };
+    return { class: 'badge-rain', text: () => T('heavyRain') };
+}
+
+function getCyclingRecommendation(sources, dayOffset) {
+    const dayDatas = sources.map(s => getDayData(s, dayOffset)).filter(Boolean);
+    if (dayDatas.length === 0) return { level: 'good', verdict: T('verdictGood'), reason: '' };
+
+    const avgTotalRain = dayDatas.reduce((s, d) => s + d.totalRain, 0) / dayDatas.length;
+    const maxTotalRain = Math.max(...dayDatas.map(d => d.totalRain));
+    const avgMaxWind = dayDatas.reduce((s, d) => s + d.maxWind, 0) / dayDatas.length;
+    const rainyCount = dayDatas.filter(d => d.totalRain >= 1).length;
+
+    if (avgMaxWind > 55) {
+        return { level: 'bad', verdict: T('verdictBad'), reason: T('reasonWind') };
+    }
+    if (maxTotalRain >= 8 || (rainyCount >= 2 && avgTotalRain >= 5)) {
+        return { level: 'bad', verdict: T('verdictBad'), reason: T('reasonHeavy') };
+    }
+    if (avgTotalRain >= 2 || rainyCount >= 2) {
+        return { level: 'caution', verdict: T('verdictCaution'), reason: T('reasonModerate') };
+    }
+    if (avgTotalRain >= 0.5 || rainyCount >= 1) {
+        return { level: 'good', verdict: T('verdictGood'), reason: T('reasonLight') };
+    }
+    return { level: 'excellent', verdict: T('verdictExcellent'), reason: T('reasonDry') };
+}
+
+function getConsensus(sources, dayOffset) {
+    const dayDatas = sources.map(s => getDayData(s, dayOffset)).filter(Boolean);
+    const rainyCount = dayDatas.filter(d => d.totalRain >= 1).length;
+    const total = dayDatas.length;
+
+    if (rainyCount === 0) return { type: 'dry', text: T('agreeNone'), pct: 100 };
+    if (rainyCount === total) return { type: 'rainy', text: T('agreeRain'), pct: 100 };
+    return { type: 'mixed', text: T('disagree'), pct: Math.round((rainyCount / total) * 100) };
+}
+
+function renderRecommendation(sources) {
+    const rec = getCyclingRecommendation(sources, selectedDay);
+    const icons = { excellent: '☀️🚴', good: '🌤️🚴', caution: '🌧️🤔', bad: '🌧️🚌' };
+    document.getElementById('recommendation').innerHTML = `
+        <div class="recommendation-card ${rec.level}">
+            <div class="icon">${icons[rec.level]}</div>
+            <div class="verdict">${rec.verdict}</div>
+            <div class="reason">${rec.reason}</div>
+        </div>
+    `;
+}
+
+function renderDayTabs() {
+    const container = document.getElementById('day-tabs');
+    container.innerHTML = '';
+    for (let i = 0; i < 2; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const label = i === 0 ? T('today') : T('tomorrow');
+        const btn = document.createElement('button');
+        btn.className = 'day-tab' + (i === selectedDay ? ' active' : '');
+        btn.innerHTML = `<span class="day-name">${label}</span><span class="day-date">${formatDate(d)}</span>`;
+        btn.onclick = () => { selectedDay = i; renderAll(); };
+        container.appendChild(btn);
+    }
+}
+
+function renderSourceCards(sources) {
+    const container = document.getElementById('source-cards');
+    container.innerHTML = '';
+
+    sources.forEach(source => {
+        const dayData = getDayData(source, selectedDay);
+        if (!dayData) return;
+
+        const badge = getBadgeInfo(dayData.totalRain);
+        const card = document.createElement('div');
+        card.className = 'source-card';
+
+        let barsHtml = '';
+        const relevantHours = dayData.hours.filter(h => {
+            const hr = h.time.getHours();
+            return hr >= 6 && hr <= 22;
+        });
+        const maxBarRain = Math.max(3, ...relevantHours.map(h => h.rain || 0));
+
+        relevantHours.forEach(h => {
+            const rain = h.rain || 0;
+            const pct = Math.max(3, (rain / maxBarRain) * 100);
+            let cls = 'rain-0';
+            if (rain > 0.1) cls = 'rain-1';
+            if (rain > 1) cls = 'rain-2';
+            if (rain > 3) cls = 'rain-3';
+            const hr = h.time.getHours();
+            const showLabel = hr % 3 === 0;
+            barsHtml += `<div class="hour-bar-wrapper">
+                <div class="hour-bar ${cls}" style="height:${pct}%" title="${hr}:00 — ${rain.toFixed(1)} mm"></div>
+                ${showLabel ? `<span class="hour-label">${hr}</span>` : ''}
+            </div>`;
+        });
+
+        card.innerHTML = `
+            <div class="source-header">
+                <span class="source-name">${source.name}</span>
+                <span class="source-badge ${badge.class}">${badge.text()}</span>
+            </div>
+            <div class="rain-summary">
+                <div class="rain-stat">
+                    <div class="label">${T('totalRain')}</div>
+                    <div class="value">${dayData.totalRain.toFixed(1)} <span class="unit">mm</span></div>
+                </div>
+                <div class="rain-stat">
+                    <div class="label">${T('maxRainH')}</div>
+                    <div class="value">${dayData.maxRain.toFixed(1)} <span class="unit">mm/h</span></div>
+                </div>
+            </div>
+            <div style="font-size:0.7rem;color:#94a3b8;margin-bottom:2px">${T('hourlyRain')} (6–22)</div>
+            <div class="hourly-bars">${barsHtml}</div>
+            <div class="temp-wind-row">
+                <div class="tw-item">${T('avgTemp')}: <strong>${dayData.avgTemp.toFixed(1)}&deg;C</strong></div>
+                <div class="tw-item">${T('maxWind')}: <strong>${dayData.maxWind.toFixed(0)} km/h</strong></div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function renderConsensus(sources) {
+    const consensus = getConsensus(sources, selectedDay);
+    document.getElementById('consensus-section').innerHTML = `
+        <div class="consensus-box">
+            <div class="consensus-title">${T('consensus')}</div>
+            <div class="consensus-meter">
+                <div class="consensus-fill ${consensus.type}" style="width:${consensus.pct}%"></div>
+            </div>
+            <div class="consensus-text">${consensus.text}</div>
+        </div>
+    `;
+}
+
+function renderSummaryTable(sources) {
+    let rows = '';
+    sources.forEach(source => {
+        const dayData = getDayData(source, selectedDay);
+        if (!dayData) return;
+        rows += `<tr>
+            <td><strong>${source.name}</strong></td>
+            <td>${dayData.totalRain.toFixed(1)} mm</td>
+            <td>${dayData.avgTemp.toFixed(1)}&deg;C</td>
+            <td>${dayData.maxWind.toFixed(0)} km/h</td>
+        </tr>`;
+    });
+
+    document.getElementById('summary-table').innerHTML = `
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>${T('source')}</th>
+                    <th>${T('rain')}</th>
+                    <th>${T('temp')}</th>
+                    <th>${T('wind')}</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+function renderAll() {
+    document.getElementById('h-title').textContent = T('title');
+    document.getElementById('h-subtitle').textContent = T('subtitle');
+    document.getElementById('lbl-rain-comparison').textContent = T('rainComparison');
+    document.getElementById('lbl-summary-table').textContent = T('summaryTable');
+
+    const sources = Object.values(weatherData);
+    if (sources.length === 0) return;
+
+    renderDayTabs();
+    renderRecommendation(sources);
+    renderSourceCards(sources);
+    renderConsensus(sources);
+    renderSummaryTable(sources);
+}
+
+async function init() {
+    const fetchers = [
+        { fn: fetchOpenMeteo, key: 'openmeteo' },
+        { fn: fetchMETNorway, key: 'met' },
+        { fn: fetchFMI, key: 'fmi' },
+    ];
+
+    const results = await Promise.allSettled(fetchers.map(f => f.fn()));
+
+    let errors = [];
+    results.forEach((r, i) => {
+        if (r.status === 'fulfilled') {
+            weatherData[fetchers[i].key] = r.value;
+        } else {
+            errors.push(fetchers[i].key + ': ' + r.reason.message);
+        }
+    });
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+
+    if (errors.length > 0 && Object.keys(weatherData).length > 0) {
+        const errDiv = document.createElement('div');
+        errDiv.className = 'error-msg';
+        errDiv.textContent = T('error') + ': ' + errors.join(', ');
+        document.getElementById('content').prepend(errDiv);
+    }
+
+    if (Object.keys(weatherData).length === 0) {
+        document.getElementById('content').innerHTML = '<div class="error-msg">Kaikkien palvelujen haku epäonnistui. Yritä myöhemmin.</div>';
+        return;
+    }
+
+    renderAll();
+}
+
+init();
+</script>
+
+</body>
+</html>
