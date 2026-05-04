@@ -405,17 +405,12 @@
         }
 
         function buildFmiUrl(startTime, endTime) {
-            const params = new URLSearchParams({
-                service: 'WFS',
-                version: '2.0.0',
-                request: 'getFeature',
-                storedquery_id: 'fmi::observations::weather::hourly::simple',
-                fmisid: HELSINKI_FMISID,
-                starttime: startTime,
-                endtime: endTime,
-                parameters: 't2m,ws_10min,rh,r_1h'
-            });
-            return `${FMI_BASE}?${params.toString()}`;
+            return `${FMI_BASE}?service=WFS&version=2.0.0&request=getFeature`
+                + `&storedquery_id=fmi::observations::weather::hourly::simple`
+                + `&fmisid=${HELSINKI_FMISID}`
+                + `&starttime=${startTime}`
+                + `&endtime=${endTime}`
+                + `&parameters=t2m,ws_10min,rh,r_1h`;
         }
 
         function parseXml(xmlText) {
@@ -424,19 +419,20 @@
         }
 
         function extractObservations(doc) {
-            const members = doc.querySelectorAll('member');
+            const members = doc.getElementsByTagName('BsWfs:BsWfsElement');
             const observations = {};
 
-            members.forEach(member => {
-                const time = member.querySelector('Time')?.textContent;
-                const param = member.querySelector('ParameterName')?.textContent;
-                const value = member.querySelector('ParameterValue')?.textContent;
+            for (let i = 0; i < members.length; i++) {
+                const member = members[i];
+                const time = member.getElementsByTagName('BsWfs:Time')[0]?.textContent;
+                const param = member.getElementsByTagName('BsWfs:ParameterName')[0]?.textContent;
+                const value = member.getElementsByTagName('BsWfs:ParameterValue')[0]?.textContent;
 
                 if (time && param && value && value !== 'NaN') {
                     if (!observations[time]) observations[time] = {};
                     observations[time][param] = parseFloat(value);
                 }
-            });
+            }
 
             return observations;
         }
@@ -658,7 +654,7 @@
                 ]);
 
                 if (!yesterdayResp.ok || !todayResp.ok) {
-                    throw new Error('FMI-rajapinta ei vastannut odotetulla tavalla');
+                    throw new Error(currentLang === 'fi' ? 'FMI-rajapinta ei vastannut odotetulla tavalla' : 'FMI API did not respond as expected');
                 }
 
                 const yesterdayXml = await yesterdayResp.text();
@@ -666,6 +662,10 @@
 
                 const yesterdayDoc = parseXml(yesterdayXml);
                 const todayDoc = parseXml(todayXml);
+
+                if (yesterdayDoc.querySelector('ExceptionReport') || todayDoc.querySelector('ExceptionReport')) {
+                    throw new Error(currentLang === 'fi' ? 'FMI-rajapinta palautti virheen. Yritä hetken kuluttua uudelleen.' : 'FMI API returned an error. Please try again shortly.');
+                }
 
                 const yesterdayObs = extractObservations(yesterdayDoc);
                 const todayObs = extractObservations(todayDoc);
