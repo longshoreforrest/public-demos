@@ -9,20 +9,20 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --card-hover: #334155;
-            --accent: #38bdf8;
-            --accent2: #818cf8;
-            --accent3: #34d399;
-            --accent4: #fb923c;
-            --text: #e2e8f0;
-            --text-dim: #94a3b8;
-            --border: #334155;
-            --gradient-1: linear-gradient(135deg, #38bdf8, #818cf8);
-            --gradient-2: linear-gradient(135deg, #34d399, #38bdf8);
-            --gradient-3: linear-gradient(135deg, #fb923c, #f472b6);
-            --gradient-4: linear-gradient(135deg, #818cf8, #c084fc);
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --card-hover: #f1f5f9;
+            --accent: #0284c7;
+            --accent2: #6366f1;
+            --accent3: #059669;
+            --accent4: #ea580c;
+            --text: #1e293b;
+            --text-dim: #64748b;
+            --border: #e2e8f0;
+            --gradient-1: linear-gradient(135deg, #0284c7, #6366f1);
+            --gradient-2: linear-gradient(135deg, #059669, #0284c7);
+            --gradient-3: linear-gradient(135deg, #ea580c, #db2777);
+            --gradient-4: linear-gradient(135deg, #6366f1, #a855f7);
         }
 
         body {
@@ -34,7 +34,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background: linear-gradient(135deg, #0c4a6e 0%, #312e81 50%, #0c4a6e 100%);
             border-bottom: 1px solid var(--border);
             padding: 2rem 1.5rem;
             text-align: center;
@@ -46,7 +46,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.15) 0%, transparent 70%);
+            background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.2) 0%, transparent 70%);
             pointer-events: none;
         }
 
@@ -98,11 +98,12 @@
             position: relative;
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         .summary-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
         }
 
         .summary-card .icon {
@@ -153,10 +154,11 @@
             border-radius: 16px;
             padding: 1.5rem;
             transition: box-shadow 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
         .chart-card:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .chart-card.full-width {
@@ -193,7 +195,7 @@
             height: 100vh;
             background: var(--card);
             border-left: 1px solid var(--border);
-            box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.15);
             z-index: 1000;
             transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             overflow-y: auto;
@@ -253,7 +255,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(51,65,85,0.5);
+            border-bottom: 1px solid rgba(226,232,240,0.8);
         }
 
         .detail-stat .stat-label {
@@ -280,17 +282,17 @@
             font-weight: 600;
         }
 
-        .tag-api { background: rgba(56,189,248,0.15); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
-        .tag-chart { background: rgba(129,140,248,0.15); color: var(--accent2); border: 1px solid rgba(129,140,248,0.3); }
-        .tag-storage { background: rgba(52,211,153,0.15); color: var(--accent3); border: 1px solid rgba(52,211,153,0.3); }
-        .tag-complex { background: rgba(251,146,60,0.15); color: var(--accent4); border: 1px solid rgba(251,146,60,0.3); }
+        .tag-api { background: rgba(2,132,199,0.1); color: var(--accent); border: 1px solid rgba(2,132,199,0.25); }
+        .tag-chart { background: rgba(99,102,241,0.1); color: var(--accent2); border: 1px solid rgba(99,102,241,0.25); }
+        .tag-storage { background: rgba(5,150,105,0.1); color: var(--accent3); border: 1px solid rgba(5,150,105,0.25); }
+        .tag-complex { background: rgba(234,88,12,0.1); color: var(--accent4); border: 1px solid rgba(234,88,12,0.25); }
 
         .effort-bar-container {
             margin-top: 1rem;
         }
 
         .effort-bar-bg {
-            background: rgba(56,189,248,0.1);
+            background: rgba(2,132,199,0.08);
             border-radius: 8px;
             height: 12px;
             overflow: hidden;
@@ -315,7 +317,7 @@
         .overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.3);
             z-index: 999;
             opacity: 0;
             pointer-events: none;
@@ -335,7 +337,7 @@
         }
 
         .tech-item {
-            background: rgba(56,189,248,0.05);
+            background: rgba(2,132,199,0.05);
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 0.75rem 1rem;
@@ -367,7 +369,7 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background 0.15s;
-            border-bottom: 1px solid rgba(51,65,85,0.3);
+            border-bottom: 1px solid rgba(226,232,240,0.6);
         }
 
         .app-item:hover {
@@ -471,7 +473,7 @@
             height: 14px;
             border-radius: 50%;
             background: var(--accent);
-            border: 3px solid var(--bg);
+            border: 3px solid var(--card);
         }
 
         .timeline-time {
@@ -490,8 +492,8 @@
         }
 
         .insight-box {
-            background: rgba(56,189,248,0.08);
-            border: 1px solid rgba(56,189,248,0.2);
+            background: rgba(2,132,199,0.06);
+            border: 1px solid rgba(2,132,199,0.15);
             border-radius: 12px;
             padding: 1rem 1.25rem;
             margin-top: 1rem;
@@ -951,7 +953,7 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
                         borderColor: 'rgba(56, 189, 248, 0.3)',
                         borderWidth: 1,
                         titleColor: '#e2e8f0',
@@ -969,13 +971,13 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { color: 'rgba(148, 163, 184, 0.4)' },
+                        ticks: { color: '#64748b' }
                     },
                     x: {
                         grid: { display: false },
                         ticks: {
-                            color: '#94a3b8',
+                            color: '#64748b',
                             maxRotation: 45,
                             font: { size: 10 }
                         }
@@ -1025,7 +1027,7 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
                         borderColor: 'rgba(56, 189, 248, 0.3)',
                         borderWidth: 1,
                         titleColor: '#e2e8f0',
@@ -1040,18 +1042,18 @@
                 scales: {
                     x: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                        ticks: { color: '#94a3b8' },
+                        grid: { color: 'rgba(148, 163, 184, 0.4)' },
+                        ticks: { color: '#64748b' },
                         title: {
                             display: true,
                             text: 'Kehittäjäpäivät',
-                            color: '#94a3b8',
+                            color: '#64748b',
                             font: { size: 11 }
                         }
                     },
                     y: {
                         grid: { display: false },
-                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                        ticks: { color: '#64748b', font: { size: 10 } }
                     }
                 }
             }
@@ -1092,7 +1094,7 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
                         borderColor: 'rgba(56, 189, 248, 0.3)',
                         borderWidth: 1,
                         titleColor: '#e2e8f0',
@@ -1167,7 +1169,7 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
                         borderColor: 'rgba(56, 189, 248, 0.3)',
                         borderWidth: 1,
                         titleColor: '#e2e8f0',
@@ -1189,14 +1191,14 @@
                 },
                 scales: {
                     x: {
-                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                        ticks: { color: '#94a3b8' },
-                        title: { display: true, text: 'Koodirivit', color: '#94a3b8', font: { size: 11 } }
+                        grid: { color: 'rgba(148, 163, 184, 0.4)' },
+                        ticks: { color: '#64748b' },
+                        title: { display: true, text: 'Koodirivit', color: '#64748b', font: { size: 11 } }
                     },
                     y: {
-                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
-                        ticks: { color: '#94a3b8' },
-                        title: { display: true, text: 'Kehittäjäpäivät', color: '#94a3b8', font: { size: 11 } }
+                        grid: { color: 'rgba(148, 163, 184, 0.4)' },
+                        ticks: { color: '#64748b' },
+                        title: { display: true, text: 'Kehittäjäpäivät', color: '#64748b', font: { size: 11 } }
                     }
                 }
             }
