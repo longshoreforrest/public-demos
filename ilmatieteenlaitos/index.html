@@ -3,199 +3,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ilmatieteen laitoksen sovellukset</title>
+    <title>Ilmatieteen laitoksen sovelluskokoelma</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --blue-900: #0c2340;
+            --blue-700: #14406e;
+            --blue-500: #1a5da6;
+            --blue-300: #5a9fd4;
+            --blue-100: #dbeaf7;
+            --blue-50: #f0f6fc;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --white: #ffffff;
+            --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+            --radius: 12px;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0c1445 0%, #1a3a6b 50%, #2d6a9f 100%);
-            min-height: 100vh;
-            color: #e8edf3;
+            background: var(--blue-50);
+            color: var(--gray-800);
+            line-height: 1.6;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
+
         header {
+            background: linear-gradient(135deg, var(--blue-900) 0%, var(--blue-700) 100%);
+            color: var(--white);
+            padding: 2.5rem 1.5rem 2rem;
             text-align: center;
-            margin-bottom: 2.5rem;
-            padding: 2rem 0;
         }
-        h1 {
-            font-size: 2rem;
+
+        header h1 {
+            font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: .4rem;
         }
-        .subtitle {
+
+        header p {
             font-size: 1rem;
-            color: #9bb5d6;
+            opacity: .85;
+            max-width: 600px;
+            margin: 0 auto;
         }
-        .apps {
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            opacity: .7;
+        }
+
+        .controls {
+            max-width: 1100px;
+            margin: -1.5rem auto 0;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-box {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .search-box svg {
+            flex-shrink: 0;
+            color: var(--gray-400);
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            color: var(--gray-800);
+            background: transparent;
+        }
+
+        .search-box input::placeholder { color: var(--gray-400); }
+
+        .search-count {
+            font-size: .85rem;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+
+        .filters {
+            max-width: 1100px;
+            margin: 1rem auto .5rem;
+            padding: 0 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .filter-btn {
+            padding: .45rem 1rem;
+            border-radius: 999px;
+            border: 1.5px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-600);
+            font-size: .85rem;
+            cursor: pointer;
+            transition: all .15s ease;
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--blue-300);
+            color: var(--blue-500);
+        }
+
+        .filter-btn.active {
+            background: var(--blue-500);
+            border-color: var(--blue-500);
+            color: var(--white);
+        }
+
+        .filter-btn .count {
+            font-size: .75rem;
+            opacity: .7;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 1rem auto 3rem;
+            padding: 0 1rem;
+        }
+
+        .grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1rem;
         }
-        .app-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            padding: 1.2rem 1.5rem;
-            text-decoration: none;
-            color: #e8edf3;
-            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform .15s ease, box-shadow .15s ease;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            min-height: 120px;
         }
-        .app-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
         }
-        .app-title {
-            font-size: 0.95rem;
+
+        .card-body {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: .5rem;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
+            color: var(--gray-800);
+            margin-bottom: .4rem;
+            line-height: 1.35;
         }
-        .app-desc {
-            font-size: 0.8rem;
-            color: #9bb5d6;
-            margin-top: auto;
-            line-height: 1.4;
+
+        .card-desc {
+            font-size: .88rem;
+            color: var(--gray-600);
+            flex: 1;
+            margin-bottom: .75rem;
         }
-        .search-wrap {
-            margin-bottom: 1.5rem;
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .35rem;
+            margin-bottom: .75rem;
         }
-        .search-wrap input {
-            width: 100%;
-            padding: 0.75rem 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #e8edf3;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s, background 0.2s;
+
+        .tag {
+            font-size: .72rem;
+            padding: .2rem .55rem;
+            border-radius: 999px;
+            font-weight: 500;
         }
-        .search-wrap input::placeholder { color: #7a9cc6; }
-        .search-wrap input:focus {
-            border-color: rgba(255, 255, 255, 0.35);
-            background: rgba(255, 255, 255, 0.12);
+
+        .tag-saa { background: #dbeafe; color: #1e40af; }
+        .tag-ulkoilu { background: #dcfce7; color: #166534; }
+        .tag-tyo { background: #fef3c7; color: #92400e; }
+        .tag-koti { background: #fce7f3; color: #9d174d; }
+        .tag-oppiminen { background: #ede9fe; color: #5b21b6; }
+        .tag-data { background: #e0e7ff; color: #3730a3; }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            color: var(--blue-500);
+            text-decoration: none;
+            font-size: .88rem;
+            font-weight: 500;
         }
-        .app-card.hidden { display: none; }
-        @media (max-width: 900px) {
-            .apps { grid-template-columns: repeat(2, 1fr); }
+
+        .card-link:hover { text-decoration: underline; }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray-400);
+            grid-column: 1 / -1;
         }
-        @media (max-width: 500px) {
-            .apps { grid-template-columns: 1fr; }
-        }
+
+        .no-results svg { margin-bottom: .75rem; }
+
         footer {
             text-align: center;
-            margin-top: 3rem;
-            padding: 1.5rem 0;
-            color: #7a9cc6;
-            font-size: 0.85rem;
+            padding: 2rem 1rem;
+            color: var(--gray-400);
+            font-size: .8rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        @media (max-width: 700px) {
+            header h1 { font-size: 1.4rem; }
+            .grid { grid-template-columns: 1fr; }
+            .stats-bar { gap: 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Ilmatieteen laitoksen sovellukset</h1>
-            <p class="subtitle">Säädata-pohjaiset demosovellukset</p>
-        </header>
-        <div class="search-wrap">
-            <input type="text" id="search" placeholder="Hae sovelluksia..." autocomplete="off">
+
+<header>
+    <h1>Ilmatieteen laitoksen sovelluskokoelma</h1>
+    <p>Avointa säädataa hyödyntäviä sovelluksia ja työkaluja — kaikki yhdessä paikassa</p>
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-number" id="app-count">19</div>
+            <div class="stat-label">Sovellusta</div>
         </div>
-        <div class="apps">
-            <a class="app-card" href="Helsinki_20260504_0603_558/">
-                <div class="app-title">Helsinki Säävertailu — Pyöräilijän sääpalvelu</div>
-                <div class="app-desc">Kertoo pyöräilijälle, kannattaako tänään pyöräillä — sää ratkaisee.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0941_538/">
-                <div class="app-title">Työajanseuranta</div>
-                <div class="app-desc">Työajanseurantatyökalu kellon ja kirjausten hallintaan.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0942_144/">
-                <div class="app-title">Helsinki — Sää tänään vs. eilen</div>
-                <div class="app-desc">Vertaa tämän päivän säätä eiliseen — näet heti onko muutos parempaan.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0942_428/">
-                <div class="app-title">Puolimaratonharjoitusohjelma — Tavoite alle 2h</div>
-                <div class="app-desc">Harjoitusohjelma alle 2 tunnin tavoiteajalle viikko viikolta.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0942_892/">
-                <div class="app-title">Autoilijan Reittisää</div>
-                <div class="app-desc">Näyttää ajoreitin sään kartalla — turvallisempi matka millä tahansa kelillä.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0943_305/">
-                <div class="app-title">DokuApuri — Projektidokumentaation työkalu</div>
-                <div class="app-desc">Auttaa luomaan projektidokumentaatiota nopeasti.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0943_605/">
-                <div class="app-title">Kieku-kirjausten automatisointi</div>
-                <div class="app-desc">Automatisoi Kieku-tuntikirjaukset — säästää työaikaa.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0945_792/">
-                <div class="app-title">Lomasuunnitelma sään mukaan</div>
-                <div class="app-desc">10 päivän sääennuste auttaa suunnittelemaan loman oikealle säätielle.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0946_698/">
-                <div class="app-title">SadeTutka-botti</div>
-                <div class="app-desc">Telegram-botti lähettää sadetutkavaroitukset suoraan puhelimeen.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0953_194/">
-                <div class="app-title">Sähköhinta & Saunasuositus</div>
-                <div class="app-desc">Yhdistää sähköhinnan ja sään — kertoo milloin sauna kannattaa lämmittää.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0954_912/">
-                <div class="app-title">Matemaattisten kaavojen todistaja</div>
-                <div class="app-desc">Näyttää matemaattisten lauseiden todistukset vaihe vaiheelta.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0956_145/">
-                <div class="app-title">SääTutka — Pilvien liike & sateen ennuste</div>
-                <div class="app-desc">Visualisoi pilvien liikkeen ja sateen todennäköisyyden kartalla.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0957_848/">
-                <div class="app-title">Tuulioptimoidut pyöräilyreitit</div>
-                <div class="app-desc">Löydä tuulioptimaalinen pyöräilyreitti — selviät kotiin vastatuulelta suojassa.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_0959_240/">
-                <div class="app-title">SDLC Guardrails</div>
-                <div class="app-desc">Tarkista ohjelmistokehitysprosessisi laatu ja tunnista riskialueet.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_1003_601/">
-                <div class="app-title">Terassin öljyämisoptimoija</div>
-                <div class="app-desc">Selvitä paras sääviikonloppu terassin öljyämiseen FMI-datan avulla.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_1007_709/">
-                <div class="app-title">EsitysVahti</div>
-                <div class="app-desc">Analysoi PowerPoint-esityksesi ja paranna yleisön osallistumista.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_1016_557/">
-                <div class="app-title">AI-agenttien tuotantoanalytiikka</div>
-                <div class="app-desc">Seuraa AI-agenttien tuotantokäyttöä interaktiivisella dashboardilla.</div>
-            </a>
-            <a class="app-card" href="Helsinki_20260504_1019_883/">
-                <div class="app-title">Ilmatieteen laitoksen sovelluskokoelma</div>
-                <div class="app-desc">Kokoelmasivu, joka listaa kaikki FMI-sovellusprotot.</div>
-            </a>
+        <div class="stat">
+            <div class="stat-number" id="cat-count">6</div>
+            <div class="stat-label">Kategoriaa</div>
         </div>
-        <footer>
-            <p>Data: Ilmatieteen laitos (FMI Open Data) | Päivitetty 4.5.2026</p>
-        </footer>
     </div>
-    <script>
-    document.getElementById('search').addEventListener('input', function() {
-        const q = this.value.toLowerCase();
-        document.querySelectorAll('.app-card').forEach(card => {
-            const text = card.textContent.toLowerCase();
-            card.classList.toggle('hidden', q && !text.includes(q));
+</header>
+
+<div class="controls">
+    <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search" placeholder="Hae sovelluksia nimellä tai kuvauksella…" autocomplete="off">
+        <span class="search-count" id="search-count"></span>
+    </div>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<main>
+    <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+    Ilmatieteen laitoksen avointa dataa hyödyntävät demosovellukset &middot; 2026
+</footer>
+
+<script>
+const apps = [
+    {
+        id: "Helsinki_20260504_0603_558",
+        title: "Helsinki Säävertailu — Pyöräilijän sääpalvelu",
+        desc: "Vertaile Helsingin säätietoja reaaliajassa pyöräilyn näkökulmasta. Lämpötila, tuuli, sade ja pyöräilysuositukset.",
+        icon: "\u{1F6B4}",
+        categories: ["saa", "ulkoilu"]
+    },
+    {
+        id: "Helsinki_20260504_0942_144",
+        title: "Sää tänään vs. eilen",
+        desc: "Vertaa Helsingin tämän päivän säätä eiliseen — lämpötila, tuuli, kosteus ja sademäärä vierekkäin.",
+        icon: "\u{1F4CA}",
+        categories: ["saa"]
+    },
+    {
+        id: "Helsinki_20260504_0942_892",
+        title: "Autoilijan Reittisää",
+        desc: "Näe sääennuste seuraavan 4 tunnin ajalle kahden kaupungin välisellä reitillä. Suunnittele matka sään mukaan.",
+        icon: "\u{1F697}",
+        categories: ["saa"]
+    },
+    {
+        id: "Helsinki_20260504_0945_792",
+        title: "Lomasuunnitelma sään mukaan",
+        desc: "Optimoi lomapäiväsi seuraavan 10 päivän sääennusteen perusteella — aurinkoiset päivät lomalle, sadepäivät töihin.",
+        icon: "\u{1F3D6}\u{FE0F}",
+        categories: ["saa", "tyo"]
+    },
+    {
+        id: "Helsinki_20260504_0946_698",
+        title: "SadeTutka-botti",
+        desc: "Säätutkadataan perustuva Telegram-botti, joka varoittaa lähestyvästä sateesta reaaliajassa.",
+        icon: "\u{1F327}\u{FE0F}",
+        categories: ["saa", "data"]
+    },
+    {
+        id: "Helsinki_20260504_0953_194",
+        title: "Sähköhinta & Saunasuositus",
+        desc: "Yhdistää sähkön spot-hinnat ja sääennusteen — suosittelee optimaalisen saunomisajan Helsingissä.",
+        icon: "\u{1F9D6}",
+        categories: ["saa", "koti"]
+    },
+    {
+        id: "Helsinki_20260504_0956_145",
+        title: "SääTutka — Pilvien liike & sateen ennuste",
+        desc: "Cloud Optimized -tutkadata, pilvien liike-ennuste ja sateen todennäköisyys kartalla.",
+        icon: "\u{1F6F0}\u{FE0F}",
+        categories: ["saa", "data"]
+    },
+    {
+        id: "Helsinki_20260504_0957_848",
+        title: "Tuulioptimoidut pyöräilyreitit",
+        desc: "Laskee 20 km ympäräreitin Helsingissä siten, että vastatuuli minimoidaan FMI:n reaaliaikaisella tuulidatalla.",
+        icon: "\u{1F32C}\u{FE0F}",
+        categories: ["saa", "ulkoilu"]
+    },
+    {
+        id: "Helsinki_20260504_1003_601",
+        title: "Terassin öljyämisoptimoija",
+        desc: "Löydä paras ajankohta terassin tai kuistin öljyämiseen FMI-sääennusteen perusteella — kuivat ja lämpimät jaksot.",
+        icon: "\u{1F3E1}",
+        categories: ["saa", "koti"]
+    },
+    {
+        id: "Helsinki_20260504_0942_428",
+        title: "Puolimaratonharjoitusohjelma",
+        desc: "12 viikon harjoitusohjelma tavoiteajalla alle 2 tuntia. Seuraa etenemistä ja viikkotavoitteita.",
+        icon: "\u{1F3C3}",
+        categories: ["ulkoilu"]
+    },
+    {
+        id: "20260504_1023_346",
+        title: "SoraReitti — Moottoripyöräilyn soratiereitit",
+        desc: "Suunnittele moottoripyöräilyn soratiereittejä Suomessa. Reittisuunnittelu, karttanäkymä ja sääolosuhteet.",
+        icon: "\u{1F3CD}\u{FE0F}",
+        categories: ["ulkoilu"]
+    },
+    {
+        id: "Helsinki_20260504_0941_538",
+        title: "Työajanseuranta",
+        desc: "Kirjaa saapuminen, lähtö ja projektitunnit. Näe historia ja yhteenveto päivittäisistä kirjauksista.",
+        icon: "\u{23F1}\u{FE0F}",
+        categories: ["tyo"]
+    },
+    {
+        id: "Helsinki_20260504_0943_305",
+        title: "DokuApuri — Projektidokumentaatio",
+        desc: "Luo ammattimaista projektidokumentaatiota hetkessä. Valitse projektityyppi ja täytä tiedot.",
+        icon: "\u{1F4C4}",
+        categories: ["tyo"]
+    },
+    {
+        id: "Helsinki_20260504_0943_605",
+        title: "Kieku-kirjausten automatisointi",
+        desc: "Hallitse ja automatisoi työaikakirjaukset — vie tiedot Kieku-järjestelmään helposti.",
+        icon: "\u{1F4CB}",
+        categories: ["tyo"]
+    },
+    {
+        id: "Helsinki_20260504_0959_240",
+        title: "SDLC Guardrails — Laadunvarmistus",
+        desc: "Varmista ohjelmistokehityksen jokaisen vaiheen laatu. Aseta guardrailit ja seuraa validointia.",
+        icon: "\u{1F6E1}\u{FE0F}",
+        categories: ["tyo"]
+    },
+    {
+        id: "Helsinki_20260504_1007_709",
+        title: "EsitysVahti — PowerPoint-analyysi",
+        desc: "Lataa PowerPoint-esitys ja saa tekoälyanalyysi yleisön aktivoinnista ja osallistamisvinkeistä.",
+        icon: "\u{1F4FD}\u{FE0F}",
+        categories: ["tyo"]
+    },
+    {
+        id: "Helsinki_20260504_1013_919",
+        title: "LyhenneSanakirja — Organisaation termistö",
+        desc: "Hallinnoi organisaation lyhenteitä ja termistöä. Hae, lisää ja jaa termejä tiimin kesken.",
+        icon: "\u{1F4D6}",
+        categories: ["tyo"]
+    },
+    {
+        id: "Helsinki_20260504_1016_557",
+        title: "AI-agenttien tuotantoanalytiikka",
+        desc: "Seuraa AI-agenttien suorituskykyä ja tuotantodataa reaaliajassa. Tilastot, trendit ja hälytysnäkymät.",
+        icon: "\u{1F916}",
+        categories: ["data", "tyo"]
+    },
+    {
+        id: "Helsinki_20260504_0954_912",
+        title: "Matemaattisten kaavojen todistaja",
+        desc: "Opi todistamaan matemaattisia kaavoja askel askeleelta — interaktiivinen työkalu välikysymyksineen.",
+        icon: "\u{1F9EE}",
+        categories: ["oppiminen"]
+    }
+];
+
+const categoryMeta = {
+    saa:       { label: "Sää & Data",          color: "tag-saa" },
+    ulkoilu:   { label: "Ulkoilu & Liikunta",  color: "tag-ulkoilu" },
+    tyo:       { label: "Työ & Tuottavuus",    color: "tag-tyo" },
+    koti:      { label: "Koti & Arki",          color: "tag-koti" },
+    oppiminen: { label: "Oppiminen",            color: "tag-oppiminen" },
+    data:      { label: "Reaaliaikadata",       color: "tag-data" }
+};
+
+let activeFilter = null;
+
+function init() {
+    renderFilters();
+    renderGrid();
+    document.getElementById("search").addEventListener("input", renderGrid);
+    document.getElementById("app-count").textContent = apps.length;
+    document.getElementById("cat-count").textContent = Object.keys(categoryMeta).length;
+}
+
+function renderFilters() {
+    const counts = {};
+    apps.forEach(a => a.categories.forEach(c => { counts[c] = (counts[c] || 0) + 1; }));
+
+    const container = document.getElementById("filters");
+    const allBtn = document.createElement("button");
+    allBtn.className = "filter-btn active";
+    allBtn.innerHTML = `Kaikki <span class="count">${apps.length}</span>`;
+    allBtn.dataset.cat = "";
+    allBtn.addEventListener("click", () => { activeFilter = null; updateFilterUI(); renderGrid(); });
+    container.appendChild(allBtn);
+
+    Object.entries(categoryMeta).forEach(([key, meta]) => {
+        if (!counts[key]) return;
+        const btn = document.createElement("button");
+        btn.className = "filter-btn";
+        btn.innerHTML = `${meta.label} <span class="count">${counts[key]}</span>`;
+        btn.dataset.cat = key;
+        btn.addEventListener("click", () => {
+            activeFilter = activeFilter === key ? null : key;
+            updateFilterUI();
+            renderGrid();
         });
+        container.appendChild(btn);
     });
-    </script>
+}
+
+function updateFilterUI() {
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        const cat = btn.dataset.cat;
+        btn.classList.toggle("active", cat === "" ? !activeFilter : cat === activeFilter);
+    });
+}
+
+function renderGrid() {
+    const query = document.getElementById("search").value.toLowerCase().trim();
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    const filtered = apps.filter(app => {
+        if (activeFilter && !app.categories.includes(activeFilter)) return false;
+        if (query) {
+            const haystack = (app.title + " " + app.desc).toLowerCase();
+            return query.split(/\s+/).every(word => haystack.includes(word));
+        }
+        return true;
+    });
+
+    document.getElementById("search-count").textContent =
+        query || activeFilter ? `${filtered.length} / ${apps.length}` : "";
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="no-results">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="8" x2="14" y2="14"/><line x1="14" y1="8" x2="8" y2="14"/></svg>
+                <p>Ei sovelluksia näillä hakuehdoilla</p>
+            </div>`;
+        return;
+    }
+
+    filtered.forEach(app => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="card-icon">${app.icon}</div>
+                <div class="card-title">${app.title}</div>
+                <div class="card-desc">${app.desc}</div>
+                <div class="card-tags">
+                    ${app.categories.map(c => `<span class="tag ${categoryMeta[c].color}">${categoryMeta[c].label}</span>`).join("")}
+                </div>
+                <a class="card-link" href="${app.id}/">
+                    Avaa sovellus
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>`;
+        grid.appendChild(card);
+    });
+}
+
+init();
+</script>
 </body>
 </html>

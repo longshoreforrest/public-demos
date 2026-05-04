@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kieku-kirjausten automatisointi</title>
+    <title>📋 Kieku-kirjausten automatisointi</title>
     <style>
         :root {
             --primary: #1a56db;
@@ -600,6 +600,16 @@
         .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
         .empty-state p { font-size: 0.95rem; }
 
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        #voice-btn.recording {
+            background: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
             .week-grid { grid-template-columns: repeat(5, 1fr); font-size: 0.85rem; }
@@ -614,7 +624,7 @@
 <body>
 
 <div class="app-header">
-    <h1>Kieku-kirjausten automatisointi</h1>
+    <h1>📋 Kieku-kirjausten automatisointi</h1>
     <p>Hallitse ja automatisoi työaikakirjaukset &mdash; vie tiedot Kiekuun helposti</p>
 </div>
 
@@ -642,6 +652,42 @@
             <div class="summary-card">
                 <div class="value" id="week-target">36:15</div>
                 <div class="label">Viikkotavoite</div>
+            </div>
+        </div>
+
+        <div class="card" id="voice-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2>Puhekirjaus</h2>
+                <span class="badge badge-primary" id="voice-support-badge"></span>
+            </div>
+            <div class="info-box" id="voice-info">
+                Paina mikrofonia ja kerro kirjauksesi puhumalla. Esimerkiksi:<br>
+                <em>"Projektityö seitsemän tuntia viisitoista minuuttia normaalityöaika"</em><br>
+                <em>"Yleishallinto kaksi tuntia koulutus API-koulutus"</em>
+            </div>
+            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+                <button class="btn btn-primary" id="voice-btn" onclick="toggleVoiceRecording()" style="width:56px;height:56px;border-radius:50%;font-size:1.5rem;padding:0;display:flex;align-items:center;justify-content:center;">
+                    🎤
+                </button>
+                <div style="flex:1;">
+                    <div id="voice-status" style="font-size:0.9rem;color:var(--gray-500);">Paina aloittaaksesi puhekirjauksen</div>
+                    <div id="voice-transcript" style="font-size:0.95rem;font-weight:500;margin-top:0.25rem;min-height:1.4em;"></div>
+                </div>
+            </div>
+            <div id="voice-result" style="display:none;">
+                <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:6px;padding:1rem;margin-bottom:0.75rem;">
+                    <div style="font-size:0.85rem;color:var(--gray-500);margin-bottom:0.5rem;">Tunnistettu kirjaus:</div>
+                    <div id="voice-parsed"></div>
+                </div>
+                <div class="btn-group" style="margin-top:0.75rem;">
+                    <button class="btn btn-success" onclick="confirmVoiceEntry()">Tallenna kirjaus</button>
+                    <button class="btn btn-outline" onclick="cancelVoiceEntry()">Hylkää</button>
+                    <button class="btn btn-outline" onclick="editVoiceEntry()">Muokkaa ennen tallennusta</button>
+                </div>
+            </div>
+            <div id="voice-pulse" style="display:none;text-align:center;padding:1rem;">
+                <div style="display:inline-block;width:16px;height:16px;background:var(--danger);border-radius:50%;animation:pulse 1s infinite;"></div>
+                <span style="margin-left:0.5rem;color:var(--danger);font-weight:500;">Kuuntelee...</span>
             </div>
         </div>
 
@@ -1576,6 +1622,307 @@ loadSettings();
 const now = new Date();
 document.getElementById('export-start').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 document.getElementById('export-end').value = now.toISOString().split('T')[0];
+
+// VOICE RECOGNITION
+let recognition = null;
+let isRecording = false;
+let voiceParsedEntry = null;
+
+function initVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const badge = document.getElementById('voice-support-badge');
+    if (!SpeechRecognition) {
+        badge.textContent = 'Ei tuettu tässä selaimessa';
+        badge.className = 'badge badge-warning';
+        document.getElementById('voice-btn').disabled = true;
+        document.getElementById('voice-btn').style.opacity = '0.5';
+        document.getElementById('voice-info').innerHTML = '<strong>Puheentunnistus ei ole käytettävissä.</strong><br>Käytä Chrome- tai Edge-selainta puhekirjauksen käyttämiseen.';
+        return;
+    }
+    badge.textContent = 'Puheentunnistus käytettävissä';
+    badge.className = 'badge badge-success';
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'fi-FI';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = function(event) {
+        let transcript = '';
+        let isFinal = false;
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+            if (event.results[i].isFinal) isFinal = true;
+        }
+        document.getElementById('voice-transcript').textContent = transcript;
+        if (isFinal) {
+            stopRecording();
+            processVoiceInput(transcript);
+        }
+    };
+
+    recognition.onerror = function(event) {
+        stopRecording();
+        if (event.error === 'no-speech') {
+            document.getElementById('voice-status').textContent = 'Puhetta ei havaittu. Yritä uudelleen.';
+        } else if (event.error === 'not-allowed') {
+            document.getElementById('voice-status').textContent = 'Mikrofoni estetty. Salli mikrofonin käyttö selaimen asetuksista.';
+        } else {
+            document.getElementById('voice-status').textContent = 'Virhe: ' + event.error;
+        }
+    };
+
+    recognition.onend = function() {
+        if (isRecording) stopRecording();
+    };
+}
+
+function toggleVoiceRecording() {
+    if (isRecording) {
+        recognition.stop();
+        stopRecording();
+    } else {
+        startRecording();
+    }
+}
+
+function startRecording() {
+    if (!recognition) return;
+    isRecording = true;
+    document.getElementById('voice-btn').classList.add('recording');
+    document.getElementById('voice-btn').textContent = '⏹';
+    document.getElementById('voice-status').textContent = 'Kuuntelee... Puhu nyt.';
+    document.getElementById('voice-transcript').textContent = '';
+    document.getElementById('voice-result').style.display = 'none';
+    document.getElementById('voice-pulse').style.display = 'block';
+    recognition.start();
+}
+
+function stopRecording() {
+    isRecording = false;
+    document.getElementById('voice-btn').classList.remove('recording');
+    document.getElementById('voice-btn').textContent = '🎤';
+    document.getElementById('voice-pulse').style.display = 'none';
+}
+
+function processVoiceInput(transcript) {
+    document.getElementById('voice-status').textContent = 'Käsitellään puhetta...';
+    const parsed = parseVoiceTranscript(transcript);
+    voiceParsedEntry = parsed;
+
+    let html = '<div style="display:grid;grid-template-columns:auto 1fr;gap:0.25rem 1rem;font-size:0.9rem;">';
+    html += `<span style="color:var(--gray-500);">Projekti:</span><strong>${parsed.projectName || '(ei tunnistettu)'}</strong>`;
+    html += `<span style="color:var(--gray-500);">Tunnit:</span><strong>${parsed.hours > 0 ? hoursToHM(parsed.hours) : '(ei tunnistettu)'}</strong>`;
+    html += `<span style="color:var(--gray-500);">Toimintolaji:</span><strong>${parsed.activityLabel || '(ei tunnistettu)'}</strong>`;
+    if (parsed.note) html += `<span style="color:var(--gray-500);">Lisätieto:</span><strong>${parsed.note}</strong>`;
+    html += '</div>';
+
+    if (!parsed.projectId || parsed.hours <= 0) {
+        html += '<div style="color:var(--warning);font-size:0.85rem;margin-top:0.5rem;">Kaikkia tietoja ei tunnistettu. Voit muokata ennen tallennusta.</div>';
+    }
+
+    document.getElementById('voice-parsed').innerHTML = html;
+    document.getElementById('voice-result').style.display = 'block';
+    document.getElementById('voice-status').textContent = 'Tarkista tunnistettu kirjaus alla.';
+}
+
+function parseVoiceTranscript(text) {
+    const lower = text.toLowerCase().trim();
+    const result = { projectId: null, projectName: null, hours: 0, activity: null, activityLabel: null, note: '' };
+
+    // Match project by name (fuzzy)
+    let bestProjectMatch = null;
+    let bestProjectScore = 0;
+    data.projects.forEach(p => {
+        const pLower = p.name.toLowerCase();
+        if (lower.includes(pLower)) {
+            if (pLower.length > bestProjectScore) {
+                bestProjectScore = pLower.length;
+                bestProjectMatch = p;
+            }
+        }
+        const wbsLower = p.wbs.toLowerCase().replace(/-/g, ' ');
+        if (lower.includes(wbsLower) || lower.includes(p.wbs.toLowerCase())) {
+            if (!bestProjectMatch || p.wbs.length > bestProjectScore) {
+                bestProjectScore = p.wbs.length;
+                bestProjectMatch = p;
+            }
+        }
+    });
+    if (bestProjectMatch) {
+        result.projectId = bestProjectMatch.id;
+        result.projectName = bestProjectMatch.name;
+    }
+
+    // Parse hours - Finnish number words
+    const numberWords = {
+        'nolla': 0, 'yksi': 1, 'kaksi': 2, 'kolme': 3, 'neljä': 4,
+        'viisi': 5, 'kuusi': 6, 'seitsemän': 7, 'kahdeksan': 8, 'yhdeksän': 9,
+        'kymmenen': 10, 'yksitoista': 11, 'kaksitoista': 12,
+        'puoli': 0.5, 'puolitoista': 1.5, 'vartti': 0.25, 'kolme varttia': 0.75
+    };
+
+    // "X tuntia Y minuuttia" pattern with words
+    let hoursFound = 0;
+    let minutesFound = 0;
+
+    // Try digit patterns first: "7 tuntia 15 minuuttia" or "7.25 tuntia"
+    const digitHoursMatch = lower.match(/(\d+[.,]?\d*)\s*(?:tuntia|tuntii|h)/);
+    if (digitHoursMatch) {
+        hoursFound = parseFloat(digitHoursMatch[1].replace(',', '.'));
+    }
+    const digitMinMatch = lower.match(/(\d+)\s*(?:minuuttia|minuuttii|min|m)/);
+    if (digitMinMatch) {
+        minutesFound = parseInt(digitMinMatch[1]);
+    }
+
+    // Try word patterns: "seitsemän tuntia viisitoista minuuttia"
+    if (hoursFound === 0) {
+        for (const [word, val] of Object.entries(numberWords)) {
+            const hourPattern = new RegExp(word + '\\s*(?:tuntia|tuntii|tunnin|h)');
+            if (hourPattern.test(lower)) {
+                hoursFound = val;
+                break;
+            }
+        }
+    }
+    if (minutesFound === 0) {
+        for (const [word, val] of Object.entries(numberWords)) {
+            const minPattern = new RegExp(word + '\\s*(?:minuuttia|minuuttii|minuutin|min)');
+            if (minPattern.test(lower)) {
+                minutesFound = val * (val < 1 ? 60 : 1);
+                break;
+            }
+        }
+        // "viisitoista" special handling
+        const fifteenMatch = lower.match(/viisitoista\s*(?:minuuttia|minuuttii|min)/);
+        if (fifteenMatch) minutesFound = 15;
+        const thirtyMatch = lower.match(/kolmekymmentä\s*(?:minuuttia|minuuttii|min)/);
+        if (thirtyMatch) minutesFound = 30;
+        const fortyFiveMatch = lower.match(/neljäkymmentäviisi\s*(?:minuuttia|minuuttii|min)/);
+        if (fortyFiveMatch) minutesFound = 45;
+    }
+
+    result.hours = hoursFound + minutesFound / 60;
+
+    // If just a single number without unit, assume hours
+    if (result.hours === 0) {
+        const singleNum = lower.match(/(\d+[.,]?\d*)/);
+        if (singleNum) {
+            const val = parseFloat(singleNum[1].replace(',', '.'));
+            if (val > 0 && val <= 24) result.hours = val;
+        }
+    }
+
+    // Activity type matching
+    const activityMap = [
+        { keywords: ['normaalityöaika', 'normaali', 'perustyö', 'normityö'], code: 'T010', label: 'T010 – Normaalityöaika' },
+        { keywords: ['ylityö 50', 'ylityö viisikymmentä', 'puolikkaat'], code: 'T020', label: 'T020 – Ylityö 50%' },
+        { keywords: ['ylityö 100', 'ylityö sata', 'täydet'], code: 'T030', label: 'T030 – Ylityö 100%' },
+        { keywords: ['vuosiloma', 'loma'], code: 'T100', label: 'T100 – Vuosiloma' },
+        { keywords: ['sairausloma', 'sairaana', 'sairas', 'saikku'], code: 'T110', label: 'T110 – Sairausloma' },
+        { keywords: ['koulutus', 'kurssi', 'opiskelu'], code: 'T200', label: 'T200 – Koulutus' },
+        { keywords: ['matka-aika', 'matka', 'matkustus'], code: 'T300', label: 'T300 – Matka-aika' }
+    ];
+
+    for (const act of activityMap) {
+        if (act.keywords.some(kw => lower.includes(kw))) {
+            result.activity = act.code;
+            result.activityLabel = act.label;
+            break;
+        }
+    }
+
+    if (!result.activity) {
+        result.activity = data.settings.defaultActivity || 'T010';
+        result.activityLabel = 'T010 – Normaalityöaika (oletus)';
+    }
+
+    // Remaining text as note — strip recognized parts
+    let noteText = text;
+    if (bestProjectMatch) {
+        noteText = noteText.replace(new RegExp(bestProjectMatch.name, 'gi'), '');
+    }
+    // Remove number+unit patterns
+    noteText = noteText.replace(/\d+[.,]?\d*\s*(?:tuntia|tuntii|tunnin|h|minuuttia|minuuttii|min)\b/gi, '');
+    // Remove activity keywords
+    activityMap.forEach(act => {
+        act.keywords.forEach(kw => {
+            noteText = noteText.replace(new RegExp(kw, 'gi'), '');
+        });
+    });
+    // Remove common Finnish number words used for time
+    Object.keys(numberWords).forEach(w => {
+        noteText = noteText.replace(new RegExp('\\b' + w + '\\b\\s*(?:tuntia|tuntii|minuuttia|minuuttii)?', 'gi'), '');
+    });
+    noteText = noteText.replace(/\s+/g, ' ').trim();
+    if (noteText.length > 2) result.note = noteText;
+
+    return result;
+}
+
+function confirmVoiceEntry() {
+    if (!voiceParsedEntry) return;
+    const date = document.getElementById('entry-date').value || selectedDate;
+
+    if (!voiceParsedEntry.projectId) {
+        if (data.projects.length > 0) {
+            voiceParsedEntry.projectId = data.projects[0].id;
+        } else {
+            alert('Lisää ensin projekti Projektit-välilehdellä.');
+            return;
+        }
+    }
+    if (voiceParsedEntry.hours <= 0) {
+        alert('Tuntimäärää ei tunnistettu. Muokkaa kirjausta ennen tallennusta.');
+        return;
+    }
+
+    const entry = {
+        id: generateId(),
+        date,
+        projectId: voiceParsedEntry.projectId,
+        activity: voiceParsedEntry.activity,
+        hours: voiceParsedEntry.hours,
+        start: null,
+        end: null,
+        note: voiceParsedEntry.note || '',
+        createdAt: new Date().toISOString()
+    };
+
+    data.entries.push(entry);
+    saveData(data);
+    renderDayEntries();
+    updateSummary();
+    cancelVoiceEntry();
+    document.getElementById('voice-status').textContent = 'Kirjaus tallennettu!';
+    document.getElementById('voice-transcript').textContent = '';
+    setTimeout(() => {
+        document.getElementById('voice-status').textContent = 'Paina aloittaaksesi puhekirjauksen';
+    }, 3000);
+}
+
+function cancelVoiceEntry() {
+    voiceParsedEntry = null;
+    document.getElementById('voice-result').style.display = 'none';
+    document.getElementById('voice-status').textContent = 'Paina aloittaaksesi puhekirjauksen';
+}
+
+function editVoiceEntry() {
+    if (!voiceParsedEntry) return;
+    // Fill the manual form with parsed data
+    if (voiceParsedEntry.projectId) document.getElementById('entry-project').value = voiceParsedEntry.projectId;
+    if (voiceParsedEntry.activity) document.getElementById('entry-activity').value = voiceParsedEntry.activity;
+    if (voiceParsedEntry.hours > 0) document.getElementById('entry-hours').value = voiceParsedEntry.hours;
+    if (voiceParsedEntry.note) document.getElementById('entry-note').value = voiceParsedEntry.note;
+    cancelVoiceEntry();
+    document.getElementById('voice-status').textContent = 'Täytetty alla olevaan lomakkeeseen — muokkaa ja tallenna.';
+    // Scroll to entry form
+    document.querySelector('#tab-kirjaus .card:nth-child(3)').scrollIntoView({ behavior: 'smooth' });
+}
+
+initVoice();
 </script>
 
 </body>

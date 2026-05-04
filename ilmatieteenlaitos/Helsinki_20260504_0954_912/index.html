@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matemaattisten kaavojen todistaja</title>
+    <title>🧮 Matemaattisten kaavojen todistaja</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -254,6 +254,79 @@
             line-height: 1.6;
             color: #c0c0c0;
         }
+        .video-section {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .video-section h3 {
+            color: #64ffda;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            aspect-ratio: 16/9;
+            background: #0a0a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .video-container svg {
+            width: 100%;
+            height: 100%;
+        }
+        .video-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .video-btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            background: rgba(100, 255, 218, 0.15);
+            color: #64ffda;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            transition: all 0.3s ease;
+        }
+        .video-btn:hover {
+            background: rgba(100, 255, 218, 0.25);
+        }
+        .video-btn.playing {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+        .video-timeline {
+            flex: 1;
+            max-width: 200px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .video-timeline-fill {
+            height: 100%;
+            background: #64ffda;
+            border-radius: 3px;
+            transition: width 0.3s linear;
+            width: 0%;
+        }
+        .video-label {
+            font-size: 0.8em;
+            color: #a0a0a0;
+            margin-top: 8px;
+        }
         @media (max-width: 600px) {
             header h1 { font-size: 1.5em; }
             .theorem-card { padding: 20px; }
@@ -264,7 +337,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Matemaattisten Kaavojen Todistaja</h1>
+            <h1>🧮 Matemaattisten Kaavojen Todistaja</h1>
             <p>Opi todistamaan matemaattisia kaavoja askel askeleelta</p>
         </header>
 
@@ -676,13 +749,127 @@
         }
     ];
 
+    const visualAnimations = {
+        "Parillisten lukujen summa": {
+            frames: [
+                { label: "Askel 1: Määritellään", draw: (ctx) => {
+                    return `<text x="300" y="60" text-anchor="middle" fill="#64ffda" font-size="18">Parilliset luvut</text>
+                    <rect x="80" y="90" width="100" height="60" rx="8" fill="rgba(100,255,218,0.1)" stroke="#64ffda"/>
+                    <text x="130" y="125" text-anchor="middle" fill="#fff" font-size="16">a = 2m</text>
+                    <rect x="220" y="90" width="100" height="60" rx="8" fill="rgba(100,255,218,0.1)" stroke="#64ffda"/>
+                    <text x="270" y="125" text-anchor="middle" fill="#fff" font-size="16">b = 2n</text>`;
+                }},
+                { label: "Askel 2: Summa", draw: (ctx) => {
+                    return `<text x="300" y="60" text-anchor="middle" fill="#64ffda" font-size="18">Lasketaan summa</text>
+                    <rect x="80" y="80" width="100" height="50" rx="8" fill="rgba(100,255,218,0.1)" stroke="#64ffda"/>
+                    <text x="130" y="110" text-anchor="middle" fill="#fff" font-size="14">2m</text>
+                    <text x="200" y="110" text-anchor="middle" fill="#ffd54f" font-size="24">+</text>
+                    <rect x="230" y="80" width="100" height="50" rx="8" fill="rgba(100,255,218,0.1)" stroke="#64ffda"/>
+                    <text x="280" y="110" text-anchor="middle" fill="#fff" font-size="14">2n</text>
+                    <line x1="130" y1="145" x2="280" y2="145" stroke="#ffd54f" stroke-width="2" stroke-dasharray="5,5"/>
+                    <text x="205" y="175" text-anchor="middle" fill="#ffd54f" font-size="16">= 2m + 2n</text>`;
+                }},
+                { label: "Askel 3: Yhteinen tekijä", draw: (ctx) => {
+                    return `<text x="300" y="60" text-anchor="middle" fill="#64ffda" font-size="18">Yhteinen tekijä 2</text>
+                    <rect x="120" y="80" width="60" height="50" rx="8" fill="rgba(255,213,79,0.2)" stroke="#ffd54f"/>
+                    <text x="150" y="110" text-anchor="middle" fill="#ffd54f" font-size="18" font-weight="bold">2</text>
+                    <text x="195" y="110" text-anchor="middle" fill="#fff" font-size="20">×</text>
+                    <rect x="210" y="80" width="120" height="50" rx="8" fill="rgba(100,255,218,0.1)" stroke="#64ffda"/>
+                    <text x="270" y="110" text-anchor="middle" fill="#fff" font-size="16">(m + n)</text>
+                    <text x="235" y="165" text-anchor="middle" fill="#81c784" font-size="14">↑ kokonaisluku</text>`;
+                }},
+                { label: "Askel 4: Tulos", draw: (ctx) => {
+                    return `<text x="300" y="60" text-anchor="middle" fill="#64ffda" font-size="18">Päätelmä</text>
+                    <rect x="100" y="80" width="250" height="60" rx="12" fill="rgba(129,199,132,0.15)" stroke="#81c784" stroke-width="2"/>
+                    <text x="225" y="115" text-anchor="middle" fill="#81c784" font-size="18">2(m + n) = parillinen ✓</text>
+                    <text x="225" y="170" text-anchor="middle" fill="#a0a0a0" font-size="13">Muotoa 2k → aina parillinen</text>`;
+                }}
+            ]
+        },
+        "Summakaava 1 + 2 + ... + n": {
+            frames: [
+                { label: "Kantatapaus n=1", draw: () => {
+                    return `<text x="300" y="50" text-anchor="middle" fill="#64ffda" font-size="18">Induktio: Kantatapaus</text>
+                    <rect x="150" y="70" width="150" height="50" rx="8" fill="rgba(100,255,218,0.1)" stroke="#64ffda"/>
+                    <text x="225" y="100" text-anchor="middle" fill="#fff" font-size="16">n = 1</text>
+                    <text x="150" y="150" text-anchor="middle" fill="#a0a0a0" font-size="14">Vasen: 1</text>
+                    <text x="300" y="150" text-anchor="middle" fill="#a0a0a0" font-size="14">Oikea: 1·2/2 = 1</text>
+                    <text x="225" y="185" text-anchor="middle" fill="#81c784" font-size="16">1 = 1 ✓</text>`;
+                }},
+                { label: "Induktio-oletus", draw: () => {
+                    return `<text x="300" y="50" text-anchor="middle" fill="#64ffda" font-size="18">Oletetaan: pätee k:lle</text>
+                    <rect x="70" y="75" width="310" height="45" rx="8" fill="rgba(255,213,79,0.1)" stroke="#ffd54f"/>
+                    <text x="225" y="103" text-anchor="middle" fill="#ffd54f" font-size="15">1+2+...+k = k(k+1)/2</text>
+                    <text x="225" y="155" text-anchor="middle" fill="#a0a0a0" font-size="13">Näytetään: pätee myös k+1:lle</text>`;
+                }},
+                { label: "Induktioaskel", draw: () => {
+                    return `<text x="300" y="45" text-anchor="middle" fill="#64ffda" font-size="16">Lisätään (k+1) molemmille puolille</text>
+                    <text x="225" y="80" text-anchor="middle" fill="#fff" font-size="14">k(k+1)/2 + (k+1)</text>
+                    <line x1="225" y1="90" x2="225" y2="110" stroke="#64ffda" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <text x="225" y="130" text-anchor="middle" fill="#fff" font-size="14">(k+1)(k+2)/2</text>
+                    <rect x="100" y="150" width="250" height="40" rx="8" fill="rgba(129,199,132,0.15)" stroke="#81c784"/>
+                    <text x="225" y="175" text-anchor="middle" fill="#81c784" font-size="14">= kaavan muoto kun n=k+1 ✓</text>`;
+                }},
+                { label: "Valmis", draw: () => {
+                    return `<text x="300" y="55" text-anchor="middle" fill="#64ffda" font-size="18">Induktio valmis!</text>
+                    <rect x="80" y="75" width="120" height="40" rx="8" fill="rgba(129,199,132,0.15)" stroke="#81c784"/>
+                    <text x="140" y="100" text-anchor="middle" fill="#81c784" font-size="13">Kantatapaus ✓</text>
+                    <text x="225" y="100" text-anchor="middle" fill="#64ffda" font-size="20">+</text>
+                    <rect x="250" y="75" width="120" height="40" rx="8" fill="rgba(129,199,132,0.15)" stroke="#81c784"/>
+                    <text x="310" y="100" text-anchor="middle" fill="#81c784" font-size="13">Askel ✓</text>
+                    <line x1="225" y1="125" x2="225" y2="150" stroke="#64ffda" stroke-width="2"/>
+                    <text x="225" y="175" text-anchor="middle" fill="#ffd54f" font-size="15">⟹ Pätee ∀ n ≥ 1</text>`;
+                }}
+            ]
+        },
+        "√2 on irrationaalinen": {
+            frames: [
+                { label: "Vastaoletus", draw: () => {
+                    return `<text x="300" y="50" text-anchor="middle" fill="#ff6b6b" font-size="16">Oletus: √2 = a/b (supistettu)</text>
+                    <circle cx="225" cy="120" r="45" fill="none" stroke="#64ffda" stroke-width="2"/>
+                    <text x="225" y="115" text-anchor="middle" fill="#fff" font-size="20">a/b</text>
+                    <text x="225" y="138" text-anchor="middle" fill="#a0a0a0" font-size="12">gcd(a,b)=1</text>`;
+                }},
+                { label: "Neliöinti", draw: () => {
+                    return `<text x="300" y="50" text-anchor="middle" fill="#64ffda" font-size="16">Korotetaan toiseen</text>
+                    <text x="225" y="95" text-anchor="middle" fill="#fff" font-size="16">2 = a²/b²</text>
+                    <line x1="225" y1="105" x2="225" y2="125" stroke="#ffd54f" stroke-width="2"/>
+                    <text x="225" y="145" text-anchor="middle" fill="#ffd54f" font-size="18">a² = 2b²</text>
+                    <text x="225" y="180" text-anchor="middle" fill="#a0a0a0" font-size="13">→ a² on parillinen → a on parillinen</text>`;
+                }},
+                { label: "Molemmat parillisia", draw: () => {
+                    return `<text x="300" y="45" text-anchor="middle" fill="#64ffda" font-size="16">a=2k → sijoitetaan</text>
+                    <rect x="80" y="65" width="130" height="40" rx="8" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b"/>
+                    <text x="145" y="90" text-anchor="middle" fill="#ff6b6b" font-size="15">a parillinen</text>
+                    <rect x="240" y="65" width="130" height="40" rx="8" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b"/>
+                    <text x="305" y="90" text-anchor="middle" fill="#ff6b6b" font-size="15">b parillinen</text>
+                    <text x="225" y="135" text-anchor="middle" fill="#fff" font-size="13">4k²=2b² → b²=2k² → b parillinen</text>`;
+                }},
+                { label: "Ristiriita!", draw: () => {
+                    return `<text x="300" y="50" text-anchor="middle" fill="#ff6b6b" font-size="18">⚡ RISTIRIITA ⚡</text>
+                    <rect x="80" y="70" width="290" height="50" rx="8" fill="rgba(255,107,107,0.1)" stroke="#ff6b6b" stroke-width="2"/>
+                    <text x="225" y="100" text-anchor="middle" fill="#ff6b6b" font-size="14">a,b molemmat parillisia → gcd≥2</text>
+                    <text x="225" y="145" text-anchor="middle" fill="#a0a0a0" font-size="13">Mutta oletimme gcd(a,b)=1!</text>
+                    <rect x="120" y="160" width="210" height="35" rx="8" fill="rgba(129,199,132,0.15)" stroke="#81c784"/>
+                    <text x="225" y="182" text-anchor="middle" fill="#81c784" font-size="14">⟹ √2 on irrationaalinen ∎</text>`;
+                }}
+            ]
+        }
+    };
+
     let currentProof = null;
     let currentStep = 0;
     let completedProofs = 0;
     let totalQuizzes = 0;
     let correctQuizzes = 0;
+    let videoInterval = null;
+    let videoFrame = 0;
+    let videoPlaying = false;
 
     function newProof() {
+        if (videoInterval) clearInterval(videoInterval);
+        videoPlaying = false;
+        videoFrame = 0;
         const index = Math.floor(Math.random() * proofs.length);
         currentProof = proofs[index];
         currentStep = 0;
@@ -694,12 +881,15 @@
         const diffClass = `difficulty-${currentProof.difficulty}`;
         const diffLabel = {easy: "Helppo", medium: "Keskitaso", hard: "Haastava"}[currentProof.difficulty];
 
+        const videoHtml = renderVideo(currentProof.name);
+
         let html = `
             <div class="theorem-card">
                 <span class="category-tag">${currentProof.category}</span>
                 <span class="difficulty-tag ${diffClass}">${diffLabel}</span>
                 <h2>${currentProof.name}</h2>
                 <div class="theorem-statement">${currentProof.statement}</div>
+                ${videoHtml}
                 <div class="proof-steps" id="proof-steps">
         `;
 
@@ -827,6 +1017,97 @@
         document.getElementById('proofs-completed').textContent = completedProofs;
         const pct = totalQuizzes > 0 ? Math.round((correctQuizzes / totalQuizzes) * 100) : 0;
         document.getElementById('quiz-score').textContent = pct + '%';
+    }
+
+    function getVideoForProof(proofName) {
+        return visualAnimations[proofName] || null;
+    }
+
+    function renderVideo(proofName) {
+        const anim = getVideoForProof(proofName);
+        if (!anim) return '';
+        return `
+            <div class="video-section">
+                <h3>Visuaalinen selitys</h3>
+                <div class="video-container" id="video-canvas">
+                    <svg viewBox="0 0 450 200" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="450" height="200" fill="#0a0a1a"/>
+                        ${anim.frames[0].draw()}
+                    </svg>
+                </div>
+                <div class="video-controls">
+                    <button class="video-btn" id="video-play-btn" onclick="toggleVideo()">▶ Toista</button>
+                    <div class="video-timeline">
+                        <div class="video-timeline-fill" id="video-progress"></div>
+                    </div>
+                    <button class="video-btn" onclick="resetVideo()">⏮ Alku</button>
+                </div>
+                <div class="video-label" id="video-label">${anim.frames[0].label}</div>
+            </div>
+        `;
+    }
+
+    function toggleVideo() {
+        const anim = getVideoForProof(currentProof.name);
+        if (!anim) return;
+        const btn = document.getElementById('video-play-btn');
+
+        if (videoPlaying) {
+            clearInterval(videoInterval);
+            videoPlaying = false;
+            btn.textContent = '▶ Toista';
+            btn.classList.remove('playing');
+        } else {
+            videoPlaying = true;
+            btn.textContent = '⏸ Tauko';
+            btn.classList.add('playing');
+            videoInterval = setInterval(() => {
+                videoFrame++;
+                if (videoFrame >= anim.frames.length) {
+                    videoFrame = 0;
+                    clearInterval(videoInterval);
+                    videoPlaying = false;
+                    btn.textContent = '▶ Toista';
+                    btn.classList.remove('playing');
+                }
+                updateVideoFrame(anim);
+            }, 2500);
+        }
+    }
+
+    function resetVideo() {
+        const anim = getVideoForProof(currentProof.name);
+        if (!anim) return;
+        clearInterval(videoInterval);
+        videoPlaying = false;
+        videoFrame = 0;
+        updateVideoFrame(anim);
+        const btn = document.getElementById('video-play-btn');
+        if (btn) {
+            btn.textContent = '▶ Toista';
+            btn.classList.remove('playing');
+        }
+    }
+
+    function updateVideoFrame(anim) {
+        const canvas = document.getElementById('video-canvas');
+        const progress = document.getElementById('video-progress');
+        const label = document.getElementById('video-label');
+        if (!canvas || !anim) return;
+
+        const frame = anim.frames[videoFrame];
+        canvas.innerHTML = `
+            <svg viewBox="0 0 450 200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="450" height="200" fill="#0a0a1a"/>
+                ${frame.draw()}
+            </svg>
+        `;
+        if (progress) {
+            progress.style.width = ((videoFrame + 1) / anim.frames.length * 100) + '%';
+        }
+        if (label) {
+            label.textContent = frame.label;
+        }
     }
     </script>
 </body>

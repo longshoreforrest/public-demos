@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 LyhenneSanakirja — Organisaation termistö</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+            color: #fff;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        .header-left h1 { font-size: 1.2rem; font-weight: 700; }
+        .header-left .subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+        .header-actions { display: flex; gap: 8px; }
+        .header-btn {
+            padding: 6px 14px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .header-btn:hover { background: rgba(255,255,255,0.2); }
+
+        main { max-width: 960px; margin: 0 auto; padding: 20px; }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-chip {
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-chip .num { color: #0284c7; font-size: 1.1rem; }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus { border-color: #0284c7; }
+        .category-filter {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #0284c7; color: #fff; }
+        .btn-primary:hover { background: #0369a1; }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
+        .btn-secondary:hover { background: #cbd5e1; }
+        .btn-danger { background: #fee2e2; color: #dc2626; }
+        .btn-danger:hover { background: #fecaca; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+        .letter-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+        .letter-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .letter-btn:hover { background: #e0f2fe; color: #0284c7; }
+        .letter-btn.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+        .letter-btn.disabled { opacity: 0.3; cursor: default; }
+
+        .letter-group { margin-bottom: 24px; }
+        .letter-heading {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #0284c7;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 12px;
+        }
+
+        .term-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            transition: box-shadow 0.2s;
+        }
+        .term-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .term-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+        .term-abbr {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .term-full { font-size: 0.95rem; color: #475569; margin-top: 4px; }
+        .term-desc { font-size: 0.88rem; color: #64748b; margin-top: 6px; line-height: 1.5; }
+        .term-meta { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+        .term-tag {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 100px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 600;
+        }
+        .term-tag.source { background: #fef3c7; color: #92400e; }
+        .term-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .icon-btn:hover { background: #f1f5f9; }
+        .icon-btn.delete:hover { background: #fee2e2; border-color: #fecaca; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state p { font-size: 1rem; margin-bottom: 16px; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .modal h2 { font-size: 1.2rem; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: #0284c7;
+        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+        .import-area {
+            width: 100%;
+            min-height: 160px;
+            padding: 12px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.82rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .import-area:focus { border-color: #0284c7; }
+        .import-hint {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .export-preview {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        .export-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .export-tab {
+            padding: 6px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .export-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+
+        .source-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .source-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #f1f5f9;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #475569;
+        }
+        .source-chip .remove {
+            cursor: pointer;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+        .source-chip .remove:hover { color: #dc2626; }
+
+        .settings-section { margin-bottom: 24px; }
+        .settings-section h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+        .source-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+        .source-list-item .name { font-weight: 600; font-size: 0.9rem; }
+        .source-list-item .desc { font-size: 0.78rem; color: #64748b; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f172a;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 3000;
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 640px) {
+            main { padding: 12px; }
+            .toolbar { gap: 8px; }
+            .search-box { min-width: 100%; }
+            .header-actions { flex-wrap: wrap; }
+            .modal { padding: 20px; }
+            .letter-btn { width: 28px; height: 28px; font-size: 0.72rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-row">
+        <div class="header-left">
+            <h1>📖 LyhenneSanakirja</h1>
+            <div class="subtitle">Organisaation termistö ja lyhenteet</div>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="openSettings()">Asetukset</button>
+            <button class="header-btn" onclick="openImport()">Tuo</button>
+            <button class="header-btn" onclick="openExport()">Vie wikiin</button>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <div class="toolbar">
+        <input type="text" class="search-box" id="search" placeholder="Hae lyhennettä, termiä tai kuvausta...">
+        <select class="category-filter" id="category-filter">
+            <option value="">Kaikki kategoriat</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddTerm()">+ Lisää termi</button>
+    </div>
+
+    <div class="letter-nav" id="letter-nav"></div>
+
+    <div id="terms-container"></div>
+</main>
+
+<!-- Add/Edit term modal -->
+<div class="modal-overlay" id="term-modal">
+    <div class="modal">
+        <h2 id="term-modal-title">Lisää uusi termi</h2>
+        <input type="hidden" id="edit-id">
+        <div class="form-group">
+            <label>Lyhenne / termi *</label>
+            <input type="text" id="term-abbr" placeholder="esim. FMI, ECMWF, SYNOP">
+        </div>
+        <div class="form-group">
+            <label>Täysi muoto</label>
+            <input type="text" id="term-full" placeholder="esim. Finnish Meteorological Institute">
+        </div>
+        <div class="form-group">
+            <label>Kuvaus / selitys</label>
+            <textarea id="term-desc" placeholder="Mitä termi tarkoittaa ja missä yhteydessä sitä käytetään..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Kategoria</label>
+            <input type="text" id="term-category" placeholder="esim. Organisaatiot, Tekniikka, Säämallit" list="cat-list">
+            <datalist id="cat-list"></datalist>
+        </div>
+        <div class="form-group">
+            <label>Lähde</label>
+            <input type="text" id="term-source" placeholder="esim. Intranet, Palaverimuistio, Käyttöohje" list="source-list">
+            <datalist id="source-list"></datalist>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-secondary" onclick="closeModal('term-modal')">Peruuta</button>
+            <button class="btn btn-primary" onclick="saveTerm()">Tallenna</button>
+        </div>
+    </div>
+</div>
+
+<!-- Import modal -->
+<div class="modal-overlay" id="import-modal">
+    <div class="modal">
+        <h2>Tuo termejä</h2>
+        <div class="form-group">
+            <label>Tuontiformaatti</label>
+            <select id="import-format">
+                <option value="csv">CSV (lyhenne;täysi muoto;kuvaus;kategoria)</option>
+                <option value="tsv">TSV (sarkainerotteinen)</option>
+                <option value="text">Vapaa teksti (lyhenne = selitys)</option>
+                <option value="json">JSON</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Liitä data alle</label>
+            <textarea class="import-area" id="import-data" placeholder="Liitä tuotava data tähän..."></textarea>
+            <div class="import-hint">
+                <strong>CSV:</strong> lyhenne;täysi muoto;kuvaus;kategoria (otsikkorivi valinnainen)<br>
+                <strong>TSV:</strong> sama kuin CSV, mutta sarkain erottimena<br>
+                <strong>Vapaa teksti:</strong> LYHENNE = Selitys (yksi per rivi)<br>
+                <strong>JSON:</strong> taulukko objekteja {abbr, full, desc, category}
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Oletuslähde tuoduille termeille</label>
+            <input type="text" id="import-source" placeholder="esim. Vuosiraportti 2025">
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-secondary" onclick="closeModal('import-modal')">Peruuta</button>
+            <button class="btn btn-primary" onclick="doImport()">Tuo termit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Export modal -->
+<div class="modal-overlay" id="export-modal">
+    <div class="modal">
+        <h2>Vie sanakirja wikiin</h2>
+        <div class="export-tabs" id="export-tabs">
+            <button class="export-tab active" data-format="markdown" onclick="switchExportTab('markdown')">Markdown</button>
+            <button class="export-tab" data-format="mediawiki" onclick="switchExportTab('mediawiki')">MediaWiki</button>
+            <button class="export-tab" data-format="confluence" onclick="switchExportTab('confluence')">Confluence</button>
+            <button class="export-tab" data-format="html" onclick="switchExportTab('html')">HTML</button>
+            <button class="export-tab" data-format="csv" onclick="switchExportTab('csv')">CSV</button>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="export-include-desc" checked> Sisällytä kuvaukset
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="export-include-source"> Sisällytä lähteet
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="export-group-by-category" checked> Ryhmittele kategorioittain
+            </label>
+        </div>
+        <pre class="export-preview" id="export-preview"></pre>
+        <div class="form-actions">
+            <button class="btn btn-secondary" onclick="closeModal('export-modal')">Sulje</button>
+            <button class="btn btn-secondary" onclick="downloadExport()">Lataa tiedostona</button>
+            <button class="btn btn-primary" onclick="copyExport()">Kopioi leikepöydälle</button>
+        </div>
+    </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+        <h2>Asetukset</h2>
+        <div class="settings-section">
+            <h3>Organisaation nimi</h3>
+            <div class="form-group">
+                <input type="text" id="settings-org" placeholder="esim. Ilmatieteen laitos">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Sallitut lähteet</h3>
+            <p style="font-size:0.82rem;color:#64748b;margin-bottom:10px;">
+                Määrittele mistä lähteistä termejä kerätään. Näitä voi valita termejä lisätessä.
+            </p>
+            <div id="sources-list"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <input type="text" id="new-source-name" placeholder="Lähteen nimi" style="flex:1;padding:8px 10px;border:2px solid #e2e8f0;border-radius:8px;font-size:0.85rem;font-family:inherit;outline:none;">
+                <button class="btn btn-secondary btn-sm" onclick="addSource()">Lisää</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Kategoriat</h3>
+            <div id="categories-list"></div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <input type="text" id="new-cat-name" placeholder="Kategorian nimi" style="flex:1;padding:8px 10px;border:2px solid #e2e8f0;border-radius:8px;font-size:0.85rem;font-family:inherit;outline:none;">
+                <button class="btn btn-secondary btn-sm" onclick="addCategory()">Lisää</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Tietojen hallinta</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="exportJSON()">Vie JSON-varmuuskopio</button>
+                <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                    Tuo JSON-varmuuskopio
+                    <input type="file" accept=".json" style="display:none" onchange="importJSONBackup(event)">
+                </label>
+                <button class="btn btn-danger btn-sm" onclick="clearAll()">Tyhjennä kaikki</button>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveSettings()">Tallenna ja sulje</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'lyhenne-sanakirja';
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ'.split('');
+
+let state = loadState();
+
+function defaultState() {
+    return {
+        orgName: '',
+        terms: [],
+        sources: ['Intranet', 'Palaverimuistio', 'Käyttöohje', 'Sähköposti', 'Toimintasuunnitelma'],
+        categories: ['Organisaatiot', 'Tekniikka', 'Prosessit', 'Järjestelmät', 'Yleiset'],
+        nextId: 1
+    };
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            const s = JSON.parse(raw);
+            if (!s.sources) s.sources = defaultState().sources;
+            if (!s.categories) s.categories = defaultState().categories;
+            if (!s.nextId) s.nextId = (s.terms || []).length + 1;
+            return s;
+        }
+    } catch(e) {}
+
+    const s = defaultState();
+    s.terms = getSampleTerms();
+    s.nextId = s.terms.length + 1;
+    return s;
+}
+
+function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getSampleTerms() {
+    return [
+        { id: 1, abbr: 'FMI', full: 'Finnish Meteorological Institute', desc: 'Ilmatieteen laitos englanniksi. Käytetään kansainvälisessä viestinnässä.', category: 'Organisaatiot', source: 'Intranet' },
+        { id: 2, abbr: 'ECMWF', full: 'European Centre for Medium-Range Weather Forecasts', desc: 'Euroopan keskipitkien sääennusteiden keskus. Tuottaa globaaleja sääennusteita.', category: 'Organisaatiot', source: 'Intranet' },
+        { id: 3, abbr: 'SYNOP', full: 'Surface Synoptic Observation', desc: 'Pintasääasemien havaintokoodi. WMO:n standardoima formaatti.', category: 'Tekniikka', source: 'Käyttöohje' },
+        { id: 4, abbr: 'METAR', full: 'Meteorological Aerodrome Report', desc: 'Lentosäähavainto. Lähetetään 30 min tai 60 min välein lentokentiltä.', category: 'Tekniikka', source: 'Käyttöohje' },
+        { id: 5, abbr: 'TAF', full: 'Terminal Aerodrome Forecast', desc: 'Lentokenttäennuste. Kattaa tyypillisesti 24–30 tunnin jakson.', category: 'Tekniikka', source: 'Käyttöohje' },
+        { id: 6, abbr: 'WMO', full: 'World Meteorological Organization', desc: 'YK:n alainen Maailman ilmatieteen järjestö. Koordinoi kansainvälistä säätoimintaa.', category: 'Organisaatiot', source: 'Intranet' },
+        { id: 7, abbr: 'NWP', full: 'Numerical Weather Prediction', desc: 'Numeerinen sääennustaminen. Tietokonemalleilla tehtävä ennustelaskenta.', category: 'Säämallit', source: 'Toimintasuunnitelma' },
+        { id: 8, abbr: 'HARMONIE', full: 'HIRLAM–ALADIN Research on Mesoscale Operational NWP in Euromed', desc: 'Eurooppalainen mesoasteinen sääennustusmalli. FMI:n pääasiallinen lyhyen ajan ennustusmalli.', category: 'Säämallit', source: 'Intranet' },
+        { id: 9, abbr: 'SILAM', full: 'System for Integrated modeLling of Atmospheric coMposition', desc: 'FMI:n ilmanlaatu- ja kulkeutumismalli. Ennustaa mm. siitepölyä ja ilmansaasteita.', category: 'Säämallit', source: 'Intranet' },
+        { id: 10, abbr: 'OBS', full: 'Observation / Havainto', desc: 'Yleislyhenne havaintodatalle. Sisältää asemat, tutkat, luotaukset.', category: 'Yleiset', source: '' },
+        { id: 11, abbr: 'QC', full: 'Quality Control', desc: 'Laadunvalvonta. Havaintodatan automaattinen ja manuaalinen tarkistusprosessi.', category: 'Prosessit', source: 'Käyttöohje' },
+        { id: 12, abbr: 'LAPS', full: 'Local Analysis and Prediction System', desc: 'Paikallinen analyysi- ja ennustusjärjestelmä. Yhdistää eri havaintolähteet.', category: 'Järjestelmät', source: 'Toimintasuunnitelma' },
+    ];
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+function render() {
+    renderStats();
+    renderCategoryFilter();
+    renderLetterNav();
+    renderTerms();
+    renderDataLists();
+}
+
+function renderStats() {
+    const cats = new Set(state.terms.map(t => t.category).filter(Boolean));
+    const sources = new Set(state.terms.map(t => t.source).filter(Boolean));
+    document.getElementById('stats-bar').innerHTML = `
+        <div class="stat-chip"><span class="num">${state.terms.length}</span> termiä</div>
+        <div class="stat-chip"><span class="num">${cats.size}</span> kategoriaa</div>
+        <div class="stat-chip"><span class="num">${sources.size}</span> lähdettä</div>
+        ${state.orgName ? `<div class="stat-chip">${state.orgName}</div>` : ''}
+    `;
+}
+
+function renderCategoryFilter() {
+    const sel = document.getElementById('category-filter');
+    const val = sel.value;
+    const cats = [...new Set([...state.categories, ...state.terms.map(t => t.category).filter(Boolean)])].sort();
+    sel.innerHTML = '<option value="">Kaikki kategoriat</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.value = val;
+}
+
+function renderDataLists() {
+    const cats = [...new Set([...state.categories, ...state.terms.map(t => t.category).filter(Boolean)])].sort();
+    const sources = [...new Set([...state.sources, ...state.terms.map(t => t.source).filter(Boolean)])].sort();
+    document.getElementById('cat-list').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+    document.getElementById('source-list').innerHTML = sources.map(s => `<option value="${s}">`).join('');
+}
+
+function getFilteredTerms() {
+    const q = document.getElementById('search').value.toLowerCase().trim();
+    const cat = document.getElementById('category-filter').value;
+    return state.terms.filter(t => {
+        if (cat && t.category !== cat) return false;
+        if (q) {
+            const haystack = [t.abbr, t.full, t.desc, t.category, t.source].join(' ').toLowerCase();
+            return haystack.includes(q);
+        }
+        return true;
+    });
+}
+
+function renderLetterNav() {
+    const terms = getFilteredTerms();
+    const usedLetters = new Set(terms.map(t => (t.abbr || '')[0].toUpperCase()));
+    document.getElementById('letter-nav').innerHTML = LETTERS.map(l =>
+        `<button class="letter-btn ${usedLetters.has(l) ? '' : 'disabled'}" onclick="scrollToLetter('${l}')" ${usedLetters.has(l) ? '' : 'disabled'}>${l}</button>`
+    ).join('');
+}
+
+function renderTerms() {
+    const terms = getFilteredTerms();
+    if (terms.length === 0) {
+        document.getElementById('terms-container').innerHTML = `
+            <div class="empty-state">
+                <div class="icon">📖</div>
+                <p>Ei termejä näytettäväksi</p>
+                <button class="btn btn-primary" onclick="openAddTerm()">Lisää ensimmäinen termi</button>
+            </div>
+        `;
+        return;
+    }
+
+    const sorted = [...terms].sort((a, b) => a.abbr.localeCompare(b.abbr, 'fi'));
+    const groups = {};
+    sorted.forEach(t => {
+        const letter = (t.abbr[0] || '?').toUpperCase();
+        if (!groups[letter]) groups[letter] = [];
+        groups[letter].push(t);
+    });
+
+    let html = '';
+    for (const letter of LETTERS) {
+        if (!groups[letter]) continue;
+        html += `<div class="letter-group" id="letter-${letter}">`;
+        html += `<div class="letter-heading">${letter}</div>`;
+        for (const t of groups[letter]) {
+            html += `<div class="term-card">
+                <div class="term-top">
+                    <div>
+                        <div class="term-abbr">${esc(t.abbr)}</div>
+                        ${t.full ? `<div class="term-full">${esc(t.full)}</div>` : ''}
+                        ${t.desc ? `<div class="term-desc">${esc(t.desc)}</div>` : ''}
+                        <div class="term-meta">
+                            ${t.category ? `<span class="term-tag">${esc(t.category)}</span>` : ''}
+                            ${t.source ? `<span class="term-tag source">${esc(t.source)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="term-actions">
+                        <button class="icon-btn" onclick="editTerm(${t.id})" title="Muokkaa">✏️</button>
+                        <button class="icon-btn delete" onclick="deleteTerm(${t.id})" title="Poista">🗑️</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+        html += '</div>';
+    }
+    document.getElementById('terms-container').innerHTML = html;
+}
+
+function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+}
+
+function scrollToLetter(l) {
+    const el = document.getElementById('letter-' + l);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openAddTerm() {
+    document.getElementById('term-modal-title').textContent = 'Lisää uusi termi';
+    document.getElementById('edit-id').value = '';
+    document.getElementById('term-abbr').value = '';
+    document.getElementById('term-full').value = '';
+    document.getElementById('term-desc').value = '';
+    document.getElementById('term-category').value = '';
+    document.getElementById('term-source').value = '';
+    document.getElementById('term-modal').classList.add('open');
+    document.getElementById('term-abbr').focus();
+}
+
+function editTerm(id) {
+    const t = state.terms.find(x => x.id === id);
+    if (!t) return;
+    document.getElementById('term-modal-title').textContent = 'Muokkaa termiä';
+    document.getElementById('edit-id').value = id;
+    document.getElementById('term-abbr').value = t.abbr;
+    document.getElementById('term-full').value = t.full || '';
+    document.getElementById('term-desc').value = t.desc || '';
+    document.getElementById('term-category').value = t.category || '';
+    document.getElementById('term-source').value = t.source || '';
+    document.getElementById('term-modal').classList.add('open');
+    document.getElementById('term-abbr').focus();
+}
+
+function saveTerm() {
+    const abbr = document.getElementById('term-abbr').value.trim();
+    if (!abbr) { showToast('Lyhenne on pakollinen'); return; }
+    const data = {
+        abbr,
+        full: document.getElementById('term-full').value.trim(),
+        desc: document.getElementById('term-desc').value.trim(),
+        category: document.getElementById('term-category').value.trim(),
+        source: document.getElementById('term-source').value.trim()
+    };
+    const editId = document.getElementById('edit-id').value;
+    if (editId) {
+        const idx = state.terms.findIndex(t => t.id === Number(editId));
+        if (idx >= 0) state.terms[idx] = { ...state.terms[idx], ...data };
+    } else {
+        data.id = state.nextId++;
+        state.terms.push(data);
+    }
+    saveState();
+    closeModal('term-modal');
+    render();
+    showToast(editId ? 'Termi päivitetty' : 'Termi lisätty');
+}
+
+function deleteTerm(id) {
+    const t = state.terms.find(x => x.id === id);
+    if (!t || !confirm(`Poistetaanko "${t.abbr}"?`)) return;
+    state.terms = state.terms.filter(x => x.id !== id);
+    saveState();
+    render();
+    showToast('Termi poistettu');
+}
+
+function openImport() {
+    document.getElementById('import-data').value = '';
+    document.getElementById('import-source').value = '';
+    document.getElementById('import-modal').classList.add('open');
+}
+
+function doImport() {
+    const format = document.getElementById('import-format').value;
+    const raw = document.getElementById('import-data').value.trim();
+    const source = document.getElementById('import-source').value.trim();
+    if (!raw) { showToast('Liitä tuotava data'); return; }
+
+    let imported = [];
+    try {
+        if (format === 'json') {
+            imported = JSON.parse(raw);
+            if (!Array.isArray(imported)) imported = [imported];
+        } else if (format === 'text') {
+            raw.split('\n').forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                const m = line.match(/^([^=:–—-]+?)\s*[=:–—-]\s*(.+)$/);
+                if (m) {
+                    imported.push({ abbr: m[1].trim(), desc: m[2].trim() });
+                }
+            });
+        } else {
+            const sep = format === 'tsv' ? '\t' : ';';
+            const lines = raw.split('\n').filter(l => l.trim());
+            const first = lines[0].toLowerCase();
+            const hasHeader = first.includes('lyhenne') || first.includes('abbr') || first.includes('termi');
+            const start = hasHeader ? 1 : 0;
+            for (let i = start; i < lines.length; i++) {
+                const parts = lines[i].split(sep).map(p => p.trim().replace(/^"|"$/g, ''));
+                if (parts[0]) {
+                    imported.push({
+                        abbr: parts[0],
+                        full: parts[1] || '',
+                        desc: parts[2] || '',
+                        category: parts[3] || ''
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        showToast('Virhe tuonnissa: ' + e.message);
+        return;
+    }
+
+    let count = 0;
+    imported.forEach(t => {
+        if (!t.abbr) return;
+        t.id = state.nextId++;
+        if (source && !t.source) t.source = source;
+        if (!t.category) t.category = '';
+        if (!t.full) t.full = '';
+        if (!t.desc) t.desc = '';
+        state.terms.push(t);
+        count++;
+    });
+
+    saveState();
+    closeModal('import-modal');
+    render();
+    showToast(`${count} termiä tuotu`);
+}
+
+let currentExportFormat = 'markdown';
+
+function openExport() {
+    currentExportFormat = 'markdown';
+    document.querySelectorAll('.export-tab').forEach(t => t.classList.toggle('active', t.dataset.format === 'markdown'));
+    updateExportPreview();
+    document.getElementById('export-modal').classList.add('open');
+}
+
+function switchExportTab(format) {
+    currentExportFormat = format;
+    document.querySelectorAll('.export-tab').forEach(t => t.classList.toggle('active', t.dataset.format === format));
+    updateExportPreview();
+}
+
+function updateExportPreview() {
+    const includeDesc = document.getElementById('export-include-desc').checked;
+    const includeSource = document.getElementById('export-include-source').checked;
+    const groupByCat = document.getElementById('export-group-by-category').checked;
+    const sorted = [...state.terms].sort((a, b) => a.abbr.localeCompare(b.abbr, 'fi'));
+    const title = state.orgName ? `${state.orgName} — Lyhenteet ja termistö` : 'Lyhenteet ja termistö';
+
+    let output = '';
+    if (currentExportFormat === 'markdown') output = toMarkdown(sorted, title, includeDesc, includeSource, groupByCat);
+    else if (currentExportFormat === 'mediawiki') output = toMediaWiki(sorted, title, includeDesc, includeSource, groupByCat);
+    else if (currentExportFormat === 'confluence') output = toConfluence(sorted, title, includeDesc, includeSource, groupByCat);
+    else if (currentExportFormat === 'html') output = toHTML(sorted, title, includeDesc, includeSource, groupByCat);
+    else if (currentExportFormat === 'csv') output = toCSV(sorted, includeDesc, includeSource);
+
+    document.getElementById('export-preview').textContent = output;
+}
+
+document.getElementById('export-include-desc').addEventListener('change', updateExportPreview);
+document.getElementById('export-include-source').addEventListener('change', updateExportPreview);
+document.getElementById('export-group-by-category').addEventListener('change', updateExportPreview);
+
+function groupTerms(terms, groupByCat) {
+    if (!groupByCat) return { '': terms };
+    const groups = {};
+    terms.forEach(t => {
+        const cat = t.category || 'Muut';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(t);
+    });
+    return groups;
+}
+
+function toMarkdown(terms, title, desc, src, groupCat) {
+    let out = `# ${title}\n\n`;
+    const groups = groupTerms(terms, groupCat);
+    for (const [cat, items] of Object.entries(groups)) {
+        if (cat) out += `## ${cat}\n\n`;
+        out += '| Lyhenne | Täysi muoto |' + (desc ? ' Kuvaus |' : '') + (src ? ' Lähde |' : '') + '\n';
+        out += '|---------|------------|' + (desc ? '---------|' : '') + (src ? '--------|' : '') + '\n';
+        items.forEach(t => {
+            out += `| **${t.abbr}** | ${t.full || ''} |`;
+            if (desc) out += ` ${t.desc || ''} |`;
+            if (src) out += ` ${t.source || ''} |`;
+            out += '\n';
+        });
+        out += '\n';
+    }
+    return out;
+}
+
+function toMediaWiki(terms, title, desc, src, groupCat) {
+    let out = `= ${title} =\n\n`;
+    const groups = groupTerms(terms, groupCat);
+    for (const [cat, items] of Object.entries(groups)) {
+        if (cat) out += `== ${cat} ==\n\n`;
+        out += '{| class="wikitable sortable"\n';
+        out += '|-\n! Lyhenne !! Täysi muoto';
+        if (desc) out += ' !! Kuvaus';
+        if (src) out += ' !! Lähde';
+        out += '\n';
+        items.forEach(t => {
+            out += '|-\n';
+            out += `| '''${t.abbr}''' || ${t.full || ''}`;
+            if (desc) out += ` || ${t.desc || ''}`;
+            if (src) out += ` || ${t.source || ''}`;
+            out += '\n';
+        });
+        out += '|}\n\n';
+    }
+    return out;
+}
+
+function toConfluence(terms, title, desc, src, groupCat) {
+    let out = `h1. ${title}\n\n`;
+    const groups = groupTerms(terms, groupCat);
+    for (const [cat, items] of Object.entries(groups)) {
+        if (cat) out += `h2. ${cat}\n\n`;
+        let header = '|| Lyhenne || Täysi muoto ||';
+        if (desc) header += ' Kuvaus ||';
+        if (src) header += ' Lähde ||';
+        out += header + '\n';
+        items.forEach(t => {
+            out += `| *${t.abbr}* | ${t.full || ''} |`;
+            if (desc) out += ` ${t.desc || ''} |`;
+            if (src) out += ` ${t.source || ''} |`;
+            out += '\n';
+        });
+        out += '\n';
+    }
+    return out;
+}
+
+function toHTML(terms, title, desc, src, groupCat) {
+    let out = `<h1>${esc(title)}</h1>\n`;
+    const groups = groupTerms(terms, groupCat);
+    for (const [cat, items] of Object.entries(groups)) {
+        if (cat) out += `<h2>${esc(cat)}</h2>\n`;
+        out += '<table border="1" cellpadding="6" cellspacing="0">\n<tr><th>Lyhenne</th><th>Täysi muoto</th>';
+        if (desc) out += '<th>Kuvaus</th>';
+        if (src) out += '<th>Lähde</th>';
+        out += '</tr>\n';
+        items.forEach(t => {
+            out += `<tr><td><strong>${esc(t.abbr)}</strong></td><td>${esc(t.full || '')}</td>`;
+            if (desc) out += `<td>${esc(t.desc || '')}</td>`;
+            if (src) out += `<td>${esc(t.source || '')}</td>`;
+            out += '</tr>\n';
+        });
+        out += '</table>\n\n';
+    }
+    return out;
+}
+
+function toCSV(terms, desc, src) {
+    let header = 'Lyhenne;Täysi muoto';
+    if (desc) header += ';Kuvaus';
+    if (src) header += ';Lähde';
+    header += ';Kategoria\n';
+    return header + terms.map(t => {
+        let row = `"${t.abbr}";"${t.full || ''}"`;
+        if (desc) row += `;"${(t.desc || '').replace(/"/g, '""')}"`;
+        if (src) row += `;"${t.source || ''}"`;
+        row += `;"${t.category || ''}"`;
+        return row;
+    }).join('\n');
+}
+
+function copyExport() {
+    const text = document.getElementById('export-preview').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('Kopioitu leikepöydälle'));
+}
+
+function downloadExport() {
+    const text = document.getElementById('export-preview').textContent;
+    const exts = { markdown: 'md', mediawiki: 'wiki', confluence: 'txt', html: 'html', csv: 'csv' };
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `lyhenteet.${exts[currentExportFormat] || 'txt'}`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function openSettings() {
+    document.getElementById('settings-org').value = state.orgName || '';
+    renderSourcesList();
+    renderCategoriesList();
+    document.getElementById('settings-modal').classList.add('open');
+}
+
+function renderSourcesList() {
+    document.getElementById('sources-list').innerHTML = state.sources.map((s, i) => `
+        <div class="source-list-item">
+            <span class="name">${esc(s)}</span>
+            <button class="btn btn-danger btn-sm" onclick="removeSource(${i})">Poista</button>
+        </div>
+    `).join('');
+}
+
+function renderCategoriesList() {
+    document.getElementById('categories-list').innerHTML = state.categories.map((c, i) => `
+        <div class="source-list-item">
+            <span class="name">${esc(c)}</span>
+            <button class="btn btn-danger btn-sm" onclick="removeCategory(${i})">Poista</button>
+        </div>
+    `).join('');
+}
+
+function addSource() {
+    const input = document.getElementById('new-source-name');
+    const name = input.value.trim();
+    if (!name) return;
+    if (!state.sources.includes(name)) state.sources.push(name);
+    input.value = '';
+    saveState();
+    renderSourcesList();
+}
+
+function removeSource(i) {
+    state.sources.splice(i, 1);
+    saveState();
+    renderSourcesList();
+}
+
+function addCategory() {
+    const input = document.getElementById('new-cat-name');
+    const name = input.value.trim();
+    if (!name) return;
+    if (!state.categories.includes(name)) state.categories.push(name);
+    input.value = '';
+    saveState();
+    renderCategoriesList();
+}
+
+function removeCategory(i) {
+    state.categories.splice(i, 1);
+    saveState();
+    renderCategoriesList();
+}
+
+function saveSettings() {
+    state.orgName = document.getElementById('settings-org').value.trim();
+    saveState();
+    closeModal('settings-modal');
+    render();
+    showToast('Asetukset tallennettu');
+}
+
+function exportJSON() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lyhenne-sanakirja-varmuuskopio.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function importJSONBackup(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            const imported = JSON.parse(ev.target.result);
+            if (imported.terms && Array.isArray(imported.terms)) {
+                state = { ...defaultState(), ...imported };
+                saveState();
+                render();
+                showToast(`Varmuuskopio palautettu (${state.terms.length} termiä)`);
+                closeModal('settings-modal');
+            } else {
+                showToast('Virheellinen varmuuskopiotiedosto');
+            }
+        } catch(err) {
+            showToast('JSON-tiedoston luku epäonnistui');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function clearAll() {
+    if (!confirm('Haluatko varmasti tyhjentää kaikki termit? Tätä ei voi perua.')) return;
+    state = defaultState();
+    state.terms = [];
+    saveState();
+    render();
+    closeModal('settings-modal');
+    showToast('Kaikki tiedot tyhjennetty');
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('category-filter').addEventListener('change', render);
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('open');
+    });
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    }
+});
+
+render();
+</script>
+</body>
+</html>

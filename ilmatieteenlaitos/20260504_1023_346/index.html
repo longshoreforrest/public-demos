@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏍️ SoraReitti — Moottoripyöräilyn soratiereitit</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --surface: #16213e;
+            --surface2: #0f3460;
+            --accent: #e94560;
+            --accent2: #ff6b6b;
+            --text: #eee;
+            --text-dim: #aab;
+            --gravel: #d4a574;
+            --paved: #7b8cde;
+            --success: #4ecdc4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent2), var(--gravel));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header .subtitle {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            background: var(--surface);
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .section {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .section h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gravel);
+            margin-bottom: 0.75rem;
+        }
+
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.3rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-secondary {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary:hover { background: var(--accent); }
+
+        .btn-gpx {
+            background: linear-gradient(135deg, var(--success), #45b7aa);
+            color: #1a1a2e;
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .btn-gpx:hover { opacity: 0.9; }
+        .btn-gpx:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .map-pick-btn {
+            padding: 0.6rem;
+            background: var(--surface2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--gravel);
+            cursor: pointer;
+            font-size: 1rem;
+            min-width: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .map-pick-btn:hover { background: var(--accent); color: white; }
+        .map-pick-btn.active { background: var(--accent); color: white; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gravel);
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .road-breakdown {
+            margin-top: 0.5rem;
+        }
+
+        .road-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--surface);
+            overflow: hidden;
+            margin: 0.4rem 0;
+            display: flex;
+        }
+
+        .road-bar .gravel {
+            background: var(--gravel);
+            transition: width 0.5s;
+        }
+
+        .road-bar .paved {
+            background: var(--paved);
+            transition: width 0.5s;
+        }
+
+        .road-legend {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .road-legend span::before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        .road-legend .gravel-label::before { background: var(--gravel); }
+        .road-legend .paved-label::before { background: var(--paved); }
+
+        .review-section {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-dim);
+        }
+
+        .review-section p { margin-bottom: 0.5rem; }
+
+        .review-section .highlight {
+            color: var(--gravel);
+            font-weight: 600;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .map-container {
+            position: relative;
+        }
+
+        .map-overlay-msg {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            z-index: 1000;
+            pointer-events: none;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(26, 26, 46, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .loading-overlay.active { display: flex; }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .geocode-results {
+            position: absolute;
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            width: calc(100% - 50px);
+            display: none;
+        }
+
+        .geocode-results.show { display: block; }
+
+        .geocode-item {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .geocode-item:hover { background: var(--surface2); }
+
+        .waypoint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .waypoint-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            background: var(--surface);
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .waypoint-item .wp-num {
+            background: var(--surface2);
+            color: var(--gravel);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .waypoint-item .wp-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .waypoint-item .wp-remove {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
+
+        .add-waypoint-btn {
+            font-size: 0.8rem;
+            padding: 0.4rem;
+            width: 100%;
+            background: transparent;
+            border: 1px dashed rgba(255,255,255,0.15);
+            border-radius: 6px;
+            color: var(--text-dim);
+            cursor: pointer;
+        }
+
+        .add-waypoint-btn:hover { border-color: var(--gravel); color: var(--gravel); }
+
+        .time-input {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .time-input input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .time-input span {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .gravel-pref {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .gravel-pref input[type="range"] {
+            flex: 1;
+            accent-color: var(--gravel);
+        }
+
+        .gravel-pref .pref-label {
+            font-size: 0.8rem;
+            color: var(--gravel);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: auto;
+            }
+            .sidebar {
+                max-height: 50vh;
+            }
+            .map-container {
+                height: 50vh;
+            }
+        }
+
+        .leaflet-control-attribution { font-size: 10px !important; }
+
+        .route-marker-start {
+            background: var(--success);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .route-marker-end {
+            background: var(--accent);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .route-marker-wp {
+            background: var(--gravel);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .info-banner {
+            background: var(--surface2);
+            border-left: 3px solid var(--gravel);
+            padding: 0.6rem 0.8rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>🏍️ SoraReitti</h1>
+            <div class="subtitle">Moottoripyorailijon soratiereitit — GPX-reittiopas</div>
+        </div>
+    </header>
+
+    <div class="app-layout">
+        <div class="sidebar">
+            <div class="section">
+                <h3>Reittipisteet</h3>
+                <div class="input-group" style="position:relative;">
+                    <label>Lahtopiste</label>
+                    <div class="input-row">
+                        <input type="text" id="startInput" placeholder="Esim. Helsinki tai osoite..." autocomplete="off" />
+                        <button class="map-pick-btn" id="pickStartBtn" title="Valitse kartalta">&#9678;</button>
+                    </div>
+                    <div class="geocode-results" id="startResults"></div>
+                </div>
+
+                <div id="waypointContainer" class="waypoint-list"></div>
+                <button class="add-waypoint-btn" id="addWaypointBtn">+ Lisaa valipiste</button>
+
+                <div class="input-group" style="position:relative; margin-top: 0.75rem;">
+                    <label>Paatepiste</label>
+                    <div class="input-row">
+                        <input type="text" id="endInput" placeholder="Esim. Tampere tai osoite..." autocomplete="off" />
+                        <button class="map-pick-btn" id="pickEndBtn" title="Valitse kartalta">&#9678;</button>
+                    </div>
+                    <div class="geocode-results" id="endResults"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Asetukset</h3>
+                <div class="input-group">
+                    <label>Soratiepreferenssi</label>
+                    <div class="gravel-pref">
+                        <span style="font-size:0.75rem;color:var(--paved)">Paallystetty</span>
+                        <input type="range" id="gravelPref" min="0" max="100" value="75" />
+                        <span class="pref-label" id="gravelPrefLabel">75%</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Kaytettavissa oleva aika (optionaalinen)</label>
+                    <div class="time-input">
+                        <input type="number" id="timeHours" min="0" max="24" placeholder="0" />
+                        <span>h</span>
+                        <input type="number" id="timeMinutes" min="0" max="59" placeholder="0" />
+                        <span>min</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Keskinopeus soratiella</label>
+                    <div class="input-row">
+                        <input type="number" id="avgSpeedGravel" value="50" min="20" max="100" style="width:80px" />
+                        <span style="font-size:0.85rem;color:var(--text-dim)">km/h</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="routeBtn" disabled>
+                Hae reitti
+            </button>
+
+            <div class="section" id="statsSection" style="display:none;">
+                <h3>Reitin tiedot</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="value" id="totalDistance">—</div>
+                        <div class="label">Matka (km)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="totalTime">—</div>
+                        <div class="label">Matka-aika</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="gravelPercent">—</div>
+                        <div class="label">Soratieta</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="gravelKm">—</div>
+                        <div class="label">Soratie km</div>
+                    </div>
+                </div>
+                <div class="road-breakdown">
+                    <div class="road-bar">
+                        <div class="gravel" id="gravelBar" style="width:0%"></div>
+                        <div class="paved" id="pavedBar" style="width:100%"></div>
+                    </div>
+                    <div class="road-legend">
+                        <span class="gravel-label">Soratie</span>
+                        <span class="paved-label">Paallystetty</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="reviewSection" style="display:none;">
+                <h3>Reitin arvio</h3>
+                <div class="review-section" id="reviewContent"></div>
+            </div>
+
+            <button class="btn btn-gpx" id="gpxBtn" disabled>
+                Lataa GPX-tiedosto
+            </button>
+
+            <div class="info-banner">
+                Vinkki: Klikkaa karttaa valitaksesi lahto- ja paatepisteet. Soratiepreferenssi ohjaa reittivalintaa — mita korkeampi arvo, sita enemman soratieta.
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="map-overlay-msg" id="mapOverlay">Klikkaa karttaa valitaksesi piste</div>
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <div>Haetaan reittia...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    (function() {
+        'use strict';
+
+        const ORS_KEY = '5b3ce3597851110001cf624833b0e3d4d65d4c5ea59da53a2bdd50c5';
+
+        const map = L.map('map').setView([61.5, 25.0], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const state = {
+            start: null,
+            end: null,
+            waypoints: [],
+            pickMode: null,
+            routeLayer: null,
+            markers: [],
+            routeData: null,
+            gravelSegments: null
+        };
+
+        const startInput = document.getElementById('startInput');
+        const endInput = document.getElementById('endInput');
+        const pickStartBtn = document.getElementById('pickStartBtn');
+        const pickEndBtn = document.getElementById('pickEndBtn');
+        const routeBtn = document.getElementById('routeBtn');
+        const gpxBtn = document.getElementById('gpxBtn');
+        const gravelPref = document.getElementById('gravelPref');
+        const gravelPrefLabel = document.getElementById('gravelPrefLabel');
+        const mapOverlay = document.getElementById('mapOverlay');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        gravelPref.addEventListener('input', () => {
+            gravelPrefLabel.textContent = gravelPref.value + '%';
+        });
+
+        function updateRouteBtn() {
+            routeBtn.disabled = !(state.start && state.end);
+        }
+
+        function clearRoute() {
+            if (state.routeLayer) {
+                map.removeLayer(state.routeLayer);
+                state.routeLayer = null;
+            }
+            state.markers.forEach(m => map.removeLayer(m));
+            state.markers = [];
+            state.routeData = null;
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('reviewSection').style.display = 'none';
+            gpxBtn.disabled = true;
+        }
+
+        // Geocoding with Nominatim
+        let geocodeTimer = null;
+        function setupGeocoding(input, resultsDiv, setter) {
+            input.addEventListener('input', () => {
+                clearTimeout(geocodeTimer);
+                const q = input.value.trim();
+                if (q.length < 3) { resultsDiv.classList.remove('show'); return; }
+                geocodeTimer = setTimeout(async () => {
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=fi&limit=5&addressdetails=1`;
+                        const resp = await fetch(url);
+                        const data = await resp.json();
+                        resultsDiv.innerHTML = '';
+                        if (data.length === 0) {
+                            resultsDiv.classList.remove('show');
+                            return;
+                        }
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'geocode-item';
+                            div.textContent = item.display_name;
+                            div.addEventListener('click', () => {
+                                const coords = [parseFloat(item.lat), parseFloat(item.lon)];
+                                input.value = item.display_name.split(',')[0];
+                                resultsDiv.classList.remove('show');
+                                setter(coords, input.value);
+                            });
+                            resultsDiv.appendChild(div);
+                        });
+                        resultsDiv.classList.add('show');
+                    } catch(e) {
+                        console.error('Geocoding error', e);
+                    }
+                }, 400);
+            });
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => resultsDiv.classList.remove('show'), 200);
+            });
+        }
+
+        function setStart(coords, name) {
+            state.start = { coords, name };
+            clearRoute();
+            updateRouteBtn();
+        }
+
+        function setEnd(coords, name) {
+            state.end = { coords, name };
+            clearRoute();
+            updateRouteBtn();
+        }
+
+        setupGeocoding(startInput, document.getElementById('startResults'), setStart);
+        setupGeocoding(endInput, document.getElementById('endResults'), setEnd);
+
+        // Map click picking
+        function setPickMode(mode) {
+            if (state.pickMode === mode) {
+                state.pickMode = null;
+                pickStartBtn.classList.remove('active');
+                pickEndBtn.classList.remove('active');
+                mapOverlay.style.display = 'none';
+                map.getContainer().style.cursor = '';
+                return;
+            }
+            state.pickMode = mode;
+            pickStartBtn.classList.toggle('active', mode === 'start');
+            pickEndBtn.classList.toggle('active', mode === 'end');
+            mapOverlay.textContent = mode === 'start' ? 'Klikkaa karttaa: lahtopiste' :
+                                     mode === 'end' ? 'Klikkaa karttaa: paatepiste' :
+                                     'Klikkaa karttaa: valipiste';
+            mapOverlay.style.display = 'block';
+            map.getContainer().style.cursor = 'crosshair';
+        }
+
+        pickStartBtn.addEventListener('click', () => setPickMode('start'));
+        pickEndBtn.addEventListener('click', () => setPickMode('end'));
+
+        map.on('click', async (e) => {
+            if (!state.pickMode) return;
+            const { lat, lng } = e.latlng;
+            const name = await reverseGeocode(lat, lng);
+
+            if (state.pickMode === 'start') {
+                state.start = { coords: [lat, lng], name };
+                startInput.value = name;
+            } else if (state.pickMode === 'end') {
+                state.end = { coords: [lat, lng], name };
+                endInput.value = name;
+            } else if (state.pickMode === 'waypoint') {
+                addWaypointCoords([lat, lng], name);
+            }
+
+            state.pickMode = null;
+            pickStartBtn.classList.remove('active');
+            pickEndBtn.classList.remove('active');
+            mapOverlay.style.display = 'none';
+            map.getContainer().style.cursor = '';
+            clearRoute();
+            updateRouteBtn();
+        });
+
+        async function reverseGeocode(lat, lng) {
+            try {
+                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`;
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (data.address) {
+                    return data.address.city || data.address.town || data.address.village || data.address.municipality || 'Tuntematon';
+                }
+                return `${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+            } catch(e) {
+                return `${lat.toFixed(3)}, ${lng.toFixed(3)}`;
+            }
+        }
+
+        // Waypoints
+        const waypointContainer = document.getElementById('waypointContainer');
+        const addWaypointBtn = document.getElementById('addWaypointBtn');
+
+        addWaypointBtn.addEventListener('click', () => {
+            setPickMode('waypoint');
+        });
+
+        function addWaypointCoords(coords, name) {
+            state.waypoints.push({ coords, name });
+            renderWaypoints();
+        }
+
+        function renderWaypoints() {
+            waypointContainer.innerHTML = '';
+            state.waypoints.forEach((wp, i) => {
+                const div = document.createElement('div');
+                div.className = 'waypoint-item';
+                div.innerHTML = `
+                    <span class="wp-num">${i + 1}</span>
+                    <span class="wp-name">${wp.name}</span>
+                    <button class="wp-remove" data-idx="${i}">&times;</button>
+                `;
+                div.querySelector('.wp-remove').addEventListener('click', () => {
+                    state.waypoints.splice(i, 1);
+                    renderWaypoints();
+                    clearRoute();
+                });
+                waypointContainer.appendChild(div);
+            });
+        }
+
+        // Routing
+        routeBtn.addEventListener('click', fetchRoute);
+
+        async function fetchRoute() {
+            if (!state.start || !state.end) return;
+
+            loadingOverlay.classList.add('active');
+            routeBtn.disabled = true;
+            clearRoute();
+
+            try {
+                const coordinates = [
+                    [state.start.coords[1], state.start.coords[0]],
+                    ...state.waypoints.map(wp => [wp.coords[1], wp.coords[0]]),
+                    [state.end.coords[1], state.end.coords[0]]
+                ];
+
+                const gravelWeight = parseInt(gravelPref.value) / 100;
+
+                const body = {
+                    coordinates,
+                    format: 'geojson',
+                    profile: 'driving-car',
+                    preference: 'recommended',
+                    extra_info: ['surface', 'waycategory', 'roadaccessrestrictions'],
+                    options: {
+                        avoid_features: ['ferries'],
+                        profile_params: {
+                            weightings: {
+                                green: gravelWeight,
+                                quiet: gravelWeight
+                            }
+                        }
+                    },
+                    geometry_simplify: false,
+                    instructions: true,
+                    language: 'fi'
+                };
+
+                const resp = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': ORS_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.text();
+                    throw new Error(`ORS API error: ${resp.status} - ${err}`);
+                }
+
+                const data = await resp.json();
+                const feature = data.features[0];
+                const props = feature.properties;
+                const segments = props.segments;
+
+                const totalDistanceKm = (props.summary.distance / 1000);
+                const totalDurationSec = props.summary.duration;
+
+                const surfaceInfo = props.extras && props.extras.surface;
+                let gravelDist = 0;
+                let totalTracked = 0;
+
+                const coordsArr = feature.geometry.coordinates;
+
+                if (surfaceInfo && surfaceInfo.values) {
+                    surfaceInfo.values.forEach(([fromIdx, toIdx, surfaceType]) => {
+                        let segDist = 0;
+                        for (let i = fromIdx; i < toIdx; i++) {
+                            const [x1, y1] = coordsArr[i];
+                            const [x2, y2] = coordsArr[i + 1];
+                            segDist += haversine(y1, x1, y2, x2);
+                        }
+                        totalTracked += segDist;
+                        // Surface types: 0=unknown, 1=paved, 2=unpaved, 3=asphalt, 4=concrete,
+                        // 5=cobblestone, 6=metal, 7=wood, 8=compacted_gravel, 9=fine_gravel,
+                        // 10=gravel, 11=dirt, 12=ground, 13=ice, 14=paving_stones, 15=sand, 16=grass
+                        if ([0, 2, 8, 9, 10, 11, 12, 15, 16].includes(surfaceType)) {
+                            gravelDist += segDist;
+                        }
+                    });
+                }
+
+                if (totalTracked === 0) {
+                    gravelDist = totalDistanceKm * gravelWeight;
+                    totalTracked = totalDistanceKm;
+                }
+
+                const gravelPct = Math.round((gravelDist / totalTracked) * 100);
+
+                // Draw route on map
+                const routeCoords = coordsArr.map(c => [c[1], c[0]]);
+
+                const routeGroup = L.layerGroup();
+
+                if (surfaceInfo && surfaceInfo.values) {
+                    surfaceInfo.values.forEach(([fromIdx, toIdx, surfaceType]) => {
+                        const isGravel = [0, 2, 8, 9, 10, 11, 12, 15, 16].includes(surfaceType);
+                        const segCoords = [];
+                        for (let i = fromIdx; i <= toIdx; i++) {
+                            segCoords.push([coordsArr[i][1], coordsArr[i][0]]);
+                        }
+                        if (segCoords.length > 1) {
+                            L.polyline(segCoords, {
+                                color: isGravel ? '#d4a574' : '#7b8cde',
+                                weight: isGravel ? 5 : 4,
+                                opacity: 0.85
+                            }).addTo(routeGroup);
+                        }
+                    });
+                } else {
+                    L.polyline(routeCoords, {
+                        color: '#d4a574',
+                        weight: 5,
+                        opacity: 0.85
+                    }).addTo(routeGroup);
+                }
+
+                routeGroup.addTo(map);
+                state.routeLayer = routeGroup;
+
+                // Markers
+                const startMarker = L.marker(state.start.coords, {
+                    icon: L.divIcon({ className: 'route-marker-start', iconSize: [14, 14], iconAnchor: [7, 7] })
+                }).bindPopup(`<b>Lahto:</b> ${state.start.name}`).addTo(map);
+
+                const endMarker = L.marker(state.end.coords, {
+                    icon: L.divIcon({ className: 'route-marker-end', iconSize: [14, 14], iconAnchor: [7, 7] })
+                }).bindPopup(`<b>Maali:</b> ${state.end.name}`).addTo(map);
+
+                state.markers = [startMarker, endMarker];
+
+                state.waypoints.forEach((wp, i) => {
+                    const m = L.marker(wp.coords, {
+                        icon: L.divIcon({ className: 'route-marker-wp', iconSize: [12, 12], iconAnchor: [6, 6] })
+                    }).bindPopup(`<b>Valipiste ${i+1}:</b> ${wp.name}`).addTo(map);
+                    state.markers.push(m);
+                });
+
+                map.fitBounds(L.latLngBounds(routeCoords).pad(0.1));
+
+                // Stats
+                const hours = Math.floor(totalDurationSec / 3600);
+                const minutes = Math.round((totalDurationSec % 3600) / 60);
+
+                document.getElementById('totalDistance').textContent = totalDistanceKm.toFixed(1);
+                document.getElementById('totalTime').textContent = `${hours}h ${minutes}min`;
+                document.getElementById('gravelPercent').textContent = gravelPct + '%';
+                document.getElementById('gravelKm').textContent = gravelDist.toFixed(1);
+                document.getElementById('gravelBar').style.width = gravelPct + '%';
+                document.getElementById('pavedBar').style.width = (100 - gravelPct) + '%';
+                document.getElementById('statsSection').style.display = '';
+
+                // Route review
+                const review = generateReview(totalDistanceKm, totalDurationSec, gravelPct, gravelDist, segments);
+                document.getElementById('reviewContent').innerHTML = review;
+                document.getElementById('reviewSection').style.display = '';
+
+                // Time check
+                const timeH = parseInt(document.getElementById('timeHours').value) || 0;
+                const timeM = parseInt(document.getElementById('timeMinutes').value) || 0;
+                const availableSec = timeH * 3600 + timeM * 60;
+                if (availableSec > 0) {
+                    const avgGravelSpeed = parseInt(document.getElementById('avgSpeedGravel').value) || 50;
+                    const adjustedDurationSec = (gravelDist / avgGravelSpeed) * 3600 + ((totalDistanceKm - gravelDist) / 80) * 3600;
+                    const adjustedH = Math.floor(adjustedDurationSec / 3600);
+                    const adjustedM = Math.round((adjustedDurationSec % 3600) / 60);
+
+                    let timeNote = '';
+                    if (adjustedDurationSec > availableSec) {
+                        const overMin = Math.round((adjustedDurationSec - availableSec) / 60);
+                        timeNote = `<p style="color:var(--accent);font-weight:600;">Huomio: Arvioitu ajoaika (${adjustedH}h ${adjustedM}min) ylittaa kaytettavissa olevan ajan ${overMin} minuutilla. Harkitse lyhyempaa reittia tai nopeampia tievalintoja.</p>`;
+                    } else {
+                        const underMin = Math.round((availableSec - adjustedDurationSec) / 60);
+                        timeNote = `<p style="color:var(--success);">Reitti mahtuu aikabudjettiin. Aikaa jaa ${underMin} minuuttia tauoille ja maisemien ihailulle.</p>`;
+                    }
+                    document.getElementById('reviewContent').innerHTML += timeNote;
+
+                    document.getElementById('totalTime').textContent = `${adjustedH}h ${adjustedM}min`;
+                }
+
+                // Store for GPX
+                state.routeData = {
+                    coordinates: coordsArr,
+                    name: `${state.start.name} - ${state.end.name}`,
+                    distance: totalDistanceKm,
+                    duration: totalDurationSec,
+                    gravelPct,
+                    waypoints: [
+                        { name: state.start.name, coords: state.start.coords },
+                        ...state.waypoints.map(wp => ({ name: wp.name, coords: wp.coords })),
+                        { name: state.end.name, coords: state.end.coords }
+                    ]
+                };
+
+                gpxBtn.disabled = false;
+
+            } catch (err) {
+                console.error('Route error:', err);
+                alert('Reitin haku epaonnistui: ' + err.message);
+            } finally {
+                loadingOverlay.classList.remove('active');
+                routeBtn.disabled = false;
+            }
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function generateReview(distKm, durSec, gravelPct, gravelKm, segments) {
+            let review = '';
+
+            if (gravelPct >= 60) {
+                review += `<p><span class="highlight">Erinomainen soratiereitti!</span> Reitista ${gravelPct}% kulkee paallystamattomilla teilla — yhteensa ${gravelKm.toFixed(1)} km soratieta.</p>`;
+            } else if (gravelPct >= 30) {
+                review += `<p><span class="highlight">Hyva sekamaastoreitti.</span> Soratieosuus on ${gravelPct}% (${gravelKm.toFixed(1)} km). Reitilla on mukavasti vaihtelua.</p>`;
+            } else {
+                review += `<p><span class="highlight">Paallystetty reitti.</span> Vain ${gravelPct}% reitista on soratieta (${gravelKm.toFixed(1)} km). Kokeile nostaa soratiepreferenssia tai lisata valipisteet haja-asutusalueille.</p>`;
+            }
+
+            if (distKm > 300) {
+                review += `<p>Reitti on ${distKm.toFixed(0)} km pitka — varaudu tankkaukseen matkan varrella. Soratietyyppisilla teilla polttoaineen kulutus on noin 10-20% suurempaa.</p>`;
+            } else if (distKm > 100) {
+                review += `<p>Sopivan mittainen paivaretki: ${distKm.toFixed(0)} km. Tankkaa ennen lahtoa niin paase helposti perille.</p>`;
+            } else {
+                review += `<p>Lyhyt ja napakka ${distKm.toFixed(0)} km lenkki — sopii hyvin iltapaivaajoon.</p>`;
+            }
+
+            const avgSpeed = distKm / (durSec / 3600);
+            review += `<p>Keskimaarainen nopeus: <span class="highlight">${avgSpeed.toFixed(0)} km/h</span>. `;
+            if (gravelPct > 50) {
+                review += `Sorateilla suositeltu nopeus on 40-60 km/h olosuhteista riippuen.</p>`;
+            } else {
+                review += `Paallystettyjen osuuksien ansiosta reitti on suhteellisen nopea ajaa.</p>`;
+            }
+
+            if (gravelPct > 40) {
+                review += `<p>Suositus renkaista: Monikayttorengas tai adventure-rengas jossa soratiepito. Varmista etummaisen renkaan kunto ennen lahtoa.</p>`;
+            }
+
+            return review;
+        }
+
+        // GPX generation
+        gpxBtn.addEventListener('click', downloadGPX);
+
+        function downloadGPX() {
+            if (!state.routeData) return;
+            const rd = state.routeData;
+            const now = new Date().toISOString();
+
+            let gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="SoraReitti">
+  <metadata>
+    <name>${escapeXml(rd.name)}</name>
+    <desc>Moottoripyorareitti: ${rd.distance.toFixed(1)} km, soratieta ${rd.gravelPct}%</desc>
+    <time>${now}</time>
+  </metadata>
+`;
+            rd.waypoints.forEach((wp, i) => {
+                const label = i === 0 ? 'Lahto' : i === rd.waypoints.length - 1 ? 'Maali' : `Valipiste ${i}`;
+                gpx += `  <wpt lat="${wp.coords[0]}" lon="${wp.coords[1]}">
+    <name>${escapeXml(label + ': ' + wp.name)}</name>
+  </wpt>
+`;
+            });
+
+            gpx += `  <trk>
+    <name>${escapeXml(rd.name)}</name>
+    <trkseg>
+`;
+            rd.coordinates.forEach(([lon, lat, ele]) => {
+                gpx += `      <trkpt lat="${lat}" lon="${lon}">${ele != null ? `<ele>${ele}</ele>` : ''}</trkpt>\n`;
+            });
+
+            gpx += `    </trkseg>
+  </trk>
+</gpx>`;
+
+            const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const safeName = rd.name.replace(/[^a-zA-Z0-9äöåÄÖÅ\-_ ]/g, '').replace(/\s+/g, '_');
+            a.download = `SoraReitti_${safeName}.gpx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function escapeXml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Close geocode on click outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.input-group')) {
+                document.querySelectorAll('.geocode-results').forEach(d => d.classList.remove('show'));
+            }
+        });
+
+    })();
+    </script>
+</body>
+</html>
