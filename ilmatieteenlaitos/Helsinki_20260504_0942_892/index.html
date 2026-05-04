@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoilijan Reittisää</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+        }
+        .header p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .controls {
+            max-width: 900px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 0.3rem;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #16213e;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        .btn {
+            padding: 0.7rem 1.5rem;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        .btn:hover { background: #d63851; }
+        .btn:disabled { background: #555; cursor: not-allowed; }
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+        }
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #aaa;
+            display: none;
+        }
+        .loading.active { display: block; }
+        .spinner {
+            border: 4px solid #333;
+            border-top: 4px solid #e94560;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .route-info {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            border: 1px solid #333;
+        }
+        .route-info h3 { color: #e94560; margin-bottom: 0.5rem; }
+        .route-info .meta { color: #aaa; font-size: 0.9rem; }
+        .weather-timeline {
+            display: grid;
+            gap: 1rem;
+        }
+        .weather-card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid #333;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+        .weather-card .time-location {
+            min-width: 100px;
+        }
+        .weather-card .time {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e94560;
+        }
+        .weather-card .location {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 0.2rem;
+        }
+        .weather-card .details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .weather-card .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .weather-card .detail-item .icon {
+            font-size: 1.2rem;
+        }
+        .weather-card .temp {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: right;
+        }
+        .weather-card .temp.cold { color: #74b9ff; }
+        .weather-card .temp.mild { color: #ffeaa7; }
+        .weather-card .temp.warm { color: #fd79a8; }
+        .warning-box {
+            background: #2d1b00;
+            border: 1px solid #e67e22;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        .warning-box h4 { color: #e67e22; margin-bottom: 0.5rem; }
+        .warning-box ul { list-style: none; padding: 0; }
+        .warning-box li { padding: 0.3rem 0; color: #f0c27b; }
+        .warning-box li::before { content: "⚠️ "; }
+        .error-msg {
+            background: #2d0000;
+            border: 1px solid #e94560;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #ff7675;
+            text-align: center;
+            display: none;
+        }
+        .suggestions {
+            position: absolute;
+            background: #16213e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            width: calc(100% - 2px);
+            left: 0;
+            top: 100%;
+            display: none;
+        }
+        .suggestions.active { display: block; }
+        .suggestions div {
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .suggestions div:hover { background: #0f3460; }
+        .input-wrapper {
+            position: relative;
+        }
+        @media (max-width: 600px) {
+            .weather-card {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .weather-card .temp { text-align: left; }
+            .controls { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 Autoilijan Reittisää</h1>
+        <p>Sää seuraavan 4 tunnin ajaksi kahden kaupungin välillä</p>
+    </div>
+
+    <div class="controls">
+        <div class="input-group">
+            <label>Lähtökaupunki</label>
+            <div class="input-wrapper">
+                <input type="text" id="startCity" placeholder="esim. Helsinki" autocomplete="off">
+                <div class="suggestions" id="startSuggestions"></div>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Kohdekaupunki</label>
+            <div class="input-wrapper">
+                <input type="text" id="endCity" placeholder="esim. Tampere" autocomplete="off">
+                <div class="suggestions" id="endSuggestions"></div>
+            </div>
+        </div>
+        <button class="btn" id="searchBtn" onclick="fetchRouteWeather()">Hae reittisää</button>
+    </div>
+
+    <div class="content">
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Haetaan reittitietoja ja säädataa...</p>
+        </div>
+        <div class="error-msg" id="error"></div>
+        <div id="map"></div>
+        <div class="route-info" id="routeInfo">
+            <h3 id="routeTitle"></h3>
+            <p class="meta" id="routeMeta"></p>
+        </div>
+        <div class="warning-box" id="warnings">
+            <h4>Varoitukset autoilijalle</h4>
+            <ul id="warningList"></ul>
+        </div>
+        <div class="weather-timeline" id="timeline"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    const FINNISH_CITIES = {
+        'Helsinki': { lat: 60.1699, lon: 24.9384 },
+        'Espoo': { lat: 60.2055, lon: 24.6559 },
+        'Tampere': { lat: 61.4978, lon: 23.7610 },
+        'Vantaa': { lat: 60.2934, lon: 25.0378 },
+        'Oulu': { lat: 65.0121, lon: 25.4651 },
+        'Turku': { lat: 60.4518, lon: 22.2666 },
+        'Jyväskylä': { lat: 62.2426, lon: 25.7473 },
+        'Lahti': { lat: 60.9827, lon: 25.6612 },
+        'Kuopio': { lat: 62.8924, lon: 27.6770 },
+        'Pori': { lat: 61.4851, lon: 21.7974 },
+        'Joensuu': { lat: 62.6010, lon: 29.7636 },
+        'Lappeenranta': { lat: 61.0587, lon: 28.1871 },
+        'Hämeenlinna': { lat: 60.9929, lon: 24.4594 },
+        'Vaasa': { lat: 63.0960, lon: 21.6158 },
+        'Rovaniemi': { lat: 66.5039, lon: 25.7294 },
+        'Seinäjoki': { lat: 62.7903, lon: 22.8403 },
+        'Mikkeli': { lat: 61.6886, lon: 27.2723 },
+        'Kotka': { lat: 60.4664, lon: 26.9458 },
+        'Kouvola': { lat: 60.8681, lon: 26.7043 },
+        'Porvoo': { lat: 60.3929, lon: 25.6649 },
+        'Hyvinkää': { lat: 60.6312, lon: 24.8598 },
+        'Rauma': { lat: 61.1287, lon: 21.5064 },
+        'Kokkola': { lat: 63.8384, lon: 23.1302 },
+        'Kajaani': { lat: 64.2272, lon: 27.7285 },
+        'Savonlinna': { lat: 61.8688, lon: 28.8797 },
+        'Iisalmi': { lat: 63.5576, lon: 27.1909 },
+        'Lohja': { lat: 60.2507, lon: 24.0655 },
+        'Kerava': { lat: 60.4035, lon: 25.1126 },
+        'Järvenpää': { lat: 60.4739, lon: 25.0900 },
+        'Nokia': { lat: 61.4774, lon: 23.5082 },
+        'Riihimäki': { lat: 60.7406, lon: 24.7721 },
+        'Forssa': { lat: 60.8144, lon: 23.6259 },
+        'Imatra': { lat: 61.1710, lon: 28.7527 },
+        'Lieksa': { lat: 63.3245, lon: 30.0186 },
+        'Tornio': { lat: 65.8491, lon: 24.1467 },
+        'Kemi': { lat: 65.7360, lon: 24.5634 },
+        'Sodankylä': { lat: 67.4171, lon: 26.5888 },
+        'Ivalo': { lat: 68.6576, lon: 27.5536 },
+        'Kuusamo': { lat: 65.9646, lon: 29.1886 },
+        'Jämsä': { lat: 61.8637, lon: 25.1903 }
+    };
+
+    let map = null;
+    let routeLayer = null;
+
+    function setupAutocomplete(inputId, suggestionsId) {
+        const input = document.getElementById(inputId);
+        const suggestions = document.getElementById(suggestionsId);
+
+        input.addEventListener('input', () => {
+            const val = input.value.toLowerCase();
+            if (val.length < 1) { suggestions.classList.remove('active'); return; }
+            const matches = Object.keys(FINNISH_CITIES).filter(c => c.toLowerCase().startsWith(val));
+            if (matches.length === 0) { suggestions.classList.remove('active'); return; }
+            suggestions.innerHTML = matches.slice(0, 8).map(c => `<div>${c}</div>`).join('');
+            suggestions.classList.add('active');
+            suggestions.querySelectorAll('div').forEach(div => {
+                div.addEventListener('click', () => {
+                    input.value = div.textContent;
+                    suggestions.classList.remove('active');
+                });
+            });
+        });
+
+        input.addEventListener('blur', () => {
+            setTimeout(() => suggestions.classList.remove('active'), 200);
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                suggestions.classList.remove('active');
+                fetchRouteWeather();
+            }
+        });
+    }
+
+    setupAutocomplete('startCity', 'startSuggestions');
+    setupAutocomplete('endCity', 'endSuggestions');
+
+    function getCity(name) {
+        const key = Object.keys(FINNISH_CITIES).find(k => k.toLowerCase() === name.trim().toLowerCase());
+        return key ? { name: key, ...FINNISH_CITIES[key] } : null;
+    }
+
+    function interpolateRoute(start, end, numPoints) {
+        const points = [];
+        for (let i = 0; i <= numPoints; i++) {
+            const t = i / numPoints;
+            points.push({
+                lat: start.lat + (end.lat - start.lat) * t,
+                lon: start.lon + (end.lon - start.lon) * t
+            });
+        }
+        return points;
+    }
+
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function estimateDriveTime(distKm) {
+        return distKm / 90;
+    }
+
+    function findNearestCity(lat, lon) {
+        let nearest = null;
+        let minDist = Infinity;
+        for (const [name, coords] of Object.entries(FINNISH_CITIES)) {
+            const d = haversineDistance(lat, lon, coords.lat, coords.lon);
+            if (d < minDist) { minDist = d; nearest = name; }
+        }
+        return minDist < 50 ? nearest : null;
+    }
+
+    async function fetchFMIWeather(lat, lon, startTime, endTime) {
+        const params = new URLSearchParams({
+            service: 'WFS',
+            version: '2.0.0',
+            request: 'getFeature',
+            storedquery_id: 'fmi::forecast::harmonie::surface::point::simple',
+            latlon: `${lat.toFixed(4)},${lon.toFixed(4)}`,
+            starttime: startTime,
+            endtime: endTime,
+            parameters: 'Temperature,WindSpeedMS,TotalCloudCover,Precipitation1h,WeatherSymbol3'
+        });
+
+        const url = `https://opendata.fmi.fi/wfs?${params}`;
+        const response = await fetch(url);
+        const text = await response.text();
+        return parseFMIResponse(text);
+    }
+
+    function parseFMIResponse(xml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, 'text/xml');
+        const members = doc.querySelectorAll('BsWfs\\:BsWfsElement, BsWfsElement');
+        const data = {};
+
+        members.forEach(member => {
+            const time = member.querySelector('BsWfs\\:Time, Time')?.textContent;
+            const param = member.querySelector('BsWfs\\:ParameterName, ParameterName')?.textContent;
+            const value = member.querySelector('BsWfs\\:ParameterValue, ParameterValue')?.textContent;
+
+            if (!time || !param || !value) return;
+            if (!data[time]) data[time] = {};
+            data[time][param] = parseFloat(value);
+        });
+
+        return data;
+    }
+
+    function getWeatherDescription(symbol) {
+        const descriptions = {
+            1: 'Selkeää', 2: 'Puolipilvistä', 3: 'Pilvistä',
+            21: 'Heikkoja sadekuuroja', 22: 'Sadekuuroja', 23: 'Voimakkaita sadekuuroja',
+            31: 'Heikkoa vesisadetta', 32: 'Vesisadetta', 33: 'Voimakasta vesisadetta',
+            41: 'Heikkoja lumikuuroja', 42: 'Lumikuuroja', 43: 'Voimakkaita lumikuuroja',
+            51: 'Heikkoa lumisadetta', 52: 'Lumisadetta', 53: 'Voimakasta lumisadetta',
+            61: 'Ukkoskuuroja', 62: 'Voimakkaita ukkoskuuroja', 63: 'Ukkosta',
+            64: 'Voimakasta ukkosta',
+            71: 'Heikkoa tihkusadetta', 72: 'Tihkusadetta', 73: 'Voimakasta tihkusadetta',
+            81: 'Heikkoa räntäsadetta', 82: 'Räntäsadetta', 83: 'Voimakasta räntäsadetta'
+        };
+        return descriptions[Math.round(symbol)] || 'Vaihtelevaa';
+    }
+
+    function getWeatherIcon(symbol) {
+        const s = Math.round(symbol);
+        if (s <= 1) return '☀️';
+        if (s <= 2) return '⛅';
+        if (s <= 3) return '☁️';
+        if (s >= 61) return '⛈️';
+        if (s >= 51 || (s >= 41 && s <= 43)) return '🌨️';
+        if (s >= 31 || (s >= 21 && s <= 23)) return '🌧️';
+        if (s >= 71 && s <= 73) return '🌫️';
+        if (s >= 81) return '🌨️';
+        return '🌤️';
+    }
+
+    function generateWarnings(weatherPoints) {
+        const warnings = [];
+        for (const wp of weatherPoints) {
+            if (wp.temp !== null && wp.temp <= 0) {
+                warnings.push(`${wp.timeStr}: Lämpötila ${wp.temp.toFixed(0)}°C – tien pinta voi olla liukas (${wp.locationName})`);
+            }
+            if (wp.precipitation > 2) {
+                warnings.push(`${wp.timeStr}: Voimakasta sadetta ${wp.precipitation.toFixed(1)} mm/h (${wp.locationName})`);
+            }
+            if (wp.wind > 12) {
+                warnings.push(`${wp.timeStr}: Kova tuuli ${wp.wind.toFixed(0)} m/s – sivutuuli voi yllättää (${wp.locationName})`);
+            }
+            if (wp.visibility === 'poor') {
+                warnings.push(`${wp.timeStr}: Heikko näkyvyys – lumisade/sumu (${wp.locationName})`);
+            }
+        }
+        return [...new Set(warnings)];
+    }
+
+    function initMap(start, end, routePoints) {
+        const mapEl = document.getElementById('map');
+        mapEl.style.display = 'block';
+
+        if (map) { map.remove(); }
+        map = L.map('map').fitBounds([[start.lat, start.lon], [end.lat, end.lon]], { padding: [30, 30] });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const latlngs = routePoints.map(p => [p.lat, p.lon]);
+        L.polyline(latlngs, { color: '#e94560', weight: 4 }).addTo(map);
+
+        L.marker([start.lat, start.lon]).addTo(map).bindPopup(`🚗 ${start.name}`);
+        L.marker([end.lat, end.lon]).addTo(map).bindPopup(`🏁 ${end.name}`);
+
+        return map;
+    }
+
+    async function fetchRouteWeather() {
+        const startName = document.getElementById('startCity').value;
+        const endName = document.getElementById('endCity').value;
+
+        const start = getCity(startName);
+        const end = getCity(endName);
+
+        if (!start || !end) {
+            showError('Kaupunkia ei tunnistettu. Valitse kaupunki listalta.');
+            return;
+        }
+        if (start.name === end.name) {
+            showError('Valitse kaksi eri kaupunkia.');
+            return;
+        }
+
+        hideError();
+        showLoading(true);
+
+        const distance = haversineDistance(start.lat, start.lon, end.lat, end.lon);
+        const roadDistance = distance * 1.3;
+        const driveHours = estimateDriveTime(roadDistance);
+
+        const numPoints = Math.min(Math.max(Math.ceil(driveHours * 2), 3), 8);
+        const routePoints = interpolateRoute(start, end, numPoints);
+
+        const now = new Date();
+        const endTime = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+        const startISO = now.toISOString();
+        const endISO = endTime.toISOString();
+
+        try {
+            const weatherPoints = [];
+            const hoursPerSegment = 4 / numPoints;
+
+            for (let i = 0; i <= numPoints; i++) {
+                const point = routePoints[i];
+                const pointTime = new Date(now.getTime() + i * hoursPerSegment * 60 * 60 * 1000);
+                const pointTimeEnd = new Date(pointTime.getTime() + 60 * 60 * 1000);
+
+                const data = await fetchFMIWeather(
+                    point.lat, point.lon,
+                    pointTime.toISOString(),
+                    pointTimeEnd.toISOString()
+                );
+
+                const times = Object.keys(data).sort();
+                const closest = times[0];
+                const weather = closest ? data[closest] : {};
+
+                const locationName = findNearestCity(point.lat, point.lon) ||
+                    `${point.lat.toFixed(2)}°N, ${point.lon.toFixed(2)}°E`;
+
+                const symbol = weather.WeatherSymbol3 || 0;
+                const visibility = (symbol >= 41 && symbol <= 53) || (symbol >= 71 && symbol <= 73) ? 'poor' : 'ok';
+
+                weatherPoints.push({
+                    time: pointTime,
+                    timeStr: pointTime.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' }),
+                    locationName,
+                    temp: weather.Temperature ?? null,
+                    wind: weather.WindSpeedMS ?? null,
+                    clouds: weather.TotalCloudCover ?? null,
+                    precipitation: weather.Precipitation1h ?? 0,
+                    symbol: weather.WeatherSymbol3 ?? 1,
+                    visibility
+                });
+            }
+
+            initMap(start, end, routePoints);
+
+            document.getElementById('routeInfo').style.display = 'block';
+            document.getElementById('routeTitle').textContent = `${start.name} → ${end.name}`;
+            document.getElementById('routeMeta').textContent =
+                `Etäisyys: ~${Math.round(roadDistance)} km | Arvioitu ajoaika: ${Math.floor(driveHours)}h ${Math.round((driveHours % 1) * 60)}min | Sää seuraavalle 4 tunnille`;
+
+            const warnings = generateWarnings(weatherPoints);
+            const warningBox = document.getElementById('warnings');
+            if (warnings.length > 0) {
+                warningBox.style.display = 'block';
+                document.getElementById('warningList').innerHTML = warnings.map(w => `<li>${w}</li>`).join('');
+            } else {
+                warningBox.style.display = 'none';
+            }
+
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = weatherPoints.map(wp => {
+                const tempClass = wp.temp <= 0 ? 'cold' : wp.temp <= 15 ? 'mild' : 'warm';
+                const desc = getWeatherDescription(wp.symbol);
+                const icon = getWeatherIcon(wp.symbol);
+                return `
+                    <div class="weather-card">
+                        <div class="time-location">
+                            <div class="time">${wp.timeStr}</div>
+                            <div class="location">${wp.locationName}</div>
+                        </div>
+                        <div class="details">
+                            <div class="detail-item"><span class="icon">${icon}</span> ${desc}</div>
+                            <div class="detail-item"><span class="icon">💨</span> ${wp.wind !== null ? wp.wind.toFixed(0) + ' m/s' : '-'}</div>
+                            <div class="detail-item"><span class="icon">🌧️</span> ${wp.precipitation.toFixed(1)} mm/h</div>
+                            <div class="detail-item"><span class="icon">☁️</span> ${wp.clouds !== null ? Math.round(wp.clouds) + '%' : '-'}</div>
+                        </div>
+                        <div class="temp ${tempClass}">${wp.temp !== null ? wp.temp.toFixed(0) + '°' : '-'}</div>
+                    </div>
+                `;
+            }).join('');
+
+        } catch (err) {
+            showError('Säätietojen haku epäonnistui: ' + err.message);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('active', show);
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('error');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function hideError() {
+        document.getElementById('error').style.display = 'none';
+    }
+    </script>
+</body>
+</html>

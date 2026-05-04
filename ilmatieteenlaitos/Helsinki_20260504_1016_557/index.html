@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-agenttien tuotantoanalytiikka — 4.5.2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card-hover: #334155;
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+            --accent3: #34d399;
+            --accent4: #fb923c;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --gradient-1: linear-gradient(135deg, #38bdf8, #818cf8);
+            --gradient-2: linear-gradient(135deg, #34d399, #38bdf8);
+            --gradient-3: linear-gradient(135deg, #fb923c, #f472b6);
+            --gradient-4: linear-gradient(135deg, #818cf8, #c084fc);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+        }
+
+        .header .date-badge {
+            display: inline-block;
+            background: rgba(56,189,248,0.15);
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 999px;
+            padding: 0.25rem 1rem;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-top: 0.75rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .summary-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .summary-card .label {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .summary-card .accent-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .card-1 .accent-bar { background: var(--gradient-1); }
+        .card-1 .value { color: var(--accent); }
+        .card-2 .accent-bar { background: var(--gradient-2); }
+        .card-2 .value { color: var(--accent3); }
+        .card-3 .accent-bar { background: var(--gradient-3); }
+        .card-3 .value { color: var(--accent4); }
+        .card-4 .accent-bar { background: var(--gradient-4); }
+        .card-4 .value { color: var(--accent2); }
+
+        /* Chart Sections */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .chart-card .chart-desc {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .chart-wrapper canvas {
+            width: 100% !important;
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 480px;
+            height: 100vh;
+            background: var(--card);
+            border-left: 1px solid var(--border);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+            z-index: 1000;
+            transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .detail-panel.open {
+            right: 0;
+        }
+
+        .detail-panel .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .detail-panel .close-btn:hover {
+            background: var(--card-hover);
+        }
+
+        .detail-panel h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding-right: 3rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-section h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+        }
+
+        .detail-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(51,65,85,0.5);
+        }
+
+        .detail-stat .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .detail-stat .stat-value {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tag-api { background: rgba(56,189,248,0.15); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
+        .tag-chart { background: rgba(129,140,248,0.15); color: var(--accent2); border: 1px solid rgba(129,140,248,0.3); }
+        .tag-storage { background: rgba(52,211,153,0.15); color: var(--accent3); border: 1px solid rgba(52,211,153,0.3); }
+        .tag-complex { background: rgba(251,146,60,0.15); color: var(--accent4); border: 1px solid rgba(251,146,60,0.3); }
+
+        .effort-bar-container {
+            margin-top: 1rem;
+        }
+
+        .effort-bar-bg {
+            background: rgba(56,189,248,0.1);
+            border-radius: 8px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .effort-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            background: var(--gradient-1);
+            transition: width 0.5s ease;
+        }
+
+        .effort-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Technology Stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .tech-item {
+            background: rgba(56,189,248,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            text-align: center;
+        }
+
+        .tech-item .tech-count {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .tech-item .tech-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* App List */
+        .app-list {
+            margin-top: 1rem;
+        }
+
+        .app-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid rgba(51,65,85,0.3);
+        }
+
+        .app-item:hover {
+            background: var(--card-hover);
+        }
+
+        .app-item .app-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .app-item .app-metric {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: right;
+        }
+
+        .app-item .app-metric strong {
+            color: var(--text);
+        }
+
+        .app-item .drill-icon {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-header span:not(:first-child) {
+            text-align: right;
+        }
+
+        /* Complexity Donut Legend */
+        .donut-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 48px;
+            padding-bottom: 1rem;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .timeline-item:hover {
+            opacity: 0.8;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 14px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--bg);
+        }
+
+        .timeline-time {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .timeline-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .timeline-loc {
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+
+        .insight-box {
+            background: rgba(56,189,248,0.08);
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .insight-box strong {
+            color: var(--accent);
+        }
+
+        @media (max-width: 900px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .app-item {
+                grid-template-columns: 1fr 1fr;
+            }
+            .list-header {
+                display: none;
+            }
+            .detail-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .animate-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in:nth-child(2) { animation-delay: 0.05s; }
+        .animate-in:nth-child(3) { animation-delay: 0.1s; }
+        .animate-in:nth-child(4) { animation-delay: 0.15s; }
+        .animate-in:nth-child(5) { animation-delay: 0.2s; }
+
+        .counter { transition: all 0.8s ease; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>AI-agenttien tuotantoanalytiikka</h1>
+        <p class="subtitle">Claude Code -agenttien tuottamat sovellukset — reaaliaikainen koodianalyysi</p>
+        <span class="date-badge">4. toukokuuta 2026 — Ilmatieteen laitos -sovellusperhe</span>
+    </header>
+
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="summary-grid" id="summaryGrid"></div>
+
+        <!-- Main Charts -->
+        <div class="chart-grid">
+            <div class="chart-card full-width animate-in">
+                <h2>Koodirivit sovelluksittain</h2>
+                <p class="chart-desc">Klikkaa palkkia nähdäksesi sovelluksen tarkemmat tiedot</p>
+                <div class="chart-wrapper" style="height: 380px;">
+                    <canvas id="locChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card animate-in">
+                <h2>Arvioitu työmäärä ilman AI-agenttia</h2>
+                <p class="chart-desc">Kehittäjäpäivät perinteisellä menetelmällä (klikkaa palkkia)</p>
+                <div class="chart-wrapper" style="height: 360px;">
+                    <canvas id="effortChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card animate-in">
+                <h2>Sovellusten kompleksisuusjakauma</h2>
+                <p class="chart-desc">Ominaisuudet: API, visualisoinnit, tietovarasto, UI</p>
+                <div class="chart-wrapper" style="height: 300px;">
+                    <canvas id="complexityDonut"></canvas>
+                </div>
+                <div class="donut-legend" id="donutLegend"></div>
+            </div>
+
+            <div class="chart-card animate-in">
+                <h2>Teknologiajakauma</h2>
+                <p class="chart-desc">Käytetyt teknologiat ja ominaisuudet</p>
+                <div class="tech-grid" id="techGrid"></div>
+                <div class="insight-box" style="margin-top: 1.25rem;">
+                    <strong>Yhteenveto:</strong> Agentit tuottivat yhden työpäivän aikana sovelluksia,
+                    joiden perinteinen kehitystyö kestäisi arviolta <strong id="totalWeeksText"></strong>.
+                    Tehokkuuskerroin: <strong id="efficiencyMultiplier"></strong>.
+                </div>
+            </div>
+
+            <div class="chart-card full-width animate-in">
+                <h2>Koodimäärä vs. arvioitu työmäärä</h2>
+                <p class="chart-desc">Kupla = tiedostokoko (KB). Klikkaa kuplaa nähdäksesi tiedot.</p>
+                <div class="chart-wrapper" style="height: 350px;">
+                    <canvas id="bubbleChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card animate-in">
+                <h2>Tuotantoaikajana</h2>
+                <p class="chart-desc">Sovellusten valmistumisaika commit-historian perusteella</p>
+                <div class="timeline-container" id="timeline"></div>
+            </div>
+
+            <div class="chart-card animate-in">
+                <h2>Kaikki sovellukset</h2>
+                <p class="chart-desc">Klikkaa riviä porautuaksesi yksityiskohtiin</p>
+                <div class="list-header">
+                    <span>Sovellus</span>
+                    <span>Rivit</span>
+                    <span>Koko</span>
+                    <span>Työmäärä</span>
+                    <span></span>
+                </div>
+                <div class="app-list" id="appList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="overlay" id="overlay"></div>
+    <div class="detail-panel" id="detailPanel">
+        <button class="close-btn" id="closeDetail">&times;</button>
+        <div id="detailContent"></div>
+    </div>
+
+    <script>
+    const apps = [
+        {
+            id: "0603_558",
+            name: "Helsinki Säävertailu — Pyöräilijän sääpalvelu",
+            shortName: "Pyöräilijän sääpalvelu",
+            lines: 784,
+            bytes: 28334,
+            jsLines: 149, cssLines: 275, htmlLines: 65,
+            hasApi: true, hasChart: false, hasStorage: false,
+            commitTime: "06:25",
+            description: "Pyöräilijöille suunnattu säävertailusovellus, joka näyttää tuulen, lämpötilan ja sateen vaikutuksen pyöräilyolosuhteisiin Helsingissä.",
+            complexity: "medium",
+            estimatedDays: 4
+        },
+        {
+            id: "0941_538",
+            name: "Työajanseuranta",
+            shortName: "Työajanseuranta",
+            lines: 753,
+            bytes: 24565,
+            jsLines: 148, cssLines: 266, htmlLines: 60,
+            hasApi: false, hasChart: false, hasStorage: true,
+            commitTime: "09:59",
+            description: "Työajan kirjaus- ja seurantasovellus saapumis- ja lähtökirjauksilla sekä projektituntikirjanpidolla. Paikallinen tietovarasto.",
+            complexity: "medium",
+            estimatedDays: 5
+        },
+        {
+            id: "0942_144",
+            name: "Sää tänään vs. eilen — Helsinki",
+            shortName: "Sää tänään vs. eilen",
+            lines: 545,
+            bytes: 19855,
+            jsLines: 89, cssLines: 161, htmlLines: 74,
+            hasApi: true, hasChart: false, hasStorage: false,
+            commitTime: "10:02",
+            description: "Vertailee tämän päivän ja eilisen sääolosuhteita Helsingissä FMI:n avoimella datalla. Selkeä visuaalinen vertailunäkymä.",
+            complexity: "simple",
+            estimatedDays: 3
+        },
+        {
+            id: "0942_428",
+            name: "Puolimaratonharjoitusohjelma",
+            shortName: "Puolimaraton-ohjelma",
+            lines: 648,
+            bytes: 30297,
+            jsLines: 37, cssLines: 185, htmlLines: 62,
+            hasApi: false, hasChart: false, hasStorage: false,
+            commitTime: "10:04",
+            description: "12 viikon harjoitusohjelma puolimaratonille, tavoite alle 2 tunnin aika. Interaktiivinen viikko- ja päivänäkymä.",
+            complexity: "medium",
+            estimatedDays: 3
+        },
+        {
+            id: "0942_892",
+            name: "Autoilijan Reittisää",
+            shortName: "Autoilijan reittisää",
+            lines: 617,
+            bytes: 23323,
+            jsLines: 126, cssLines: 213, htmlLines: 48,
+            hasApi: true, hasChart: false, hasStorage: false,
+            commitTime: "10:04",
+            description: "Autoilijoille suunnattu reittisääpalvelu, joka näyttää sääolosuhteet reitin varrella FMI-datalla.",
+            complexity: "medium",
+            estimatedDays: 4
+        },
+        {
+            id: "0943_305",
+            name: "DokuApuri — Projektidokumentaatio",
+            shortName: "DokuApuri",
+            lines: 872,
+            bytes: 43412,
+            jsLines: 66, cssLines: 286, htmlLines: 75,
+            hasApi: false, hasChart: false, hasStorage: false,
+            commitTime: "10:08",
+            description: "Projektidokumentaation luontityökalu. Laaja CSS-pohjainen käyttöliittymä dokumenttipohjien hallintaan.",
+            complexity: "medium",
+            estimatedDays: 5
+        },
+        {
+            id: "0943_605",
+            name: "Kieku-kirjausten automatisointi",
+            shortName: "Kieku-automaatio",
+            lines: 1582,
+            bytes: 54882,
+            jsLines: 220, cssLines: 446, htmlLines: 276,
+            hasApi: false, hasChart: false, hasStorage: true,
+            commitTime: "10:07",
+            description: "Laaja Kieku-työajanhallintajärjestelmän kirjausten automatisointisovellus. Monimutkaisin kokonaisuus: 276 HTML-elementtiä, paikallinen tallennus, lomakkeet ja validointi.",
+            complexity: "complex",
+            estimatedDays: 10
+        },
+        {
+            id: "0945_792",
+            name: "Lomasuunnitelma sään mukaan",
+            shortName: "Lomasuunnitelma",
+            lines: 524,
+            bytes: 17351,
+            jsLines: 90, cssLines: 173, htmlLines: 56,
+            hasApi: true, hasChart: false, hasStorage: false,
+            commitTime: "10:07",
+            description: "10 päivän lomasuunnittelutyökalu, joka käyttää FMI-ennustetta aktiviteettiehdotuksiin sääolosuhteiden mukaan.",
+            complexity: "simple",
+            estimatedDays: 3
+        },
+        {
+            id: "0946_698",
+            name: "SadeTutka-botti",
+            shortName: "SadeTutka-botti",
+            lines: 887,
+            bytes: 26427,
+            jsLines: 84, cssLines: 296, htmlLines: 54,
+            hasApi: false, hasChart: true, hasStorage: false,
+            commitTime: "10:09",
+            description: "Telegram-tyylinen säätutkavaroitusjärjestelmä, joka havaitsee lähestyvät sadealueet ja visualisoi ne SVG-grafiikalla.",
+            complexity: "medium",
+            estimatedDays: 6
+        },
+        {
+            id: "0953_194",
+            name: "Sähköhinta & Saunasuositus",
+            shortName: "Sähkö & Sauna",
+            lines: 643,
+            bytes: 22013,
+            jsLines: 163, cssLines: 230, htmlLines: 21,
+            hasApi: true, hasChart: true, hasStorage: false,
+            commitTime: "10:10",
+            description: "Sähkön spot-hinnat, FMI-säädata ja saunan lämmityssuositus yhdistettynä. API-integraatiot ja kuvaajat.",
+            complexity: "medium",
+            estimatedDays: 5
+        },
+        {
+            id: "0954_912",
+            name: "Matemaattisten kaavojen todistaja",
+            shortName: "Kaavantodistaja",
+            lines: 833,
+            bytes: 34323,
+            jsLines: 41, cssLines: 227, htmlLines: 50,
+            hasApi: false, hasChart: false, hasStorage: false,
+            commitTime: "10:11",
+            description: "Interaktiivinen työkalu matemaattisten kaavojen askel-askeleiseen todistamiseen. Laaja sisältö ja visuaalinen esitys.",
+            complexity: "medium",
+            estimatedDays: 5
+        },
+        {
+            id: "0956_145",
+            name: "SääTutka — Pilvien liike & sade",
+            shortName: "SääTutka",
+            lines: 1312,
+            bytes: 43991,
+            jsLines: 187, cssLines: 409, htmlLines: 135,
+            hasApi: true, hasChart: true, hasStorage: false,
+            commitTime: "10:16",
+            description: "Kehittynyt säätutkasovellus: Cloud Optimized tutkadata, pilvien liike-ennuste, sateen todennäköisyys. Karttavisualisoinnit ja API-yhteydet.",
+            complexity: "complex",
+            estimatedDays: 10
+        },
+        {
+            id: "0957_848",
+            name: "Tuulioptimoidut pyöräilyreitit",
+            shortName: "Tuulireititys",
+            lines: 908,
+            bytes: 35320,
+            jsLines: 184, cssLines: 246, htmlLines: 64,
+            hasApi: true, hasChart: true, hasStorage: false,
+            commitTime: "10:17",
+            description: "Pyöräilyreittien optimointi vastatuulen minimoimiseksi 20km ympyräreitillä. FMI-tuulidata, karttavisualisointi ja reittianalyysi.",
+            complexity: "complex",
+            estimatedDays: 8
+        },
+        {
+            id: "0959_240",
+            name: "SDLC Guardrails",
+            shortName: "SDLC Guardrails",
+            lines: 1329,
+            bytes: 48192,
+            jsLines: 140, cssLines: 423, htmlLines: 144,
+            hasApi: false, hasChart: true, hasStorage: true,
+            commitTime: "10:13",
+            description: "Ohjelmistokehityksen laadunvarmistussovellus. Visualisoinnit, paikallinen tallennus, laaja lomake- ja raportointirakenne.",
+            complexity: "complex",
+            estimatedDays: 10
+        },
+        {
+            id: "1003_601",
+            name: "Terassin öljyämisoptimoija",
+            shortName: "Öljyämisoptimoija",
+            lines: 665,
+            bytes: 19218,
+            jsLines: 99, cssLines: 272, htmlLines: 43,
+            hasApi: true, hasChart: false, hasStorage: false,
+            commitTime: "10:13",
+            description: "FMI-sääennusteeseen perustuva optimaalisen öljyämisajankohdan suositus. Kosteus, lämpötila, sade, pilvisyys ja tuuli huomioitu.",
+            complexity: "medium",
+            estimatedDays: 3
+        },
+        {
+            id: "1007_709",
+            name: "EsitysVahti — Aktivointianalyysi",
+            shortName: "EsitysVahti",
+            lines: 693,
+            bytes: 25495,
+            jsLines: 92, cssLines: 233, htmlLines: 55,
+            hasApi: false, hasChart: true, hasStorage: false,
+            commitTime: "10:14",
+            description: "PowerPoint-esitysten aktivointianalyysi: yleisön osallistaminen, aktivointivinkit ja visualisointi tuloksista.",
+            complexity: "medium",
+            estimatedDays: 4
+        }
+    ];
+
+    // Computed stats
+    const totalLines = apps.reduce((sum, a) => sum + a.lines, 0);
+    const totalBytes = apps.reduce((sum, a) => sum + a.bytes, 0);
+    const totalEffortDays = apps.reduce((sum, a) => sum + a.estimatedDays, 0);
+    const totalEffortWeeks = (totalEffortDays / 5).toFixed(1);
+    const agentTimeDays = 1;
+    const efficiencyX = Math.round(totalEffortDays / agentTimeDays);
+    const appsWithApi = apps.filter(a => a.hasApi).length;
+    const appsWithChart = apps.filter(a => a.hasChart).length;
+    const appsWithStorage = apps.filter(a => a.hasStorage).length;
+
+    // Colors for charts
+    const barColors = apps.map((a, i) => {
+        const hue = (i * 22 + 195) % 360;
+        return `hsla(${hue}, 70%, 60%, 0.8)`;
+    });
+    const barBorderColors = apps.map((a, i) => {
+        const hue = (i * 22 + 195) % 360;
+        return `hsla(${hue}, 70%, 60%, 1)`;
+    });
+
+    // Summary Cards
+    function renderSummary() {
+        const grid = document.getElementById('summaryGrid');
+        const cards = [
+            { icon: '📦', value: apps.length, label: 'Sovellusta rakennettu', cls: 'card-1' },
+            { icon: '💻', value: totalLines.toLocaleString('fi'), label: 'Koodiriviä tuotettu', cls: 'card-2' },
+            { icon: '⏱️', value: `${totalEffortDays} pv`, label: 'Arvioitu perinteinen työmäärä', cls: 'card-3' },
+            { icon: '🚀', value: `${efficiencyX}×`, label: 'Tehokkuuskerroin', cls: 'card-4' }
+        ];
+        grid.innerHTML = cards.map((c, i) => `
+            <div class="summary-card ${c.cls} animate-in" style="animation-delay: ${i * 0.08}s">
+                <div class="accent-bar"></div>
+                <div class="icon">${c.icon}</div>
+                <div class="value counter">${c.value}</div>
+                <div class="label">${c.label}</div>
+            </div>
+        `).join('');
+    }
+
+    // LOC Bar Chart
+    function renderLocChart() {
+        const ctx = document.getElementById('locChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: apps.map(a => a.shortName),
+                datasets: [{
+                    label: 'Koodirivit',
+                    data: apps.map(a => a.lines),
+                    backgroundColor: barColors,
+                    borderColor: barBorderColors,
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (e, elements) => {
+                    if (elements.length > 0) openDetail(elements[0].index);
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        borderColor: 'rgba(56, 189, 248, 0.3)',
+                        borderWidth: 1,
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            afterLabel: (ctx) => {
+                                const app = apps[ctx.dataIndex];
+                                return `${(app.bytes / 1024).toFixed(1)} KB | ~${app.estimatedDays} päivän työ`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: '#94a3b8',
+                            maxRotation: 45,
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Effort Horizontal Bar
+    function renderEffortChart() {
+        const ctx = document.getElementById('effortChart').getContext('2d');
+        const sorted = [...apps].sort((a, b) => b.estimatedDays - a.estimatedDays);
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sorted.map(a => a.shortName),
+                datasets: [{
+                    label: 'Kehittäjäpäivät',
+                    data: sorted.map(a => a.estimatedDays),
+                    backgroundColor: sorted.map(a => {
+                        if (a.estimatedDays >= 8) return 'rgba(251, 146, 60, 0.7)';
+                        if (a.estimatedDays >= 5) return 'rgba(129, 140, 248, 0.7)';
+                        return 'rgba(52, 211, 153, 0.7)';
+                    }),
+                    borderColor: sorted.map(a => {
+                        if (a.estimatedDays >= 8) return 'rgba(251, 146, 60, 1)';
+                        if (a.estimatedDays >= 5) return 'rgba(129, 140, 248, 1)';
+                        return 'rgba(52, 211, 153, 1)';
+                    }),
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (e, elements) => {
+                    if (elements.length > 0) {
+                        const app = sorted[elements[0].index];
+                        const origIndex = apps.findIndex(a => a.id === app.id);
+                        openDetail(origIndex);
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        borderColor: 'rgba(56, 189, 248, 0.3)',
+                        borderWidth: 1,
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => `~${ctx.parsed.x} kehittäjäpäivää perinteisesti`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                        ticks: { color: '#94a3b8' },
+                        title: {
+                            display: true,
+                            text: 'Kehittäjäpäivät',
+                            color: '#94a3b8',
+                            font: { size: 11 }
+                        }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // Complexity Donut
+    function renderComplexityDonut() {
+        const ctx = document.getElementById('complexityDonut').getContext('2d');
+        const simple = apps.filter(a => a.complexity === 'simple').length;
+        const medium = apps.filter(a => a.complexity === 'medium').length;
+        const complex = apps.filter(a => a.complexity === 'complex').length;
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Yksinkertainen', 'Keskitaso', 'Monimutkainen'],
+                datasets: [{
+                    data: [simple, medium, complex],
+                    backgroundColor: [
+                        'rgba(52, 211, 153, 0.8)',
+                        'rgba(129, 140, 248, 0.8)',
+                        'rgba(251, 146, 60, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(52, 211, 153, 1)',
+                        'rgba(129, 140, 248, 1)',
+                        'rgba(251, 146, 60, 1)'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        borderColor: 'rgba(56, 189, 248, 0.3)',
+                        borderWidth: 1,
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: (ctx) => `${ctx.parsed} sovellusta (${Math.round(ctx.parsed / apps.length * 100)}%)`
+                        }
+                    }
+                }
+            }
+        });
+
+        const legend = document.getElementById('donutLegend');
+        const colors = ['rgba(52, 211, 153, 1)', 'rgba(129, 140, 248, 1)', 'rgba(251, 146, 60, 1)'];
+        const labels = [`Yksinkertainen (${simple})`, `Keskitaso (${medium})`, `Monimutkainen (${complex})`];
+        legend.innerHTML = labels.map((l, i) => `
+            <div class="legend-item">
+                <div class="legend-dot" style="background: ${colors[i]}"></div>
+                ${l}
+            </div>
+        `).join('');
+    }
+
+    // Tech Grid
+    function renderTechGrid() {
+        const grid = document.getElementById('techGrid');
+        const items = [
+            { count: appsWithApi, label: 'API-integraatio' },
+            { count: appsWithChart, label: 'Visualisoinnit' },
+            { count: appsWithStorage, label: 'Tietovarasto' },
+            { count: apps.length, label: 'Single-page app' },
+            { count: apps.filter(a => a.jsLines > 100).length, label: 'Laaja JS-logiikka' },
+            { count: apps.filter(a => a.cssLines > 250).length, label: 'Monipuolinen UI' }
+        ];
+        grid.innerHTML = items.map(i => `
+            <div class="tech-item">
+                <div class="tech-count">${i.count}</div>
+                <div class="tech-label">${i.label}</div>
+            </div>
+        `).join('');
+
+        document.getElementById('totalWeeksText').textContent = `${totalEffortWeeks} viikkoa (${totalEffortDays} kehittäjäpäivää)`;
+        document.getElementById('efficiencyMultiplier').textContent = `${efficiencyX}× nopeampi`;
+    }
+
+    // Bubble Chart
+    function renderBubbleChart() {
+        const ctx = document.getElementById('bubbleChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Sovellukset',
+                    data: apps.map(a => ({
+                        x: a.lines,
+                        y: a.estimatedDays,
+                        r: Math.max(6, Math.sqrt(a.bytes / 1024) * 3)
+                    })),
+                    backgroundColor: barColors,
+                    borderColor: barBorderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (e, elements) => {
+                    if (elements.length > 0) openDetail(elements[0].index);
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                        borderColor: 'rgba(56, 189, 248, 0.3)',
+                        borderWidth: 1,
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            title: (items) => apps[items[0].dataIndex].shortName,
+                            label: (ctx) => {
+                                const a = apps[ctx.dataIndex];
+                                return [
+                                    `${a.lines} koodiriviä`,
+                                    `~${a.estimatedDays} kehittäjäpäivää`,
+                                    `${(a.bytes / 1024).toFixed(1)} KB`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                        ticks: { color: '#94a3b8' },
+                        title: { display: true, text: 'Koodirivit', color: '#94a3b8', font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(51, 65, 85, 0.4)' },
+                        ticks: { color: '#94a3b8' },
+                        title: { display: true, text: 'Kehittäjäpäivät', color: '#94a3b8', font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // Timeline
+    function renderTimeline() {
+        const container = document.getElementById('timeline');
+        const sorted = [...apps].sort((a, b) => a.commitTime.localeCompare(b.commitTime));
+        container.innerHTML = `<div class="timeline-line"></div>` +
+            sorted.map((a, i) => {
+                const origIndex = apps.findIndex(ap => ap.id === a.id);
+                return `
+                <div class="timeline-item" onclick="openDetail(${origIndex})">
+                    <div class="timeline-dot" style="background: ${barColors[origIndex]}"></div>
+                    <div class="timeline-time">${a.commitTime}</div>
+                    <div class="timeline-title">${a.shortName}</div>
+                    <div class="timeline-loc">${a.lines} riviä</div>
+                </div>`;
+            }).join('');
+    }
+
+    // App List
+    function renderAppList() {
+        const list = document.getElementById('appList');
+        list.innerHTML = apps.map((a, i) => `
+            <div class="app-item" onclick="openDetail(${i})">
+                <div class="app-name">${a.shortName}</div>
+                <div class="app-metric"><strong>${a.lines}</strong> riviä</div>
+                <div class="app-metric"><strong>${(a.bytes / 1024).toFixed(1)}</strong> KB</div>
+                <div class="app-metric"><strong>~${a.estimatedDays}</strong> pv</div>
+                <div class="drill-icon">→</div>
+            </div>
+        `).join('');
+    }
+
+    // Detail Panel
+    function openDetail(index) {
+        const app = apps[index];
+        const panel = document.getElementById('detailPanel');
+        const overlay = document.getElementById('overlay');
+        const content = document.getElementById('detailContent');
+
+        const features = [];
+        if (app.hasApi) features.push('<span class="feature-tag tag-api">API-integraatio</span>');
+        if (app.hasChart) features.push('<span class="feature-tag tag-chart">Visualisoinnit</span>');
+        if (app.hasStorage) features.push('<span class="feature-tag tag-storage">Tietovarasto</span>');
+        const complexLabel = app.complexity === 'simple' ? 'Yksinkertainen' : app.complexity === 'medium' ? 'Keskitaso' : 'Monimutkainen';
+        const complexCls = app.complexity === 'simple' ? 'tag-api' : app.complexity === 'medium' ? 'tag-chart' : 'tag-complex';
+        features.push(`<span class="feature-tag ${complexCls}">${complexLabel}</span>`);
+
+        const totalAppLines = app.jsLines + app.cssLines + app.htmlLines;
+        const jsPercent = Math.round(app.jsLines / totalAppLines * 100);
+        const cssPercent = Math.round(app.cssLines / totalAppLines * 100);
+        const htmlPercent = Math.round(app.htmlLines / totalAppLines * 100);
+
+        const effortPct = Math.round(app.estimatedDays / Math.max(...apps.map(a => a.estimatedDays)) * 100);
+
+        content.innerHTML = `
+            <h2>${app.name}</h2>
+
+            <div class="detail-section">
+                <h3>Kuvaus</h3>
+                <p style="font-size: 0.9rem; color: var(--text-dim); line-height: 1.6;">${app.description}</p>
+            </div>
+
+            <div class="detail-section">
+                <h3>Mittarit</h3>
+                <div class="detail-stat">
+                    <span class="stat-label">Koodirivit</span>
+                    <span class="stat-value" style="color: var(--accent);">${app.lines.toLocaleString('fi')}</span>
+                </div>
+                <div class="detail-stat">
+                    <span class="stat-label">Tiedostokoko</span>
+                    <span class="stat-value">${(app.bytes / 1024).toFixed(1)} KB</span>
+                </div>
+                <div class="detail-stat">
+                    <span class="stat-label">Commit-aika</span>
+                    <span class="stat-value">${app.commitTime}</span>
+                </div>
+                <div class="detail-stat">
+                    <span class="stat-label">Osuus kokonaistuotannosta</span>
+                    <span class="stat-value">${Math.round(app.lines / totalLines * 100)}%</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Koodin koostumus</h3>
+                <div class="detail-stat">
+                    <span class="stat-label">JavaScript</span>
+                    <span class="stat-value" style="color: var(--accent4);">${app.jsLines} riviä (${jsPercent}%)</span>
+                </div>
+                <div class="detail-stat">
+                    <span class="stat-label">CSS</span>
+                    <span class="stat-value" style="color: var(--accent2);">${app.cssLines} riviä (${cssPercent}%)</span>
+                </div>
+                <div class="detail-stat">
+                    <span class="stat-label">HTML</span>
+                    <span class="stat-value" style="color: var(--accent3);">${app.htmlLines} riviä (${htmlPercent}%)</span>
+                </div>
+                <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 0.75rem; gap: 2px;">
+                    <div style="width: ${jsPercent}%; background: var(--accent4); border-radius: 4px;"></div>
+                    <div style="width: ${cssPercent}%; background: var(--accent2); border-radius: 4px;"></div>
+                    <div style="width: ${htmlPercent}%; background: var(--accent3); border-radius: 4px;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-dim); margin-top: 0.25rem;">
+                    <span>JS</span><span>CSS</span><span>HTML</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Ominaisuudet</h3>
+                <div class="feature-tags">${features.join('')}</div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Arvioitu työmäärä ilman AI-agenttia</h3>
+                <div class="effort-bar-container">
+                    <div class="effort-bar-bg">
+                        <div class="effort-bar-fill" style="width: ${effortPct}%"></div>
+                    </div>
+                    <div class="effort-label">
+                        <span>~${app.estimatedDays} kehittäjäpäivää</span>
+                        <span>${(app.estimatedDays / 5).toFixed(1)} viikkoa</span>
+                    </div>
+                </div>
+                <div class="insight-box" style="margin-top: 0.75rem;">
+                    AI-agentti tuotti tämän sovelluksen <strong>minuuteissa</strong>,
+                    kun vastaava työ veisi kokeneelta kehittäjältä arviolta
+                    <strong>${app.estimatedDays} työpäivää</strong>.
+                </div>
+            </div>
+        `;
+
+        panel.classList.add('open');
+        overlay.classList.add('active');
+    }
+
+    function closeDetail() {
+        document.getElementById('detailPanel').classList.remove('open');
+        document.getElementById('overlay').classList.remove('active');
+    }
+
+    document.getElementById('closeDetail').addEventListener('click', closeDetail);
+    document.getElementById('overlay').addEventListener('click', closeDetail);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDetail();
+    });
+
+    // Init
+    renderSummary();
+    renderLocChart();
+    renderEffortChart();
+    renderComplexityDonut();
+    renderTechGrid();
+    renderBubbleChart();
+    renderTimeline();
+    renderAppList();
+    </script>
+</body>
+</html>

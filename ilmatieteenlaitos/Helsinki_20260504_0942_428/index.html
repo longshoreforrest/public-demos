@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puolimaratonharjoitusohjelma — Tavoite alle 2h</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #a0c4ff;
+        }
+
+        .goal-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0,212,255,0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .goal-item {
+            text-align: center;
+        }
+
+        .goal-item .label {
+            font-size: 0.85rem;
+            color: #7aa2f7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .goal-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .week-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .week-selector button {
+            background: rgba(0,212,255,0.15);
+            border: 1px solid rgba(0,212,255,0.4);
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .week-selector button:hover {
+            background: rgba(0,212,255,0.3);
+        }
+
+        .week-selector button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .week-selector .week-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .phase-base { background: #1e4d2b; color: #4ade80; }
+        .phase-build { background: #4a3728; color: #fbbf24; }
+        .phase-peak { background: #4a2828; color: #f87171; }
+        .phase-taper { background: #2e3a5e; color: #818cf8; }
+
+        .week-summary {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .week-summary h3 {
+            color: #00d4ff;
+            margin-bottom: 6px;
+        }
+
+        .week-summary p {
+            color: #b0b0b0;
+            font-size: 0.95rem;
+        }
+
+        .schedule {
+            display: grid;
+            gap: 12px;
+        }
+
+        .day-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 18px 22px;
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s;
+        }
+
+        .day-card:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(0,212,255,0.3);
+        }
+
+        .day-card.rest {
+            opacity: 0.6;
+        }
+
+        .day-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #7aa2f7;
+        }
+
+        .day-workout {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .day-workout .type {
+            font-weight: 600;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .day-workout .details {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        .day-stats {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .day-stats .distance {
+            font-weight: 700;
+            color: #00d4ff;
+            font-size: 1.1rem;
+        }
+
+        .day-stats .pace {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .totals {
+            margin-top: 20px;
+            background: rgba(0,212,255,0.08);
+            border: 1px solid rgba(0,212,255,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            text-align: center;
+        }
+
+        .total-item .num {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .total-item .desc {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .progress-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .progress-section h3 {
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            transition: width 0.5s ease;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .tip-box {
+            margin-top: 24px;
+            background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .tip-box h4 {
+            color: #fbbf24;
+            margin-bottom: 8px;
+        }
+
+        .tip-box p {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .day-card {
+                grid-template-columns: 80px 1fr;
+                gap: 10px;
+            }
+            .day-stats {
+                grid-column: 1 / -1;
+                text-align: left;
+                flex-direction: row;
+                gap: 12px;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .goal-card {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Puolimaratonharjoitusohjelma</h1>
+            <p>Tavoite: alle 2:00:00 — 12 viikon ohjelma</p>
+        </header>
+
+        <div class="goal-card">
+            <div class="goal-item">
+                <div class="label">Tavoiteaika</div>
+                <div class="value">1:59:59</div>
+            </div>
+            <div class="goal-item">
+                <div class="label">Tavoitevauhti</div>
+                <div class="value">5:41 /km</div>
+            </div>
+            <div class="goal-item">
+                <div class="label">Lähtötaso</div>
+                <div class="value">5:50 /km</div>
+            </div>
+            <div class="goal-item">
+                <div class="label">Kilpailu</div>
+                <div class="value" id="raceDate"></div>
+            </div>
+        </div>
+
+        <div class="week-selector">
+            <button id="prevWeek" onclick="changeWeek(-1)">&#9664; Edellinen</button>
+            <div class="week-label" id="weekLabel">Viikko 1 / 12</div>
+            <button id="nextWeek" onclick="changeWeek(1)">Seuraava &#9654;</button>
+        </div>
+
+        <div id="phaseInfo"></div>
+        <div class="week-summary" id="weekSummary"></div>
+        <div class="schedule" id="schedule"></div>
+        <div class="totals" id="totals"></div>
+
+        <div class="progress-section">
+            <h3>Ohjelman eteneminen</h3>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-labels">
+                <span>Viikko 1</span>
+                <span id="progressText"></span>
+                <span>Kilpailu</span>
+            </div>
+        </div>
+
+        <div class="tip-box" id="tipBox"></div>
+    </div>
+
+    <script>
+        const trainingPlan = [
+            {
+                week: 1,
+                phase: "base",
+                phaseLabel: "Peruskunto",
+                summary: "Peruskuntopohja — totuttele säännölliseen harjoitteluun. Kaikki juoksut helpolla aerobisella vauhdilla.",
+                tip: "Aloita rauhallisesti! Ensimmäisten viikkojen tavoite on luoda rutiini ja antaa kehon sopeutua. Juokse niin, että pystyt puhumaan kokonaisia lauseita.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 6, pace: "6:10–6:30" },
+                    { day: "Tiistai", type: "Lepo tai kevyt liike", details: "Kävely, venyttely tai jooga", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Peruskestävyys", details: "Helppo tasavauhti + 4×100m vetoja lopuksi", distance: 7, pace: "6:10–6:20" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Vauhtikestävyys", details: "2 km alkulämmittely + 4×800m (5:30/km) + 1 km loppujäähdyttely", distance: 7, pace: "5:30 intervalliosuudet" },
+                    { day: "Lauantai", type: "Lepo tai kevyt lenkki", details: "Max 30 min kevyttä hölkkää", distance: 3, pace: "6:30+" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Rauhallinen tasainen vauhti", distance: 12, pace: "6:15–6:30" }
+                ]
+            },
+            {
+                week: 2,
+                phase: "base",
+                phaseLabel: "Peruskunto",
+                summary: "Jatketaan pohjan rakentamista — pieniä lisäyksiä volyymiin.",
+                tip: "Kuuntele kehoasi. Pienet lihaskivut ovat normaaleja, mutta terävä kipu on merkki levon tarpeesta.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 7, pace: "6:05–6:25" },
+                    { day: "Tiistai", type: "Lepo tai kevyt liike", details: "Kehonhuolto, foam roller", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Tempojuoksu", details: "2 km lämmittely + 3 km tempolla (5:40/km) + 2 km jäähdyttely", distance: 7, pace: "5:40 tempo-osuus" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Intervallit", details: "2 km lämmittely + 5×800m (5:25/km) + 1,5 km jäähdyttely", distance: 7.5, pace: "5:25 intervalliosuudet" },
+                    { day: "Lauantai", type: "Palauttava lenkki", details: "Todella helppo, lyhyt", distance: 4, pace: "6:30+" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Rauhallinen tasainen vauhti", distance: 13, pace: "6:10–6:25" }
+                ]
+            },
+            {
+                week: 3,
+                phase: "base",
+                phaseLabel: "Peruskunto",
+                summary: "Peruskuntovaiheen viimeinen viikko — haetaan rytmiä ennen rakennusvaihetta.",
+                tip: "Varmista riittävä uni (7–9h) ja hyvä ravinto. Hiilihydraatit ovat juoksijan polttoainetta!",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 7, pace: "6:00–6:20" },
+                    { day: "Tiistai", type: "Lihaskunto", details: "Juoksijan voimaharjoitus (keskivartalo, lantio, pohkeet)", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Vauhtikestävyys", details: "2 km lämmittely + 5×1000m (5:30/km) + 1,5 km jäähdyttely", distance: 8.5, pace: "5:30 intervalliosuudet" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Peruskestävyys", details: "Helppo + 6×100m vedot lopuksi", distance: 7, pace: "6:05–6:20" },
+                    { day: "Lauantai", type: "Lepo tai kävely", details: "Aktiivinen palautuminen", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Pidennetty pitkä lenkki", distance: 14, pace: "6:10–6:25" }
+                ]
+            },
+            {
+                week: 4,
+                phase: "build",
+                phaseLabel: "Rakentaminen",
+                summary: "Rakennusvaihe alkaa — intensiteetti nousee, pitkä lenkki pitenee. Tempo-osuudet lähestyvät kisavauhtia.",
+                tip: "Tästä viikosta lähtien tempo-osuudet ovat lähellä kisavauhtia (5:41/km). Opi tuntemaan tämä vauhti kehossasi.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 8, pace: "6:00–6:15" },
+                    { day: "Tiistai", type: "Lepo tai kevyt liike", details: "Venyttely, foam roller", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Tempojuoksu", details: "2 km lämmittely + 5 km tempolla (5:40/km) + 2 km jäähdyttely", distance: 9, pace: "5:40 tempo-osuus" },
+                    { day: "Torstai", type: "Palauttava lenkki", details: "Todella helppo", distance: 5, pace: "6:30+" },
+                    { day: "Perjantai", type: "Intervallit", details: "2 km lämmittely + 6×1000m (5:20/km, 2 min palautus) + 1,5 km jäähdyttely", distance: 9.5, pace: "5:20 intervalliosuudet" },
+                    { day: "Lauantai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Tasainen vauhti, viimeiset 3 km kisavauhtiin", distance: 15, pace: "6:10, loppu 5:40" }
+                ]
+            },
+            {
+                week: 5,
+                phase: "build",
+                phaseLabel: "Rakentaminen",
+                summary: "Volyymi ja intensiteetti jatkavat kasvua. Pitkä lenkki 16 km.",
+                tip: "Harjoittele juomista lenkin aikana. Pitkillä lenkeillä kannattaa ottaa vettä tai urheilujuomaa 15–20 min välein.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 8, pace: "6:00–6:15" },
+                    { day: "Tiistai", type: "Lihaskunto", details: "Juoksijan voimaharjoitus", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Vauhtikestävyys", details: "2 km lämmittely + 3×2000m (5:30/km, 2 min palautus) + 2 km jäähdyttely", distance: 10, pace: "5:30 intervalliosuudet" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Tempojuoksu", details: "2 km lämmittely + 6 km tempolla (5:38/km) + 1,5 km jäähdyttely", distance: 9.5, pace: "5:38 tempo-osuus" },
+                    { day: "Lauantai", type: "Palauttava lenkki", details: "Kevyt hölkkä", distance: 4, pace: "6:30+" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Tasainen vauhti", distance: 16, pace: "6:05–6:20" }
+                ]
+            },
+            {
+                week: 6,
+                phase: "build",
+                phaseLabel: "Rakentaminen",
+                summary: "Rakenteen viimeistely — palautusviiikko lähestyy, mutta pidetään vielä kova viikko.",
+                tip: "Jos tunnet väsymystä, se on normaalia. Seuraavalla viikolla on kevennys joka antaa kehon sopeutua.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 8, pace: "6:00–6:15" },
+                    { day: "Tiistai", type: "Lepo tai kevyt liike", details: "Kävely tai jooga", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Intervallit", details: "2 km lämmittely + 8×800m (5:15/km, 90s palautus) + 1,5 km jäähdyttely", distance: 10, pace: "5:15 intervalliosuudet" },
+                    { day: "Torstai", type: "Palauttava lenkki", details: "Todella helppo", distance: 5, pace: "6:30+" },
+                    { day: "Perjantai", type: "Tempojuoksu", details: "2 km lämmittely + 7 km tempolla (5:38/km) + 2 km jäähdyttely", distance: 11, pace: "5:38 tempo-osuus" },
+                    { day: "Lauantai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Pitkä lenkki, viimeiset 4 km kisavauhtiin", distance: 17, pace: "6:10, loppu 5:40" }
+                ]
+            },
+            {
+                week: 7,
+                phase: "build",
+                phaseLabel: "Rakentaminen (kevennys)",
+                summary: "Palautusviikko — volyymi laskee 30% mutta intensiteetti säilyy. Kehon annetaan sopeutua.",
+                tip: "Palautusviikko on yhtä tärkeä kuin kova treeni! Keho vahvistuu levossa. Älä tee ylimääräistä.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 6, pace: "6:10–6:25" },
+                    { day: "Tiistai", type: "Lepo", details: "Täysi lepo", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Tempojuoksu", details: "1,5 km lämmittely + 4 km tempolla (5:40/km) + 1,5 km jäähdyttely", distance: 7, pace: "5:40 tempo-osuus" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Peruskestävyys", details: "Helppo + 4×100m vedot", distance: 6, pace: "6:10–6:20" },
+                    { day: "Lauantai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Lyhyempi pitkä lenkki, rento vauhti", distance: 12, pace: "6:15–6:30" }
+                ]
+            },
+            {
+                week: 8,
+                phase: "peak",
+                phaseLabel: "Huippuvaihe",
+                summary: "Huippuvaihe alkaa — tämä on harjoittelun kovin jakso. Pitkät lenkit lähellä puolimaratonia.",
+                tip: "Testaa kilpailupäivän rutiinit pitkällä lenkillä: aamupala, juoma, vaatetus. Älä kokeile uutta kisapäivänä!",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 8, pace: "6:00–6:15" },
+                    { day: "Tiistai", type: "Lihaskunto", details: "Kevyt voimaharjoitus", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Vauhtikestävyys", details: "2 km lämmittely + 4×2000m (5:25/km, 2 min palautus) + 2 km jäähdyttely", distance: 12, pace: "5:25 intervalliosuudet" },
+                    { day: "Torstai", type: "Palauttava lenkki", details: "Todella helppo", distance: 5, pace: "6:30+" },
+                    { day: "Perjantai", type: "Tempojuoksu", details: "2 km lämmittely + 8 km tempolla (5:38/km) + 2 km jäähdyttely", distance: 12, pace: "5:38 tempo-osuus" },
+                    { day: "Lauantai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Kilpailusimulaatio: 18 km, viimeiset 5 km kisavauhtiin", distance: 18, pace: "6:05, loppu 5:40" }
+                ]
+            },
+            {
+                week: 9,
+                phase: "peak",
+                phaseLabel: "Huippuvaihe",
+                summary: "Ohjelman kovin viikko — pisin lenkki 20 km. Tämän jälkeen kevennetään kohti kisaa.",
+                tip: "20 km lenkki on henkisesti iso saavutus. Muista: kisapäivänä adrenaliini kantaa lopun matkaa!",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 8, pace: "6:00–6:10" },
+                    { day: "Tiistai", type: "Lepo tai kevyt liike", details: "Venyttely", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Intervallit", details: "2 km lämmittely + 5×1600m (5:25/km, 2,5 min palautus) + 2 km jäähdyttely", distance: 12, pace: "5:25 intervalliosuudet" },
+                    { day: "Torstai", type: "Palauttava lenkki", details: "Todella helppo", distance: 5, pace: "6:30+" },
+                    { day: "Perjantai", type: "Tempojuoksu", details: "2 km lämmittely + 6 km kisavauhtia (5:40/km) + 2 km jäähdyttely", distance: 10, pace: "5:40 tempo-osuus" },
+                    { day: "Lauantai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Pisin lenkki! 20 km tasaisella vauhdilla", distance: 20, pace: "6:00–6:15" }
+                ]
+            },
+            {
+                week: 10,
+                phase: "peak",
+                phaseLabel: "Huippuvaihe (kevennys)",
+                summary: "Toinen palautusviikko — keho tarvitsee toipumisen pitkän lenkin ja kovan jakson jälkeen.",
+                tip: "Luota harjoitteluun! Kevennysviikolla kunto ei katoa, vaan keho adaptoituu ja vahvistuu.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 6, pace: "6:10–6:25" },
+                    { day: "Tiistai", type: "Lepo", details: "Täysi lepo", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Tempojuoksu", details: "2 km lämmittely + 5 km tempolla (5:38/km) + 1,5 km jäähdyttely", distance: 8.5, pace: "5:38 tempo-osuus" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Peruskestävyys", details: "Helppo + vedot", distance: 6, pace: "6:10–6:20" },
+                    { day: "Lauantai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Rento pitkä lenkki", distance: 14, pace: "6:10–6:25" }
+                ]
+            },
+            {
+                week: 11,
+                phase: "taper",
+                phaseLabel: "Kevennys (Taper)",
+                summary: "Kevennysjakso alkaa — volyymi laskee merkittävästi mutta terävyys säilyy. Keho latautuu kisaan.",
+                tip: "Saatat tuntea olosi levottomaksi kun treenejä on vähemmän — se on normaalia! Keho kerää voimaa.",
+                days: [
+                    { day: "Maanantai", type: "Peruskestävyys", details: "Helppo tasavauhti", distance: 6, pace: "6:00–6:15" },
+                    { day: "Tiistai", type: "Lepo", details: "Täysi lepo", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Vauhtikestävyys", details: "1,5 km lämmittely + 4×1000m (5:30/km) + 1,5 km jäähdyttely", distance: 7, pace: "5:30 intervalliosuudet" },
+                    { day: "Torstai", type: "Lepo", details: "Palautumispäivä", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Tempojuoksu", details: "1,5 km lämmittely + 4 km kisavauhtia (5:40/km) + 1,5 km jäähdyttely", distance: 7, pace: "5:40 tempo-osuus" },
+                    { day: "Lauantai", type: "Lepo tai kävely", details: "Aktiivinen palautuminen", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "Pitkä lenkki", details: "Viimeinen pitkä lenkki ennen kisaa", distance: 12, pace: "6:00–6:15" }
+                ]
+            },
+            {
+                week: 12,
+                phase: "taper",
+                phaseLabel: "Kisaviikko",
+                summary: "Kisaviikko! Minimaalinen harjoittelu — jalat tuoreina kisapäivänä. Keskity lepoon ja ravintoon.",
+                tip: "Täytä glykogeenivarastot 2–3 päivää ennen kisaa (pasta, riisi, peruna). Vältä uusia ruokia. Nuku hyvin erityisesti 2 yötä ennen kisaa.",
+                days: [
+                    { day: "Maanantai", type: "Kevyt lenkki", details: "Lyhyt helppo lenkki", distance: 5, pace: "6:10–6:20" },
+                    { day: "Tiistai", type: "Lepo", details: "Täysi lepo", distance: 0, pace: "-" },
+                    { day: "Keskiviikko", type: "Aktivointi", details: "3 km helppo + 4×200m kisavauhtia", distance: 4, pace: "6:00 + vedot 5:30" },
+                    { day: "Torstai", type: "Lepo", details: "Täysi lepo", distance: 0, pace: "-" },
+                    { day: "Perjantai", type: "Ravistelu", details: "2–3 km todella kevyttä hölkkää", distance: 3, pace: "6:30+" },
+                    { day: "Lauantai", type: "Lepo", details: "Täysi lepo — valmistele kisavarusteet", distance: 0, pace: "-" },
+                    { day: "Sunnuntai", type: "KILPAILU!", details: "Puolimaraton — tavoite alle 2:00:00!", distance: 21.1, pace: "5:41 tavoitevauhti" }
+                ]
+            }
+        ];
+
+        let currentWeek = 0;
+
+        function getRaceDate() {
+            const today = new Date(2026, 4, 4);
+            const race = new Date(today);
+            race.setDate(race.getDate() + 12 * 7);
+            return race;
+        }
+
+        function formatDate(date) {
+            const days = ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'];
+            const months = ['tammi', 'helmi', 'maalis', 'huhti', 'touko', 'kesä', 'heinä', 'elo', 'syys', 'loka', 'marras', 'joulu'];
+            return `${date.getDate()}. ${months[date.getMonth()]}kuuta`;
+        }
+
+        function getCurrentWeekIndex() {
+            const today = new Date();
+            const start = new Date(2026, 4, 5);
+            const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+            const weekIndex = Math.floor(diffDays / 7);
+            return Math.max(0, Math.min(weekIndex, 11));
+        }
+
+        function changeWeek(delta) {
+            currentWeek = Math.max(0, Math.min(11, currentWeek + delta));
+            render();
+        }
+
+        function render() {
+            const week = trainingPlan[currentWeek];
+
+            document.getElementById('weekLabel').textContent = `Viikko ${week.week} / 12`;
+            document.getElementById('prevWeek').disabled = currentWeek === 0;
+            document.getElementById('nextWeek').disabled = currentWeek === 11;
+
+            const phaseClass = `phase-${week.phase}`;
+            document.getElementById('phaseInfo').innerHTML = `<span class="phase-badge ${phaseClass}">${week.phaseLabel}</span>`;
+
+            document.getElementById('weekSummary').innerHTML = `<h3>Viikon tavoite</h3><p>${week.summary}</p>`;
+
+            let totalDist = 0;
+            let runDays = 0;
+            let scheduleHtml = '';
+
+            week.days.forEach(d => {
+                totalDist += d.distance;
+                if (d.distance > 0) runDays++;
+
+                const isRest = d.distance === 0;
+                scheduleHtml += `
+                    <div class="day-card ${isRest ? 'rest' : ''}">
+                        <div class="day-name">${d.day}</div>
+                        <div class="day-workout">
+                            <div class="type">${d.type}</div>
+                            <div class="details">${d.details}</div>
+                        </div>
+                        <div class="day-stats">
+                            <div class="distance">${d.distance > 0 ? d.distance + ' km' : 'Lepo'}</div>
+                            <div class="pace">${d.pace}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('schedule').innerHTML = scheduleHtml;
+
+            document.getElementById('totals').innerHTML = `
+                <div class="total-item">
+                    <div class="num">${totalDist.toFixed(1)}</div>
+                    <div class="desc">km viikossa</div>
+                </div>
+                <div class="total-item">
+                    <div class="num">${runDays}</div>
+                    <div class="desc">juoksupäivää</div>
+                </div>
+                <div class="total-item">
+                    <div class="num">${(7 - runDays)}</div>
+                    <div class="desc">lepopäivää</div>
+                </div>
+                <div class="total-item">
+                    <div class="num">${Math.round(totalDist / runDays * 10) / 10}</div>
+                    <div class="desc">km / juoksupäivä</div>
+                </div>
+            `;
+
+            const progress = ((currentWeek + 1) / 12) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${Math.round(progress)}% ohjelmasta`;
+
+            document.getElementById('tipBox').innerHTML = `<h4>Viikon vinkki</h4><p>${week.tip}</p>`;
+        }
+
+        document.getElementById('raceDate').textContent = formatDate(getRaceDate());
+        currentWeek = getCurrentWeekIndex();
+        render();
+    </script>
+</body>
+</html>

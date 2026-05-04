@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDLC Guardrails — Ohjelmistokehityksen laadunvarmistus</title>
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-light: #e1effe;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.85;
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .score-ring {
+            width: 64px;
+            height: 64px;
+            position: relative;
+        }
+
+        .score-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-ring .track {
+            fill: none;
+            stroke: var(--gray-200);
+            stroke-width: 6;
+        }
+
+        .score-ring .fill {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease;
+        }
+
+        .score-ring .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .score-info h3 {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .score-info p {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: #1e40af; }
+
+        .btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-outline:hover { background: var(--gray-100); }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover { background: #047857; }
+
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .phase-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .phase-card:hover { box-shadow: var(--shadow-lg); }
+        .phase-card.selected { border-color: var(--primary); }
+
+        .phase-header {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .phase-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .phase-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .phase-subtitle {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .phase-progress {
+            padding: 0 1rem 1rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .phase-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 1rem 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .detail-panel {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .detail-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-header h2 {
+            font-size: 1.2rem;
+        }
+
+        .guardrails-list {
+            padding: 1rem;
+        }
+
+        .guardrail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .guardrail-item:hover {
+            background: var(--gray-50);
+        }
+
+        .guardrail-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 2px solid var(--gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            background: white;
+            margin-top: 2px;
+        }
+
+        .guardrail-check.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .guardrail-check.warning {
+            background: var(--warning);
+            border-color: var(--warning);
+            color: white;
+        }
+
+        .guardrail-check.blocked {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        .guardrail-content {
+            flex: 1;
+        }
+
+        .guardrail-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .guardrail-desc {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+        }
+
+        .guardrail-tags {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .tag-required {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .tag-recommended {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .tag-optional {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+
+        .tag-auto {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .guardrail-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .findings-section {
+            margin-top: 1.5rem;
+        }
+
+        .finding {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .finding-critical {
+            background: var(--danger-light);
+            border-left: 3px solid var(--danger);
+        }
+
+        .finding-warning {
+            background: var(--warning-light);
+            border-left: 3px solid var(--warning);
+        }
+
+        .finding-info {
+            background: var(--primary-light);
+            border-left: 3px solid var(--primary);
+        }
+
+        .finding-ok {
+            background: var(--success-light);
+            border-left: 3px solid var(--success);
+        }
+
+        .finding-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .finding-text h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .finding-text p {
+            font-size: 0.82rem;
+            color: var(--gray-600);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .report-section {
+            margin-top: 2rem;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .report-stat {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--gray-50);
+        }
+
+        .report-stat .number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .report-stat .label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .timeline {
+            margin-top: 1.5rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gray-200);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.6rem;
+            top: 0.3rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+        }
+
+        .timeline-item.completed::before { background: var(--success); }
+        .timeline-item.pending::before { background: var(--gray-400); }
+
+        .timeline-item h4 {
+            font-size: 0.9rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.82rem;
+            color: var(--gray-500);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-400);
+        }
+
+        .empty-state .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.4rem; }
+            .pipeline { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; }
+            .score-card { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SDLC Guardrails</h1>
+        <p>Varmista ohjelmistokehityksen jokaisen vaiheen laatu. Aseta guardrailit, seuraa validointia ja tunnista puutteet ennen kuin koodi etenee tuotantoon.</p>
+    </header>
+
+    <div class="app-container">
+        <div class="top-bar">
+            <div class="score-card">
+                <div class="score-ring">
+                    <svg viewBox="0 0 36 36" width="64" height="64">
+                        <circle class="track" cx="18" cy="18" r="15.5"></circle>
+                        <circle class="fill" id="scoreCircle" cx="18" cy="18" r="15.5"
+                            stroke-dasharray="97.4" stroke-dashoffset="97.4"></circle>
+                    </svg>
+                    <span class="score-text" id="scoreText">0%</span>
+                </div>
+                <div class="score-info">
+                    <h3>Kokonaisvalmius</h3>
+                    <p id="scoreLabel">Ei arvioitu</p>
+                </div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-primary" onclick="openProjectModal()">+ Uusi projekti</button>
+                <button class="btn btn-outline" onclick="runAnalysis()">Analysoi puutteet</button>
+                <button class="btn btn-outline" onclick="exportReport()">Vie raportti</button>
+            </div>
+        </div>
+
+        <div class="pipeline" id="pipeline"></div>
+
+        <div class="detail-panel" id="detailPanel">
+            <div class="empty-state">
+                <div class="icon">&#9881;</div>
+                <p>Valitse vaihe yläpuolelta nähdäksesi sen guardrailit ja validoinnit</p>
+            </div>
+        </div>
+
+        <div class="findings-section" id="findingsSection" style="display:none">
+            <h3 style="margin-bottom: 1rem;">Puuteanalyysi</h3>
+            <div id="findingsList"></div>
+        </div>
+
+        <div class="report-section" id="reportSection" style="display:none">
+            <div class="report-card">
+                <h3>Projektin tila</h3>
+                <div class="report-grid" id="reportGrid"></div>
+                <div class="timeline" id="timeline"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Uusi projekti</h3>
+                <button class="icon-btn" onclick="closeProjectModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Projektin nimi</label>
+                    <input type="text" id="projectName" placeholder="esim. Sääsovellus v2.0">
+                </div>
+                <div class="form-group">
+                    <label>Kuvaus</label>
+                    <textarea id="projectDesc" placeholder="Lyhyt kuvaus projektin tavoitteista"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Guardrail-taso</label>
+                    <select id="guardrailLevel">
+                        <option value="strict">Tiukka — kaikki pakolliset vaaditaan</option>
+                        <option value="standard" selected>Standardi — suositellut mukana</option>
+                        <option value="minimal">Kevyt — vain kriittiset</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Teknologiapino</label>
+                    <select id="techStack">
+                        <option value="web">Web (HTML/CSS/JS)</option>
+                        <option value="fullstack">Full Stack (React + Node)</option>
+                        <option value="python">Python / Data</option>
+                        <option value="mobile">Mobiili (React Native)</option>
+                        <option value="other">Muu</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeProjectModal()">Peruuta</button>
+                <button class="btn btn-primary" onclick="createProject()">Luo projekti</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="guardrailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="guardrailModalTitle">Muokkaa guardrail</h3>
+                <button class="icon-btn" onclick="closeGuardrailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nimi</label>
+                    <input type="text" id="grName">
+                </div>
+                <div class="form-group">
+                    <label>Kuvaus</label>
+                    <textarea id="grDesc"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Taso</label>
+                    <select id="grLevel">
+                        <option value="required">Pakollinen</option>
+                        <option value="recommended">Suositeltu</option>
+                        <option value="optional">Valinnainen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Validointityyppi</label>
+                    <select id="grValidation">
+                        <option value="manual">Manuaalinen tarkistus</option>
+                        <option value="checklist">Tarkistuslista</option>
+                        <option value="automated">Automaattinen (CI/CD)</option>
+                        <option value="review">Katselmointi</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Muistiinpanot</label>
+                    <textarea id="grNotes" placeholder="Vapaamuotoisia huomioita..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeGuardrailModal()">Peruuta</button>
+                <button class="btn btn-primary" onclick="saveGuardrail()">Tallenna</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const PHASES = [
+        {
+            id: 'requirements',
+            name: 'Vaatimukset',
+            subtitle: 'Määrittely & rajaus',
+            icon: '&#128203;',
+            color: '#7c3aed',
+            bg: '#ede9fe',
+            guardrails: [
+                { id: 'req-1', name: 'Käyttäjätarinat määritelty', desc: 'Jokainen toiminnallisuus on kuvattu käyttäjätarinana hyväksymiskriteereineen', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'req-2', name: 'Ei-toiminnalliset vaatimukset', desc: 'Suorituskyky, saavutettavuus, tietoturva ja skaalautuvuus on huomioitu', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'req-3', name: 'Sidosryhmien hyväksyntä', desc: 'Vaatimukset on katselmoitu ja hyväksytty sidosryhmien toimesta', level: 'required', validation: 'review', status: 'unchecked', notes: '' },
+                { id: 'req-4', name: 'Priorisointi ja laajuus', desc: 'Toteutettavat ominaisuudet on priorisoitu ja rajattu MVP:hen', level: 'recommended', validation: 'manual', status: 'unchecked', notes: '' },
+                { id: 'req-5', name: 'AI-tuotannon rajoitteet', desc: 'Rajaukset sille mitä tekoäly saa ja ei saa generoida on dokumentoitu', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+            ]
+        },
+        {
+            id: 'design',
+            name: 'Suunnittelu',
+            subtitle: 'Arkkitehtuuri & UX',
+            icon: '&#9998;',
+            color: '#2563eb',
+            bg: '#dbeafe',
+            guardrails: [
+                { id: 'des-1', name: 'Arkkitehtuuripäätökset dokumentoitu', desc: 'ADR (Architecture Decision Record) tehty keskeisistä valinnoista', level: 'required', validation: 'review', status: 'unchecked', notes: '' },
+                { id: 'des-2', name: 'Tietomalli suunniteltu', desc: 'Tietokannan rakenne, rajapinnat ja datavirrat on kuvattu', level: 'required', validation: 'review', status: 'unchecked', notes: '' },
+                { id: 'des-3', name: 'UI/UX-suunnitelma', desc: 'Käyttöliittymän wireframe tai mockup on katselmoitu', level: 'recommended', validation: 'review', status: 'unchecked', notes: '' },
+                { id: 'des-4', name: 'Tietoturvasuunnitelma', desc: 'OWASP Top 10 -uhkamalli ja tietoturvakontrollit on määritelty', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'des-5', name: 'AI-promptien suunnittelu', desc: 'Koneelle annettavat ohjeet ja rajoitteet on suunniteltu etukäteen', level: 'recommended', validation: 'manual', status: 'unchecked', notes: '' },
+            ]
+        },
+        {
+            id: 'implementation',
+            name: 'Toteutus',
+            subtitle: 'Koodaus & integraatio',
+            icon: '&#128187;',
+            color: '#059669',
+            bg: '#d1fae5',
+            guardrails: [
+                { id: 'imp-1', name: 'Koodausstandardit noudatettu', desc: 'Lint, muotoilu ja nimeämiskäytännöt ovat yhdenmukaiset', level: 'required', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'imp-2', name: 'AI-tuotos katselmoitu', desc: 'Kaikki tekoälyn generoima koodi on ihmisen tarkistama', level: 'required', validation: 'review', status: 'unchecked', notes: '' },
+                { id: 'imp-3', name: 'Ei kovakoodattuja salaisuuksia', desc: 'API-avaimet, salasanat ja tokenien haku ympäristömuuttujista', level: 'required', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'imp-4', name: 'Riippuvuudet tarkistettu', desc: 'Kolmannen osapuolen kirjastot on auditoitu turvallisuuden osalta', level: 'recommended', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'imp-5', name: 'Koodin vastaavuus vaatimuksiin', desc: 'Jokainen toteutettu ominaisuus on jäljitettävissä vaatimukseen', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'imp-6', name: 'Hallusinaatiotarkistus', desc: 'Varmistettu ettei AI ole keksinyt olemattomia API-rajapintoja tai kirjastoja', level: 'required', validation: 'manual', status: 'unchecked', notes: '' },
+            ]
+        },
+        {
+            id: 'testing',
+            name: 'Testaus',
+            subtitle: 'Laadunvarmistus',
+            icon: '&#128269;',
+            color: '#d97706',
+            bg: '#fef3c7',
+            guardrails: [
+                { id: 'tst-1', name: 'Yksikkötestit kirjoitettu', desc: 'Kriittisten komponenttien testikattavuus >= 80%', level: 'required', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'tst-2', name: 'Integraatiotestit', desc: 'Rajapintojen yhteistoiminta testattu end-to-end', level: 'required', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'tst-3', name: 'Hyväksymistestaus', desc: 'Käyttäjätarinoiden hyväksymiskriteerit testattu', level: 'required', validation: 'manual', status: 'unchecked', notes: '' },
+                { id: 'tst-4', name: 'Suorituskykytestaus', desc: 'Latausajat ja resurssien käyttö mitattu', level: 'recommended', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'tst-5', name: 'Tietoturvatestaus', desc: 'SAST/DAST-skannaus ja haavoittuvuustarkistus suoritettu', level: 'required', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'tst-6', name: 'Regressiotestaus', desc: 'Aiemmat toiminnallisuudet toimivat edelleen muutosten jälkeen', level: 'recommended', validation: 'automated', status: 'unchecked', notes: '' },
+            ]
+        },
+        {
+            id: 'review',
+            name: 'Katselmointi',
+            subtitle: 'PR & hyväksyntä',
+            icon: '&#128101;',
+            color: '#dc2626',
+            bg: '#fee2e2',
+            guardrails: [
+                { id: 'rev-1', name: 'Code review suoritettu', desc: 'Vähintään yksi muu kehittäjä on katselmoinut muutokset', level: 'required', validation: 'review', status: 'unchecked', notes: '' },
+                { id: 'rev-2', name: 'AI-koodin merkintä', desc: 'Tekoälyn generoima koodi on selkeästi merkitty ja dokumentoitu', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'rev-3', name: 'Definition of Done täytetty', desc: 'Kaikki DoD-kriteerit on tarkistettu ennen hyväksyntää', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'rev-4', name: 'Dokumentaatio päivitetty', desc: 'README, API-docs ja muutosloki ovat ajan tasalla', level: 'recommended', validation: 'manual', status: 'unchecked', notes: '' },
+            ]
+        },
+        {
+            id: 'deploy',
+            name: 'Julkaisu',
+            subtitle: 'Käyttöönotto',
+            icon: '&#128640;',
+            color: '#0891b2',
+            bg: '#cffafe',
+            guardrails: [
+                { id: 'dep-1', name: 'CI/CD-putki vihreä', desc: 'Kaikki automaattiset tarkistukset läpäisty', level: 'required', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'dep-2', name: 'Staging-ympäristö testattu', desc: 'Sovellus toimii staging-ympäristössä ennen tuotantoa', level: 'required', validation: 'manual', status: 'unchecked', notes: '' },
+                { id: 'dep-3', name: 'Rollback-suunnitelma', desc: 'Palautusmekanismi on testattu ja dokumentoitu', level: 'required', validation: 'checklist', status: 'unchecked', notes: '' },
+                { id: 'dep-4', name: 'Monitorointi käytössä', desc: 'Loki-, virhe- ja suorituskykyseuranta on konfiguroitu', level: 'recommended', validation: 'automated', status: 'unchecked', notes: '' },
+                { id: 'dep-5', name: 'Julkaisun hyväksyntä', desc: 'Projektipäällikkö tai tuoteomistaja on hyväksynyt julkaisun', level: 'required', validation: 'review', status: 'unchecked', notes: '' },
+            ]
+        }
+    ];
+
+    let state = {
+        project: null,
+        phases: JSON.parse(JSON.stringify(PHASES)),
+        selectedPhase: null,
+        editingGuardrail: null,
+        analysisRun: false
+    };
+
+    function loadState() {
+        const saved = localStorage.getItem('sdlc-guardrails-state');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                state = { ...state, ...parsed };
+            } catch(e) {}
+        }
+    }
+
+    function saveState() {
+        localStorage.setItem('sdlc-guardrails-state', JSON.stringify(state));
+    }
+
+    function getPhaseProgress(phase) {
+        const total = phase.guardrails.length;
+        const checked = phase.guardrails.filter(g => g.status === 'checked').length;
+        return { total, checked, pct: total ? Math.round((checked / total) * 100) : 0 };
+    }
+
+    function getOverallScore() {
+        let totalRequired = 0;
+        let checkedRequired = 0;
+        let totalAll = 0;
+        let checkedAll = 0;
+
+        state.phases.forEach(phase => {
+            phase.guardrails.forEach(g => {
+                totalAll++;
+                if (g.status === 'checked') checkedAll++;
+                if (g.level === 'required') {
+                    totalRequired++;
+                    if (g.status === 'checked') checkedRequired++;
+                }
+            });
+        });
+
+        return {
+            totalRequired,
+            checkedRequired,
+            totalAll,
+            checkedAll,
+            pctRequired: totalRequired ? Math.round((checkedRequired / totalRequired) * 100) : 0,
+            pctAll: totalAll ? Math.round((checkedAll / totalAll) * 100) : 0
+        };
+    }
+
+    function renderScore() {
+        const score = getOverallScore();
+        const pct = score.pctAll;
+        const circumference = 97.4;
+        const offset = circumference - (pct / 100) * circumference;
+        const circle = document.getElementById('scoreCircle');
+        const text = document.getElementById('scoreText');
+        const label = document.getElementById('scoreLabel');
+
+        circle.style.strokeDashoffset = offset;
+
+        let color;
+        if (pct >= 80) color = 'var(--success)';
+        else if (pct >= 50) color = 'var(--warning)';
+        else color = 'var(--danger)';
+
+        circle.style.stroke = color;
+        text.textContent = pct + '%';
+        text.style.color = color;
+
+        if (!state.project) {
+            label.textContent = 'Luo projekti aloittaaksesi';
+        } else if (pct === 100) {
+            label.textContent = 'Kaikki guardrailit validoitu!';
+        } else if (score.pctRequired === 100) {
+            label.textContent = 'Pakolliset OK, suositellut puuttuu';
+        } else {
+            label.textContent = `${score.checkedRequired}/${score.totalRequired} pakollista valmiina`;
+        }
+    }
+
+    function renderPipeline() {
+        const container = document.getElementById('pipeline');
+        container.innerHTML = '';
+
+        state.phases.forEach(phase => {
+            const progress = getPhaseProgress(phase);
+            let progressColor;
+            if (progress.pct >= 80) progressColor = 'var(--success)';
+            else if (progress.pct >= 50) progressColor = 'var(--warning)';
+            else if (progress.pct > 0) progressColor = 'var(--danger)';
+            else progressColor = 'var(--gray-300)';
+
+            const card = document.createElement('div');
+            card.className = 'phase-card' + (state.selectedPhase === phase.id ? ' selected' : '');
+            card.onclick = () => selectPhase(phase.id);
+            card.innerHTML = `
+                <div class="phase-header">
+                    <div class="phase-icon" style="background:${phase.bg};color:${phase.color}">${phase.icon}</div>
+                    <div>
+                        <div class="phase-title">${phase.name}</div>
+                        <div class="phase-subtitle">${phase.subtitle}</div>
+                    </div>
+                </div>
+                <div class="phase-stats">
+                    <span>${progress.checked}/${progress.total} valmiina</span>
+                    <span>${progress.pct}%</span>
+                </div>
+                <div class="phase-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${progress.pct}%;background:${progressColor}"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function selectPhase(phaseId) {
+        state.selectedPhase = phaseId;
+        renderPipeline();
+        renderDetail();
+        saveState();
+    }
+
+    function renderDetail() {
+        const panel = document.getElementById('detailPanel');
+
+        if (!state.selectedPhase) {
+            panel.innerHTML = `<div class="empty-state"><div class="icon">&#9881;</div><p>Valitse vaihe yläpuolelta nähdäksesi sen guardrailit ja validoinnit</p></div>`;
+            return;
+        }
+
+        const phase = state.phases.find(p => p.id === state.selectedPhase);
+
+        const validationLabels = {
+            manual: 'Manuaalinen',
+            checklist: 'Tarkistuslista',
+            automated: 'Automaattinen',
+            review: 'Katselmointi'
+        };
+
+        const levelLabels = {
+            required: 'Pakollinen',
+            recommended: 'Suositeltu',
+            optional: 'Valinnainen'
+        };
+
+        let guardrailsHtml = phase.guardrails.map(g => {
+            let checkClass = '';
+            let checkIcon = '';
+            if (g.status === 'checked') { checkClass = 'checked'; checkIcon = '&#10003;'; }
+            else if (g.status === 'warning') { checkClass = 'warning'; checkIcon = '!'; }
+            else if (g.status === 'blocked') { checkClass = 'blocked'; checkIcon = '&#10007;'; }
+
+            return `
+                <div class="guardrail-item">
+                    <div class="guardrail-check ${checkClass}" onclick="toggleGuardrail('${phase.id}','${g.id}')">${checkIcon}</div>
+                    <div class="guardrail-content">
+                        <div class="guardrail-name">${g.name}</div>
+                        <div class="guardrail-desc">${g.desc}</div>
+                        <div class="guardrail-tags">
+                            <span class="tag tag-${g.level}">${levelLabels[g.level]}</span>
+                            <span class="tag tag-auto">${validationLabels[g.validation]}</span>
+                        </div>
+                        ${g.notes ? `<div style="margin-top:0.5rem;font-size:0.82rem;color:var(--gray-600);font-style:italic">&#128221; ${g.notes}</div>` : ''}
+                    </div>
+                    <div class="guardrail-actions">
+                        <button class="icon-btn" onclick="editGuardrail('${phase.id}','${g.id}')" title="Muokkaa">&#9998;</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        panel.innerHTML = `
+            <div class="detail-header">
+                <h2>${phase.icon} ${phase.name} — ${phase.subtitle}</h2>
+                <button class="btn btn-outline" onclick="addGuardrail('${phase.id}')">+ Lisää guardrail</button>
+            </div>
+            <div class="guardrails-list">${guardrailsHtml}</div>
+        `;
+    }
+
+    function toggleGuardrail(phaseId, guardrailId) {
+        const phase = state.phases.find(p => p.id === phaseId);
+        const g = phase.guardrails.find(gr => gr.id === guardrailId);
+
+        if (g.status === 'unchecked') g.status = 'checked';
+        else if (g.status === 'checked') g.status = 'warning';
+        else if (g.status === 'warning') g.status = 'blocked';
+        else g.status = 'unchecked';
+
+        saveState();
+        renderPipeline();
+        renderDetail();
+        renderScore();
+    }
+
+    function editGuardrail(phaseId, guardrailId) {
+        const phase = state.phases.find(p => p.id === phaseId);
+        const g = phase.guardrails.find(gr => gr.id === guardrailId);
+
+        state.editingGuardrail = { phaseId, guardrailId };
+        document.getElementById('guardrailModalTitle').textContent = 'Muokkaa guardrail';
+        document.getElementById('grName').value = g.name;
+        document.getElementById('grDesc').value = g.desc;
+        document.getElementById('grLevel').value = g.level;
+        document.getElementById('grValidation').value = g.validation;
+        document.getElementById('grNotes').value = g.notes || '';
+        document.getElementById('guardrailModal').classList.add('visible');
+    }
+
+    function addGuardrail(phaseId) {
+        state.editingGuardrail = { phaseId, guardrailId: null };
+        document.getElementById('guardrailModalTitle').textContent = 'Lisää uusi guardrail';
+        document.getElementById('grName').value = '';
+        document.getElementById('grDesc').value = '';
+        document.getElementById('grLevel').value = 'recommended';
+        document.getElementById('grValidation').value = 'manual';
+        document.getElementById('grNotes').value = '';
+        document.getElementById('guardrailModal').classList.add('visible');
+    }
+
+    function saveGuardrail() {
+        const { phaseId, guardrailId } = state.editingGuardrail;
+        const phase = state.phases.find(p => p.id === phaseId);
+
+        const data = {
+            name: document.getElementById('grName').value.trim(),
+            desc: document.getElementById('grDesc').value.trim(),
+            level: document.getElementById('grLevel').value,
+            validation: document.getElementById('grValidation').value,
+            notes: document.getElementById('grNotes').value.trim()
+        };
+
+        if (!data.name) return;
+
+        if (guardrailId) {
+            const g = phase.guardrails.find(gr => gr.id === guardrailId);
+            Object.assign(g, data);
+        } else {
+            phase.guardrails.push({
+                id: 'custom-' + Date.now(),
+                ...data,
+                status: 'unchecked'
+            });
+        }
+
+        closeGuardrailModal();
+        saveState();
+        renderPipeline();
+        renderDetail();
+        renderScore();
+    }
+
+    function closeGuardrailModal() {
+        document.getElementById('guardrailModal').classList.remove('visible');
+        state.editingGuardrail = null;
+    }
+
+    function openProjectModal() {
+        document.getElementById('projectModal').classList.add('visible');
+    }
+
+    function closeProjectModal() {
+        document.getElementById('projectModal').classList.remove('visible');
+    }
+
+    function createProject() {
+        const name = document.getElementById('projectName').value.trim();
+        if (!name) return;
+
+        const level = document.getElementById('guardrailLevel').value;
+
+        state.project = {
+            name,
+            desc: document.getElementById('projectDesc').value.trim(),
+            level,
+            techStack: document.getElementById('techStack').value,
+            createdAt: new Date().toISOString()
+        };
+
+        if (level === 'minimal') {
+            state.phases.forEach(phase => {
+                phase.guardrails = phase.guardrails.filter(g => g.level === 'required');
+            });
+        }
+
+        closeProjectModal();
+        saveState();
+        renderPipeline();
+        renderScore();
+        renderReport();
+    }
+
+    function runAnalysis() {
+        const findings = [];
+        const score = getOverallScore();
+
+        state.phases.forEach(phase => {
+            const progress = getPhaseProgress(phase);
+            const uncheckedRequired = phase.guardrails.filter(g => g.level === 'required' && g.status !== 'checked');
+            const blocked = phase.guardrails.filter(g => g.status === 'blocked');
+
+            if (blocked.length > 0) {
+                blocked.forEach(g => {
+                    findings.push({
+                        type: 'critical',
+                        icon: '&#128308;',
+                        title: `ESTETTY: ${g.name}`,
+                        text: `${phase.name}-vaiheessa guardrail "${g.name}" on merkitty estetyksi. Tämä estää etenemisen.`
+                    });
+                });
+            }
+
+            if (uncheckedRequired.length > 0) {
+                uncheckedRequired.forEach(g => {
+                    if (g.status !== 'blocked') {
+                        findings.push({
+                            type: 'warning',
+                            icon: '&#9888;',
+                            title: `Pakollinen puuttuu: ${g.name}`,
+                            text: `${phase.name}-vaiheessa pakollinen guardrail "${g.name}" on vielä validoimatta.`
+                        });
+                    }
+                });
+            }
+
+            if (progress.pct === 100) {
+                findings.push({
+                    type: 'ok',
+                    icon: '&#9989;',
+                    title: `${phase.name}: Kaikki kunnossa`,
+                    text: `Kaikki ${progress.total} guardrail'ia on validoitu onnistuneesti.`
+                });
+            }
+
+            const autoGuardrails = phase.guardrails.filter(g => g.validation === 'automated' && g.status !== 'checked');
+            if (autoGuardrails.length > 0) {
+                findings.push({
+                    type: 'info',
+                    icon: '&#128161;',
+                    title: `Automaatio mahdollinen: ${phase.name}`,
+                    text: `${autoGuardrails.length} guardrail'ia voitaisiin automatisoida CI/CD-putkeen: ${autoGuardrails.map(g => g.name).join(', ')}.`
+                });
+            }
+        });
+
+        if (score.pctRequired < 100) {
+            findings.unshift({
+                type: 'critical',
+                icon: '&#128680;',
+                title: 'Julkaisueste: pakollisia guardrail\'eja puuttuu',
+                text: `${score.totalRequired - score.checkedRequired} pakollista guardrail'ia on vielä validoimatta. Julkaisua ei suositella ennen niiden täyttämistä.`
+            });
+        }
+
+        if (score.pctAll === 100) {
+            findings.unshift({
+                type: 'ok',
+                icon: '&#127881;',
+                title: 'Kaikki guardrailit validoitu!',
+                text: 'Projekti on valmis julkaistavaksi. Kaikki SDLC-vaiheiden tarkistukset on suoritettu.'
+            });
+        }
+
+        const section = document.getElementById('findingsSection');
+        const list = document.getElementById('findingsList');
+
+        section.style.display = 'block';
+        list.innerHTML = findings.map(f => `
+            <div class="finding finding-${f.type}">
+                <span class="finding-icon">${f.icon}</span>
+                <div class="finding-text">
+                    <h4>${f.title}</h4>
+                    <p>${f.text}</p>
+                </div>
+            </div>
+        `).join('');
+
+        state.analysisRun = true;
+        saveState();
+    }
+
+    function renderReport() {
+        if (!state.project) return;
+        const section = document.getElementById('reportSection');
+        section.style.display = 'block';
+
+        const score = getOverallScore();
+        const grid = document.getElementById('reportGrid');
+
+        let reqColor = score.pctRequired >= 80 ? 'var(--success)' : score.pctRequired >= 50 ? 'var(--warning)' : 'var(--danger)';
+
+        grid.innerHTML = `
+            <div class="report-stat">
+                <div class="number" style="color:${reqColor}">${score.checkedRequired}</div>
+                <div class="label">Pakollisia valmiina (/${score.totalRequired})</div>
+            </div>
+            <div class="report-stat">
+                <div class="number">${score.checkedAll}</div>
+                <div class="label">Yhteensä valmiina (/${score.totalAll})</div>
+            </div>
+            <div class="report-stat">
+                <div class="number">${state.phases.length}</div>
+                <div class="label">SDLC-vaihetta</div>
+            </div>
+            <div class="report-stat">
+                <div class="number" style="color:var(--primary)">${state.project.level === 'strict' ? 'Tiukka' : state.project.level === 'standard' ? 'Std' : 'Kevyt'}</div>
+                <div class="label">Guardrail-taso</div>
+            </div>
+        `;
+
+        const timeline = document.getElementById('timeline');
+        timeline.innerHTML = state.phases.map(phase => {
+            const p = getPhaseProgress(phase);
+            const cls = p.pct === 100 ? 'completed' : p.pct > 0 ? '' : 'pending';
+            return `
+                <div class="timeline-item ${cls}">
+                    <h4>${phase.icon} ${phase.name} — ${p.pct}%</h4>
+                    <p>${p.checked}/${p.total} guardrail'ia valmiina</p>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function exportReport() {
+        const score = getOverallScore();
+        const date = new Date().toLocaleDateString('fi-FI');
+        let text = `SDLC GUARDRAILS -RAPORTTI\n`;
+        text += `Päivämäärä: ${date}\n`;
+        if (state.project) {
+            text += `Projekti: ${state.project.name}\n`;
+            text += `Guardrail-taso: ${state.project.level}\n`;
+        }
+        text += `\nKokonaisvalmius: ${score.pctAll}%\n`;
+        text += `Pakolliset: ${score.checkedRequired}/${score.totalRequired} (${score.pctRequired}%)\n`;
+        text += `Kaikki: ${score.checkedAll}/${score.totalAll}\n`;
+        text += `${'='.repeat(50)}\n\n`;
+
+        state.phases.forEach(phase => {
+            const p = getPhaseProgress(phase);
+            text += `${phase.name} (${p.pct}%)\n`;
+            text += `${'-'.repeat(30)}\n`;
+            phase.guardrails.forEach(g => {
+                const icon = g.status === 'checked' ? '[OK]' : g.status === 'warning' ? '[!!]' : g.status === 'blocked' ? '[XX]' : '[  ]';
+                const lvl = g.level === 'required' ? 'PAK' : g.level === 'recommended' ? 'SUO' : 'VAL';
+                text += `  ${icon} [${lvl}] ${g.name}\n`;
+                if (g.notes) text += `       Huom: ${g.notes}\n`;
+            });
+            text += '\n';
+        });
+
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `sdlc-guardrails-raportti-${date}.txt`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function init() {
+        loadState();
+        renderPipeline();
+        renderScore();
+        if (state.selectedPhase) renderDetail();
+        if (state.project) renderReport();
+    }
+
+    init();
+    </script>
+</body>
+</html>

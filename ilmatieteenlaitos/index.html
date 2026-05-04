@@ -3,73 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ilmatieteen laitos - Sääsovellukset</title>
+    <title>Ilmatieteen laitoksen sovellukset</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #2d5f9a, #4a90c4);
+            background: linear-gradient(135deg, #0c1445 0%, #1a3a6b 50%, #2d6a9f 100%);
             min-height: 100vh;
-            color: #fff;
-            padding: 2rem;
+            color: #e8edf3;
         }
-        .container { max-width: 800px; margin: 0 auto; }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding: 2rem 0;
+        }
         h1 {
             font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
         .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            margin-bottom: 2rem;
+            font-size: 1rem;
+            color: #9bb5d6;
         }
-        .app-list { list-style: none; }
-        .app-list li {
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(10px);
+        .apps {
+            display: grid;
+            gap: 1rem;
+        }
+        .app-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            margin-bottom: 1rem;
-            transition: transform 0.2s, background 0.2s;
-        }
-        .app-list li:hover {
-            transform: translateY(-2px);
-            background: rgba(255,255,255,0.2);
-        }
-        .app-list a {
-            display: block;
             padding: 1.2rem 1.5rem;
-            color: #fff;
             text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 500;
+            color: #e8edf3;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            display: block;
         }
-        .app-list .desc {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            font-weight: 400;
-            margin-top: 0.3rem;
+        .app-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .app-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .app-id {
+            font-size: 0.8rem;
+            color: #7a9cc6;
         }
         footer {
-            margin-top: 3rem;
             text-align: center;
-            opacity: 0.5;
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            color: #7a9cc6;
             font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Ilmatieteen laitos - Sääsovellukset</h1>
-        <p class="subtitle">Ilmatieteen laitoksen avointa dataa hyödyntävät sovellukset</p>
-        <ul class="app-list">
-            <li>
-                <a href="Helsinki_20260504_0603_558/">
-                    Helsinki - Sääennuste
-                    <div class="desc">Helsingin sääennuste Ilmatieteen laitoksen datasta</div>
-                </a>
-            </li>
-        </ul>
-        <footer>Päivitetty 4.5.2026</footer>
+        <header>
+            <h1>Ilmatieteen laitoksen sovellukset</h1>
+            <p class="subtitle">Säädata-pohjaiset demosovellukset</p>
+        </header>
+        <div class="apps">
+            <a class="app-card" href="Helsinki_20260504_0603_558/">
+                <div class="app-title">Helsinki Säävertailu — Pyöräilijän sääpalvelu</div>
+                <div class="app-id">Helsinki_20260504_0603_558</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0941_538/">
+                <div class="app-title">Työajanseuranta</div>
+                <div class="app-id">Helsinki_20260504_0941_538</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0942_144/">
+                <div class="app-title">Helsinki — Sää tänään vs. eilen</div>
+                <div class="app-id">Helsinki_20260504_0942_144</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0942_428/">
+                <div class="app-title">Puolimaratonharjoitusohjelma — Tavoite alle 2h</div>
+                <div class="app-id">Helsinki_20260504_0942_428</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0942_892/">
+                <div class="app-title">Autoilijan Reittisää</div>
+                <div class="app-id">Helsinki_20260504_0942_892</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0943_305/">
+                <div class="app-title">DokuApuri — Projektidokumentaation työkalu</div>
+                <div class="app-id">Helsinki_20260504_0943_305</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0943_605/">
+                <div class="app-title">Kieku-kirjausten automatisointi</div>
+                <div class="app-id">Helsinki_20260504_0943_605</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0945_792/">
+                <div class="app-title">Lomasuunnitelma sään mukaan – Seuraavat 10 päivää</div>
+                <div class="app-id">Helsinki_20260504_0945_792</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0946_698/">
+                <div class="app-title">SadeTutka-botti | Säätutkavaroitukset Telegramiin</div>
+                <div class="app-id">Helsinki_20260504_0946_698</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0953_194/">
+                <div class="app-title">Sähköhinta & Saunasuositus — Helsinki</div>
+                <div class="app-id">Helsinki_20260504_0953_194</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0954_912/">
+                <div class="app-title">Matemaattisten kaavojen todistaja</div>
+                <div class="app-id">Helsinki_20260504_0954_912</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0956_145/">
+                <div class="app-title">SääTutka – Pilvien liike & sateen ennuste</div>
+                <div class="app-id">Helsinki_20260504_0956_145</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0957_848/">
+                <div class="app-title">Tuulioptimoidut pyöräilyreitit — Helsinki</div>
+                <div class="app-id">Helsinki_20260504_0957_848</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_0959_240/">
+                <div class="app-title">SDLC Guardrails — Ohjelmistokehityksen laadunvarmistus</div>
+                <div class="app-id">Helsinki_20260504_0959_240</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_1003_601/">
+                <div class="app-title">Terassin öljyämisoptimoija — FMI-säädata</div>
+                <div class="app-id">Helsinki_20260504_1003_601</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_1007_709/">
+                <div class="app-title">EsitysVahti — PowerPoint-esitysten aktivointianalyysi</div>
+                <div class="app-id">Helsinki_20260504_1007_709</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_1016_557/">
+                <div class="app-title">AI-agenttien tuotantoanalytiikka</div>
+                <div class="app-id">Helsinki_20260504_1016_557</div>
+            </a>
+            <a class="app-card" href="Helsinki_20260504_1019_883/">
+                <div class="app-title">Ilmatieteen laitoksen sovelluskokoelma</div>
+                <div class="app-id">Helsinki_20260504_1019_883</div>
+            </a>
+        </div>
+        <footer>
+            <p>Data: Ilmatieteen laitos (FMI Open Data) | Päivitetty 4.5.2026</p>
+        </footer>
     </div>
 </body>
 </html>

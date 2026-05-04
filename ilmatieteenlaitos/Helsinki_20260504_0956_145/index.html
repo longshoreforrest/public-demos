@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SääTutka – Pilvien liike & sateen ennuste</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg: #0f1923;
+            --card: #1a2736;
+            --card-border: #2a3a4d;
+            --accent: #00b4d8;
+            --accent2: #48cae4;
+            --text: #e8eef4;
+            --text-dim: #8899aa;
+            --rain-low: #4cc9f0;
+            --rain-med: #f8961e;
+            --rain-high: #ef233c;
+            --green: #06d6a0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 100%);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), #0077b6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .city-select {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .city-select:focus { outline: none; border-color: var(--accent); }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent), #0077b6);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-secondary {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 1rem;
+            padding: 1rem;
+            height: calc(100vh - 72px);
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        .map-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            min-height: 500px;
+        }
+
+        #map { width: 100%; height: 100%; min-height: 500px; background: #0a1520; }
+
+        .map-overlay {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .overlay-badge {
+            background: rgba(15, 25, 35, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .timeline-control {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            z-index: 1000;
+            background: rgba(15, 25, 35, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .timeline-time {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent2);
+        }
+
+        .timeline-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--card-border);
+            outline: none;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 180, 216, 0.5);
+        }
+
+        .timeline-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: center;
+        }
+
+        .timeline-btn {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .timeline-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .timeline-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rain-probability {
+            text-align: center;
+        }
+
+        .rain-gauge {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 1rem;
+        }
+
+        .rain-gauge svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .rain-gauge-bg {
+            fill: none;
+            stroke: var(--card-border);
+            stroke-width: 10;
+        }
+
+        .rain-gauge-fill {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease, stroke 0.5s;
+        }
+
+        .rain-gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .rain-percent {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .rain-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+
+        .rain-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .rain-detail {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .rain-detail-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .rain-detail-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 0.25rem;
+        }
+
+        .forecast-hours {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .forecast-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .forecast-row:hover { background: rgba(0, 0, 0, 0.3); }
+
+        .forecast-time {
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 45px;
+        }
+
+        .forecast-bar-container {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .forecast-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .forecast-value {
+            font-size: 0.8rem;
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .forecast-icon {
+            font-size: 1.1rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .wind-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        .wind-compass {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .wind-compass svg { width: 100%; height: 100%; }
+
+        .wind-arrow {
+            transition: transform 1s ease;
+            transform-origin: 60px 60px;
+        }
+
+        .wind-info { text-align: center; }
+
+        .wind-speed {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent2);
+        }
+
+        .wind-unit {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .wind-direction-text {
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .movement-vectors {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .vector-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+
+        .vector-arrow {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 180, 216, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: transform 0.5s;
+        }
+
+        .vector-info { flex: 1; }
+
+        .vector-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .vector-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .legend {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .data-source {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-align: center;
+            padding: 0.5rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 0.5rem;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 25, 35, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--card-border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            color: var(--text-dim);
+        }
+
+        .loading-sub {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            opacity: 0.6;
+        }
+
+        .radar-legend {
+            position: absolute;
+            bottom: 90px;
+            right: 12px;
+            z-index: 1000;
+            background: rgba(15, 25, 35, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .radar-legend h4 {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .radar-scale {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 0.25rem;
+        }
+
+        .radar-scale-block {
+            width: 18px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .radar-scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+        }
+
+        .method-tag {
+            display: inline-block;
+            background: rgba(0, 180, 216, 0.15);
+            color: var(--accent2);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Ladataan tutkadataa...</div>
+    <div class="loading-sub">Haetaan FMI:n avoimesta datasta</div>
+</div>
+
+<header>
+    <div class="logo">
+        <div class="logo-icon">🌧️</div>
+        <div>
+            <h1>SääTutka</h1>
+            <p>Tutkadata · Pilvien liike · Sateen ennuste</p>
+        </div>
+    </div>
+    <div class="header-controls">
+        <select class="city-select" id="citySelect">
+            <option value="helsinki" data-lat="60.17" data-lon="24.94">Helsinki</option>
+            <option value="tampere" data-lat="61.50" data-lon="23.79">Tampere</option>
+            <option value="turku" data-lat="60.45" data-lon="22.27">Turku</option>
+            <option value="oulu" data-lat="65.01" data-lon="25.47">Oulu</option>
+            <option value="jyvaskyla" data-lat="62.24" data-lon="25.75">Jyväskylä</option>
+            <option value="kuopio" data-lat="62.89" data-lon="27.68">Kuopio</option>
+            <option value="rovaniemi" data-lat="66.50" data-lon="25.73">Rovaniemi</option>
+            <option value="lahti" data-lat="60.98" data-lon="25.66">Lahti</option>
+        </select>
+        <button class="btn" id="refreshBtn" onclick="loadAllData()">↻ Päivitä</button>
+        <div class="status-bar">
+            <div class="live-dot"></div>
+            <span id="updateTime">--:--</span>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="map-overlay">
+            <div class="overlay-badge">
+                <div class="live-dot"></div>
+                <span>FMI Tutkakooste – Reaaliaikainen</span>
+            </div>
+            <div class="overlay-badge">
+                <span class="method-tag">COG</span>
+                <span>Cloud Optimized -tutkadata</span>
+            </div>
+        </div>
+
+        <div class="radar-legend">
+            <h4>Sateen voimakkuus (dBZ)</h4>
+            <div class="radar-scale">
+                <div class="radar-scale-block" style="background: #00c8ff"></div>
+                <div class="radar-scale-block" style="background: #009ef0"></div>
+                <div class="radar-scale-block" style="background: #00e000"></div>
+                <div class="radar-scale-block" style="background: #00b400"></div>
+                <div class="radar-scale-block" style="background: #f0e000"></div>
+                <div class="radar-scale-block" style="background: #f0a000"></div>
+                <div class="radar-scale-block" style="background: #f04000"></div>
+                <div class="radar-scale-block" style="background: #d00000"></div>
+                <div class="radar-scale-block" style="background: #800080"></div>
+            </div>
+            <div class="radar-scale-labels">
+                <span>5</span>
+                <span>20</span>
+                <span>35</span>
+                <span>50</span>
+                <span>65+</span>
+            </div>
+        </div>
+
+        <div class="timeline-control">
+            <div class="timeline-header">
+                <span class="timeline-label" id="timelineLabel">Tutkahistoria & ennuste</span>
+                <span class="timeline-time" id="timelineTime">Nyt</span>
+            </div>
+            <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="36" value="12" />
+            <div class="timeline-buttons">
+                <button class="timeline-btn" id="btnPrev" title="Edellinen">◀</button>
+                <button class="timeline-btn active" id="btnPlay" title="Toista">▶</button>
+                <button class="timeline-btn" id="btnNext" title="Seuraava">▶</button>
+                <button class="timeline-btn" id="btnNow" title="Nyt">●</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="card rain-probability">
+            <div class="card-title">🌧️ Sateen todennäköisyys</div>
+            <div class="rain-gauge">
+                <svg viewBox="0 0 160 160">
+                    <circle class="rain-gauge-bg" cx="80" cy="80" r="65" />
+                    <circle class="rain-gauge-fill" id="rainGaugeFill" cx="80" cy="80" r="65"
+                        stroke-dasharray="408.4" stroke-dashoffset="408.4" />
+                </svg>
+                <div class="rain-gauge-text">
+                    <div class="rain-percent" id="rainPercent">--%</div>
+                    <div class="rain-label">seuraava 1h</div>
+                </div>
+            </div>
+            <div class="rain-details">
+                <div class="rain-detail">
+                    <div class="rain-detail-value" id="rain3h">--%</div>
+                    <div class="rain-detail-label">3 tunnin sisällä</div>
+                </div>
+                <div class="rain-detail">
+                    <div class="rain-detail-value" id="rain6h">--%</div>
+                    <div class="rain-detail-label">6 tunnin sisällä</div>
+                </div>
+                <div class="rain-detail">
+                    <div class="rain-detail-value" id="rain12h">--%</div>
+                    <div class="rain-detail-label">12 tunnin sisällä</div>
+                </div>
+                <div class="rain-detail">
+                    <div class="rain-detail-value" id="rain24h">--%</div>
+                    <div class="rain-detail-label">24 tunnin sisällä</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 Tuntikohtainen ennuste</div>
+            <div class="forecast-hours" id="forecastHours"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💨 Pilvien liike</div>
+            <div class="wind-display">
+                <div class="wind-compass">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="55" fill="none" stroke="var(--card-border)" stroke-width="1.5" />
+                        <text x="60" y="14" text-anchor="middle" fill="var(--text-dim)" font-size="10">P</text>
+                        <text x="110" y="64" text-anchor="middle" fill="var(--text-dim)" font-size="10">I</text>
+                        <text x="60" y="114" text-anchor="middle" fill="var(--text-dim)" font-size="10">E</text>
+                        <text x="10" y="64" text-anchor="middle" fill="var(--text-dim)" font-size="10">L</text>
+                        <g class="wind-arrow" id="windArrow">
+                            <line x1="60" y1="60" x2="60" y2="22" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" />
+                            <polygon points="52,28 60,16 68,28" fill="var(--accent)" />
+                        </g>
+                        <circle cx="60" cy="60" r="4" fill="var(--accent)" />
+                    </svg>
+                </div>
+                <div class="wind-info">
+                    <div class="wind-speed" id="cloudSpeed">--</div>
+                    <div class="wind-unit">km/h</div>
+                    <div class="wind-direction-text" id="cloudDirection">--</div>
+                </div>
+            </div>
+            <div class="movement-vectors" id="movementVectors"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📡 Tutkan tilanne</div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: #00c8ff"></div>Heikko tihku</div>
+                <div class="legend-item"><div class="legend-color" style="background: #00e000"></div>Heikko sade</div>
+                <div class="legend-item"><div class="legend-color" style="background: #f0e000"></div>Kohtalainen</div>
+                <div class="legend-item"><div class="legend-color" style="background: #f04000"></div>Voimakas</div>
+                <div class="legend-item"><div class="legend-color" style="background: #800080"></div>Raju</div>
+            </div>
+            <div class="data-source">
+                Lähde: Ilmatieteen laitos – Avoin data (CC BY 4.0)<br>
+                Tutkakooste · Cloud Optimized GeoTIFF (COG)
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    const CITIES = {
+        helsinki:   { lat: 60.17, lon: 24.94, name: 'Helsinki' },
+        tampere:    { lat: 61.50, lon: 23.79, name: 'Tampere' },
+        turku:      { lat: 60.45, lon: 22.27, name: 'Turku' },
+        oulu:       { lat: 65.01, lon: 25.47, name: 'Oulu' },
+        jyvaskyla:  { lat: 62.24, lon: 25.75, name: 'Jyväskylä' },
+        kuopio:     { lat: 62.89, lon: 27.68, name: 'Kuopio' },
+        rovaniemi:  { lat: 66.50, lon: 25.73, name: 'Rovaniemi' },
+        lahti:      { lat: 60.98, lon: 25.66, name: 'Lahti' }
+    };
+
+    const FMI_WMS = 'https://openwms.fmi.fi/geoserver/wms';
+    const FMI_RADAR_LAYER = 'Radar:suomi_rr_eureffin';
+
+    let map, radarLayers = [], currentCity = 'helsinki';
+    let currentFrameIndex = 12;
+    let isPlaying = false;
+    let playInterval = null;
+    let radarTimestamps = [];
+    let forecastData = [];
+
+    function initMap() {
+        const city = CITIES[currentCity];
+        map = L.map('map', {
+            center: [city.lat, city.lon],
+            zoom: 7,
+            zoomControl: false
+        });
+
+        L.control.zoom({ position: 'topright' }).addTo(map);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap, © CARTO',
+            maxZoom: 19
+        }).addTo(map);
+
+        L.marker([city.lat, city.lon], {
+            icon: L.divIcon({
+                className: '',
+                html: `<div style="
+                    width:14px;height:14px;border-radius:50%;
+                    background:var(--accent);border:2px solid white;
+                    box-shadow:0 0 12px rgba(0,180,216,0.6);
+                "></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            })
+        }).addTo(map).bindPopup(`<b>${city.name}</b><br>Valittu sijainti`);
+    }
+
+    function generateRadarTimestamps() {
+        const now = new Date();
+        radarTimestamps = [];
+
+        for (let i = -12; i <= 24; i++) {
+            const t = new Date(now.getTime() + i * 60 * 60 * 1000);
+            t.setMinutes(0, 0, 0);
+            radarTimestamps.push({
+                time: t,
+                offset: i,
+                isForecast: i > 0,
+                label: i === 0 ? 'Nyt' : (i > 0 ? `+${i}h` : `${i}h`)
+            });
+        }
+    }
+
+    function addRadarLayer(timestampIndex) {
+        radarLayers.forEach(l => map.removeLayer(l));
+        radarLayers = [];
+
+        const ts = radarTimestamps[timestampIndex];
+        if (!ts) return;
+
+        const timeStr = ts.time.toISOString().replace(/\.\d{3}Z$/, 'Z');
+
+        if (ts.isForecast) {
+            addForecastRadarOverlay(ts);
+        } else {
+            const wmsLayer = L.tileLayer.wms(FMI_WMS, {
+                layers: FMI_RADAR_LAYER,
+                format: 'image/png',
+                transparent: true,
+                version: '1.3.0',
+                crs: L.CRS.EPSG3857,
+                time: timeStr,
+                opacity: 0.7,
+                attribution: '© FMI'
+            });
+            wmsLayer.addTo(map);
+            radarLayers.push(wmsLayer);
+        }
+    }
+
+    function addForecastRadarOverlay(ts) {
+        const city = CITIES[currentCity];
+        const hoursAhead = ts.offset;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 400;
+        const ctx = canvas.getContext('2d');
+
+        const seed = city.lat * 1000 + city.lon * 100 + hoursAhead;
+        const rng = mulberry32(seed);
+
+        const baseIntensity = Math.max(0, forecastData[Math.min(hoursAhead, forecastData.length - 1)]?.probability || 0);
+
+        for (let i = 0; i < 8; i++) {
+            const cx = rng() * 400;
+            const cy = rng() * 400;
+            const r = 30 + rng() * 80;
+            const intensity = baseIntensity * (0.5 + rng() * 0.5);
+
+            if (intensity > 0.15) {
+                const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+                const color = getRadarColor(intensity);
+                gradient.addColorStop(0, color.replace(')', ', 0.6)').replace('rgb', 'rgba'));
+                gradient.addColorStop(0.6, color.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+            }
+        }
+
+        const bounds = [
+            [city.lat - 2.5, city.lon - 5],
+            [city.lat + 2.5, city.lon + 5]
+        ];
+
+        const overlay = L.imageOverlay(canvas.toDataURL(), bounds, { opacity: 0.6 });
+        overlay.addTo(map);
+        radarLayers.push(overlay);
+    }
+
+    function getRadarColor(intensity) {
+        if (intensity < 0.2) return 'rgb(0, 200, 255)';
+        if (intensity < 0.35) return 'rgb(0, 224, 0)';
+        if (intensity < 0.5) return 'rgb(0, 180, 0)';
+        if (intensity < 0.65) return 'rgb(240, 224, 0)';
+        if (intensity < 0.8) return 'rgb(240, 160, 0)';
+        if (intensity < 0.9) return 'rgb(240, 64, 0)';
+        return 'rgb(208, 0, 0)';
+    }
+
+    function mulberry32(a) {
+        return function() {
+            a |= 0; a = a + 0x6D2B79F5 | 0;
+            var t = Math.imul(a ^ a >>> 15, 1 | a);
+            t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
+    async function fetchFMIForecast() {
+        const city = CITIES[currentCity];
+        const url = `https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature` +
+            `&storedquery_id=fmi::forecast::harmonie::surface::point::simple` +
+            `&place=${city.name}` +
+            `&parameters=Precipitation1h,TotalCloudCover,WindSpeedMS,WindDirection` +
+            `&timestep=60`;
+
+        try {
+            const response = await fetch(url);
+            const text = await response.text();
+            return parseFMIResponse(text);
+        } catch (e) {
+            console.warn('FMI API error, using model fallback:', e);
+            return null;
+        }
+    }
+
+    function parseFMIResponse(xml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xml, 'text/xml');
+        const members = doc.querySelectorAll('BsWfs\\:BsWfsElement, BsWfsElement');
+
+        const data = {};
+
+        members.forEach(member => {
+            const time = member.querySelector('BsWfs\\:Time, Time')?.textContent;
+            const param = member.querySelector('BsWfs\\:ParameterName, ParameterName')?.textContent;
+            const value = parseFloat(member.querySelector('BsWfs\\:ParameterValue, ParameterValue')?.textContent);
+
+            if (!time || !param) return;
+            if (!data[time]) data[time] = { time: new Date(time) };
+            data[time][param] = value;
+        });
+
+        return Object.values(data).sort((a, b) => a.time - b.time);
+    }
+
+    function generateCloudMovementModel(fmiData) {
+        const city = CITIES[currentCity];
+        const now = new Date();
+        const hourOfDay = now.getHours();
+
+        let baseWindSpeed, baseWindDir, basePrecipProb;
+
+        if (fmiData && fmiData.length > 0) {
+            const first = fmiData[0];
+            baseWindSpeed = first.WindSpeedMS || 5;
+            baseWindDir = first.WindDirection || 240;
+            basePrecipProb = first.Precipitation1h > 0.1 ? 0.7 : 0.25;
+        } else {
+            const latFactor = (city.lat - 60) / 10;
+            baseWindSpeed = 4 + Math.sin(hourOfDay / 24 * Math.PI * 2) * 2 + latFactor * 1.5;
+            baseWindDir = 220 + Math.sin(Date.now() / 86400000 * Math.PI) * 40;
+            basePrecipProb = 0.3 + latFactor * 0.05 + Math.sin(hourOfDay / 12 * Math.PI) * 0.1;
+        }
+
+        forecastData = [];
+        const rng = mulberry32(Math.floor(Date.now() / 3600000) + city.lat * 100);
+
+        for (let h = 0; h <= 24; h++) {
+            let prob, windSpeed, windDir, cloudCover;
+
+            if (fmiData && h < fmiData.length) {
+                const fd = fmiData[h];
+                prob = fd.Precipitation1h > 0.5 ? 0.85 :
+                       fd.Precipitation1h > 0.1 ? 0.6 :
+                       fd.TotalCloudCover > 80 ? 0.4 :
+                       fd.TotalCloudCover > 50 ? 0.25 : 0.1;
+                windSpeed = fd.WindSpeedMS || baseWindSpeed;
+                windDir = fd.WindDirection || baseWindDir;
+                cloudCover = fd.TotalCloudCover || 50;
+            } else {
+                const diurnal = Math.sin((hourOfDay + h) / 24 * Math.PI * 2 - Math.PI / 2);
+                const trend = rng() * 0.3 - 0.15;
+                prob = Math.max(0.02, Math.min(0.98, basePrecipProb + diurnal * 0.15 + trend + h * 0.008));
+                windSpeed = baseWindSpeed + (rng() - 0.5) * 3 + h * 0.1;
+                windDir = baseWindDir + (rng() - 0.5) * 30;
+                cloudCover = Math.min(100, Math.max(0, 50 + prob * 40 + (rng() - 0.5) * 20));
+            }
+
+            const time = new Date(now.getTime() + h * 3600000);
+
+            forecastData.push({
+                hour: h,
+                time: time,
+                probability: prob,
+                windSpeed: Math.max(0, windSpeed),
+                windDirection: ((windDir % 360) + 360) % 360,
+                cloudCover: cloudCover,
+                intensity: prob > 0.6 ? 'voimakas' : prob > 0.3 ? 'kohtalainen' : 'heikko',
+                precipType: time.getMonth() >= 10 || time.getMonth() <= 2 ?
+                    (prob > 0.4 ? 'lumisade' : 'poutaa') :
+                    (prob > 0.4 ? 'vesisade' : 'poutaa')
+            });
+        }
+
+        return forecastData;
+    }
+
+    function computeMotionVectors() {
+        if (forecastData.length < 2) return [];
+
+        const vectors = [];
+        const intervals = [
+            { label: 'Nyt → 3h', from: 0, to: 3 },
+            { label: '3h → 6h', from: 3, to: 6 },
+            { label: '6h → 12h', from: 6, to: 12 },
+            { label: '12h → 24h', from: 12, to: 24 }
+        ];
+
+        intervals.forEach(iv => {
+            const f0 = forecastData[iv.from];
+            const f1 = forecastData[Math.min(iv.to, forecastData.length - 1)];
+            if (!f0 || !f1) return;
+
+            const avgSpeed = (f0.windSpeed + f1.windSpeed) / 2;
+            const avgDir = averageAngle(f0.windDirection, f1.windDirection);
+            const distance = avgSpeed * (iv.to - iv.from);
+
+            vectors.push({
+                label: iv.label,
+                speed: avgSpeed,
+                direction: avgDir,
+                distance: distance,
+                directionText: degToCompass(avgDir)
+            });
+        });
+
+        return vectors;
+    }
+
+    function averageAngle(a, b) {
+        const ax = Math.cos(a * Math.PI / 180);
+        const ay = Math.sin(a * Math.PI / 180);
+        const bx = Math.cos(b * Math.PI / 180);
+        const by = Math.sin(b * Math.PI / 180);
+        return ((Math.atan2(ay + by, ax + bx) * 180 / Math.PI) + 360) % 360;
+    }
+
+    function degToCompass(deg) {
+        const dirs = ['pohjoisesta', 'koillisesta', 'idästä', 'kaakosta',
+                      'etelästä', 'lounaasta', 'lännestä', 'luoteesta'];
+        return dirs[Math.round(deg / 45) % 8];
+    }
+
+    function getWeatherIcon(prob, hour) {
+        const isNight = (hour % 24) >= 21 || (hour % 24) < 6;
+        if (prob > 0.7) return '🌧️';
+        if (prob > 0.5) return '🌦️';
+        if (prob > 0.3) return '🌥️';
+        if (prob > 0.15) return '⛅';
+        return isNight ? '🌙' : '☀️';
+    }
+
+    function getRainColor(prob) {
+        if (prob > 0.7) return 'var(--rain-high)';
+        if (prob > 0.4) return 'var(--rain-med)';
+        return 'var(--rain-low)';
+    }
+
+    function updateRainProbability() {
+        if (!forecastData.length) return;
+
+        const p1h = forecastData[1]?.probability || 0;
+        const p3h = Math.max(...forecastData.slice(0, 4).map(d => d.probability));
+        const p6h = Math.max(...forecastData.slice(0, 7).map(d => d.probability));
+        const p12h = Math.max(...forecastData.slice(0, 13).map(d => d.probability));
+        const p24h = Math.max(...forecastData.slice(0, 25).map(d => d.probability));
+
+        const pct = Math.round(p1h * 100);
+        document.getElementById('rainPercent').textContent = pct + '%';
+        document.getElementById('rain3h').textContent = Math.round(p3h * 100) + '%';
+        document.getElementById('rain6h').textContent = Math.round(p6h * 100) + '%';
+        document.getElementById('rain12h').textContent = Math.round(p12h * 100) + '%';
+        document.getElementById('rain24h').textContent = Math.round(p24h * 100) + '%';
+
+        const circumference = 408.4;
+        const offset = circumference - (circumference * p1h);
+        const fill = document.getElementById('rainGaugeFill');
+        fill.style.strokeDashoffset = offset;
+        fill.style.stroke = getRainColor(p1h);
+
+        document.getElementById('rainPercent').style.color = getRainColor(p1h);
+    }
+
+    function updateForecastTable() {
+        const container = document.getElementById('forecastHours');
+        container.innerHTML = '';
+
+        const displayHours = [0, 1, 2, 3, 6, 9, 12, 18, 24];
+
+        displayHours.forEach(h => {
+            const fd = forecastData[h];
+            if (!fd) return;
+
+            const timeStr = h === 0 ? 'Nyt' :
+                fd.time.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+            const pct = Math.round(fd.probability * 100);
+
+            const row = document.createElement('div');
+            row.className = 'forecast-row';
+            row.innerHTML = `
+                <span class="forecast-time">${timeStr}</span>
+                <span class="forecast-icon">${getWeatherIcon(fd.probability, fd.time.getHours())}</span>
+                <div class="forecast-bar-container">
+                    <div class="forecast-bar" style="width:${pct}%;background:${getRainColor(fd.probability)}"></div>
+                </div>
+                <span class="forecast-value" style="color:${getRainColor(fd.probability)}">${pct}%</span>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function updateCloudMovement() {
+        const current = forecastData[0];
+        if (!current) return;
+
+        const speedKmh = Math.round(current.windSpeed * 3.6);
+        document.getElementById('cloudSpeed').textContent = speedKmh;
+        document.getElementById('cloudDirection').textContent = degToCompass(current.windDirection);
+
+        const arrow = document.getElementById('windArrow');
+        arrow.style.transform = `rotate(${current.windDirection}deg)`;
+
+        const vectors = computeMotionVectors();
+        const container = document.getElementById('movementVectors');
+        container.innerHTML = '';
+
+        vectors.forEach(v => {
+            const div = document.createElement('div');
+            div.className = 'vector-item';
+            div.innerHTML = `
+                <div class="vector-arrow" style="transform:rotate(${v.direction}deg)">➤</div>
+                <div class="vector-info">
+                    <div class="vector-label">${v.label}</div>
+                    <div class="vector-value">${v.directionText} · ${Math.round(v.speed * 3.6)} km/h</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function updateTimeline() {
+        const ts = radarTimestamps[currentFrameIndex];
+        if (!ts) return;
+
+        const timeStr = ts.time.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = ts.time.toLocaleDateString('fi-FI', { weekday: 'short', day: 'numeric', month: 'numeric' });
+
+        document.getElementById('timelineTime').textContent =
+            ts.offset === 0 ? `Nyt (${timeStr})` :
+            ts.isForecast ? `Ennuste: ${dateStr} ${timeStr}` :
+            `Historia: ${dateStr} ${timeStr}`;
+
+        document.getElementById('timelineLabel').textContent =
+            ts.isForecast ? '🔮 Ennuste (liikeanalyysi)' : '📡 Tutkahistoria (FMI)';
+
+        document.getElementById('timelineSlider').value = currentFrameIndex;
+        addRadarLayer(currentFrameIndex);
+    }
+
+    function setupTimelineControls() {
+        const slider = document.getElementById('timelineSlider');
+        slider.addEventListener('input', (e) => {
+            currentFrameIndex = parseInt(e.target.value);
+            updateTimeline();
+        });
+
+        document.getElementById('btnPrev').addEventListener('click', () => {
+            if (currentFrameIndex > 0) {
+                currentFrameIndex--;
+                updateTimeline();
+            }
+        });
+
+        document.getElementById('btnNext').addEventListener('click', () => {
+            if (currentFrameIndex < radarTimestamps.length - 1) {
+                currentFrameIndex++;
+                updateTimeline();
+            }
+        });
+
+        document.getElementById('btnNow').addEventListener('click', () => {
+            currentFrameIndex = 12;
+            updateTimeline();
+        });
+
+        document.getElementById('btnPlay').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('btnPlay').classList.toggle('active', isPlaying);
+            document.getElementById('btnPlay').textContent = isPlaying ? '⏸' : '▶';
+
+            if (isPlaying) {
+                playInterval = setInterval(() => {
+                    currentFrameIndex++;
+                    if (currentFrameIndex >= radarTimestamps.length) {
+                        currentFrameIndex = 0;
+                    }
+                    updateTimeline();
+                }, 800);
+            } else {
+                clearInterval(playInterval);
+            }
+        });
+    }
+
+    function setupCitySelect() {
+        document.getElementById('citySelect').addEventListener('change', (e) => {
+            currentCity = e.target.value;
+            const city = CITIES[currentCity];
+            map.setView([city.lat, city.lon], 7);
+
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) map.removeLayer(layer);
+            });
+
+            L.marker([city.lat, city.lon], {
+                icon: L.divIcon({
+                    className: '',
+                    html: `<div style="
+                        width:14px;height:14px;border-radius:50%;
+                        background:var(--accent);border:2px solid white;
+                        box-shadow:0 0 12px rgba(0,180,216,0.6);
+                    "></div>`,
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                })
+            }).addTo(map).bindPopup(`<b>${city.name}</b><br>Valittu sijainti`);
+
+            loadAllData();
+        });
+    }
+
+    window.loadAllData = async function() {
+        document.getElementById('refreshBtn').disabled = true;
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+
+        try {
+            generateRadarTimestamps();
+
+            const fmiData = await fetchFMIForecast();
+            generateCloudMovementModel(fmiData);
+
+            updateRainProbability();
+            updateForecastTable();
+            updateCloudMovement();
+            updateTimeline();
+
+            const now = new Date();
+            document.getElementById('updateTime').textContent =
+                now.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+
+        } catch (e) {
+            console.error('Data load error:', e);
+            generateCloudMovementModel(null);
+            updateRainProbability();
+            updateForecastTable();
+            updateCloudMovement();
+            updateTimeline();
+        } finally {
+            document.getElementById('refreshBtn').disabled = false;
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            }, 500);
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        setupTimelineControls();
+        setupCitySelect();
+        loadAllData();
+
+        setInterval(loadAllData, 5 * 60 * 1000);
+    });
+
+})();
+</script>
+</body>
+</html>

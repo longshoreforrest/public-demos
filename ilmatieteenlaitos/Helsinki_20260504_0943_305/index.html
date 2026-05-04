@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DokuApuri — Projektidokumentaation työkalu</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .panel h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.35rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: var(--surface);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea { resize: vertical; min-height: 70px; }
+
+        .form-group { margin-bottom: 1rem; }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .template-btn {
+            padding: 0.6rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .template-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .template-btn.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .template-btn .icon { font-size: 1.3rem; display: block; margin-bottom: 0.2rem; }
+
+        .section-list { list-style: none; }
+
+        .section-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            cursor: grab;
+            background: var(--surface);
+            transition: background 0.15s;
+        }
+
+        .section-item:hover { background: #f1f5f9; }
+
+        .section-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .section-item .drag-handle {
+            color: var(--text-secondary);
+            cursor: grab;
+            font-size: 1rem;
+        }
+
+        .section-item .section-name { flex: 1; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-secondary:hover { background: var(--border); }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover { background: #047857; }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-group .btn { width: auto; flex: 1; }
+
+        .output-area {
+            min-height: 500px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { color: var(--text); }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .preview-content {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .preview-content h1 { font-size: 1.8rem; margin-bottom: 0.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+        .preview-content h2 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--primary-dark); }
+        .preview-content h3 { font-size: 1.1rem; margin-top: 1rem; margin-bottom: 0.3rem; }
+        .preview-content p { margin-bottom: 0.75rem; }
+        .preview-content ul, .preview-content ol { margin-left: 1.5rem; margin-bottom: 0.75rem; }
+        .preview-content li { margin-bottom: 0.3rem; }
+        .preview-content code {
+            background: #f1f5f9;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.88em;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .preview-content pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+        .preview-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .preview-content blockquote {
+            border-left: 4px solid var(--primary);
+            padding: 0.5rem 1rem;
+            background: var(--primary-light);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 0.75rem;
+        }
+        .preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .preview-content th, .preview-content td {
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+        .preview-content th {
+            background: var(--bg);
+            font-weight: 600;
+        }
+        .preview-content .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.3rem;
+        }
+        .preview-content .badge-blue { background: var(--primary-light); color: var(--primary); }
+        .preview-content .badge-green { background: var(--success-bg); color: var(--success); }
+
+        .markdown-raw {
+            width: 100%;
+            min-height: 500px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            padding: 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: #f8fafc;
+            resize: vertical;
+        }
+
+        .copied-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .copied-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .custom-section-add {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .custom-section-add input { flex: 1; }
+        .custom-section-add button {
+            padding: 0.5rem 0.8rem;
+            border: 1.5px solid var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 1rem 0;
+        }
+
+        .tip {
+            background: var(--warning-bg);
+            border-left: 4px solid var(--warning);
+            padding: 0.6rem 0.8rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            color: #92400e;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>DokuApuri</h1>
+    <p>Luo ammattimaista dokumentaatiota projekteillesi hetkessä</p>
+</header>
+
+<div class="container">
+    <div class="layout">
+        <aside>
+            <div class="panel" style="margin-bottom: 1rem;">
+                <h2>Projektityyppi</h2>
+                <div class="template-grid" id="templateGrid">
+                    <button class="template-btn active" data-template="web" onclick="selectTemplate('web')">
+                        <span class="icon">🌐</span> Web-sovellus
+                    </button>
+                    <button class="template-btn" data-template="api" onclick="selectTemplate('api')">
+                        <span class="icon">🔌</span> API / Backend
+                    </button>
+                    <button class="template-btn" data-template="library" onclick="selectTemplate('library')">
+                        <span class="icon">📦</span> Kirjasto
+                    </button>
+                    <button class="template-btn" data-template="mobile" onclick="selectTemplate('mobile')">
+                        <span class="icon">📱</span> Mobiilisovellus
+                    </button>
+                    <button class="template-btn" data-template="data" onclick="selectTemplate('data')">
+                        <span class="icon">📊</span> Data-projekti
+                    </button>
+                    <button class="template-btn" data-template="devops" onclick="selectTemplate('devops')">
+                        <span class="icon">⚙️</span> DevOps / Infra
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom: 1rem;">
+                <h2>Projektin tiedot</h2>
+                <div class="form-group">
+                    <label>Projektin nimi</label>
+                    <input type="text" id="projectName" placeholder="esim. SääApuri" oninput="generateDocs()">
+                </div>
+                <div class="form-group">
+                    <label>Lyhyt kuvaus</label>
+                    <textarea id="projectDesc" rows="2" placeholder="Mitä projekti tekee?" oninput="generateDocs()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Teknologiat</label>
+                    <input type="text" id="projectTech" placeholder="esim. React, Node.js, PostgreSQL" oninput="generateDocs()">
+                </div>
+                <div class="form-group">
+                    <label>Lisenssi</label>
+                    <select id="projectLicense" onchange="generateDocs()">
+                        <option value="MIT">MIT</option>
+                        <option value="Apache-2.0">Apache 2.0</option>
+                        <option value="GPL-3.0">GPL 3.0</option>
+                        <option value="BSD-3-Clause">BSD 3-Clause</option>
+                        <option value="ISC">ISC</option>
+                        <option value="Proprietary">Yksityinen (Proprietary)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tekijä / tiimi</label>
+                    <input type="text" id="projectAuthor" placeholder="esim. Tiimi Alfa" oninput="generateDocs()">
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Dokumentin osiot</h2>
+                <div class="tip">Valitse osiot ja järjestä ne vetämällä. Osiot vaihtelevat projektityypin mukaan.</div>
+                <ul class="section-list" id="sectionList"></ul>
+                <div class="custom-section-add">
+                    <input type="text" id="customSectionInput" placeholder="Oma osio...">
+                    <button onclick="addCustomSection()">+ Lisää</button>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="panel output-area">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('preview', this)">Esikatselu</button>
+                        <button class="tab" onclick="switchTab('markdown', this)">Markdown</button>
+                    </div>
+                    <div class="btn-group" style="margin-top: 0;">
+                        <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="copyMarkdown()">Kopioi</button>
+                        <button class="btn btn-success" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="downloadMarkdown()">Lataa .md</button>
+                    </div>
+                </div>
+                <div id="previewTab" class="preview-content"></div>
+                <textarea id="markdownTab" class="markdown-raw" style="display:none;" readonly></textarea>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="copied-toast" id="toast">Kopioitu leikepöydälle!</div>
+
+<footer>
+    DokuApuri — Anniina Kokkosen idea &bull; Toteutettu Ilmatieteen laitoksen avoin data -kategoriassa
+</footer>
+
+<script>
+const TEMPLATES = {
+    web: {
+        name: 'Web-sovellus',
+        sections: [
+            { id: 'intro', name: 'Johdanto', checked: true },
+            { id: 'features', name: 'Ominaisuudet', checked: true },
+            { id: 'demo', name: 'Demo / Kuvakaappaukset', checked: true },
+            { id: 'requirements', name: 'Vaatimukset', checked: true },
+            { id: 'install', name: 'Asennus', checked: true },
+            { id: 'usage', name: 'Käyttö', checked: true },
+            { id: 'env', name: 'Ympäristömuuttujat', checked: true },
+            { id: 'structure', name: 'Projektirakenne', checked: true },
+            { id: 'testing', name: 'Testaus', checked: true },
+            { id: 'deployment', name: 'Julkaisu (Deploy)', checked: true },
+            { id: 'contributing', name: 'Osallistuminen', checked: false },
+            { id: 'license', name: 'Lisenssi', checked: true },
+        ]
+    },
+    api: {
+        name: 'API / Backend',
+        sections: [
+            { id: 'intro', name: 'Johdanto', checked: true },
+            { id: 'features', name: 'Ominaisuudet', checked: true },
+            { id: 'requirements', name: 'Vaatimukset', checked: true },
+            { id: 'install', name: 'Asennus', checked: true },
+            { id: 'env', name: 'Ympäristömuuttujat', checked: true },
+            { id: 'endpoints', name: 'API-rajapinnat', checked: true },
+            { id: 'auth', name: 'Autentikointi', checked: true },
+            { id: 'datamodel', name: 'Tietomalli', checked: true },
+            { id: 'errors', name: 'Virhekäsittely', checked: true },
+            { id: 'testing', name: 'Testaus', checked: true },
+            { id: 'deployment', name: 'Julkaisu (Deploy)', checked: true },
+            { id: 'license', name: 'Lisenssi', checked: true },
+        ]
+    },
+    library: {
+        name: 'Kirjasto',
+        sections: [
+            { id: 'intro', name: 'Johdanto', checked: true },
+            { id: 'features', name: 'Ominaisuudet', checked: true },
+            { id: 'install', name: 'Asennus', checked: true },
+            { id: 'quickstart', name: 'Pikaopas', checked: true },
+            { id: 'apiref', name: 'API-referenssi', checked: true },
+            { id: 'examples', name: 'Esimerkit', checked: true },
+            { id: 'config', name: 'Konfigurointi', checked: false },
+            { id: 'testing', name: 'Testaus', checked: true },
+            { id: 'contributing', name: 'Osallistuminen', checked: true },
+            { id: 'changelog', name: 'Muutosloki', checked: true },
+            { id: 'license', name: 'Lisenssi', checked: true },
+        ]
+    },
+    mobile: {
+        name: 'Mobiilisovellus',
+        sections: [
+            { id: 'intro', name: 'Johdanto', checked: true },
+            { id: 'features', name: 'Ominaisuudet', checked: true },
+            { id: 'screenshots', name: 'Kuvakaappaukset', checked: true },
+            { id: 'requirements', name: 'Vaatimukset', checked: true },
+            { id: 'install', name: 'Kehitysympäristö', checked: true },
+            { id: 'build', name: 'Buildin luominen', checked: true },
+            { id: 'structure', name: 'Projektirakenne', checked: true },
+            { id: 'testing', name: 'Testaus', checked: true },
+            { id: 'publishing', name: 'Sovelluskauppajulkaisu', checked: true },
+            { id: 'license', name: 'Lisenssi', checked: true },
+        ]
+    },
+    data: {
+        name: 'Data-projekti',
+        sections: [
+            { id: 'intro', name: 'Johdanto', checked: true },
+            { id: 'datasources', name: 'Datalähteet', checked: true },
+            { id: 'requirements', name: 'Vaatimukset', checked: true },
+            { id: 'install', name: 'Asennus', checked: true },
+            { id: 'pipeline', name: 'Dataputki (Pipeline)', checked: true },
+            { id: 'schema', name: 'Tietorakenne / Schema', checked: true },
+            { id: 'analysis', name: 'Analyysit', checked: true },
+            { id: 'visualizations', name: 'Visualisoinnit', checked: true },
+            { id: 'reproducibility', name: 'Toistettavuus', checked: true },
+            { id: 'license', name: 'Lisenssi', checked: true },
+        ]
+    },
+    devops: {
+        name: 'DevOps / Infra',
+        sections: [
+            { id: 'intro', name: 'Johdanto', checked: true },
+            { id: 'architecture', name: 'Arkkitehtuuri', checked: true },
+            { id: 'requirements', name: 'Vaatimukset', checked: true },
+            { id: 'setup', name: 'Käyttöönotto', checked: true },
+            { id: 'env', name: 'Ympäristömuuttujat', checked: true },
+            { id: 'services', name: 'Palvelut', checked: true },
+            { id: 'monitoring', name: 'Monitorointi ja hälytykset', checked: true },
+            { id: 'backup', name: 'Varmuuskopiointi', checked: true },
+            { id: 'troubleshooting', name: 'Vianmääritys', checked: true },
+            { id: 'runbook', name: 'Runbook', checked: false },
+            { id: 'license', name: 'Lisenssi', checked: true },
+        ]
+    }
+};
+
+const SECTION_CONTENT = {
+    intro: (p) => `# ${p.name || 'Projektin nimi'}\n\n${p.desc ? `> ${p.desc}` : '> Projektin lyhyt kuvaus tähän.'}\n\n${p.tech ? `**Teknologiat:** ${p.tech}\n` : ''}${p.author ? `**Tekijä:** ${p.author}\n` : ''}`,
+
+    features: () => `## Ominaisuudet\n\n- Ominaisuus 1: kuvaus\n- Ominaisuus 2: kuvaus\n- Ominaisuus 3: kuvaus`,
+
+    demo: () => `## Demo\n\n[Kokeile demoa täällä](https://example.com)\n\n<!-- Lisää kuvakaappauksia: -->\n<!-- ![Päänäkymä](docs/images/screenshot.png) -->`,
+
+    screenshots: () => `## Kuvakaappaukset\n\n| Aloitusnäkymä | Päänäkymä | Asetukset |\n|---|---|---|\n| ![Aloitus](docs/images/start.png) | ![Pää](docs/images/main.png) | ![Asetukset](docs/images/settings.png) |`,
+
+    requirements: (p) => {
+        if (p.template === 'data') return `## Vaatimukset\n\n- Python 3.10+\n- pip tai conda\n- Jupyter Notebook (valinnainen)\n\n${p.tech ? `### Käytetyt kirjastot\n\n\`\`\`\n${p.tech.split(',').map(t => t.trim()).join('\\n')}\n\`\`\`` : ''}`;
+        return `## Vaatimukset\n\n${p.tech ? `- ${p.tech.split(',').map(t => t.trim()).join('\\n- ')}` : '- Node.js 18+\n- npm tai yarn'}`;
+    },
+
+    install: (p) => {
+        if (p.template === 'data') return `## Asennus\n\n\`\`\`bash\n# Kloonaa repo\ngit clone https://github.com/kayttaja/${(p.name || 'projekti').toLowerCase().replace(/\\s+/g, '-')}.git\ncd ${(p.name || 'projekti').toLowerCase().replace(/\\s+/g, '-')}\n\n# Luo virtuaaliympäristö\npython -m venv venv\nsource venv/bin/activate  # Windows: venv\\\\Scripts\\\\activate\n\n# Asenna riippuvuudet\npip install -r requirements.txt\n\`\`\``;
+        return `## Asennus\n\n\`\`\`bash\n# Kloonaa repo\ngit clone https://github.com/kayttaja/${(p.name || 'projekti').toLowerCase().replace(/\\s+/g, '-')}.git\ncd ${(p.name || 'projekti').toLowerCase().replace(/\\s+/g, '-')}\n\n# Asenna riippuvuudet\nnpm install\n\n# Käynnistä kehityspalvelin\nnpm run dev\n\`\`\``;
+    },
+
+    usage: () => `## Käyttö\n\n\`\`\`bash\n# Kehityspalvelin\nnpm run dev\n\n# Tuotanto-build\nnpm run build\n\n# Esikatselu\nnpm run preview\n\`\`\`\n\nAvaa selaimessa: [http://localhost:3000](http://localhost:3000)`,
+
+    env: () => `## Ympäristömuuttujat\n\nLuo \`.env\`-tiedosto projektin juureen:\n\n\`\`\`env\n# Palvelin\nPORT=3000\nNODE_ENV=development\n\n# Tietokanta\nDATABASE_URL=postgresql://user:password@localhost:5432/dbname\n\n# API-avaimet\nAPI_KEY=your-api-key-here\n\`\`\`\n\n| Muuttuja | Kuvaus | Pakollinen |\n|---|---|---|\n| \`PORT\` | Palvelimen portti | Ei (oletus: 3000) |\n| \`DATABASE_URL\` | Tietokantayhteys | Kyllä |\n| \`API_KEY\` | Ulkoisen palvelun avain | Kyllä |`,
+
+    structure: (p) => `## Projektirakenne\n\n\`\`\`\n${(p.name || 'projekti').toLowerCase().replace(/\\s+/g, '-')}/\n├── src/\n│   ├── components/     # UI-komponentit\n│   ├── pages/          # Sivut / näkymät\n│   ├── services/       # API-kutsut\n│   ├── utils/          # Apufunktiot\n│   └── App.js          # Pääkomponentti\n├── public/             # Staattiset tiedostot\n├── tests/              # Testit\n├── .env.example        # Ympäristömuuttujapohja\n├── package.json\n└── README.md\n\`\`\``,
+
+    testing: () => `## Testaus\n\n\`\`\`bash\n# Aja kaikki testit\nnpm test\n\n# Aja testit watch-tilassa\nnpm run test:watch\n\n# Testikattavuusraportti\nnpm run test:coverage\n\`\`\`\n\n### Testien rakenne\n\n| Tyyppi | Sijainti | Kuvaus |\n|---|---|---|\n| Yksikkötestit | \`tests/unit/\` | Yksittäisten funktioiden testaus |\n| Integraatiotestit | \`tests/integration/\` | Komponenttien yhteistoiminta |\n| E2E-testit | \`tests/e2e/\` | Käyttäjäpolkujen testaus |`,
+
+    deployment: (p) => `## Julkaisu (Deploy)\n\n### Tuotantoympäristö\n\n\`\`\`bash\n# Build tuotantoa varten\nnpm run build\n\n# Julkaise\nnpm run deploy\n\`\`\`\n\n### CI/CD\n\nProjekti käyttää GitHub Actions -putkea:\n\n1. **Push main-haaraan** → Automaattinen testaus\n2. **Testit läpi** → Build ja julkaisu\n3. **Julkaistu** → Ilmoitus tiimille`,
+
+    contributing: () => `## Osallistuminen\n\nOtamme mielellämme vastaan kontribuutioita!\n\n1. Forkkaa repo\n2. Luo feature-haara: \`git checkout -b feature/uusi-ominaisuus\`\n3. Tee muutokset ja commitoi: \`git commit -m "Lisää uusi ominaisuus"\`\n4. Pushaa: \`git push origin feature/uusi-ominaisuus\`\n5. Avaa Pull Request\n\n### Kehitysperiaatteet\n\n- Kirjoita selkeää, kommentoitua koodia\n- Lisää testit uusille ominaisuuksille\n- Päivitä dokumentaatio muutosten mukana\n- Noudata olemassa olevia koodauskäytäntöjä`,
+
+    license: (p) => `## Lisenssi\n\nTämä projekti on lisensoitu [${p.license}](LICENSE)-lisenssillä.${p.author ? `\n\n© ${new Date().getFullYear()} ${p.author}` : ''}`,
+
+    endpoints: () => `## API-rajapinnat\n\n### Perustiedot\n\n- **Base URL:** \`https://api.example.com/v1\`\n- **Muoto:** JSON\n- **Autentikointi:** Bearer token\n\n### Endpointit\n\n#### GET /items\n\nHakee kaikki kohteet.\n\n**Parametrit:**\n\n| Parametri | Tyyppi | Kuvaus |\n|---|---|---|\n| \`page\` | number | Sivunumero (oletus: 1) |\n| \`limit\` | number | Tuloksia per sivu (oletus: 20) |\n\n**Vastaus:**\n\n\`\`\`json\n{\n  "data": [\n    { "id": 1, "name": "Esimerkki", "createdAt": "2025-01-01T00:00:00Z" }\n  ],\n  "total": 42,\n  "page": 1\n}\n\`\`\`\n\n#### POST /items\n\nLuo uuden kohteen.\n\n\`\`\`json\n{\n  "name": "Uusi kohde",\n  "description": "Kuvaus tähän"\n}\n\`\`\`\n\n#### PUT /items/:id\n\nPäivittää olemassa olevan kohteen.\n\n#### DELETE /items/:id\n\nPoistaa kohteen.`,
+
+    auth: () => `## Autentikointi\n\nAPI käyttää Bearer token -autentikointia.\n\n\`\`\`bash\ncurl -H "Authorization: Bearer YOUR_TOKEN" https://api.example.com/v1/items\n\`\`\`\n\n### Token-tyypit\n\n| Tyyppi | Voimassaolo | Käyttö |\n|---|---|---|\n| Access token | 1 tunti | API-kutsut |\n| Refresh token | 30 päivää | Access tokenin uusiminen |`,
+
+    datamodel: () => `## Tietomalli\n\n### Taulut\n\n\`\`\`\nusers\n├── id (UUID, PK)\n├── email (VARCHAR, UNIQUE)\n├── name (VARCHAR)\n├── created_at (TIMESTAMP)\n└── updated_at (TIMESTAMP)\n\nitems\n├── id (UUID, PK)\n├── user_id (UUID, FK → users.id)\n├── title (VARCHAR)\n├── content (TEXT)\n├── status (ENUM: draft, published)\n├── created_at (TIMESTAMP)\n└── updated_at (TIMESTAMP)\n\`\`\``,
+
+    errors: () => `## Virhekäsittely\n\nAPI palauttaa virheet yhtenäisessä muodossa:\n\n\`\`\`json\n{\n  "error": {\n    "code": "NOT_FOUND",\n    "message": "Kohdetta ei löytynyt",\n    "status": 404\n  }\n}\n\`\`\`\n\n### Virhekoodit\n\n| HTTP-koodi | Koodi | Kuvaus |\n|---|---|---|\n| 400 | \`BAD_REQUEST\` | Virheellinen pyyntö |\n| 401 | \`UNAUTHORIZED\` | Puuttuva tai virheellinen token |\n| 403 | \`FORBIDDEN\` | Ei oikeuksia |\n| 404 | \`NOT_FOUND\` | Resurssia ei löydy |\n| 429 | \`RATE_LIMITED\` | Liikaa pyyntöjä |\n| 500 | \`INTERNAL_ERROR\` | Palvelinvirhe |`,
+
+    quickstart: (p) => `## Pikaopas\n\n\`\`\`bash\nnpm install ${(p.name || 'kirjasto').toLowerCase().replace(/\\s+/g, '-')}\n\`\`\`\n\n\`\`\`javascript\nimport { create } from '${(p.name || 'kirjasto').toLowerCase().replace(/\\s+/g, '-')}';\n\nconst instance = create({\n  // asetukset\n});\n\nconst result = await instance.run();\nconsole.log(result);\n\`\`\``,
+
+    apiref: () => `## API-referenssi\n\n### \`create(options)\`\n\nLuo uuden instanssin.\n\n**Parametrit:**\n\n| Nimi | Tyyppi | Oletus | Kuvaus |\n|---|---|---|---|\n| \`option1\` | \`string\` | \`—\` | Pakollinen asetus |\n| \`option2\` | \`number\` | \`10\` | Valinnainen asetus |\n\n**Palauttaa:** \`Instance\`\n\n### \`instance.run()\`\n\nSuorittaa pääoperaation.\n\n**Palauttaa:** \`Promise<Result>\`\n\n### \`instance.destroy()\`\n\nVapauttaa resurssit.`,
+
+    examples: () => `## Esimerkit\n\n### Perusesimerkki\n\n\`\`\`javascript\nimport lib from 'kirjasto';\n\nconst result = await lib.process('data');\nconsole.log(result);\n\`\`\`\n\n### Edistynyt esimerkki\n\n\`\`\`javascript\nimport lib from 'kirjasto';\n\nconst instance = lib.create({\n  verbose: true,\n  cache: true\n});\n\ninstance.on('progress', (p) => console.log(\`\${p}%\`));\nconst result = await instance.process('data');\n\`\`\`\n\nLisää esimerkkejä löytyy [examples/](examples/)-hakemistosta.`,
+
+    config: () => `## Konfigurointi\n\nKonfiguraatio ladataan seuraavassa järjestyksessä:\n\n1. Oletusarvot\n2. Konfiguraatiotiedosto (\`config.json\`)\n3. Ympäristömuuttujat\n4. Komentoriviparametrit\n\n\`\`\`json\n{\n  "setting1": "arvo",\n  "setting2": 42,\n  "nested": {\n    "option": true\n  }\n}\n\`\`\``,
+
+    changelog: () => `## Muutosloki\n\n### [1.0.0] - ${new Date().toISOString().split('T')[0]}\n\n**Lisätty:**\n- Ensimmäinen julkaisuversio\n- Perusominaisuudet\n- Dokumentaatio\n\n### [0.2.0] - YYYY-MM-DD\n\n**Lisätty:**\n- Uusi ominaisuus X\n\n**Korjattu:**\n- Bugikorjaus Y\n\n### [0.1.0] - YYYY-MM-DD\n\n**Lisätty:**\n- Alustava toteutus`,
+
+    build: () => `## Buildin luominen\n\n### Android\n\n\`\`\`bash\n# Debug-build\nnpx react-native run-android\n\n# Release APK\ncd android && ./gradlew assembleRelease\n\`\`\`\n\n### iOS\n\n\`\`\`bash\n# Debug-build\nnpx react-native run-ios\n\n# Release\ncd ios && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release\n\`\`\``,
+
+    publishing: () => `## Sovelluskauppajulkaisu\n\n### Google Play Store\n\n1. Luo allekirjoitettu APK/AAB\n2. Lataa Google Play Consoleen\n3. Täytä kauppatiedot ja kuvakaappaukset\n4. Lähetä tarkistettavaksi\n\n### Apple App Store\n\n1. Luo Archive Xcodessa\n2. Lataa App Store Connectiin\n3. Täytä metatiedot ja kuvakaappaukset\n4. Lähetä tarkistettavaksi`,
+
+    datasources: () => `## Datalähteet\n\n| Lähde | Tyyppi | Päivitystiheys | Kuvaus |\n|---|---|---|---|\n| Lähde A | CSV / API | Päivittäin | Pääasiallinen datalähde |\n| Lähde B | Tietokanta | Reaaliaikainen | Täydentävä data |\n\n### Datan hakeminen\n\n\`\`\`bash\npython scripts/fetch_data.py --source=all\n\`\`\``,
+
+    pipeline: () => `## Dataputki (Pipeline)\n\n\`\`\`\nHaku → Puhdistus → Muunnos → Lataus → Analyysi\n\`\`\`\n\n### Vaiheet\n\n1. **Haku (Extract):** Datan lataaminen lähteistä\n2. **Puhdistus (Clean):** Puuttuvien arvojen käsittely, validointi\n3. **Muunnos (Transform):** Piirteiden muodostus, aggregointi\n4. **Lataus (Load):** Tallennus kohdetietokantaan\n5. **Analyysi:** Raporttien ja visualisointien tuottaminen\n\n\`\`\`bash\n# Aja koko putki\npython pipeline/run.py\n\n# Yksittäinen vaihe\npython pipeline/run.py --step=transform\n\`\`\``,
+
+    schema: () => `## Tietorakenne / Schema\n\n### Päätaulu\n\n| Kenttä | Tyyppi | Kuvaus |\n|---|---|---|\n| \`id\` | INTEGER | Pääavain |\n| \`timestamp\` | DATETIME | Havaintoaika |\n| \`value\` | FLOAT | Mittausarvo |\n| \`category\` | VARCHAR | Luokittelu |\n| \`source\` | VARCHAR | Datalähde |`,
+
+    analysis: () => `## Analyysit\n\n### Suoritettavat analyysit\n\n1. **Kuvaileva analyysi** — Perustilastot ja jakaumat\n2. **Trendi-analyysi** — Aikasarjat ja kehityssuunnat\n3. **Korrelaatioanalyysi** — Muuttujien väliset yhteydet\n\n\`\`\`bash\n# Aja kaikki analyysit\npython analysis/run_all.py\n\n# Yksittäinen analyysi\npython analysis/trends.py --output=reports/\n\`\`\``,
+
+    visualizations: () => `## Visualisoinnit\n\nRaportit ja kuvat tallentuvat \`output/\`-hakemistoon.\n\n\`\`\`bash\n# Luo kaikki visualisoinnit\npython visualize.py\n\n# Interaktiivinen dashboard\npython dashboard.py  # Avaa http://localhost:8050\n\`\`\``,
+
+    reproducibility: () => `## Toistettavuus\n\nKaikki tulokset ovat toistettavissa:\n\n\`\`\`bash\n# Asenna täsmälleen samat riippuvuudet\npip install -r requirements.txt\n\n# Aja koko analyysiputki\npython pipeline/run.py && python analysis/run_all.py\n\`\`\`\n\n### Versiointi\n\n- **Koodi:** Git\n- **Data:** DVC tai manuaalinen versiointi \`data/raw/YYYY-MM-DD/\`\n- **Ympäristö:** \`requirements.txt\` + Python-version lukitus`,
+
+    architecture: () => `## Arkkitehtuuri\n\n\`\`\`\n┌──────────┐    ┌──────────┐    ┌──────────┐\n│  Client  │───▶│   LB /   │───▶│   App    │\n│          │    │  Ingress │    │  Server  │\n└──────────┘    └──────────┘    └────┬─────┘\n                                     │\n                              ┌──────┴──────┐\n                              │  Database   │\n                              └─────────────┘\n\`\`\``,
+
+    setup: () => `## Käyttöönotto\n\n\`\`\`bash\n# Kloonaa infrakoodit\ngit clone https://github.com/org/infra.git\ncd infra\n\n# Alusta Terraform\nterraform init\n\n# Tarkista muutokset\nterraform plan\n\n# Ota käyttöön\nterraform apply\n\`\`\``,
+
+    services: () => `## Palvelut\n\n| Palvelu | Portti | Kuvaus | Terveystarkistus |\n|---|---|---|---|\n| API Gateway | 443 | Ulkoinen rajapinta | \`/health\` |\n| Auth Service | 8081 | Autentikointi | \`/health\` |\n| Worker | — | Taustaprosessit | Prometheus metrics |\n| PostgreSQL | 5432 | Tietokanta | pg_isready |\n| Redis | 6379 | Välimuisti | \`PING\` |`,
+
+    monitoring: () => `## Monitorointi ja hälytykset\n\n### Työkalut\n\n- **Metriikat:** Prometheus + Grafana\n- **Lokit:** ELK Stack / Loki\n- **Hälytykset:** Alertmanager → Slack / PagerDuty\n\n### Tärkeimmät metriikat\n\n| Metriikka | Hälytysraja | Kuvaus |\n|---|---|---|\n| CPU-käyttö | > 80% (5 min) | Skaalaus tarpeen |\n| Muisti | > 85% | Muistivuoto? |\n| API-latenssi (p95) | > 500ms | Suorituskykyongelma |\n| Virheprosentti (5xx) | > 1% | Palveluongelma |`,
+
+    backup: () => `## Varmuuskopiointi\n\n### Aikataulu\n\n| Kohde | Tiheys | Säilytys | Sijainti |\n|---|---|---|---|\n| Tietokanta | 6h | 30 päivää | S3 / GCS |\n| Tiedostot | Päivittäin | 90 päivää | S3 / GCS |\n| Konfiguraatio | Muutoksissa | Git-historia | Git |\n\n### Palautus\n\n\`\`\`bash\n# Palauta tietokanta\n./scripts/restore-db.sh --date=2025-01-15\n\n# Tarkista palautus\n./scripts/verify-restore.sh\n\`\`\``,
+
+    troubleshooting: () => `## Vianmääritys\n\n### Yleiset ongelmat\n\n<details>\n<summary><strong>Palvelu ei käynnisty</strong></summary>\n\n1. Tarkista lokit: \`docker logs palvelu\`\n2. Tarkista ympäristömuuttujat\n3. Tarkista tietokantayhteys\n\n</details>\n\n<details>\n<summary><strong>Hidas vastausaika</strong></summary>\n\n1. Tarkista Grafana-dashboard\n2. Tarkista tietokantakyselyt: \`EXPLAIN ANALYZE\`\n3. Tarkista välimuistin osumaprosetti\n\n</details>`,
+
+    runbook: () => `## Runbook\n\n### Julkaisu (Deploy)\n\n1. Varmista testien läpimeno\n2. Luo release-tagi: \`git tag v1.x.x\`\n3. Pushaa tagi: \`git push --tags\`\n4. Seuraa CI/CD-putkea\n5. Tarkista terveystarkistukset\n\n### Rollback\n\n\`\`\`bash\n# Palaa edelliseen versioon\nkubectl rollout undo deployment/app\n\n# Tai tiettyyn versioon\nkubectl rollout undo deployment/app --to-revision=3\n\`\`\``,
+};
+
+let currentTemplate = 'web';
+let sections = [];
+let draggedItem = null;
+
+function selectTemplate(templateId) {
+    currentTemplate = templateId;
+    document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.template === templateId);
+    });
+    sections = TEMPLATES[templateId].sections.map(s => ({ ...s }));
+    renderSections();
+    generateDocs();
+}
+
+function renderSections() {
+    const list = document.getElementById('sectionList');
+    list.innerHTML = '';
+    sections.forEach((section, index) => {
+        const li = document.createElement('li');
+        li.className = 'section-item';
+        li.draggable = true;
+        li.dataset.index = index;
+        li.innerHTML = `
+            <span class="drag-handle">⠿</span>
+            <input type="checkbox" ${section.checked ? 'checked' : ''} onchange="toggleSection(${index}, this.checked)">
+            <span class="section-name">${section.name}</span>
+        `;
+        li.addEventListener('dragstart', handleDragStart);
+        li.addEventListener('dragover', handleDragOver);
+        li.addEventListener('drop', handleDrop);
+        li.addEventListener('dragend', handleDragEnd);
+        list.appendChild(li);
+    });
+}
+
+function toggleSection(index, checked) {
+    sections[index].checked = checked;
+    generateDocs();
+}
+
+function handleDragStart(e) {
+    draggedItem = this;
+    this.style.opacity = '0.4';
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    if (draggedItem !== this) {
+        const fromIndex = parseInt(draggedItem.dataset.index);
+        const toIndex = parseInt(this.dataset.index);
+        const [moved] = sections.splice(fromIndex, 1);
+        sections.splice(toIndex, 0, moved);
+        renderSections();
+        generateDocs();
+    }
+}
+
+function handleDragEnd() {
+    this.style.opacity = '1';
+}
+
+function addCustomSection() {
+    const input = document.getElementById('customSectionInput');
+    const name = input.value.trim();
+    if (!name) return;
+    const id = 'custom_' + Date.now();
+    sections.push({ id, name, checked: true, custom: true });
+    SECTION_CONTENT[id] = () => `## ${name}\n\nSisältö tähän...`;
+    input.value = '';
+    renderSections();
+    generateDocs();
+}
+
+function getProjectData() {
+    return {
+        name: document.getElementById('projectName').value,
+        desc: document.getElementById('projectDesc').value,
+        tech: document.getElementById('projectTech').value,
+        license: document.getElementById('projectLicense').value,
+        author: document.getElementById('projectAuthor').value,
+        template: currentTemplate,
+    };
+}
+
+function generateMarkdown() {
+    const p = getProjectData();
+    const activeSections = sections.filter(s => s.checked);
+    const parts = activeSections.map(s => {
+        const fn = SECTION_CONTENT[s.id];
+        return fn ? fn(p) : `## ${s.name}\n\nSisältö tähän...`;
+    });
+    return parts.join('\n\n---\n\n');
+}
+
+function markdownToHtml(md) {
+    let html = md;
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+    html = html.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+        return `<pre><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+    });
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%">');
+
+    // Tables
+    html = html.replace(/((?:^\|.+\|$\n?)+)/gm, (tableBlock) => {
+        const rows = tableBlock.trim().split('\n').filter(r => !r.match(/^\|\s*[-:]+/));
+        if (rows.length === 0) return tableBlock;
+        let table = '<table>';
+        rows.forEach((row, i) => {
+            const cells = row.split('|').filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+            const tag = i === 0 ? 'th' : 'td';
+            table += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+        });
+        table += '</table>';
+        return table;
+    });
+
+    // Lists
+    html = html.replace(/^(\s*)- (.+)$/gm, '$1<li>$2</li>');
+    html = html.replace(/^(\s*)\d+\. (.+)$/gm, '$1<li>$2</li>');
+    html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, (list) => {
+        return '<ul>' + list + '</ul>';
+    });
+
+    // Details
+    html = html.replace(/<details>/g, '<details style="margin-bottom:0.5rem">');
+    html = html.replace(/<summary>/g, '<summary style="cursor:pointer">');
+
+    // Paragraphs
+    html = html.replace(/^(?!<[hupoltbd]|<\/|<details|<summary|<blockquote|<img|<a )(.+)$/gm, '<p>$1</p>');
+
+    html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:1.5rem 0">');
+    html = html.replace(/<!-- .+? -->/g, '');
+
+    return html;
+}
+
+function generateDocs() {
+    const md = generateMarkdown();
+    document.getElementById('markdownTab').value = md;
+    document.getElementById('previewTab').innerHTML = markdownToHtml(md);
+}
+
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('previewTab').style.display = tab === 'preview' ? 'block' : 'none';
+    document.getElementById('markdownTab').style.display = tab === 'markdown' ? 'block' : 'none';
+}
+
+function copyMarkdown() {
+    const md = generateMarkdown();
+    navigator.clipboard.writeText(md).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+}
+
+function downloadMarkdown() {
+    const md = generateMarkdown();
+    const name = document.getElementById('projectName').value || 'dokumentaatio';
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${name.toLowerCase().replace(/\s+/g, '-')}-README.md`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+document.getElementById('customSectionInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addCustomSection();
+});
+
+selectTemplate('web');
+</script>
+
+</body>
+</html>

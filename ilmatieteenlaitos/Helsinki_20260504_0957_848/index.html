@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuulioptimoidut pyöräilyreitit — Helsinki</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        header .icon { font-size: 2rem; }
+        header h1 { font-size: 1.3rem; font-weight: 700; }
+        header p { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+
+        .main {
+            display: flex;
+            height: calc(100vh - 72px);
+        }
+
+        .sidebar {
+            width: 340px;
+            min-width: 340px;
+            background: white;
+            overflow-y: auto;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .panel-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+        }
+
+        .compass-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem 0;
+        }
+        canvas#compass {
+            width: 220px;
+            height: 220px;
+        }
+
+        .wind-info {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+        .wind-speed {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e40af;
+        }
+        .wind-speed span { font-size: 0.9rem; font-weight: 400; color: #64748b; }
+        .wind-dir-text {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-top: 0.25rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .stat-good { color: #16a34a; }
+        .stat-warn { color: #ea580c; }
+        .stat-neutral { color: #1e40af; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+        .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .controls label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+            color: #334155;
+        }
+        .slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .slider-wrap input[type="range"] {
+            flex: 1;
+            accent-color: #3b82f6;
+        }
+        .slider-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.75rem;
+        }
+        .preset-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #334155;
+        }
+        .preset-btn:hover { background: #e2e8f0; }
+        .preset-btn.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .btn-generate {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0.75rem;
+        }
+        .btn-generate:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .btn-generate:active { transform: translateY(0); }
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #map {
+            flex: 1;
+            min-height: 400px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+        .loading-overlay.hidden { display: none; }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #475569;
+        }
+
+        .tip {
+            background: #eff6ff;
+            border-left: 3px solid #3b82f6;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.8rem;
+            color: #1e40af;
+            border-radius: 0 6px 6px 0;
+            line-height: 1.4;
+        }
+
+        .error-msg {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.8rem;
+            color: #991b1b;
+            border-radius: 0 6px 6px 0;
+            display: none;
+        }
+
+        .attribution {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                flex-direction: column-reverse;
+                height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+                border-right: none;
+                border-top: 1px solid #e2e8f0;
+                max-height: 50vh;
+            }
+            #map {
+                height: 50vh;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="icon">&#x1F6B4;</div>
+        <div>
+            <h1>Tuulioptimoidut pyöräreitit</h1>
+            <p>Ympyräreitti, jossa vastatuuli on minimoitu &mdash; FMI:n reaaliaikainen tuulidata</p>
+        </div>
+    </header>
+
+    <div class="main">
+        <aside class="sidebar">
+            <div class="panel">
+                <div class="panel-title">Tuulitiedot</div>
+                <div class="compass-wrap">
+                    <canvas id="compass" width="440" height="440"></canvas>
+                </div>
+                <div class="wind-info">
+                    <div class="wind-speed" id="windSpeedDisplay">-- <span>m/s</span></div>
+                    <div class="wind-dir-text" id="windDirText">Haetaan tuulitietoja&hellip;</div>
+                </div>
+                <div class="error-msg" id="windError"></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Reittitiedot</div>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value stat-neutral" id="statDistance">--</div>
+                        <div class="stat-label">Matka (km)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value stat-neutral" id="statTime">--</div>
+                        <div class="stat-label">Aika (min)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value stat-good" id="statTailwind">--</div>
+                        <div class="stat-label">Myötätuuli-%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value stat-warn" id="statHeadwind">--</div>
+                        <div class="stat-label">Vastatuuli-%</div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-color" style="background:#22c55e"></div>Myötätuuli</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#86efac"></div>Lievä myötä</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#fde047"></div>Sivutuuli</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#fb923c"></div>Lievä vasta</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div>Vastatuuli</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Asetukset</div>
+                <div class="controls">
+                    <label>Reitin pituus</label>
+                    <div class="slider-wrap">
+                        <input type="range" id="distanceSlider" min="10" max="50" step="1" value="20">
+                        <div class="slider-value" id="distanceValue">20 km</div>
+                    </div>
+
+                    <label style="margin-top:0.75rem">Lähtöpaikka</label>
+                    <div class="presets" id="presetButtons"></div>
+
+                    <button class="btn-generate" id="btnGenerate">Luo optimoitu reitti</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="tip" id="tipBox">
+                    Klikkaa karttaa valitaksesi vapaa lähtöpiste, tai valitse esiasetus yllä.
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="attribution">
+                    Tuulitiedot: Ilmatieteen laitos, avoin data &middot;
+                    Reititys: OSRM &middot;
+                    Kartta: OpenStreetMap
+                </div>
+            </div>
+        </aside>
+
+        <div id="map"></div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Haetaan tuulitietoja&hellip;</div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        const PRESETS = [
+            { name: 'Rautatientori', lat: 60.1710, lng: 24.9414 },
+            { name: 'Kallio', lat: 60.1847, lng: 24.9514 },
+            { name: 'Töölö', lat: 60.1780, lng: 24.9200 },
+            { name: 'Pasila', lat: 60.1985, lng: 24.9340 },
+            { name: 'Munkkiniemi', lat: 60.1972, lng: 24.8782 },
+            { name: 'Herttoniemi', lat: 60.1940, lng: 25.0285 },
+            { name: 'Kontula', lat: 60.2370, lng: 25.0830 },
+        ];
+        const WIND_DIR_NAMES = [
+            'pohjoisesta','koillisesta','idästä','kaakosta',
+            'etelästä','lounaasta','lännestä','luoteesta'
+        ];
+        const ROAD_FACTOR = 1.35;
+        const AVG_CYCLING_SPEED = 20;
+
+        let map, startMarker, routeLayers = [], waypointMarkers = [];
+        let windDir = null, windSpeed = null;
+        let startPoint = { lat: 60.1710, lng: 24.9414 };
+        let targetDistance = 20;
+        let activePreset = 0;
+
+        // ========== FMI Wind Data ==========
+
+        async function fetchWindData() {
+            const url = 'https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature'
+                + '&storedquery_id=fmi::observations::weather::simple'
+                + '&place=helsinki&parameters=winddirection,windspeedms'
+                + '&timestep=10&maxlocations=1';
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error('FMI API vastasi virheellä: ' + resp.status);
+            const xml = await resp.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xml, 'text/xml');
+            const members = doc.querySelectorAll('BsWfs\\:BsWfsElement, BsWfsElement');
+            let dir = null, spd = null;
+            members.forEach(el => {
+                const name = (el.querySelector('BsWfs\\:ParameterName, ParameterName') || {}).textContent;
+                const val = parseFloat((el.querySelector('BsWfs\\:ParameterValue, ParameterValue') || {}).textContent);
+                if (name === 'winddirection' && !isNaN(val)) dir = val;
+                if (name === 'windspeedms' && !isNaN(val)) spd = val;
+            });
+            if (dir === null || spd === null) throw new Error('Tuulitietoja ei saatu');
+            return { direction: dir, speed: spd };
+        }
+
+        // ========== Compass Drawing ==========
+
+        function drawCompass(dir, speed) {
+            const canvas = document.getElementById('compass');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const cx = w / 2, cy = h / 2;
+            const r = Math.min(cx, cy) - 35;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const toCanvasAngle = deg => (deg - 90) * Math.PI / 180;
+            const windRad = toCanvasAngle(dir);
+
+            // Colored sectors
+            const zones = [
+                { start: -60, end: 60, color: 'rgba(239,68,68,0.12)' },
+                { start: 60, end: 120, color: 'rgba(251,191,36,0.10)' },
+                { start: 120, end: 240, color: 'rgba(34,197,94,0.12)' },
+                { start: 240, end: 300, color: 'rgba(251,191,36,0.10)' },
+            ];
+            zones.forEach(z => {
+                const s = windRad + z.start * Math.PI / 180;
+                const e = windRad + z.end * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, r, s, e);
+                ctx.closePath();
+                ctx.fillStyle = z.color;
+                ctx.fill();
+            });
+
+            // Outer circle
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Tick marks
+            for (let i = 0; i < 36; i++) {
+                const a = toCanvasAngle(i * 10);
+                const len = i % 9 === 0 ? 14 : i % 3 === 0 ? 9 : 5;
+                ctx.beginPath();
+                ctx.moveTo(cx + (r - len) * Math.cos(a), cy + (r - len) * Math.sin(a));
+                ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+                ctx.strokeStyle = i % 9 === 0 ? '#475569' : '#94a3b8';
+                ctx.lineWidth = i % 9 === 0 ? 2 : 1;
+                ctx.stroke();
+            }
+
+            // Cardinal labels
+            const labels = [
+                { text: 'P', deg: 0 },
+                { text: 'I', deg: 90 },
+                { text: 'E', deg: 180 },
+                { text: 'L', deg: 270 },
+            ];
+            ctx.font = 'bold 18px system-ui';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#334155';
+            labels.forEach(l => {
+                const a = toCanvasAngle(l.deg);
+                ctx.fillText(l.text, cx + (r + 20) * Math.cos(a), cy + (r + 20) * Math.sin(a));
+            });
+
+            // Zone labels
+            ctx.font = '600 11px system-ui';
+            const zoneLabels = [
+                { text: 'VASTATUULI', offsetDeg: 0, color: '#dc2626' },
+                { text: 'SIVUTUULI', offsetDeg: 90, color: '#b45309' },
+                { text: 'MYÖTÄTUULI', offsetDeg: 180, color: '#16a34a' },
+                { text: 'SIVUTUULI', offsetDeg: 270, color: '#b45309' },
+            ];
+            zoneLabels.forEach(zl => {
+                const a = windRad + zl.offsetDeg * Math.PI / 180;
+                ctx.fillStyle = zl.color;
+                ctx.save();
+                ctx.translate(cx + (r * 0.62) * Math.cos(a), cy + (r * 0.62) * Math.sin(a));
+                let rot = a + Math.PI / 2;
+                if (rot > Math.PI / 2 && rot < Math.PI * 3 / 2) rot += Math.PI;
+                if (rot > Math.PI * 5 / 2) rot -= Math.PI * 2;
+                ctx.rotate(rot);
+                ctx.fillText(zl.text, 0, 0);
+                ctx.restore();
+            });
+
+            // Wind arrow
+            const arrowLen = r * 0.75;
+            const ax1 = cx + arrowLen * Math.cos(windRad);
+            const ay1 = cy + arrowLen * Math.sin(windRad);
+            const ax2 = cx - arrowLen * 0.15 * Math.cos(windRad);
+            const ay2 = cy - arrowLen * 0.15 * Math.sin(windRad);
+
+            ctx.beginPath();
+            ctx.moveTo(ax1, ay1);
+            ctx.lineTo(ax2, ay2);
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Arrowhead at center end (shows wind flow direction = FROM edge toward center)
+            const headLen = 12;
+            const headAngle = Math.PI / 6;
+            const tipAngle = windRad + Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(ax2, ay2);
+            ctx.lineTo(ax2 + headLen * Math.cos(tipAngle - headAngle), ay2 + headLen * Math.sin(tipAngle - headAngle));
+            ctx.moveTo(ax2, ay2);
+            ctx.lineTo(ax2 + headLen * Math.cos(tipAngle + headAngle), ay2 + headLen * Math.sin(tipAngle + headAngle));
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Wind dot at source
+            ctx.beginPath();
+            ctx.arc(ax1, ay1, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#3b82f6';
+            ctx.fill();
+
+            // Center: speed
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 26px system-ui';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(speed.toFixed(1), cx, cy - 6);
+            ctx.font = '13px system-ui';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('m/s', cx, cy + 14);
+        }
+
+        function windDirName(deg) {
+            const i = Math.round(deg / 45) % 8;
+            return WIND_DIR_NAMES[i];
+        }
+
+        // ========== Route Generation ==========
+
+        function generateWaypoints(center, distKm, windDirDeg, numPoints) {
+            numPoints = numPoints || 10;
+            const straightCirc = (distKm * 1000) / ROAD_FACTOR;
+            const ratio = 2.0;
+            const a = straightCirc / (2 * Math.PI * Math.sqrt((1 + 1 / (ratio * ratio)) / 2));
+            const b = a / ratio;
+
+            const theta = windDirDeg * Math.PI / 180;
+            // Major axis perpendicular to wind, minor axis along wind
+            const ux = Math.cos(theta), uy = -Math.sin(theta);   // perp to wind (East,North)
+            const vx = -Math.sin(theta), vy = -Math.cos(theta);  // along wind flow
+
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (2 * Math.PI * i) / numPoints;
+                const dx = a * Math.cos(angle) * ux + b * Math.sin(angle) * vx;
+                const dy = a * Math.cos(angle) * uy + b * Math.sin(angle) * vy;
+
+                const lat = center.lat + dy / 111320;
+                const lng = center.lng + dx / (111320 * Math.cos(center.lat * Math.PI / 180));
+                points.push({ lat, lng });
+            }
+            return points;
+        }
+
+        // ========== OSRM Routing ==========
+
+        async function getOSRMRoute(waypoints) {
+            const coords = waypoints.map(p => p.lng.toFixed(6) + ',' + p.lat.toFixed(6));
+            coords.push(coords[0]);
+            const url = 'https://router.project-osrm.org/route/v1/driving/'
+                + coords.join(';')
+                + '?overview=full&geometries=geojson&continue_straight=true';
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error('OSRM reititys epäonnistui');
+            const data = await resp.json();
+            if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
+                throw new Error('Reittiä ei löytynyt');
+            }
+            return data.routes[0];
+        }
+
+        // ========== Route Analysis ==========
+
+        function calcBearing(lat1, lng1, lat2, lng2) {
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const la1 = lat1 * Math.PI / 180, la2 = lat2 * Math.PI / 180;
+            const y = Math.sin(dLng) * Math.cos(la2);
+            const x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(dLng);
+            return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
+        }
+
+        function haversine(lat1, lng1, lat2, lng2) {
+            const R = 6371000;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function analyzeRoute(geojson, wDir, wSpd) {
+            const coords = geojson.coordinates;
+            let totalDist = 0, headwindDist = 0, tailwindDist = 0, crosswindDist = 0;
+            let weightedHeadwind = 0;
+            const segments = [];
+
+            for (let i = 0; i < coords.length - 1; i++) {
+                const [lng1, lat1] = coords[i];
+                const [lng2, lat2] = coords[i + 1];
+                const dist = haversine(lat1, lng1, lat2, lng2);
+                if (dist < 0.5) continue;
+
+                const bearing = calcBearing(lat1, lng1, lat2, lng2);
+                const headwindFactor = Math.cos((bearing - wDir) * Math.PI / 180);
+
+                totalDist += dist;
+                weightedHeadwind += headwindFactor * headwindFactor * dist;
+
+                if (headwindFactor > 0.3) headwindDist += dist;
+                else if (headwindFactor < -0.3) tailwindDist += dist;
+                else crosswindDist += dist;
+
+                let color;
+                if (headwindFactor > 0.6) color = '#ef4444';
+                else if (headwindFactor > 0.3) color = '#fb923c';
+                else if (headwindFactor > -0.3) color = '#fde047';
+                else if (headwindFactor > -0.6) color = '#86efac';
+                else color = '#22c55e';
+
+                segments.push({
+                    coords: [[lat1, lng1], [lat2, lng2]],
+                    color,
+                    headwindFactor,
+                    dist
+                });
+            }
+
+            const circleWindCost = 0.5;
+            const thisWindCost = totalDist > 0 ? weightedHeadwind / totalDist : 0;
+            const savings = circleWindCost > 0
+                ? Math.round((1 - thisWindCost / circleWindCost) * 100) : 0;
+
+            return {
+                totalDist,
+                headwindPct: totalDist > 0 ? Math.round(headwindDist / totalDist * 100) : 0,
+                tailwindPct: totalDist > 0 ? Math.round(tailwindDist / totalDist * 100) : 0,
+                crosswindPct: totalDist > 0 ? Math.round(crosswindDist / totalDist * 100) : 0,
+                savings,
+                segments,
+                estimatedMinutes: Math.round((totalDist / 1000) / AVG_CYCLING_SPEED * 60),
+            };
+        }
+
+        // ========== Map Display ==========
+
+        function clearRoute() {
+            routeLayers.forEach(l => map.removeLayer(l));
+            routeLayers = [];
+            waypointMarkers.forEach(m => map.removeLayer(m));
+            waypointMarkers = [];
+        }
+
+        function displayRoute(route, analysis, waypoints) {
+            clearRoute();
+
+            // Color-coded segments with outline
+            const allCoords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+            const outline = L.polyline(allCoords, {
+                color: '#1e293b', weight: 7, opacity: 0.25, lineCap: 'round', lineJoin: 'round'
+            }).addTo(map);
+            routeLayers.push(outline);
+
+            // Batch segments by color for performance
+            const batches = {};
+            analysis.segments.forEach(seg => {
+                if (!batches[seg.color]) batches[seg.color] = [];
+                batches[seg.color].push(seg.coords);
+            });
+            Object.entries(batches).forEach(([color, coordSets]) => {
+                coordSets.forEach(coords => {
+                    const line = L.polyline(coords, {
+                        color, weight: 5, opacity: 0.9, lineCap: 'round', lineJoin: 'round'
+                    }).addTo(map);
+                    routeLayers.push(line);
+                });
+            });
+
+            // Waypoint dots
+            waypoints.forEach((wp, i) => {
+                const m = L.circleMarker([wp.lat, wp.lng], {
+                    radius: 4, fillColor: '#3b82f6', fillOpacity: 0.5,
+                    color: '#1e40af', weight: 1, opacity: 0.5
+                }).addTo(map);
+                waypointMarkers.push(m);
+            });
+
+            // Wind direction arrow on map
+            addWindArrowToMap();
+
+            map.fitBounds(L.polyline(allCoords).getBounds().pad(0.1));
+        }
+
+        function addWindArrowToMap() {
+            if (windDir === null) return;
+            const bounds = map.getBounds();
+            const ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
+            const centerLat = (ne.lat + sw.lat) / 2;
+            const centerLng = (ne.lng + sw.lng) / 2;
+            const size = Math.min(ne.lat - sw.lat, ne.lng - sw.lng) * 0.12;
+
+            const theta = windDir * Math.PI / 180;
+            const fromLat = centerLat + size * Math.cos(theta) + (ne.lat - sw.lat) * 0.38;
+            const fromLng = centerLng + size * Math.sin(theta) + (ne.lng - sw.lng) * 0.38;
+            const toLat = centerLat - size * Math.cos(theta) + (ne.lat - sw.lat) * 0.38;
+            const toLng = centerLng - size * Math.sin(theta) + (ne.lng - sw.lng) * 0.38;
+
+            const windLine = L.polyline([[fromLat, fromLng], [toLat, toLng]], {
+                color: '#3b82f6', weight: 3, opacity: 0.7, dashArray: '8,6'
+            }).addTo(map);
+            routeLayers.push(windLine);
+
+            const arrowIcon = L.divIcon({
+                className: '',
+                html: `<div style="font-size:18px;color:#3b82f6;transform:rotate(${windDir}deg);line-height:1;margin-top:-9px;margin-left:-5px">&#x2B07;</div>`,
+                iconSize: [18, 18]
+            });
+            const arrowM = L.marker([toLat, toLng], { icon: arrowIcon, interactive: false }).addTo(map);
+            routeLayers.push(arrowM);
+
+            const labelIcon = L.divIcon({
+                className: '',
+                html: `<div style="background:rgba(59,130,246,0.85);color:white;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap;margin-left:-30px;margin-top:-8px">Tuuli ${windSpeed?.toFixed(1) ?? '?'} m/s</div>`,
+                iconSize: [80, 20]
+            });
+            const labelM = L.marker([fromLat, fromLng], { icon: labelIcon, interactive: false }).addTo(map);
+            routeLayers.push(labelM);
+        }
+
+        function updateStats(analysis) {
+            document.getElementById('statDistance').textContent = (analysis.totalDist / 1000).toFixed(1);
+            document.getElementById('statTime').textContent = '~' + analysis.estimatedMinutes;
+            document.getElementById('statTailwind').textContent = analysis.tailwindPct + '%';
+            document.getElementById('statHeadwind').textContent = analysis.headwindPct + '%';
+
+            const tip = document.getElementById('tipBox');
+            if (analysis.savings > 0) {
+                tip.innerHTML = `<strong>Reitti on optimoitu!</strong> Tuulikustannus on noin <strong>${analysis.savings}%</strong> pienempi kuin ympyräreitillä. Suurin osa matkasta ajetaan sivutuulessa.`;
+            } else {
+                tip.innerHTML = 'Tuuli on hyvin heikko — reittioptimoinilla ei ole suurta vaikutusta. Nauti lenkistä!';
+            }
+        }
+
+        // ========== Main Flow ==========
+
+        async function generateRoute() {
+            const btn = document.getElementById('btnGenerate');
+            btn.disabled = true;
+            btn.textContent = 'Luodaan reittiä…';
+            showLoading('Luodaan optimoitua reittiä…');
+
+            try {
+                const wp = generateWaypoints(startPoint, targetDistance, windDir, 10);
+                const route = await getOSRMRoute(wp);
+                const analysis = analyzeRoute(route.geometry, windDir, windSpeed);
+                displayRoute(route, analysis, wp);
+                updateStats(analysis);
+                document.getElementById('windError').style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                const el = document.getElementById('windError');
+                el.textContent = 'Reititys epäonnistui: ' + err.message;
+                el.style.display = 'block';
+            } finally {
+                hideLoading();
+                btn.disabled = false;
+                btn.textContent = 'Luo optimoitu reitti';
+            }
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        function setStartPoint(lat, lng) {
+            startPoint = { lat, lng };
+            if (startMarker) {
+                startMarker.setLatLng([lat, lng]);
+            } else {
+                const icon = L.divIcon({
+                    className: '',
+                    html: '<div style="width:28px;height:28px;background:#1e40af;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;margin-left:-14px;margin-top:-14px"><span style="color:white;font-size:14px">&#x1F6B4;</span></div>',
+                    iconSize: [28, 28]
+                });
+                startMarker = L.marker([lat, lng], { icon, draggable: true }).addTo(map);
+                startMarker.on('dragend', function(e) {
+                    const pos = e.target.getLatLng();
+                    startPoint = { lat: pos.lat, lng: pos.lng };
+                    setActivePreset(-1);
+                    generateRoute();
+                });
+            }
+            map.setView([lat, lng], map.getZoom());
+        }
+
+        function setActivePreset(idx) {
+            activePreset = idx;
+            document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === idx);
+            });
+        }
+
+        function buildPresetButtons() {
+            const container = document.getElementById('presetButtons');
+            PRESETS.forEach((p, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = p.name;
+                btn.addEventListener('click', () => {
+                    setActivePreset(i);
+                    setStartPoint(p.lat, p.lng);
+                    generateRoute();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        // ========== Init ==========
+
+        async function init() {
+            showLoading('Haetaan tuulitietoja…');
+
+            map = L.map('map', { zoomControl: true }).setView([startPoint.lat, startPoint.lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap',
+                maxZoom: 18
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                setActivePreset(-1);
+                setStartPoint(e.latlng.lat, e.latlng.lng);
+                generateRoute();
+            });
+
+            buildPresetButtons();
+            setStartPoint(startPoint.lat, startPoint.lng);
+
+            document.getElementById('distanceSlider').addEventListener('input', function() {
+                targetDistance = parseInt(this.value);
+                document.getElementById('distanceValue').textContent = targetDistance + ' km';
+            });
+            document.getElementById('distanceSlider').addEventListener('change', function() {
+                generateRoute();
+            });
+            document.getElementById('btnGenerate').addEventListener('click', generateRoute);
+
+            try {
+                const wind = await fetchWindData();
+                windDir = wind.direction;
+                windSpeed = wind.speed;
+                drawCompass(windDir, windSpeed);
+                document.getElementById('windSpeedDisplay').innerHTML =
+                    windSpeed.toFixed(1) + ' <span>m/s</span>';
+                document.getElementById('windDirText').textContent =
+                    'Tuulee ' + windDirName(windDir) + ' (' + Math.round(windDir) + '°)';
+            } catch (err) {
+                console.error('FMI error:', err);
+                windDir = 225;
+                windSpeed = 4.0;
+                drawCompass(windDir, windSpeed);
+                document.getElementById('windSpeedDisplay').innerHTML =
+                    windSpeed.toFixed(1) + ' <span>m/s</span>';
+                document.getElementById('windDirText').textContent =
+                    'Arvioitu: ' + windDirName(windDir) + ' (' + Math.round(windDir) + '°)';
+                const el = document.getElementById('windError');
+                el.textContent = 'FMI-tietoja ei saatu, käytetään arvioitua tuulta.';
+                el.style.display = 'block';
+            }
+
+            await generateRoute();
+        }
+
+        init();
+    })();
+    </script>
+</body>
+</html>

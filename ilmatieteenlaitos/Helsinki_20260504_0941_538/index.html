@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Työajanseuranta</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            color: #1a202c;
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0 20px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .clock-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .current-time {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2d3748;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .current-date {
+            color: #718096;
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 16px;
+        }
+
+        .status-badge.working {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.off {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .clock-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-arrive {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-arrive:hover:not(:disabled) {
+            background: #38a169;
+        }
+
+        .btn-leave {
+            background: #fc8181;
+            color: white;
+        }
+
+        .btn-leave:hover:not(:disabled) {
+            background: #f56565;
+        }
+
+        .elapsed-time {
+            margin-top: 16px;
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        .elapsed-time span {
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section h2 {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .project-form input, .project-form select {
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .project-form input:focus, .project-form select:focus {
+            border-color: #4299e1;
+        }
+
+        .project-form input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .project-form input[type="number"] {
+            width: 100px;
+        }
+
+        .btn-add {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #3182ce;
+        }
+
+        .project-list {
+            list-style: none;
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .project-item .name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .project-item .hours {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #4299e1;
+        }
+
+        .project-item .delete-btn {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .project-item .delete-btn:hover {
+            color: #e53e3e;
+            background: #fff5f5;
+        }
+
+        .total-hours {
+            text-align: right;
+            padding-top: 12px;
+            border-top: 2px solid #e2e8f0;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        .total-hours span {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #718096;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .history-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 0.95rem;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #a0aec0;
+        }
+
+        .btn-clear {
+            background: #edf2f7;
+            color: #4a5568;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+        }
+
+        .btn-clear:hover {
+            background: #e2e8f0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .summary-card .label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            background: #edf2f7;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2d3748;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .current-time {
+                font-size: 2.2rem;
+            }
+            .clock-buttons {
+                flex-direction: column;
+            }
+            .project-form {
+                flex-direction: column;
+            }
+            .project-form input[type="number"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <h1>Työajanseuranta</h1>
+            <p>Kirjaa saapuminen, lähtö ja projektitunnit</p>
+        </header>
+
+        <div class="clock-section">
+            <div class="current-time" id="currentTime">--:--:--</div>
+            <div class="current-date" id="currentDate"></div>
+            <div id="statusBadge"></div>
+            <div class="elapsed-time" id="elapsedTime"></div>
+            <div class="clock-buttons">
+                <button class="btn btn-arrive" id="btnArrive" onclick="clockIn()">Saavuin töihin</button>
+                <button class="btn btn-leave" id="btnLeave" onclick="clockOut()" disabled>Lähden töistä</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Projektitunnit tänään</h2>
+            <div class="project-form">
+                <select id="projectSelect">
+                    <option value="">Valitse projekti...</option>
+                </select>
+                <input type="text" id="newProjectName" placeholder="Tai lisää uusi projekti">
+                <input type="number" id="projectHours" placeholder="Tunnit" step="0.25" min="0" max="24">
+                <button class="btn btn-add" onclick="addProjectHours()">Lisää</button>
+            </div>
+            <ul class="project-list" id="projectList"></ul>
+            <div class="total-hours" id="totalHours"></div>
+        </div>
+
+        <div class="section">
+            <h2>Historia ja yhteenveto</h2>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('today')">Tänään</button>
+                <button class="tab" onclick="switchTab('week')">Viikko</button>
+                <button class="tab" onclick="switchTab('history')">Historia</button>
+            </div>
+
+            <div class="tab-content active" id="tab-today">
+                <div class="summary-grid" id="todaySummary"></div>
+            </div>
+
+            <div class="tab-content" id="tab-week">
+                <div class="summary-grid" id="weekSummary"></div>
+                <table class="history-table" id="weekTable"></table>
+            </div>
+
+            <div class="tab-content" id="tab-history">
+                <table class="history-table" id="historyTable"></table>
+                <div style="margin-top: 12px; text-align: right;">
+                    <button class="btn btn-clear" onclick="clearHistory()">Tyhjennä historia</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'tyoajanseuranta';
+
+        function getData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return { days: {}, projects: ['Yleinen', 'Kehitys', 'Palaveri', 'Hallinto'] };
+            return JSON.parse(raw);
+        }
+
+        function saveData(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function today() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function getDay(data, date) {
+            if (!data.days[date]) {
+                data.days[date] = { arrivals: [], projectHours: {} };
+            }
+            return data.days[date];
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('fi-FI', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function formatHours(h) {
+            const hours = Math.floor(h);
+            const mins = Math.round((h - hours) * 60);
+            if (hours === 0) return `${mins} min`;
+            if (mins === 0) return `${hours} h`;
+            return `${hours} h ${mins} min`;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = formatTime(now);
+            document.getElementById('currentDate').textContent = formatDate(now);
+        }
+
+        function isWorking() {
+            const data = getData();
+            const day = data.days[today()];
+            if (!day || !day.arrivals || day.arrivals.length === 0) return false;
+            const last = day.arrivals[day.arrivals.length - 1];
+            return !last.left;
+        }
+
+        function updateStatus() {
+            const working = isWorking();
+            const badge = document.getElementById('statusBadge');
+            const elapsed = document.getElementById('elapsedTime');
+
+            if (working) {
+                badge.innerHTML = '<span class="status-badge working">Töissä</span>';
+                document.getElementById('btnArrive').disabled = true;
+                document.getElementById('btnLeave').disabled = false;
+
+                const data = getData();
+                const day = data.days[today()];
+                const last = day.arrivals[day.arrivals.length - 1];
+                const start = new Date(last.arrived);
+                const diff = (new Date() - start) / 1000 / 60 / 60;
+                elapsed.innerHTML = `Tänään paikalla: <span>${formatHours(getTotalWorkHours(day))}</span>`;
+            } else {
+                badge.innerHTML = '<span class="status-badge off">Ei töissä</span>';
+                document.getElementById('btnArrive').disabled = false;
+                document.getElementById('btnLeave').disabled = true;
+
+                const data = getData();
+                const day = data.days[today()];
+                if (day && day.arrivals && day.arrivals.length > 0) {
+                    elapsed.innerHTML = `Tänään yhteensä: <span>${formatHours(getTotalWorkHours(day))}</span>`;
+                } else {
+                    elapsed.innerHTML = '';
+                }
+            }
+        }
+
+        function getTotalWorkHours(day) {
+            if (!day || !day.arrivals) return 0;
+            let total = 0;
+            for (const entry of day.arrivals) {
+                const start = new Date(entry.arrived);
+                const end = entry.left ? new Date(entry.left) : new Date();
+                total += (end - start) / 1000 / 60 / 60;
+            }
+            return total;
+        }
+
+        function clockIn() {
+            const data = getData();
+            const day = getDay(data, today());
+            day.arrivals.push({ arrived: new Date().toISOString() });
+            saveData(data);
+            updateStatus();
+            renderAll();
+        }
+
+        function clockOut() {
+            const data = getData();
+            const day = getDay(data, today());
+            const last = day.arrivals[day.arrivals.length - 1];
+            last.left = new Date().toISOString();
+            saveData(data);
+            updateStatus();
+            renderAll();
+        }
+
+        function addProjectHours() {
+            const select = document.getElementById('projectSelect');
+            const newName = document.getElementById('newProjectName').value.trim();
+            const hours = parseFloat(document.getElementById('projectHours').value);
+
+            let project = select.value || newName;
+            if (!project) return alert('Valitse tai kirjoita projektin nimi');
+            if (!hours || hours <= 0) return alert('Syötä tunnit');
+
+            const data = getData();
+            const day = getDay(data, today());
+
+            if (!day.projectHours[project]) {
+                day.projectHours[project] = 0;
+            }
+            day.projectHours[project] += hours;
+
+            if (!data.projects.includes(project)) {
+                data.projects.push(project);
+            }
+
+            saveData(data);
+            document.getElementById('newProjectName').value = '';
+            document.getElementById('projectHours').value = '';
+            document.getElementById('projectSelect').value = '';
+            renderAll();
+        }
+
+        function removeProjectHours(project) {
+            const data = getData();
+            const day = data.days[today()];
+            if (day && day.projectHours) {
+                delete day.projectHours[project];
+                saveData(data);
+                renderAll();
+            }
+        }
+
+        function renderProjectSelect() {
+            const data = getData();
+            const select = document.getElementById('projectSelect');
+            select.innerHTML = '<option value="">Valitse projekti...</option>';
+            for (const p of data.projects) {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                select.appendChild(opt);
+            }
+        }
+
+        function renderProjectList() {
+            const data = getData();
+            const day = data.days[today()];
+            const list = document.getElementById('projectList');
+            const totalEl = document.getElementById('totalHours');
+
+            if (!day || !day.projectHours || Object.keys(day.projectHours).length === 0) {
+                list.innerHTML = '<li class="no-data">Ei vielä kirjattuja tunteja tänään</li>';
+                totalEl.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            for (const [name, hours] of Object.entries(day.projectHours)) {
+                total += hours;
+                html += `<li class="project-item">
+                    <span class="name">${escapeHtml(name)}</span>
+                    <span class="hours">${formatHours(hours)}</span>
+                    <button class="delete-btn" onclick="removeProjectHours('${escapeHtml(name)}')" title="Poista">&times;</button>
+                </li>`;
+            }
+            list.innerHTML = html;
+            totalEl.innerHTML = `Yhteensä kirjattu: <span>${formatHours(total)}</span>`;
+        }
+
+        function renderTodaySummary() {
+            const data = getData();
+            const day = data.days[today()];
+            const workHours = day ? getTotalWorkHours(day) : 0;
+            const projectTotal = day && day.projectHours
+                ? Object.values(day.projectHours).reduce((a, b) => a + b, 0)
+                : 0;
+            const arrivals = day && day.arrivals ? day.arrivals.length : 0;
+            const firstArrival = day && day.arrivals && day.arrivals.length > 0
+                ? new Date(day.arrivals[0].arrived).toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })
+                : '-';
+
+            document.getElementById('todaySummary').innerHTML = `
+                <div class="summary-card"><div class="value">${formatHours(workHours)}</div><div class="label">Työaika</div></div>
+                <div class="summary-card"><div class="value">${formatHours(projectTotal)}</div><div class="label">Kirjattu</div></div>
+                <div class="summary-card"><div class="value">${firstArrival}</div><div class="label">Saapuminen</div></div>
+                <div class="summary-card"><div class="value">${arrivals}</div><div class="label">Leimauksia</div></div>
+            `;
+        }
+
+        function renderWeekSummary() {
+            const data = getData();
+            const now = new Date();
+            const dayOfWeek = now.getDay() || 7;
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - dayOfWeek + 1);
+
+            let totalWork = 0;
+            let totalProject = 0;
+            let daysWorked = 0;
+            let rows = '';
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                const key = d.toISOString().slice(0, 10);
+                const day = data.days[key];
+
+                if (day && day.arrivals && day.arrivals.length > 0) {
+                    const work = getTotalWorkHours(day);
+                    const proj = day.projectHours ? Object.values(day.projectHours).reduce((a, b) => a + b, 0) : 0;
+                    totalWork += work;
+                    totalProject += proj;
+                    daysWorked++;
+
+                    const dayName = d.toLocaleDateString('fi-FI', { weekday: 'short', day: 'numeric', month: 'numeric' });
+                    rows += `<tr><td>${dayName}</td><td>${formatHours(work)}</td><td>${formatHours(proj)}</td></tr>`;
+                }
+            }
+
+            document.getElementById('weekSummary').innerHTML = `
+                <div class="summary-card"><div class="value">${formatHours(totalWork)}</div><div class="label">Viikon tunnit</div></div>
+                <div class="summary-card"><div class="value">${formatHours(totalProject)}</div><div class="label">Kirjattu</div></div>
+                <div class="summary-card"><div class="value">${daysWorked}</div><div class="label">Työpäiviä</div></div>
+            `;
+
+            document.getElementById('weekTable').innerHTML = rows
+                ? `<thead><tr><th>Päivä</th><th>Työaika</th><th>Kirjattu</th></tr></thead><tbody>${rows}</tbody>`
+                : '<tr><td class="no-data" colspan="3">Ei tietoja tälle viikolle</td></tr>';
+        }
+
+        function renderHistory() {
+            const data = getData();
+            const table = document.getElementById('historyTable');
+
+            const sortedDays = Object.keys(data.days).sort().reverse().slice(0, 14);
+
+            if (sortedDays.length === 0) {
+                table.innerHTML = '<tr><td class="no-data">Ei historiaa</td></tr>';
+                return;
+            }
+
+            let rows = '';
+            for (const key of sortedDays) {
+                const day = data.days[key];
+                if (!day.arrivals || day.arrivals.length === 0) continue;
+
+                const d = new Date(key + 'T00:00:00');
+                const dayName = d.toLocaleDateString('fi-FI', { weekday: 'short', day: 'numeric', month: 'numeric' });
+                const work = getTotalWorkHours(day);
+                const proj = day.projectHours ? Object.values(day.projectHours).reduce((a, b) => a + b, 0) : 0;
+                const arrived = new Date(day.arrivals[0].arrived).toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+                const lastEntry = day.arrivals[day.arrivals.length - 1];
+                const left = lastEntry.left
+                    ? new Date(lastEntry.left).toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })
+                    : '-';
+
+                rows += `<tr>
+                    <td>${dayName}</td>
+                    <td>${arrived}</td>
+                    <td>${left}</td>
+                    <td>${formatHours(work)}</td>
+                    <td>${formatHours(proj)}</td>
+                </tr>`;
+            }
+
+            table.innerHTML = `<thead><tr><th>Päivä</th><th>Saapui</th><th>Lähti</th><th>Työaika</th><th>Kirjattu</th></tr></thead><tbody>${rows}</tbody>`;
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        function clearHistory() {
+            if (confirm('Haluatko varmasti tyhjentää kaiken historian?')) {
+                const data = getData();
+                data.days = {};
+                saveData(data);
+                renderAll();
+                updateStatus();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderAll() {
+            renderProjectSelect();
+            renderProjectList();
+            renderTodaySummary();
+            renderWeekSummary();
+            renderHistory();
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+        setInterval(updateStatus, 60000);
+        updateStatus();
+        renderAll();
+    </script>
+</body>
+</html>

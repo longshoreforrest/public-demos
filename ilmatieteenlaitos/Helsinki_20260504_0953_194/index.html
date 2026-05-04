@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sähköhinta & Saunasuositus — Helsinki</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-alt: #334155;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header {
+    text-align: center;
+    padding: 1.5rem 0 1rem;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+  }
+  header p { color: var(--text-dim); margin-top: .3rem; font-size: .95rem; }
+  .sauna-card {
+    background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .sauna-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .sauna-card h2 {
+    font-size: 1.15rem;
+    color: var(--yellow);
+    margin-bottom: .8rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+  }
+  .sauna-recommendation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .sauna-option {
+    flex: 1;
+    min-width: 160px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: default;
+    transition: transform 0.15s;
+    border: 2px solid transparent;
+  }
+  .sauna-option:hover { transform: translateY(-2px); }
+  .sauna-option.best { border-color: var(--green); }
+  .sauna-option .day-label {
+    font-size: .85rem;
+    color: var(--text-dim);
+    margin-bottom: .3rem;
+  }
+  .sauna-option .price-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  .sauna-option .detail {
+    font-size: .8rem;
+    color: var(--text-dim);
+    margin-top: .3rem;
+  }
+  .sauna-option .badge {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 600;
+    padding: .15rem .5rem;
+    border-radius: 999px;
+    margin-top: .4rem;
+    text-transform: uppercase;
+  }
+  .badge-best { background: rgba(74,222,128,0.2); color: var(--green); }
+  .badge-ok { background: rgba(251,191,36,0.2); color: var(--yellow); }
+  .badge-wait { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  .section {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+  }
+  .section h3 {
+    font-size: 1rem;
+    margin-bottom: .8rem;
+    color: var(--accent);
+  }
+  .chart-wrap { position: relative; height: 260px; }
+  @media (max-width: 600px) { .chart-wrap { height: 200px; } }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+  }
+  .price-table th {
+    text-align: left;
+    padding: .4rem .6rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--card-alt);
+    font-weight: 500;
+  }
+  .price-table td {
+    padding: .4rem .6rem;
+    border-bottom: 1px solid rgba(51,65,85,0.5);
+  }
+  .price-table .cheap { color: var(--green); }
+  .price-table .mid { color: var(--yellow); }
+  .price-table .expensive { color: var(--red); }
+
+  .forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: .6rem;
+  }
+  .forecast-item {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: .8rem;
+    text-align: center;
+  }
+  .forecast-item .f-day { font-weight: 600; font-size: .9rem; }
+  .forecast-item .f-temp { font-size: 1.3rem; font-weight: 700; margin: .3rem 0; }
+  .forecast-item .f-detail { font-size: .78rem; color: var(--text-dim); }
+
+  .estimate-bar {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .5rem 0;
+    border-bottom: 1px solid rgba(51,65,85,0.4);
+  }
+  .estimate-bar:last-child { border-bottom: none; }
+  .estimate-bar .e-day { width: 80px; font-size: .85rem; color: var(--text-dim); }
+  .estimate-bar .e-bar-wrap { flex: 1; height: 24px; background: rgba(0,0,0,0.25); border-radius: 6px; overflow: hidden; position: relative; }
+  .estimate-bar .e-bar { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+  .estimate-bar .e-val { width: 80px; text-align: right; font-weight: 600; font-size: .9rem; }
+
+  .info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-top: .5rem;
+  }
+  .info-chip {
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 8px;
+    padding: .3rem .7rem;
+    font-size: .78rem;
+    color: var(--text-dim);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-dim);
+  }
+  .loading .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--card-alt);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-box {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: var(--red);
+    font-size: .9rem;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem 0;
+    font-size: .75rem;
+    color: var(--text-dim);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ Sähköhinta & Saunasuositus</h1>
+    <p>Helsinki — <span id="dateDisplay"></span></p>
+  </header>
+
+  <div id="app">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Haetaan sähkön hintoja ja säätietoja…</p>
+    </div>
+  </div>
+
+  <footer>
+    Spot-hinnat: <a href="https://porssisahko.net" target="_blank">porssisahko.net</a> ·
+    Sääennuste: <a href="https://www.ilmatieteenlaitos.fi/avoin-data" target="_blank">Ilmatieteen laitos</a><br>
+    Arviohinnat perustuvat tilastolliseen malliin (lämpötila, tuuli, viikonpäivä). Toteutuva hinta voi poiketa.
+  </footer>
+</div>
+
+<script>
+const DAYS_FI = ['sunnuntai','maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai'];
+const DAYS_SHORT = ['su','ma','ti','ke','to','pe','la'];
+const MONTHS_FI = ['tammikuuta','helmikuuta','maaliskuuta','huhtikuuta','toukokuuta','kesäkuuta',
+                   'heinäkuuta','elokuuta','syyskuuta','lokakuuta','marraskuuta','joulukuuta'];
+
+const SAUNA_KWH = 30;
+
+function formatDate(d) {
+  return `${DAYS_FI[d.getDay()]} ${d.getDate()}. ${MONTHS_FI[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function formatDayShort(d) {
+  return `${DAYS_SHORT[d.getDay()]} ${d.getDate()}.${d.getMonth()+1}.`;
+}
+
+document.getElementById('dateDisplay').textContent = formatDate(new Date());
+
+async function fetchSpotPrices() {
+  const res = await fetch('https://api.porssisahko.net/v1/latest-prices.json');
+  if (!res.ok) throw new Error('Spot-hintojen haku epäonnistui');
+  const data = await res.json();
+  return data.prices.map(p => ({
+    start: new Date(p.startDate),
+    end: new Date(p.endDate),
+    price: p.price
+  })).sort((a, b) => a.start - b.start);
+}
+
+async function fetchWeatherForecast() {
+  const now = new Date();
+  const end = new Date(now.getTime() + 5 * 24 * 3600 * 1000);
+  const startStr = now.toISOString();
+  const endStr = end.toISOString();
+
+  const url = `https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=getFeature`
+    + `&storedquery_id=fmi::forecast::harmonie::surface::point::simple`
+    + `&place=helsinki&parameters=temperature,windspeedms`
+    + `&starttime=${startStr}&endtime=${endStr}&timestep=180`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Sääennusteen haku epäonnistui');
+  const text = await res.text();
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, 'text/xml');
+  const members = xml.getElementsByTagName('BsWfs:BsWfsElement');
+
+  const points = [];
+  for (let i = 0; i < members.length; i++) {
+    const el = members[i];
+    const time = el.getElementsByTagName('BsWfs:Time')[0]?.textContent;
+    const param = el.getElementsByTagName('BsWfs:ParameterName')[0]?.textContent;
+    const val = parseFloat(el.getElementsByTagName('BsWfs:ParameterValue')[0]?.textContent);
+    if (!time || isNaN(val)) continue;
+    const t = new Date(time);
+    let existing = points.find(p => p.time.getTime() === t.getTime());
+    if (!existing) { existing = { time: t }; points.push(existing); }
+    if (param === 'temperature') existing.temp = val;
+    if (param === 'windspeedms') existing.wind = val;
+  }
+  return points.sort((a, b) => a.time - b.time);
+}
+
+function groupByDay(items, keyFn) {
+  const groups = {};
+  for (const item of items) {
+    const d = keyFn(item);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(item);
+  }
+  return groups;
+}
+
+function estimatePrice(avgTemp, avgWind, dayOfWeek) {
+  let base = 5.0;
+
+  if (avgTemp < -10) base += 8;
+  else if (avgTemp < 0) base += 4 + (0 - avgTemp) * 0.4;
+  else if (avgTemp < 10) base += 2 + (10 - avgTemp) * 0.2;
+  else if (avgTemp < 20) base += 0.5;
+  else base += 1.0;
+
+  if (avgWind > 8) base -= 2.0;
+  else if (avgWind > 5) base -= 1.0;
+  else if (avgWind < 2) base += 0.5;
+
+  if (dayOfWeek >= 1 && dayOfWeek <= 5) base += 1.5;
+  else base -= 1.0;
+
+  const now = new Date();
+  const month = now.getMonth();
+  if (month >= 10 || month <= 2) base += 2.0;
+  else if (month >= 5 && month <= 7) base -= 1.0;
+
+  return Math.max(0, base + (Math.random() - 0.5) * 1.5);
+}
+
+function priceColor(c) {
+  if (c < 5) return 'var(--green)';
+  if (c < 10) return 'var(--yellow)';
+  if (c < 15) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function priceClass(c) {
+  if (c < 5) return 'cheap';
+  if (c < 10) return 'mid';
+  return 'expensive';
+}
+
+function findBestSaunaHours(dayPrices) {
+  if (dayPrices.length < 3) return null;
+  let minSum = Infinity, bestStart = 0;
+  for (let i = 0; i <= dayPrices.length - 3; i++) {
+    const sum = dayPrices[i].price + dayPrices[i+1].price + dayPrices[i+2].price;
+    if (sum < minSum) {
+      minSum = sum;
+      bestStart = i;
+    }
+  }
+  return {
+    startHour: dayPrices[bestStart].start.getHours(),
+    endHour: (dayPrices[bestStart + 2].start.getHours() + 1) % 24,
+    avgPrice: minSum / 3,
+    cost: (minSum / 3) * SAUNA_KWH / 100
+  };
+}
+
+async function main() {
+  const app = document.getElementById('app');
+  try {
+    const [spotPrices, weather] = await Promise.all([
+      fetchSpotPrices(),
+      fetchWeatherForecast()
+    ]);
+
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+    const pricesByDay = groupByDay(spotPrices, p => p.start);
+    const weatherByDay = groupByDay(weather, w => w.time);
+
+    const dayKeys = Object.keys(pricesByDay).sort();
+    const weatherKeys = Object.keys(weatherByDay).sort();
+
+    const allDays = [];
+
+    for (const dk of dayKeys) {
+      const dp = pricesByDay[dk];
+      const avg = dp.reduce((s, p) => s + p.price, 0) / dp.length;
+      const min = Math.min(...dp.map(p => p.price));
+      const max = Math.max(...dp.map(p => p.price));
+      const wDay = weatherByDay[dk];
+      const avgTemp = wDay ? wDay.reduce((s, w) => s + (w.temp || 0), 0) / wDay.length : null;
+      const avgWind = wDay ? wDay.reduce((s, w) => s + (w.wind || 0), 0) / wDay.length : null;
+      const sauna = findBestSaunaHours(dp);
+      const d = new Date(dk + 'T12:00:00');
+      allDays.push({
+        key: dk, date: d, type: 'spot',
+        avg, min, max, avgTemp, avgWind,
+        sauna, prices: dp,
+        dayOfWeek: d.getDay()
+      });
+    }
+
+    const lastSpotDate = dayKeys.length > 0 ? new Date(dayKeys[dayKeys.length - 1] + 'T12:00:00') : new Date();
+    for (let i = 1; i <= 4; i++) {
+      const d = new Date(lastSpotDate);
+      d.setDate(d.getDate() + i);
+      const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+      if (pricesByDay[dk]) continue;
+
+      const wDay = weatherByDay[dk];
+      const avgTemp = wDay ? wDay.reduce((s, w) => s + (w.temp || 0), 0) / wDay.length : 12;
+      const avgWind = wDay ? wDay.reduce((s, w) => s + (w.wind || 0), 0) / wDay.length : 4;
+
+      const estAvg = estimatePrice(avgTemp, avgWind, d.getDay());
+      const estMin = estAvg * 0.4;
+      const estMax = estAvg * 2.2;
+
+      allDays.push({
+        key: dk, date: d, type: 'estimate',
+        avg: estAvg, min: estMin, max: estMax,
+        avgTemp, avgWind,
+        sauna: { startHour: 22, endHour: 1, avgPrice: estMin + (estAvg - estMin) * 0.3, cost: (estMin + (estAvg - estMin) * 0.3) * SAUNA_KWH / 100 },
+        prices: [],
+        dayOfWeek: d.getDay()
+      });
+    }
+
+    allDays.sort((a, b) => a.date - b.date);
+
+    let bestSaunaDay = null;
+    let bestSaunaCost = Infinity;
+    for (const day of allDays) {
+      if (day.sauna && day.sauna.cost < bestSaunaCost) {
+        bestSaunaCost = day.sauna.cost;
+        bestSaunaDay = day;
+      }
+    }
+
+    let html = '';
+
+    html += `<div class="sauna-card">`;
+    html += `<h2>🧖 Saunasuositus tällä viikolla</h2>`;
+    html += `<div class="sauna-recommendation">`;
+    for (const day of allDays) {
+      if (!day.sauna) continue;
+      const isBest = day === bestSaunaDay;
+      const badge = isBest ? '<span class="badge badge-best">Paras päivä</span>'
+        : day.sauna.cost < bestSaunaCost * 1.3 ? '<span class="badge badge-ok">OK</span>'
+        : '<span class="badge badge-wait">Kalliimpi</span>';
+      const dayLabel = day.key === todayKey ? 'Tänään' : formatDayShort(day.date);
+      html += `<div class="sauna-option ${isBest ? 'best' : ''}">`;
+      html += `<div class="day-label">${dayLabel}${day.type === 'estimate' ? ' *' : ''}</div>`;
+      html += `<div class="price-label" style="color:${priceColor(day.sauna.avgPrice)}">${day.sauna.avgPrice.toFixed(1)} snt</div>`;
+      html += `<div class="detail">klo ${String(day.sauna.startHour).padStart(2,'0')}–${String(day.sauna.endHour).padStart(2,'0')} · ~${day.sauna.cost.toFixed(2)} €</div>`;
+      html += badge;
+      html += `</div>`;
+    }
+    html += `</div>`;
+    html += `<div class="info-row">`;
+    html += `<div class="info-chip">Sähkösauna ~${SAUNA_KWH} kWh / lämmitys (3 h)</div>`;
+    if (bestSaunaDay) {
+      const bLabel = bestSaunaDay.key === todayKey ? 'tänään' : DAYS_FI[bestSaunaDay.date.getDay()].substring(0, 2) + ' ' + bestSaunaDay.date.getDate() + '.' + (bestSaunaDay.date.getMonth()+1) + '.';
+      html += `<div class="info-chip">💡 Edullisin: ${bLabel} klo ${String(bestSaunaDay.sauna.startHour).padStart(2,'0')}–${String(bestSaunaDay.sauna.endHour).padStart(2,'0')} · ${bestSaunaDay.sauna.cost.toFixed(2)} €</div>`;
+    }
+    html += `</div>`;
+    html += `</div>`;
+
+    const todayPrices = pricesByDay[todayKey] || [];
+    const tomorrowDate = new Date(now);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const tomorrowKey = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth()+1).padStart(2,'0')}-${String(tomorrowDate.getDate()).padStart(2,'0')}`;
+    const tomorrowPrices = pricesByDay[tomorrowKey] || [];
+
+    if (todayPrices.length > 0 || tomorrowPrices.length > 0) {
+      html += `<div class="section">`;
+      html += `<h3>📊 Tuntihinnat — spot</h3>`;
+      html += `<div class="chart-wrap"><canvas id="priceChart"></canvas></div>`;
+      html += `</div>`;
+    }
+
+    html += `<div class="section">`;
+    html += `<h3>📅 Hinta-arvio tuleville päiville</h3>`;
+    const maxAvg = Math.max(...allDays.map(d => d.avg), 1);
+    for (const day of allDays) {
+      const pct = Math.min((day.avg / (maxAvg * 1.2)) * 100, 100);
+      const dayLabel = day.key === todayKey ? 'Tänään' : formatDayShort(day.date);
+      const typeLabel = day.type === 'estimate' ? ' (arvio)' : ' (spot)';
+      html += `<div class="estimate-bar">`;
+      html += `<div class="e-day">${dayLabel}</div>`;
+      html += `<div class="e-bar-wrap"><div class="e-bar" style="width:${pct}%;background:${priceColor(day.avg)}"></div></div>`;
+      html += `<div class="e-val" style="color:${priceColor(day.avg)}">${day.avg.toFixed(1)} snt${typeLabel}</div>`;
+      html += `</div>`;
+    }
+    html += `<div class="info-row" style="margin-top:.8rem">`;
+    html += `<div class="info-chip">* Arvio perustuu lämpötilaan, tuuleen ja viikonpäivään</div>`;
+    html += `</div>`;
+    html += `</div>`;
+
+    const forecastDays = [];
+    for (const wk of weatherKeys) {
+      const pts = weatherByDay[wk];
+      const avgT = pts.filter(p => p.temp != null).reduce((s, p) => s + p.temp, 0) / pts.filter(p => p.temp != null).length;
+      const avgW = pts.filter(p => p.wind != null).reduce((s, p) => s + p.wind, 0) / pts.filter(p => p.wind != null).length;
+      const maxT = Math.max(...pts.filter(p => p.temp != null).map(p => p.temp));
+      const minT = Math.min(...pts.filter(p => p.temp != null).map(p => p.temp));
+      const d = new Date(wk + 'T12:00:00');
+      forecastDays.push({ date: d, key: wk, avgTemp: avgT, avgWind: avgW, maxTemp: maxT, minTemp: minT });
+    }
+
+    if (forecastDays.length > 0) {
+      html += `<div class="section">`;
+      html += `<h3>🌤️ Sääennuste — Helsinki</h3>`;
+      html += `<div class="forecast-grid">`;
+      for (const fd of forecastDays.slice(0, 6)) {
+        const label = fd.key === todayKey ? 'Tänään' : formatDayShort(fd.date);
+        const tempColor = fd.avgTemp < 0 ? 'var(--accent)' : fd.avgTemp < 15 ? 'var(--text)' : 'var(--yellow)';
+        html += `<div class="forecast-item">`;
+        html += `<div class="f-day">${label}</div>`;
+        html += `<div class="f-temp" style="color:${tempColor}">${fd.avgTemp.toFixed(0)}°C</div>`;
+        html += `<div class="f-detail">${fd.minTemp.toFixed(0)}°…${fd.maxTemp.toFixed(0)}° · 💨 ${fd.avgWind.toFixed(0)} m/s</div>`;
+        html += `</div>`;
+      }
+      html += `</div>`;
+      html += `</div>`;
+    }
+
+    if (todayPrices.length > 0) {
+      html += `<div class="section">`;
+      html += `<h3>🔢 Tämän päivän tuntihinnat</h3>`;
+      html += `<table class="price-table"><thead><tr><th>Tunti</th><th>Hinta (snt/kWh)</th><th>Sauna 3h</th></tr></thead><tbody>`;
+      for (const p of todayPrices) {
+        const h = p.start.getHours();
+        const cls = priceClass(p.price);
+        const saunaCost = (p.price * SAUNA_KWH / 100).toFixed(2);
+        const isNow = now >= p.start && now < p.end;
+        html += `<tr${isNow ? ' style="background:rgba(56,189,248,0.1)"' : ''}>`;
+        html += `<td>${String(h).padStart(2,'0')}:00–${String((h+1)%24).padStart(2,'0')}:00${isNow ? ' ◀' : ''}</td>`;
+        html += `<td class="${cls}">${p.price.toFixed(2)} snt/kWh</td>`;
+        html += `<td>${saunaCost} €</td>`;
+        html += `</tr>`;
+      }
+      html += `</tbody></table>`;
+      html += `</div>`;
+    }
+
+    app.innerHTML = html;
+
+    if (todayPrices.length > 0 || tomorrowPrices.length > 0) {
+      const chartCanvas = document.getElementById('priceChart');
+      if (chartCanvas) {
+        const labels = [];
+        const dataToday = [];
+        const dataTomorrow = [];
+
+        for (let h = 0; h < 24; h++) {
+          labels.push(`${String(h).padStart(2,'0')}:00`);
+          const tp = todayPrices.find(p => p.start.getHours() === h);
+          dataToday.push(tp ? tp.price : null);
+          const tmp = tomorrowPrices.find(p => p.start.getHours() === h);
+          dataTomorrow.push(tmp ? tmp.price : null);
+        }
+
+        const datasets = [];
+        if (todayPrices.length > 0) {
+          datasets.push({
+            label: 'Tänään',
+            data: dataToday,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56,189,248,0.15)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+          });
+        }
+        if (tomorrowPrices.length > 0) {
+          datasets.push({
+            label: 'Huomenna',
+            data: dataTomorrow,
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251,191,36,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+          });
+        }
+
+        new Chart(chartCanvas, {
+          type: 'line',
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                title: { display: true, text: 'snt/kWh', color: '#94a3b8' },
+                grid: { color: 'rgba(51,65,85,0.5)' },
+                ticks: { color: '#94a3b8' }
+              },
+              x: {
+                grid: { color: 'rgba(51,65,85,0.3)' },
+                ticks: { color: '#94a3b8', maxRotation: 45 }
+              }
+            },
+            plugins: {
+              legend: { labels: { color: '#e2e8f0' } },
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} snt/kWh`
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+  } catch (err) {
+    console.error(err);
+    app.innerHTML = `
+      <div class="error-box">
+        <strong>Virhe:</strong> ${err.message}<br>
+        <small>Tarkista verkkoyhteytesi ja yritä uudelleen.</small>
+      </div>
+    `;
+  }
+}
+
+main();
+</script>
+</body>
+</html>

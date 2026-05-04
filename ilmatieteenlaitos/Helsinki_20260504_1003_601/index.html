@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terassin öljyämisoptimoija — FMI-säädata</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-alt: #334155;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header {
+    text-align: center;
+    padding: 1.5rem 0 1rem;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+  }
+  header p { color: var(--text-dim); margin-top: .3rem; font-size: .95rem; }
+
+  .input-section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(56, 189, 248, 0.15);
+  }
+  .input-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+  }
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+  .form-group {
+    flex: 1;
+    min-width: 180px;
+  }
+  .form-group label {
+    display: block;
+    font-size: .85rem;
+    color: var(--text-dim);
+    margin-bottom: .3rem;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: .6rem .8rem;
+    border-radius: 8px;
+    border: 1px solid var(--card-alt);
+    background: var(--bg);
+    color: var(--text);
+    font-size: .95rem;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .btn {
+    padding: .7rem 1.5rem;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+    white-space: nowrap;
+  }
+  .btn:hover { opacity: .85; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .presets {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .preset-btn {
+    padding: .4rem .8rem;
+    background: var(--card-alt);
+    color: var(--text-dim);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: .8rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .results-section {
+    margin: 1.5rem 0;
+  }
+  .results-section h2 {
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .best-slot {
+    background: linear-gradient(135deg, #064e3b 0%, #1e293b 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .best-slot::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .best-slot h3 {
+    color: var(--green);
+    font-size: 1.1rem;
+    margin-bottom: .5rem;
+  }
+  .best-slot .time {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: .5rem;
+  }
+  .best-slot .details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-top: .8rem;
+  }
+  .best-slot .detail-item {
+    background: rgba(0,0,0,.25);
+    padding: .4rem .7rem;
+    border-radius: 6px;
+    font-size: .85rem;
+    color: var(--text-dim);
+  }
+  .best-slot .detail-item span { color: var(--text); font-weight: 600; }
+
+  .timeline {
+    display: grid;
+    gap: .6rem;
+  }
+  .slot-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(56, 189, 248, 0.1);
+    transition: border-color .2s;
+  }
+  .slot-card:hover { border-color: rgba(56, 189, 248, 0.3); }
+  .slot-card.good { border-left: 4px solid var(--green); }
+  .slot-card.ok { border-left: 4px solid var(--yellow); }
+  .slot-card.bad { border-left: 4px solid var(--red); }
+  .slot-time {
+    font-size: .95rem;
+    font-weight: 600;
+    min-width: 130px;
+  }
+  .slot-score {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .95rem;
+    flex-shrink: 0;
+  }
+  .slot-score.good { background: rgba(74,222,128,.15); color: var(--green); }
+  .slot-score.ok { background: rgba(251,191,36,.15); color: var(--yellow); }
+  .slot-score.bad { background: rgba(248,113,113,.15); color: var(--red); }
+  .slot-details {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    font-size: .82rem;
+    color: var(--text-dim);
+  }
+  .slot-details .tag {
+    background: var(--card-alt);
+    padding: .2rem .5rem;
+    border-radius: 4px;
+  }
+
+  .info-box {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(56, 189, 248, 0.1);
+  }
+  .info-box h3 {
+    color: var(--yellow);
+    font-size: .95rem;
+    margin-bottom: .6rem;
+  }
+  .info-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .info-box li {
+    padding: .3rem 0;
+    font-size: .85rem;
+    color: var(--text-dim);
+    padding-left: 1rem;
+    position: relative;
+  }
+  .info-box li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-dim);
+  }
+  .loading .spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--card-alt);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: .8rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--red);
+    margin: 1rem 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    color: var(--text-dim);
+    font-size: .8rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .form-row { flex-direction: column; }
+    .form-group { min-width: 100%; }
+    .slot-card { flex-wrap: wrap; }
+    .slot-time { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Terassin öljyämisoptimoija</h1>
+    <p>Löydä paras ajankohta terassin tai mökin kuistin öljyämiseen FMI-sääennusteen perusteella</p>
+  </header>
+
+  <div class="input-section">
+    <h2>Sijainti</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Paikan nimi tai koordinaatit</label>
+        <input type="text" id="location" placeholder="esim. Jyväskylä tai 62.24,25.74">
+      </div>
+      <div class="form-group" style="flex: 0.5; min-width: 120px;">
+        <label>Ennuste (pv)</label>
+        <select id="days">
+          <option value="3">3 päivää</option>
+          <option value="5" selected>5 päivää</option>
+        </select>
+      </div>
+      <button class="btn" id="searchBtn" onclick="fetchForecast()">Hae suositus</button>
+    </div>
+    <div class="presets">
+      <button class="preset-btn" onclick="setPreset('Helsinki', 60.17, 24.94)">Helsinki</button>
+      <button class="preset-btn" onclick="setPreset('Tampere', 61.50, 23.79)">Tampere</button>
+      <button class="preset-btn" onclick="setPreset('Jyväskylä', 62.24, 25.74)">Jyväskylä</button>
+      <button class="preset-btn" onclick="setPreset('Kuopio', 62.89, 27.68)">Kuopio</button>
+      <button class="preset-btn" onclick="setPreset('Oulu', 65.01, 25.47)">Oulu</button>
+      <button class="preset-btn" onclick="setPreset('Mikkeli', 61.69, 27.27)">Mikkeli</button>
+      <button class="preset-btn" onclick="setPreset('Savonlinna', 61.87, 28.88)">Savonlinna</button>
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="info-box">
+    <h3>Optimaaliset olosuhteet terassin öljyämiseen</h3>
+    <ul>
+      <li><strong>Ilmankosteus:</strong> 40–70 % — liian kostea hidastaa kuivumista, liian kuiva öljy ei imeydy kunnolla</li>
+      <li><strong>Lämpötila:</strong> +15–25 °C — öljy levittyy ja imeytyy tasaisesti</li>
+      <li><strong>Ei sadetta:</strong> vähintään 12 h sateeton jakso öljyämisen jälkeen</li>
+      <li><strong>Ei suoraa auringonpaistetta:</strong> pilvinen tai puolipilvinen sää estää öljyn liian nopean kuivumisen ja läikikkyyden</li>
+      <li><strong>Tuuli:</strong> heikko tai kohtalainen (alle 5 m/s) — vähentää pölyn tarttumista</li>
+      <li><strong>Kastepiste:</strong> pintakosteuden riski huomioitava aamulla ja illalla</li>
+    </ul>
+  </div>
+
+  <footer>
+    Säädata: <a href="https://www.ilmatieteenlaitos.fi/" target="_blank">Ilmatieteen laitos</a> (avoin data, CC 4.0)
+  </footer>
+</div>
+
+<script>
+const FMI_BASE = 'https://opendata.fmi.fi/wfs/fin';
+
+const CITIES = {
+  'helsinki': { lat: 60.17, lon: 24.94 },
+  'tampere': { lat: 61.50, lon: 23.79 },
+  'jyväskylä': { lat: 62.24, lon: 25.74 },
+  'kuopio': { lat: 62.89, lon: 27.68 },
+  'oulu': { lat: 65.01, lon: 25.47 },
+  'turku': { lat: 60.45, lon: 22.27 },
+  'mikkeli': { lat: 61.69, lon: 27.27 },
+  'savonlinna': { lat: 61.87, lon: 28.88 },
+  'lahti': { lat: 60.98, lon: 25.66 },
+  'rovaniemi': { lat: 66.50, lon: 25.73 },
+  'vaasa': { lat: 63.10, lon: 21.62 },
+  'joensuu': { lat: 62.60, lon: 29.76 },
+  'hämeenlinna': { lat: 61.00, lon: 24.44 },
+  'lappeenranta': { lat: 61.06, lon: 28.19 },
+  'seinäjoki': { lat: 62.79, lon: 22.84 },
+  'pori': { lat: 61.48, lon: 21.80 },
+  'kotka': { lat: 60.47, lon: 26.94 },
+  'kouvola': { lat: 60.87, lon: 26.70 },
+};
+
+function setPreset(name, lat, lon) {
+  document.getElementById('location').value = name;
+  fetchForecast(lat, lon);
+}
+
+function resolveLocation(input) {
+  const trimmed = input.trim().toLowerCase();
+  if (CITIES[trimmed]) {
+    return CITIES[trimmed];
+  }
+  const coordMatch = input.match(/(-?\d+[.,]\d+)\s*[,;\s]\s*(-?\d+[.,]\d+)/);
+  if (coordMatch) {
+    return {
+      lat: parseFloat(coordMatch[1].replace(',', '.')),
+      lon: parseFloat(coordMatch[2].replace(',', '.'))
+    };
+  }
+  for (const [city, coords] of Object.entries(CITIES)) {
+    if (city.includes(trimmed) || trimmed.includes(city)) {
+      return coords;
+    }
+  }
+  return null;
+}
+
+async function fetchForecast(lat, lon) {
+  const locationInput = document.getElementById('location').value;
+  const days = parseInt(document.getElementById('days').value);
+  const resultsDiv = document.getElementById('results');
+
+  if (!lat || !lon) {
+    const resolved = resolveLocation(locationInput);
+    if (!resolved) {
+      resultsDiv.innerHTML = '<div class="error">Sijaintia ei tunnistettu. Käytä kaupungin nimeä tai koordinaatteja (esim. 61.50,23.79).</div>';
+      return;
+    }
+    lat = resolved.lat;
+    lon = resolved.lon;
+  }
+
+  resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><br>Haetaan sääennustetta Ilmatieteen laitokselta...</div>';
+
+  try {
+    const now = new Date();
+    const end = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+    const startTime = now.toISOString();
+    const endTime = end.toISOString();
+
+    const params = new URLSearchParams({
+      service: 'WFS',
+      version: '2.0.0',
+      request: 'GetFeature',
+      storedquery_id: 'fmi::forecast::harmonie::surface::point::timevaluepair',
+      latlon: `${lat},${lon}`,
+      starttime: startTime,
+      endtime: endTime,
+      parameters: 'Temperature,Humidity,WindSpeedMS,TotalCloudCover,Precipitation1h'
+    });
+
+    const response = await fetch(`${FMI_BASE}?${params}`);
+    if (!response.ok) throw new Error(`FMI API virhe: ${response.status}`);
+
+    const text = await response.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'text/xml');
+
+    const data = parseWeatherData(xml);
+    if (data.length === 0) throw new Error('Ennustedataa ei saatu.');
+
+    const slots = analyzeSlots(data);
+    renderResults(slots, locationInput || `${lat.toFixed(2)}, ${lon.toFixed(2)}`);
+
+  } catch (err) {
+    resultsDiv.innerHTML = `<div class="error">Virhe haettaessa ennustetta: ${err.message}</div>`;
+  }
+}
+
+function parseWeatherData(xml) {
+  const members = xml.querySelectorAll('member');
+  const timeSeriesMap = {};
+
+  members.forEach(member => {
+    const observedProperty = member.querySelector('observedProperty');
+    let param = '';
+    if (observedProperty) {
+      const href = observedProperty.getAttribute('xlink:href') || observedProperty.getAttribute('href') || '';
+      param = href.split('/').pop();
+    }
+
+    const points = member.querySelectorAll('MeasurementTVP');
+    points.forEach(point => {
+      const time = point.querySelector('time')?.textContent;
+      const value = parseFloat(point.querySelector('value')?.textContent);
+      if (time && !isNaN(value)) {
+        if (!timeSeriesMap[time]) timeSeriesMap[time] = {};
+        timeSeriesMap[time][param] = value;
+      }
+    });
+  });
+
+  return Object.entries(timeSeriesMap)
+    .map(([time, params]) => ({ time: new Date(time), ...params }))
+    .sort((a, b) => a.time - b.time);
+}
+
+function analyzeSlots(data) {
+  const slots = [];
+  const hourlyData = data.filter(d => {
+    const h = d.time.getHours();
+    return h >= 6 && h <= 20;
+  });
+
+  for (let i = 0; i < hourlyData.length; i++) {
+    const d = hourlyData[i];
+    const temp = d.Temperature ?? d.temperature ?? null;
+    const humidity = d.Humidity ?? d.humidity ?? null;
+    const wind = d.WindSpeedMS ?? d.windspeedms ?? null;
+    const cloud = d.TotalCloudCover ?? d.totalcloudcover ?? null;
+    const precip = d.Precipitation1h ?? d.precipitation1h ?? 0;
+
+    if (temp === null && humidity === null) continue;
+
+    let score = 0;
+    const factors = [];
+
+    // Temperature scoring (ideal: 15-25°C)
+    if (temp !== null) {
+      if (temp >= 15 && temp <= 25) {
+        score += 25;
+        factors.push(`${temp.toFixed(0)}°C`);
+      } else if (temp >= 10 && temp < 15) {
+        score += 15;
+        factors.push(`${temp.toFixed(0)}°C (viileä)`);
+      } else if (temp > 25 && temp <= 30) {
+        score += 15;
+        factors.push(`${temp.toFixed(0)}°C (lämmin)`);
+      } else {
+        score += 5;
+        factors.push(`${temp.toFixed(0)}°C (ei optimaalinen)`);
+      }
+    }
+
+    // Humidity scoring (ideal: 40-70%)
+    if (humidity !== null) {
+      if (humidity >= 40 && humidity <= 70) {
+        score += 25;
+        factors.push(`Kosteus ${humidity.toFixed(0)}%`);
+      } else if (humidity > 70 && humidity <= 85) {
+        score += 12;
+        factors.push(`Kosteus ${humidity.toFixed(0)}% (korkea)`);
+      } else if (humidity < 40) {
+        score += 15;
+        factors.push(`Kosteus ${humidity.toFixed(0)}% (matala)`);
+      } else {
+        score += 5;
+        factors.push(`Kosteus ${humidity.toFixed(0)}% (liian korkea)`);
+      }
+    }
+
+    // Precipitation scoring (ideal: 0 mm, and dry period ahead)
+    let dryHoursAhead = 0;
+    for (let j = i; j < Math.min(i + 12, hourlyData.length); j++) {
+      const p = hourlyData[j].Precipitation1h ?? hourlyData[j].precipitation1h ?? 0;
+      if (p < 0.1) dryHoursAhead++;
+      else break;
+    }
+
+    if (precip < 0.1 && dryHoursAhead >= 12) {
+      score += 25;
+      factors.push(`Sateeton (${dryHoursAhead}h kuiva)`);
+    } else if (precip < 0.1 && dryHoursAhead >= 6) {
+      score += 15;
+      factors.push(`Sateeton (${dryHoursAhead}h kuiva)`);
+    } else if (precip < 0.5) {
+      score += 5;
+      factors.push(`Vähän sadetta (${precip.toFixed(1)} mm/h)`);
+    } else {
+      score += 0;
+      factors.push(`Sadetta (${precip.toFixed(1)} mm/h)`);
+    }
+
+    // Cloud cover scoring (ideal: partly cloudy 40-80% - protects from direct sun)
+    if (cloud !== null) {
+      if (cloud >= 40 && cloud <= 80) {
+        score += 15;
+        factors.push(`Pilvisyys ${cloud.toFixed(0)}% (suojaa auringolta)`);
+      } else if (cloud > 80) {
+        score += 12;
+        factors.push(`Pilvinen ${cloud.toFixed(0)}%`);
+      } else {
+        score += 8;
+        factors.push(`Aurinkoinen ${cloud.toFixed(0)}% (nopea kuivumisriski)`);
+      }
+    }
+
+    // Wind scoring (ideal: < 5 m/s)
+    if (wind !== null) {
+      if (wind < 3) {
+        score += 10;
+        factors.push(`Tuuli ${wind.toFixed(1)} m/s (tyyni)`);
+      } else if (wind < 5) {
+        score += 8;
+        factors.push(`Tuuli ${wind.toFixed(1)} m/s`);
+      } else if (wind < 8) {
+        score += 4;
+        factors.push(`Tuuli ${wind.toFixed(1)} m/s (navakka)`);
+      } else {
+        score += 0;
+        factors.push(`Tuuli ${wind.toFixed(1)} m/s (voimakas)`);
+      }
+    }
+
+    slots.push({
+      time: d.time,
+      score,
+      factors,
+      temp,
+      humidity,
+      wind,
+      cloud,
+      precip,
+      dryHoursAhead
+    });
+  }
+
+  return slots.sort((a, b) => b.score - a.score);
+}
+
+function formatTime(date) {
+  const days = ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'];
+  const day = days[date.getDay()];
+  const d = date.getDate();
+  const m = date.getMonth() + 1;
+  const h = date.getHours().toString().padStart(2, '0');
+  return `${day} ${d}.${m}. klo ${h}:00`;
+}
+
+function getScoreClass(score) {
+  if (score >= 70) return 'good';
+  if (score >= 45) return 'ok';
+  return 'bad';
+}
+
+function renderResults(slots, locationName) {
+  const resultsDiv = document.getElementById('results');
+  if (slots.length === 0) {
+    resultsDiv.innerHTML = '<div class="error">Ennustedataa ei löytynyt analysoitavaksi.</div>';
+    return;
+  }
+
+  const best = slots[0];
+  const topSlots = slots.slice(0, 15);
+
+  let html = `<div class="results-section">`;
+  html += `<h2>Suositus: ${locationName}</h2>`;
+
+  html += `<div class="best-slot">`;
+  html += `<h3>Paras ajankohta öljyämiseen</h3>`;
+  html += `<div class="time">${formatTime(best.time)}</div>`;
+  html += `<div>Pisteet: ${best.score}/100</div>`;
+  html += `<div class="details">`;
+  best.factors.forEach(f => {
+    html += `<div class="detail-item">${f}</div>`;
+  });
+  html += `</div></div>`;
+
+  html += `<h2 style="margin-top:1.5rem">Kaikki analysoidut ajankohdat (top 15)</h2>`;
+  html += `<div class="timeline">`;
+
+  topSlots.forEach(slot => {
+    const cls = getScoreClass(slot.score);
+    html += `<div class="slot-card ${cls}">`;
+    html += `<div class="slot-score ${cls}">${slot.score}</div>`;
+    html += `<div class="slot-time">${formatTime(slot.time)}</div>`;
+    html += `<div class="slot-details">`;
+    slot.factors.forEach(f => {
+      html += `<span class="tag">${f}</span>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `</div></div>`;
+  resultsDiv.innerHTML = html;
+}
+
+document.getElementById('location').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') fetchForecast();
+});
+</script>
+</body>
+</html>

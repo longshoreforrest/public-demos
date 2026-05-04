@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matemaattisten kaavojen todistaja</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        header h1 {
+            font-size: 2em;
+            color: #64ffda;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: #a0a0a0;
+            font-style: italic;
+        }
+        .theorem-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .theorem-card h2 {
+            color: #64ffda;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+        .theorem-statement {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #64ffda;
+            padding: 15px 20px;
+            margin: 15px 0;
+            font-size: 1.2em;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+        .proof-steps {
+            margin-top: 20px;
+        }
+        .proof-step {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 12px 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+        .proof-step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .proof-step.active {
+            border-color: #64ffda;
+            background: rgba(100, 255, 218, 0.05);
+        }
+        .step-number {
+            display: inline-block;
+            background: #64ffda;
+            color: #1a1a2e;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #fff;
+            display: inline;
+            font-size: 1.05em;
+        }
+        .step-explanation {
+            margin-top: 10px;
+            padding-left: 38px;
+            line-height: 1.7;
+            color: #c0c0c0;
+        }
+        .step-math {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 15px;
+            margin: 10px 0 10px 38px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #fff;
+            overflow-x: auto;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #64ffda;
+            color: #1a1a2e;
+        }
+        .btn-primary:hover {
+            background: #4ad4b5;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .btn-new {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .btn-new:hover {
+            background: #ee5a5a;
+            transform: translateY(-2px);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #64ffda;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        .category-tag {
+            display: inline-block;
+            background: rgba(100, 255, 218, 0.15);
+            color: #64ffda;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .difficulty-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-left: 8px;
+        }
+        .difficulty-easy { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        .difficulty-medium { background: rgba(255, 193, 7, 0.2); color: #ffd54f; }
+        .difficulty-hard { background: rgba(244, 67, 54, 0.2); color: #e57373; }
+        .quiz-section {
+            background: rgba(100, 255, 218, 0.05);
+            border: 1px dashed rgba(100, 255, 218, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0 15px 38px;
+        }
+        .quiz-section h4 {
+            color: #64ffda;
+            margin-bottom: 10px;
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quiz-option {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #64ffda;
+        }
+        .quiz-option.correct {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #81c784;
+        }
+        .quiz-option.incorrect {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #e57373;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct { background: rgba(76, 175, 80, 0.1); color: #81c784; }
+        .feedback.incorrect { background: rgba(244, 67, 54, 0.1); color: #e57373; }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8em;
+            color: #64ffda;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 0.85em;
+            color: #a0a0a0;
+        }
+        .intro-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .intro-screen p {
+            margin: 15px 0;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5em; }
+            .theorem-card { padding: 20px; }
+            .step-math { font-size: 0.95em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Matemaattisten Kaavojen Todistaja</h1>
+            <p>Opi todistamaan matemaattisia kaavoja askel askeleelta</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="proofs-completed">0</div>
+                <div class="stat-label">Todistuksia suoritettu</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="quiz-score">0%</div>
+                <div class="stat-label">Oikein vastattu</div>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="intro-screen">
+                <p>Tämä sovellus arpoo satunnaisia matemaattisia kaavoja ja opettaa sinulle niiden todistuksen interaktiivisesti.</p>
+                <p>Jokainen todistus esitetään selkeinä askeleina, ja voit testata ymmärrystäsi välikysymyksillä.</p>
+                <div class="controls">
+                    <button class="btn-primary" onclick="newProof()">Arvo uusi todistus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const proofs = [
+        {
+            name: "Parillisten lukujen summa",
+            category: "Algebra",
+            difficulty: "easy",
+            statement: "Kahden parillisen luvun summa on aina parillinen.",
+            steps: [
+                {
+                    title: "Määritellään parilliset luvut",
+                    explanation: "Parillinen luku voidaan kirjoittaa muodossa 2k, missä k on kokonaisluku. Olkoon kaksi parilista lukua a ja b.",
+                    math: "a = 2m,  b = 2n,  missä m, n ∈ ℤ"
+                },
+                {
+                    title: "Lasketaan summa",
+                    explanation: "Sijoitetaan parilliset luvut summalausekkeeseen.",
+                    math: "a + b = 2m + 2n"
+                },
+                {
+                    title: "Otetaan yhteinen tekijä",
+                    explanation: "Yhteinen tekijä 2 voidaan ottaa eteen.",
+                    math: "a + b = 2(m + n)",
+                    quiz: {
+                        question: "Miksi voimme ottaa luvun 2 yhteiseksi tekijäksi?",
+                        options: [
+                            "Koska molemmat termit ovat jaollisia kahdella",
+                            "Koska summa on aina parillinen",
+                            "Koska m ja n ovat kokonaislukuja"
+                        ],
+                        correct: 0,
+                        feedback: "Oikein! Koska 2m ja 2n ovat molemmat jaollisia kahdella, voimme käyttää osittelulakia: 2m + 2n = 2(m + n)."
+                    }
+                },
+                {
+                    title: "Päätelmä",
+                    explanation: "Koska m + n on kokonaisluku (kokonaislukujen summa on kokonaisluku), niin 2(m + n) on muotoa 2k, eli parillinen. ∎",
+                    math: "m + n ∈ ℤ  ⟹  2(m + n) on parillinen  ∎"
+                }
+            ]
+        },
+        {
+            name: "Summakaava 1 + 2 + ... + n",
+            category: "Induktio",
+            difficulty: "medium",
+            statement: "Todista: 1 + 2 + 3 + ... + n = n(n+1)/2 kaikilla n ≥ 1.",
+            steps: [
+                {
+                    title: "Induktion kantatapaus (n = 1)",
+                    explanation: "Tarkistetaan, että kaava pätee kun n = 1.",
+                    math: "Vasen puoli: 1\nOikea puoli: 1·(1+1)/2 = 1  ✓"
+                },
+                {
+                    title: "Induktio-oletus",
+                    explanation: "Oletetaan, että kaava pätee jollekin n = k, eli:",
+                    math: "1 + 2 + ... + k = k(k+1)/2",
+                    quiz: {
+                        question: "Mitä induktio-oletus tarkoittaa?",
+                        options: [
+                            "Todistamme väitteen kaikille luvuille kerralla",
+                            "Oletamme väitteen todeksi yhdelle arvolle ja näytämme seuraavan",
+                            "Kokeilemme väitettä muutamalla arvolla"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! Induktio-oletus tarkoittaa, että oletamme väitteen pätevän jollekin k:lle ja näytämme sitten, että se pätee myös k+1:lle."
+                    }
+                },
+                {
+                    title: "Induktioaskel (n = k + 1)",
+                    explanation: "Näytetään, että kaava pätee myös arvolle k + 1. Lisätään molemmille puolille (k + 1):",
+                    math: "1 + 2 + ... + k + (k+1)\n= k(k+1)/2 + (k+1)\n= k(k+1)/2 + 2(k+1)/2\n= (k+1)(k+2)/2"
+                },
+                {
+                    title: "Tarkistus",
+                    explanation: "Saatu tulos (k+1)(k+2)/2 on täsmälleen kaavan muoto kun n = k+1, sillä (k+1)((k+1)+1)/2 = (k+1)(k+2)/2.",
+                    math: "(k+1)((k+1)+1)/2 = (k+1)(k+2)/2  ✓  ∎",
+                    quiz: {
+                        question: "Miksi induktiotodistus on valmis?",
+                        options: [
+                            "Koska testasimme riittävän monta arvoa",
+                            "Koska kantatapaus pätee JA induktiostep toimii",
+                            "Koska kaava näyttää oikealta"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! Induktiotodistus on valmis kun: (1) kantatapaus pätee ja (2) induktioaskel näyttää, että jos väite pätee k:lle, se pätee myös k+1:lle. Yhdessä nämä takaavat, että väite pätee kaikille n ≥ 1."
+                    }
+                }
+            ]
+        },
+        {
+            name: "√2 on irrationaalinen",
+            category: "Ristiriitatodistus",
+            difficulty: "hard",
+            statement: "Todista: √2 ei ole rationaaliluku.",
+            steps: [
+                {
+                    title: "Vastaoletus (ristiriitatodistus)",
+                    explanation: "Oletetaan vastoin väitettä, että √2 ON rationaaliluku. Tällöin se voidaan esittää supistetussa murtolukukmuodossa:",
+                    math: "√2 = a/b,  missä gcd(a, b) = 1",
+                    quiz: {
+                        question: "Mitä 'gcd(a, b) = 1' tarkoittaa?",
+                        options: [
+                            "a ja b ovat molemmat alkulukuja",
+                            "a ja b ovat keskenään jaottomia (ei yhteisiä tekijöitä)",
+                            "a on suurempi kuin b"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! gcd(a,b) = 1 tarkoittaa, että a:lla ja b:llä ei ole yhteisiä tekijöitä — murto on supistettu."
+                    }
+                },
+                {
+                    title: "Korotetaan toiseen potenssiin",
+                    explanation: "Korotetaan molemmat puolet toiseen potenssiin:",
+                    math: "2 = a²/b²\n⟹  a² = 2b²"
+                },
+                {
+                    title: "Päätellään a:n parillisuus",
+                    explanation: "Koska a² = 2b², niin a² on parillinen. Jos a² on parillinen, myös a on parillinen (parittoman luvun neliö on pariton). Siis a = 2k jollekin k:",
+                    math: "a² parillinen ⟹ a parillinen ⟹ a = 2k"
+                },
+                {
+                    title: "Sijoitetaan takaisin",
+                    explanation: "Sijoitetaan a = 2k yhtälöön a² = 2b²:",
+                    math: "(2k)² = 2b²\n4k² = 2b²\n2k² = b²",
+                    quiz: {
+                        question: "Mitä voimme päätellä b:stä?",
+                        options: [
+                            "b on pariton",
+                            "b on parillinen (koska b² = 2k²)",
+                            "b on alkuluku"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! Koska b² = 2k², niin b² on parillinen, joten myös b on parillinen."
+                    }
+                },
+                {
+                    title: "Ristiriita",
+                    explanation: "Saimme, että sekä a että b ovat parillisia. Mutta oletimme gcd(a,b) = 1! Jos molemmat ovat parillisia, niillä on yhteinen tekijä 2. Tämä on ristiriita, joten vastaoletus on väärä. Siis √2 on irrationaalinen. ∎",
+                    math: "a parillinen JA b parillinen ⟹ gcd(a,b) ≥ 2\nRISTIRIITA oletuksen gcd(a,b) = 1 kanssa  ∎"
+                }
+            ]
+        },
+        {
+            name: "Neliösummakaava (a+b)²",
+            category: "Algebra",
+            difficulty: "easy",
+            statement: "Todista: (a + b)² = a² + 2ab + b²",
+            steps: [
+                {
+                    title: "Kirjoitetaan neliö auki",
+                    explanation: "Neliö tarkoittaa kertolaskua itsensä kanssa:",
+                    math: "(a + b)² = (a + b)(a + b)"
+                },
+                {
+                    title: "Käytetään osittelulakia",
+                    explanation: "Kerrotaan jokainen termi ensimmäisestä sulkeesta jokaisen termin kanssa toisesta:",
+                    math: "(a + b)(a + b) = a·a + a·b + b·a + b·b",
+                    quiz: {
+                        question: "Montako termiä syntyy kun kerrotaan kaksi kaksitermistä lauseketta?",
+                        options: ["2 termiä", "3 termiä", "4 termiä"],
+                        correct: 2,
+                        feedback: "Oikein! Kaksi termiä kertaa kaksi termiä antaa 2×2 = 4 termiä ennen yhdistämistä."
+                    }
+                },
+                {
+                    title: "Yksinkertaistetaan",
+                    explanation: "Lasketaan potenssit ja yhdistetään samanmuotoiset termit (ab + ba = 2ab):",
+                    math: "= a² + ab + ab + b²\n= a² + 2ab + b²  ∎"
+                }
+            ]
+        },
+        {
+            name: "Alkulukujen äärettömyys",
+            category: "Ristiriitatodistus",
+            difficulty: "medium",
+            statement: "Todista: Alkulukuja on äärettömän monta.",
+            steps: [
+                {
+                    title: "Vastaoletus",
+                    explanation: "Oletetaan vastoin väitettä, että alkulukuja on äärellinen määrä. Listataan kaikki alkuluvut:",
+                    math: "p₁, p₂, p₃, ..., pₙ  (kaikki olemassa olevat alkuluvut)"
+                },
+                {
+                    title: "Muodostetaan uusi luku",
+                    explanation: "Muodostetaan luku Q, joka on kaikkien alkulukujen tulo + 1:",
+                    math: "Q = p₁ · p₂ · p₃ · ... · pₙ + 1",
+                    quiz: {
+                        question: "Mikä on luvun Q jakojäännös millä tahansa alkuluvulla pᵢ?",
+                        options: ["0", "1", "Se riippuu alkuluvusta"],
+                        correct: 1,
+                        feedback: "Oikein! Koska Q = (p₁·p₂·...·pₙ) + 1, niin jaettaessa Q millä tahansa pᵢ:llä jää aina jakojäännös 1."
+                    }
+                },
+                {
+                    title: "Analysoidaan lukua Q",
+                    explanation: "Q ei ole jaollinen millään listamme alkuluvulla pᵢ (jakojäännös on aina 1). Mutta aritmetiikan peruslauseen mukaan jokaisella luvulla > 1 on alkulukutekijä.",
+                    math: "Q mod pᵢ = 1  kaikilla i = 1, ..., n\nMutta Q > 1, joten Q:lla ON alkulukutekijä"
+                },
+                {
+                    title: "Ristiriita",
+                    explanation: "Q:n alkulukutekijä ei ole mikään listan luvuista p₁, ..., pₙ. Siis on olemassa alkuluku, jota ei ole listassamme — mutta listamme piti sisältää KAIKKI alkuluvut! Ristiriita. ∎",
+                    math: "∃ alkuluku p | p ∤ Q mutta p ∉ {p₁,...,pₙ}\nRISTIRIITA  ⟹  alkulukuja on äärettömästi  ∎"
+                }
+            ]
+        },
+        {
+            name: "Geometrinen summa",
+            category: "Induktio",
+            difficulty: "medium",
+            statement: "Todista: 1 + r + r² + ... + rⁿ = (rⁿ⁺¹ - 1)/(r - 1) kun r ≠ 1.",
+            steps: [
+                {
+                    title: "Algebrallinen todistus — nimetään summa",
+                    explanation: "Merkitään summaa S:llä:",
+                    math: "S = 1 + r + r² + ... + rⁿ"
+                },
+                {
+                    title: "Kerrotaan r:llä",
+                    explanation: "Kerrotaan koko summa r:llä:",
+                    math: "rS = r + r² + r³ + ... + rⁿ⁺¹",
+                    quiz: {
+                        question: "Mitä tapahtuu kun vähennämme rS - S?",
+                        options: [
+                            "Kaikki termit jäävät jäljelle",
+                            "Suurin osa termeistä kumoutuu (teleskooppisumma)",
+                            "Tulos on nolla"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! VäliTermit kumoutuvat: rS:ssä on termit r, r², ..., rⁿ ja S:ssä samat — jäljelle jää vain rⁿ⁺¹ ja -1."
+                    }
+                },
+                {
+                    title: "Vähennetään",
+                    explanation: "Lasketaan rS - S:",
+                    math: "rS - S = rⁿ⁺¹ - 1\nS(r - 1) = rⁿ⁺¹ - 1"
+                },
+                {
+                    title: "Ratkaistaan S",
+                    explanation: "Jaetaan molemmat puolet (r - 1):llä (mahdollista koska r ≠ 1):",
+                    math: "S = (rⁿ⁺¹ - 1) / (r - 1)  ∎"
+                }
+            ]
+        },
+        {
+            name: "Kolmion kulmien summa",
+            category: "Geometria",
+            difficulty: "easy",
+            statement: "Todista: Kolmion kulmien summa on 180°.",
+            steps: [
+                {
+                    title: "Piirretään apuviiva",
+                    explanation: "Olkoon kolmio ABC. Piirretään pisteen C kautta suora DE, joka on yhdensuuntainen sivun AB kanssa.",
+                    math: "DE ∥ AB,  C ∈ DE"
+                },
+                {
+                    title: "Vuorokulmat",
+                    explanation: "Koska DE ∥ AB ja CA on leikkaaja, vuorokulmat ovat yhtä suuret:",
+                    math: "∠DCA = ∠CAB = α  (vuorokulmat)",
+                    quiz: {
+                        question: "Miksi vuorokulmat ovat yhtä suuret?",
+                        options: [
+                            "Koska kolmio on tasakylkinen",
+                            "Koska yhdensuuntaisten suorien leikkaajan vuorokulmat ovat yhtä suuret",
+                            "Koska kaikki kulmat ovat 60°"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! Tämä on yhdensuuntaisten suorien perusominaisuus: leikkaajan muodostamat vuorokulmat ovat yhtä suuret."
+                    }
+                },
+                {
+                    title: "Toinen vuorokulmapari",
+                    explanation: "Samoin koska DE ∥ AB ja CB on leikkaaja:",
+                    math: "∠ECB = ∠CBA = β  (vuorokulmat)"
+                },
+                {
+                    title: "Oikokulma",
+                    explanation: "Kulmat DCA, ACB ja ECB muodostavat yhdessä oikokulman (suoran kulman) pisteessä C:",
+                    math: "∠DCA + ∠ACB + ∠ECB = 180°\nα + ∠ACB + β = 180°\n⟹ ∠A + ∠B + ∠C = 180°  ∎"
+                }
+            ]
+        },
+        {
+            name: "Pythagoraan lause",
+            category: "Geometria",
+            difficulty: "hard",
+            statement: "Todista: Suorakulmaisessa kolmiossa a² + b² = c², missä c on hypotenuusa.",
+            steps: [
+                {
+                    title: "Rakennetaan neliö",
+                    explanation: "Järjestetään neljä identtistä suorakulmaista kolmiota (kateetit a ja b) neliön sisään niin, että ulkoneliön sivun pituus on (a + b).",
+                    math: "Ulkoneliön ala = (a + b)²"
+                },
+                {
+                    title: "Lasketaan ala kahdella tavalla",
+                    explanation: "Ulkoneliön ala koostuu neljästä kolmiosta ja sisäneliöstä (jonka sivu on c):",
+                    math: "Ala = 4 · (½ab) + c²\n    = 2ab + c²",
+                    quiz: {
+                        question: "Miksi sisäkuvio on neliö sivulla c?",
+                        options: [
+                            "Koska se näyttää neliöltä",
+                            "Koska sen sivut ovat kolmioiden hypotenuusoja ja kulmat ovat 90°",
+                            "Koska a = b"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! Sisäkuvion jokainen sivu on hypotenuusa c, ja kulmien summa osoittaa, että jokainen sisäkulma on 90°."
+                    }
+                },
+                {
+                    title: "Asetetaan yhtäsuuriksi",
+                    explanation: "Koska molemmat lausekkeet kuvaavat samaa alaa:",
+                    math: "(a + b)² = 2ab + c²\na² + 2ab + b² = 2ab + c²"
+                },
+                {
+                    title: "Yksinkertaistetaan",
+                    explanation: "Vähennetään 2ab molemmilta puolilta:",
+                    math: "a² + b² = c²  ∎"
+                }
+            ]
+        },
+        {
+            name: "Parittoman ja parillisen tulo",
+            category: "Algebra",
+            difficulty: "easy",
+            statement: "Todista: Parittoman ja parillisen luvun tulo on aina parillinen.",
+            steps: [
+                {
+                    title: "Määritellään luvut",
+                    explanation: "Olkoon a pariton ja b parillinen. Tällöin ne voidaan kirjoittaa:",
+                    math: "a = 2m + 1,  b = 2n,  missä m, n ∈ ℤ"
+                },
+                {
+                    title: "Lasketaan tulo",
+                    explanation: "Kerrotaan a ja b:",
+                    math: "a · b = (2m + 1) · 2n\n     = 2n(2m + 1)",
+                    quiz: {
+                        question: "Miksi tulos on varmasti parillinen?",
+                        options: [
+                            "Koska 2m + 1 on pariton",
+                            "Koska tulossa on tekijänä 2 (nimittäin 2n)",
+                            "Koska m ja n ovat kokonaislukuja"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! Koska yksi tekijöistä on 2n = parillinen, koko tulo on jaollinen kahdella — siis parillinen."
+                    }
+                },
+                {
+                    title: "Päätelmä",
+                    explanation: "Tulo 2n(2m + 1) on muotoa 2k, missä k = n(2m + 1) ∈ ℤ. Siis tulo on parillinen. ∎",
+                    math: "a · b = 2 · [n(2m + 1)]  ∈  parilliset luvut  ∎"
+                }
+            ]
+        },
+        {
+            name: "Kolmiolla n solmua on n(n-3)/2 lävistäjää",
+            category: "Kombinatoriikka",
+            difficulty: "medium",
+            statement: "Todista: n-kulmiolla on n(n-3)/2 lävistäjää.",
+            steps: [
+                {
+                    title: "Lasketaan yhteydet",
+                    explanation: "Jokaisesta n-kulmion kärjestä voidaan vetää jana (n-1) muuhun kärkeen.",
+                    math: "Yhteyksiä yhteensä: n(n-1)"
+                },
+                {
+                    title: "Poistetaan kaksinkertaiset",
+                    explanation: "Jokainen jana laskettiin kahdesti (kerran molemmista päistä), joten erilaisia janoja on:",
+                    math: "Janoja: n(n-1)/2",
+                    quiz: {
+                        question: "Mitä n(n-1)/2 kuvaa kombinatoriikassa?",
+                        options: [
+                            "Permutaatioiden määrää",
+                            "Kombinaatioiden C(n,2) määrää — tapojen valita 2 pistettä n:stä",
+                            "Tekijöiden määrää"
+                        ],
+                        correct: 1,
+                        feedback: "Oikein! n(n-1)/2 = C(n,2) = \"n yli 2\" eli kuinka monella tavalla voidaan valita 2 pistettä n:stä."
+                    }
+                },
+                {
+                    title: "Vähennetään sivut",
+                    explanation: "Kaikista janoista n kappaletta on monikulmion sivuja (ei lävistäjiä):",
+                    math: "Lävistäjät = n(n-1)/2 - n\n           = [n(n-1) - 2n] / 2\n           = n(n-3)/2  ∎"
+                }
+            ]
+        }
+    ];
+
+    let currentProof = null;
+    let currentStep = 0;
+    let completedProofs = 0;
+    let totalQuizzes = 0;
+    let correctQuizzes = 0;
+
+    function newProof() {
+        const index = Math.floor(Math.random() * proofs.length);
+        currentProof = proofs[index];
+        currentStep = 0;
+        renderProof();
+    }
+
+    function renderProof() {
+        const content = document.getElementById('content');
+        const diffClass = `difficulty-${currentProof.difficulty}`;
+        const diffLabel = {easy: "Helppo", medium: "Keskitaso", hard: "Haastava"}[currentProof.difficulty];
+
+        let html = `
+            <div class="theorem-card">
+                <span class="category-tag">${currentProof.category}</span>
+                <span class="difficulty-tag ${diffClass}">${diffLabel}</span>
+                <h2>${currentProof.name}</h2>
+                <div class="theorem-statement">${currentProof.statement}</div>
+                <div class="proof-steps" id="proof-steps">
+        `;
+
+        currentProof.steps.forEach((step, i) => {
+            const visible = i <= currentStep ? 'visible' : '';
+            const active = i === currentStep ? 'active' : '';
+            html += `
+                <div class="proof-step ${visible} ${active}" id="step-${i}">
+                    <span class="step-number">${i + 1}</span>
+                    <span class="step-title">${step.title}</span>
+                    <div class="step-explanation">${step.explanation}</div>
+                    <div class="step-math">${step.math}</div>
+            `;
+
+            if (step.quiz && i <= currentStep) {
+                html += renderQuiz(step.quiz, i);
+            }
+
+            html += `</div>`;
+        });
+
+        html += `</div>`;
+
+        const progress = ((currentStep + 1) / currentProof.steps.length) * 100;
+        html += `
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <div class="controls">
+        `;
+
+        if (currentStep < currentProof.steps.length - 1) {
+            html += `<button class="btn-primary" onclick="nextStep()">Seuraava askel →</button>`;
+        } else {
+            html += `<button class="btn-primary" onclick="completeProof()">Todistus valmis ✓</button>`;
+        }
+
+        if (currentStep > 0) {
+            html += `<button class="btn-secondary" onclick="prevStep()">← Edellinen</button>`;
+        }
+
+        html += `<button class="btn-new" onclick="newProof()">Arvo uusi</button>`;
+        html += `</div></div>`;
+
+        content.innerHTML = html;
+    }
+
+    function renderQuiz(quiz, stepIndex) {
+        let html = `
+            <div class="quiz-section">
+                <h4>Testaa ymmärryksesi:</h4>
+                <p>${quiz.question}</p>
+                <div class="quiz-options">
+        `;
+
+        quiz.options.forEach((option, i) => {
+            html += `<div class="quiz-option" id="quiz-${stepIndex}-${i}" onclick="answerQuiz(${stepIndex}, ${i}, ${quiz.correct})">${option}</div>`;
+        });
+
+        html += `
+                </div>
+                <div class="feedback" id="feedback-${stepIndex}"></div>
+            </div>
+        `;
+        return html;
+    }
+
+    function answerQuiz(stepIndex, selected, correct) {
+        const options = document.querySelectorAll(`[id^="quiz-${stepIndex}-"]`);
+        options.forEach((opt, i) => {
+            opt.style.pointerEvents = 'none';
+            if (i === correct) opt.classList.add('correct');
+            if (i === selected && i !== correct) opt.classList.add('incorrect');
+        });
+
+        const feedback = document.getElementById(`feedback-${stepIndex}`);
+        const quiz = currentProof.steps[stepIndex].quiz;
+        totalQuizzes++;
+
+        if (selected === correct) {
+            correctQuizzes++;
+            feedback.className = 'feedback show correct';
+            feedback.textContent = quiz.feedback;
+        } else {
+            feedback.className = 'feedback show incorrect';
+            feedback.textContent = "Ei aivan. " + quiz.feedback;
+        }
+
+        updateStats();
+    }
+
+    function nextStep() {
+        if (currentStep < currentProof.steps.length - 1) {
+            currentStep++;
+            renderProof();
+            const stepEl = document.getElementById(`step-${currentStep}`);
+            if (stepEl) stepEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 0) {
+            currentStep--;
+            renderProof();
+        }
+    }
+
+    function completeProof() {
+        completedProofs++;
+        updateStats();
+        const content = document.getElementById('content');
+        content.innerHTML = `
+            <div class="theorem-card" style="text-align: center;">
+                <h2 style="color: #81c784;">Todistus suoritettu!</h2>
+                <p style="margin: 15px 0; font-size: 1.1em;">Olet todentanut: <strong>${currentProof.name}</strong></p>
+                <p style="color: #a0a0a0;">Olet suorittanut yhteensä ${completedProofs} todistusta.</p>
+                <div class="controls" style="margin-top: 30px;">
+                    <button class="btn-primary" onclick="newProof()">Arvo seuraava todistus</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateStats() {
+        document.getElementById('proofs-completed').textContent = completedProofs;
+        const pct = totalQuizzes > 0 ? Math.round((correctQuizzes / totalQuizzes) * 100) : 0;
+        document.getElementById('quiz-score').textContent = pct + '%';
+    }
+    </script>
+</body>
+</html>

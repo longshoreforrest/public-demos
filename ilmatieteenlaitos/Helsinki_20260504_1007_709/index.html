@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsitysVahti — PowerPoint-esitysten aktivointianalyysi</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        header h1 span {
+            color: #4fc3f7;
+        }
+
+        header p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .upload-area {
+            border: 3px dashed #4fc3f7;
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(79, 195, 247, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            background: rgba(79, 195, 247, 0.15);
+            border-color: #81d4fa;
+            transform: scale(1.01);
+        }
+
+        .upload-area .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area h2 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area p {
+            color: #999;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(79, 195, 247, 0.2);
+            border-top-color: #4fc3f7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card h3 {
+            color: #4fc3f7;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .score-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .score-bar .label {
+            min-width: 140px;
+            font-size: 0.9rem;
+        }
+
+        .score-bar .bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar .bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .score-bar .value {
+            min-width: 40px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .slide-analysis {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .slide-analysis:hover {
+            transform: translateX(4px);
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .slide-header h4 {
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .slide-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge-good { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        .badge-ok { background: rgba(255, 193, 7, 0.2); color: #ffd54f; }
+        .badge-improve { background: rgba(244, 67, 54, 0.2); color: #ef5350; }
+
+        .slide-content {
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            font-style: italic;
+        }
+
+        .suggestions {
+            list-style: none;
+            padding: 0;
+        }
+
+        .suggestions li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #ddd;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .suggestions li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+        }
+
+        .suggestion-category {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .cat-kysymys { background: rgba(156, 39, 176, 0.2); color: #ce93d8; }
+        .cat-aktivointi { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
+        .cat-vuorovaikutus { background: rgba(0, 188, 212, 0.2); color: #4dd0e1; }
+        .cat-visuaalinen { background: rgba(76, 175, 80, 0.2); color: #81c784; }
+        .cat-rakenne { background: rgba(63, 81, 181, 0.2); color: #7986cb; }
+
+        .general-tips {
+            background: rgba(79, 195, 247, 0.08);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .general-tips h3 {
+            color: #4fc3f7;
+            margin-bottom: 1rem;
+        }
+
+        .general-tips ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .general-tips li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .general-tips li::before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 2rem auto 0;
+            padding: 0.75rem 2rem;
+            background: rgba(79, 195, 247, 0.2);
+            border: 1px solid #4fc3f7;
+            color: #4fc3f7;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: rgba(79, 195, 247, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #666;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span>EsitysVahti</span> — Aktivointianalyysi</h1>
+            <p>Lataa PowerPoint-esitys ja saat tekoälyanalyysin siitä, miten ja missä kohtaa yleisöä kannattaa aktivoida</p>
+        </header>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="icon">📊</div>
+            <h2>Pudota .pptx-tiedosto tähän</h2>
+            <p>tai klikkaa valitaksesi tiedoston</p>
+            <input type="file" id="fileInput" accept=".pptx">
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analysoidaan esitystä...</p>
+        </div>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <footer>
+        EsitysVahti — PowerPoint-esitysten aktivointianalyysi | Toimii selaimessa, tiedostoa ei lähetetä palvelimelle
+    </footer>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (!file.name.endsWith('.pptx')) {
+                alert('Valitse .pptx-tiedosto (PowerPoint-esitys)');
+                return;
+            }
+
+            uploadArea.style.display = 'none';
+            loading.classList.add('active');
+
+            try {
+                const slides = await parsePPTX(file);
+                const analysis = analyzePresentation(slides);
+                renderResults(analysis, file.name);
+            } catch (err) {
+                alert('Virhe tiedoston käsittelyssä: ' + err.message);
+                uploadArea.style.display = 'block';
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        async function parsePPTX(file) {
+            const zip = await JSZip.loadAsync(file);
+            const slides = [];
+            let slideIndex = 1;
+
+            while (true) {
+                const slideFile = zip.file(`ppt/slides/slide${slideIndex}.xml`);
+                if (!slideFile) break;
+
+                const xml = await slideFile.async('text');
+                const text = extractTextFromSlideXML(xml);
+                const hasImages = xml.includes('<a:blip') || xml.includes('<p:pic');
+                const hasCharts = xml.includes('<c:chart') || xml.includes('<p:graphicFrame');
+                const hasVideo = xml.includes('<a:videoFile') || xml.includes('p:video');
+                const hasTables = xml.includes('<a:tbl');
+                const bulletCount = (xml.match(/<a:buChar|<a:buAutoNum/g) || []).length;
+
+                slides.push({
+                    number: slideIndex,
+                    text: text,
+                    hasImages: hasImages,
+                    hasCharts: hasCharts,
+                    hasVideo: hasVideo,
+                    hasTables: hasTables,
+                    bulletCount: bulletCount,
+                    wordCount: text.split(/\s+/).filter(w => w.length > 0).length
+                });
+
+                slideIndex++;
+            }
+
+            return slides;
+        }
+
+        function extractTextFromSlideXML(xml) {
+            const textParts = [];
+            const regex = /<a:t>(.*?)<\/a:t>/g;
+            let match;
+            while ((match = regex.exec(xml)) !== null) {
+                textParts.push(match[1]);
+            }
+            return textParts.join(' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        }
+
+        function analyzePresentation(slides) {
+            const totalSlides = slides.length;
+            const analysis = {
+                totalSlides: totalSlides,
+                slides: [],
+                overallScore: 0,
+                scores: {
+                    interactivity: 0,
+                    visual: 0,
+                    pacing: 0,
+                    textBalance: 0
+                },
+                generalTips: []
+            };
+
+            let interactiveSlides = 0;
+            let heavyTextSlides = 0;
+            let visualSlides = 0;
+
+            slides.forEach((slide, idx) => {
+                const slideAnalysis = analyzeSlide(slide, idx, totalSlides);
+                analysis.slides.push(slideAnalysis);
+
+                if (slideAnalysis.isInteractive) interactiveSlides++;
+                if (slide.wordCount > 80) heavyTextSlides++;
+                if (slide.hasImages || slide.hasCharts || slide.hasVideo) visualSlides++;
+            });
+
+            analysis.scores.interactivity = Math.min(100, Math.round((interactiveSlides / Math.max(totalSlides, 1)) * 200));
+            analysis.scores.visual = Math.min(100, Math.round((visualSlides / Math.max(totalSlides, 1)) * 130));
+            analysis.scores.textBalance = Math.max(0, 100 - Math.round((heavyTextSlides / Math.max(totalSlides, 1)) * 150));
+            analysis.scores.pacing = calculatePacingScore(slides);
+            analysis.overallScore = Math.round(
+                (analysis.scores.interactivity * 0.35 +
+                 analysis.scores.visual * 0.2 +
+                 analysis.scores.textBalance * 0.2 +
+                 analysis.scores.pacing * 0.25)
+            );
+
+            analysis.generalTips = generateGeneralTips(analysis, slides);
+            return analysis;
+        }
+
+        function analyzeSlide(slide, idx, totalSlides) {
+            const result = {
+                number: slide.number,
+                text: slide.text.substring(0, 120) + (slide.text.length > 120 ? '...' : ''),
+                suggestions: [],
+                isInteractive: false,
+                rating: 'ok'
+            };
+
+            const lowerText = slide.text.toLowerCase();
+            const hasQuestion = lowerText.includes('?') || lowerText.includes('kysymys') || lowerText.includes('pohdittavaa');
+            const hasInteractive = lowerText.includes('keskustelu') || lowerText.includes('ryhmä') || lowerText.includes('tehtävä') || lowerText.includes('harjoitus') || lowerText.includes('äänestys') || lowerText.includes('pari');
+
+            if (hasQuestion || hasInteractive) {
+                result.isInteractive = true;
+            }
+
+            const position = idx / Math.max(totalSlides - 1, 1);
+
+            if (idx === 0) {
+                if (!hasQuestion && slide.wordCount < 50) {
+                    result.suggestions.push({
+                        category: 'aktivointi',
+                        text: 'Aloita esitys energisesti — kysy yleisöltä herättelevä kysymys tai pyydä nostamaan käsi ("Kuinka moni teistä on kokenut...?")'
+                    });
+                }
+            }
+
+            if (slide.wordCount > 80) {
+                result.suggestions.push({
+                    category: 'rakenne',
+                    text: `Tässä kalvossa on paljon tekstiä (${slide.wordCount} sanaa). Harkitse sisällön jakamista useammalle kalvolle tai visuaalisen esityksen käyttöä.`
+                });
+                result.suggestions.push({
+                    category: 'aktivointi',
+                    text: 'Pysähdy tämän kalvon jälkeen ja kysy yleisöltä: "Mikä näistä resonoi eniten teidän kokemukseenne?"'
+                });
+            }
+
+            if (slide.bulletCount > 5) {
+                result.suggestions.push({
+                    category: 'visuaalinen',
+                    text: 'Liian monta luettelomerkkiä — yleisön huomio hajoaa. Käytä "progressive reveal" -tekniikkaa tai jaa useampaan kalvoon.'
+                });
+            }
+
+            if (position > 0.2 && position < 0.4 && !result.isInteractive) {
+                result.suggestions.push({
+                    category: 'vuorovaikutus',
+                    text: 'Tämä on hyvä kohta ensimmäiselle aktivoinnille — yleisön energia alkaa laskea. Kokeile: nopea "kädet ylös" -kysymys, parikeskustelu (30 sek) tai live-äänestys.'
+                });
+            }
+
+            if (position > 0.45 && position < 0.6 && !result.isInteractive) {
+                result.suggestions.push({
+                    category: 'aktivointi',
+                    text: 'Esityksen puoliväli — kriittinen hetki! Tee lyhyt energiaharjoitus: pyydä yleisöä nousemaan seisomaan, tekemään nopea parikeskustelu tai kirjoittamaan yksi ajatus chatiin.'
+                });
+            }
+
+            if (position > 0.7 && position < 0.85 && !result.isInteractive) {
+                result.suggestions.push({
+                    category: 'vuorovaikutus',
+                    text: 'Loppupuolen aktivointi: pyydä yleisöä pohtimaan "Mikä on yksi konkreettinen asia, jonka viet tästä mukanasi?" — tämä ankkuroi oppimisen.'
+                });
+            }
+
+            if (idx === totalSlides - 1) {
+                if (!hasQuestion) {
+                    result.suggestions.push({
+                        category: 'kysymys',
+                        text: 'Lopeta esitys toimintakehotukseen tai avoimeen kysymykseen — älä pelkkään "Kiitos!" -kalvoon. Kokeile: "Mikä on ensimmäinen askel, jonka otatte huomenna?"'
+                    });
+                }
+            }
+
+            if (!slide.hasImages && !slide.hasCharts && !slide.hasVideo && slide.wordCount > 30) {
+                result.suggestions.push({
+                    category: 'visuaalinen',
+                    text: 'Pelkkää tekstiä — lisää kuva, kaavio tai ikoni tukemaan viestiä. Visuaalinen tuki parantaa muistamista 65%.'
+                });
+            }
+
+            if (slide.hasCharts || slide.hasTables) {
+                result.suggestions.push({
+                    category: 'kysymys',
+                    text: 'Data-kalvo: älä vain näytä lukuja — kysy "Mikä tässä yllättää teitä?" tai "Arvaatteko mikä luku tässä on suurin?" ennen paljastamista.'
+                });
+            }
+
+            if (result.suggestions.length === 0) {
+                result.rating = 'good';
+            } else if (result.suggestions.length <= 2) {
+                result.rating = 'ok';
+            } else {
+                result.rating = 'improve';
+            }
+
+            return result;
+        }
+
+        function calculatePacingScore(slides) {
+            if (slides.length < 3) return 50;
+
+            let interactivePositions = [];
+            slides.forEach((slide, idx) => {
+                const lowerText = slide.text.toLowerCase();
+                if (lowerText.includes('?') || lowerText.includes('keskustelu') || lowerText.includes('tehtävä') || lowerText.includes('harjoitus')) {
+                    interactivePositions.push(idx / slides.length);
+                }
+            });
+
+            if (interactivePositions.length === 0) return 20;
+            if (interactivePositions.length === 1) return 40;
+
+            let maxGap = 0;
+            for (let i = 1; i < interactivePositions.length; i++) {
+                maxGap = Math.max(maxGap, interactivePositions[i] - interactivePositions[i - 1]);
+            }
+            maxGap = Math.max(maxGap, interactivePositions[0], 1 - interactivePositions[interactivePositions.length - 1]);
+
+            return Math.max(0, Math.min(100, Math.round(100 - (maxGap - 0.2) * 200)));
+        }
+
+        function generateGeneralTips(analysis, slides) {
+            const tips = [];
+
+            if (analysis.scores.interactivity < 40) {
+                tips.push('Lisää aktivointipisteitä: nyrkkisääntö on vähintään 1 vuorovaikutushetki per 10 minuuttia (noin 5 kalvoa).');
+            }
+
+            if (analysis.totalSlides > 20) {
+                tips.push(`Esityksessä on ${analysis.totalSlides} kalvoa — harkitse tauon lisäämistä puoliväliin ja "energizer"-harjoitusta tauon jälkeen.`);
+            }
+
+            if (analysis.scores.textBalance < 40) {
+                tips.push('Useissa kalvoissa on runsaasti tekstiä. Muista: kalvo on tukimateriaali, ei käsikirjoitus. Kerro tarina — älä lue kalvoa.');
+            }
+
+            tips.push('Käytä "10-20-30 -sääntöä" pohjana: max 10 kalvoa, max 20 min, min 30pt fonttikoko.');
+            tips.push('Aktivoi eri tavoin: kysy kysymyksiä, pyydä nostamaan käsi, käytä live-äänestystä (Mentimeter/Slido), tee parikeskusteluja.');
+            tips.push('Jokaisen datakalvon jälkeen: pysähdy ja kysy yleisön reaktiota ennen kuin jatkat.');
+
+            return tips;
+        }
+
+        function renderResults(analysis, filename) {
+            const ratingLabel = { good: 'Hyvä', ok: 'Kohtalainen', improve: 'Parannettavaa' };
+            const ratingClass = { good: 'badge-good', ok: 'badge-ok', improve: 'badge-improve' };
+
+            function getScoreColor(score) {
+                if (score >= 70) return '#4caf50';
+                if (score >= 40) return '#ffc107';
+                return '#f44336';
+            }
+
+            let html = `
+                <div class="summary-card">
+                    <h3>📊 ${filename} — Yhteenveto (${analysis.totalSlides} kalvoa)</h3>
+                    <div class="score-bar">
+                        <span class="label">Kokonaispisteet</span>
+                        <div class="bar"><div class="fill" style="width:${analysis.overallScore}%;background:${getScoreColor(analysis.overallScore)}"></div></div>
+                        <span class="value" style="color:${getScoreColor(analysis.overallScore)}">${analysis.overallScore}/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <span class="label">Vuorovaikutteisuus</span>
+                        <div class="bar"><div class="fill" style="width:${analysis.scores.interactivity}%;background:${getScoreColor(analysis.scores.interactivity)}"></div></div>
+                        <span class="value">${analysis.scores.interactivity}/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <span class="label">Visuaalisuus</span>
+                        <div class="bar"><div class="fill" style="width:${analysis.scores.visual}%;background:${getScoreColor(analysis.scores.visual)}"></div></div>
+                        <span class="value">${analysis.scores.visual}/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <span class="label">Tekstin tasapaino</span>
+                        <div class="bar"><div class="fill" style="width:${analysis.scores.textBalance}%;background:${getScoreColor(analysis.scores.textBalance)}"></div></div>
+                        <span class="value">${analysis.scores.textBalance}/100</span>
+                    </div>
+                    <div class="score-bar">
+                        <span class="label">Rytmitys</span>
+                        <div class="bar"><div class="fill" style="width:${analysis.scores.pacing}%;background:${getScoreColor(analysis.scores.pacing)}"></div></div>
+                        <span class="value">${analysis.scores.pacing}/100</span>
+                    </div>
+                </div>
+            `;
+
+            const slidesWithSuggestions = analysis.slides.filter(s => s.suggestions.length > 0);
+
+            if (slidesWithSuggestions.length > 0) {
+                html += '<h3 style="color:#fff;margin-bottom:1rem;">Kalvokohtaiset aktivointivinkit</h3>';
+                slidesWithSuggestions.forEach(slide => {
+                    html += `
+                        <div class="slide-analysis">
+                            <div class="slide-header">
+                                <h4>Kalvo ${slide.number}</h4>
+                                <span class="slide-badge ${ratingClass[slide.rating]}">${ratingLabel[slide.rating]}</span>
+                            </div>
+                            ${slide.text ? `<div class="slide-content">"${slide.text}"</div>` : ''}
+                            <ul class="suggestions">
+                                ${slide.suggestions.map(s => `
+                                    <li><span class="suggestion-category cat-${s.category}">${s.category}</span>${s.text}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                });
+            }
+
+            const goodSlides = analysis.slides.filter(s => s.rating === 'good');
+            if (goodSlides.length > 0) {
+                html += `<p style="color:#81c784;margin:1rem 0;">✅ ${goodSlides.length} kalvoa on jo hyvällä tasolla aktivoinnin suhteen.</p>`;
+            }
+
+            html += `
+                <div class="general-tips">
+                    <h3>Yleiset aktivointivinkit</h3>
+                    <ul>
+                        ${analysis.generalTips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
+                </div>
+                <button class="reset-btn" onclick="resetApp()">Analysoi toinen esitys</button>
+            `;
+
+            results.innerHTML = html;
+            results.classList.add('active');
+        }
+
+        function resetApp() {
+            results.classList.remove('active');
+            results.innerHTML = '';
+            uploadArea.style.display = 'block';
+            fileInput.value = '';
+        }
+    </script>
+</body>
+</html>

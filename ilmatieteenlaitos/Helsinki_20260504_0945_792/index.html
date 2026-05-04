@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lomasuunnitelma sään mukaan – Seuraavat 10 päivää</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .summary {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .summary h2 {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 140px;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card.vacation {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .stat-card.work {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-card.vacation .number {
+            color: #2e7d32;
+        }
+
+        .stat-card.work .number {
+            color: #1565c0;
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .day-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .day-card.vacation {
+            border-left: 5px solid #4caf50;
+        }
+
+        .day-card.work {
+            border-left: 5px solid #2196f3;
+        }
+
+        .day-card .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .day-card.vacation .badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .day-card.work .badge {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .day-date {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .day-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .weather-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .weather-icon {
+            font-size: 2.2rem;
+        }
+
+        .weather-details {
+            flex: 1;
+        }
+
+        .weather-desc {
+            font-size: 0.9rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .weather-temp {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .recommendation {
+            font-size: 0.85rem;
+            color: #666;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+        }
+
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fff3f3;
+            border: 1px solid #ffcdd2;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            color: #c62828;
+        }
+
+        .info-box {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .city-select {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .city-select select {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            background: white;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            margin-top: 30px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Lomasuunnitelma sään mukaan</h1>
+            <p>Seuraavat 10 päivää – sadepäivät töissä, aurinkoiset lomalla</p>
+        </header>
+
+        <div class="city-select">
+            <select id="citySelect">
+                <option value="Helsinki">Helsinki</option>
+                <option value="Tampere">Tampere</option>
+                <option value="Turku">Turku</option>
+                <option value="Oulu">Oulu</option>
+                <option value="Jyväskylä">Jyväskylä</option>
+                <option value="Kuopio">Kuopio</option>
+                <option value="Rovaniemi">Rovaniemi</option>
+                <option value="Lahti">Lahti</option>
+            </select>
+        </div>
+
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Haetaan sääennustetta...</p>
+            </div>
+        </div>
+
+        <footer>
+            Säädata: Ilmatieteen laitos (avoin data) | Ennuste seuraavalle 10 päivälle
+        </footer>
+    </div>
+
+    <script>
+        const CITIES = {
+            'Helsinki': { lat: 60.17, lon: 24.94 },
+            'Tampere': { lat: 61.50, lon: 23.79 },
+            'Turku': { lat: 60.45, lon: 22.27 },
+            'Oulu': { lat: 65.01, lon: 25.47 },
+            'Jyväskylä': { lat: 62.24, lon: 25.75 },
+            'Kuopio': { lat: 62.89, lon: 27.68 },
+            'Rovaniemi': { lat: 66.50, lon: 25.72 },
+            'Lahti': { lat: 60.98, lon: 25.66 }
+        };
+
+        const DAY_NAMES = ['sunnuntai', 'maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai'];
+
+        function getWeatherIcon(precipitation, cloudiness, temp) {
+            if (precipitation > 1.0) return '🌧️';
+            if (precipitation > 0.3) return '🌦️';
+            if (cloudiness > 70) return '☁️';
+            if (cloudiness > 40) return '⛅';
+            if (temp > 20) return '☀️';
+            return '🌤️';
+        }
+
+        function getWeatherDescription(precipitation, cloudiness, temp, windSpeed) {
+            let desc = '';
+            if (precipitation > 2.0) desc = 'Runsasta sadetta';
+            else if (precipitation > 0.5) desc = 'Sadetta';
+            else if (precipitation > 0.1) desc = 'Heikkoa sadetta';
+            else if (cloudiness > 70) desc = 'Pilvistä';
+            else if (cloudiness > 40) desc = 'Puolipilvistä';
+            else desc = 'Selkeää';
+
+            if (windSpeed > 10) desc += ', tuulista';
+            return desc;
+        }
+
+        function isRainyDay(precipitation) {
+            return precipitation > 0.5;
+        }
+
+        function getRecommendation(isWorkDay, precipitation, temp, windSpeed) {
+            if (isWorkDay) {
+                if (precipitation > 2.0) return 'Rankka sade – paras olla sisällä töissä!';
+                if (precipitation > 0.5) return 'Sateinen päivä – hyvä hetki hoitaa työasioita.';
+                return 'Pilvipouta – voit keskittyä työhön.';
+            } else {
+                if (temp > 20 && windSpeed < 5) return 'Upea lomapäivä! Rannalle tai puistoon.';
+                if (temp > 15) return 'Mukava lämmin – ulkoile ja nauti!';
+                if (temp > 10) return 'Hyvä retkeily- tai pyöräilysää.';
+                return 'Viileää mutta poutaa – pukeudu lämpimästi ja nauti ulkoilusta.';
+            }
+        }
+
+        async function fetchFMIForecast(city) {
+            const coords = CITIES[city];
+            const now = new Date();
+            const startTime = now.toISOString();
+            const endTime = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+            const params = new URLSearchParams({
+                service: 'WFS',
+                version: '2.0.0',
+                request: 'getFeature',
+                storedquery_id: 'fmi::forecast::harmonie::surface::point::simple',
+                place: city,
+                starttime: startTime,
+                endtime: endTime,
+                timestep: '180',
+                parameters: 'Temperature,Precipitation1h,TotalCloudCover,WindSpeedMS'
+            });
+
+            const url = `https://opendata.fmi.fi/wfs?${params}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`FMI API virhe: ${response.status}`);
+            }
+
+            const text = await response.text();
+            return parseFMIResponse(text);
+        }
+
+        function parseFMIResponse(xml) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xml, 'text/xml');
+            const members = doc.querySelectorAll('BsWfs\\:BsWfsElement, BsWfsElement');
+
+            const hourlyData = {};
+
+            members.forEach(member => {
+                const time = member.querySelector('BsWfs\\:Time, Time')?.textContent;
+                const param = member.querySelector('BsWfs\\:ParameterName, ParameterName')?.textContent;
+                const value = parseFloat(member.querySelector('BsWfs\\:ParameterValue, ParameterValue')?.textContent);
+
+                if (!time || !param) return;
+
+                const dateKey = time.split('T')[0];
+                if (!hourlyData[dateKey]) {
+                    hourlyData[dateKey] = { temps: [], precip: [], clouds: [], wind: [] };
+                }
+
+                if (param === 'Temperature') hourlyData[dateKey].temps.push(value);
+                if (param === 'Precipitation1h') hourlyData[dateKey].precip.push(value);
+                if (param === 'TotalCloudCover') hourlyData[dateKey].clouds.push(value);
+                if (param === 'WindSpeedMS') hourlyData[dateKey].wind.push(value);
+            });
+
+            const dailyData = [];
+            const sortedDates = Object.keys(hourlyData).sort();
+
+            for (const date of sortedDates.slice(0, 10)) {
+                const d = hourlyData[date];
+                if (d.temps.length === 0) continue;
+
+                const avgTemp = d.temps.reduce((a, b) => a + b, 0) / d.temps.length;
+                const maxTemp = Math.max(...d.temps);
+                const minTemp = Math.min(...d.temps);
+                const totalPrecip = d.precip.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
+                const avgClouds = d.clouds.reduce((a, b) => a + b, 0) / d.clouds.length;
+                const avgWind = d.wind.reduce((a, b) => a + b, 0) / d.wind.length;
+
+                dailyData.push({
+                    date,
+                    avgTemp: Math.round(avgTemp * 10) / 10,
+                    maxTemp: Math.round(maxTemp * 10) / 10,
+                    minTemp: Math.round(minTemp * 10) / 10,
+                    totalPrecip: Math.round(totalPrecip * 10) / 10,
+                    avgClouds: Math.round(avgClouds),
+                    avgWind: Math.round(avgWind * 10) / 10
+                });
+            }
+
+            return dailyData;
+        }
+
+        function renderResults(data, city) {
+            const vacationDays = data.filter(d => !isRainyDay(d.totalPrecip));
+            const workDays = data.filter(d => isRainyDay(d.totalPrecip));
+
+            let html = `
+                <div class="summary">
+                    <h2>Yhteenveto: ${city}, seuraavat ${data.length} päivää</h2>
+                    <div class="summary-stats">
+                        <div class="stat-card vacation">
+                            <div class="number">${vacationDays.length}</div>
+                            <div class="label">Lomapäivää (poutaa)</div>
+                        </div>
+                        <div class="stat-card work">
+                            <div class="number">${workDays.length}</div>
+                            <div class="label">Työpäivää (sadetta)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box">
+                    <strong>Suositus:</strong> Pidä lomaa poutapäivinä ja hoida työt sadepäivinä.
+                    Näin saat ${vacationDays.length} päivää ulkoilua ja hyvää säätä!
+                </div>
+                <div class="days-grid">
+            `;
+
+            for (const day of data) {
+                const dateObj = new Date(day.date + 'T12:00:00');
+                const dayName = DAY_NAMES[dateObj.getDay()];
+                const dateFormatted = `${dateObj.getDate()}.${dateObj.getMonth() + 1}.${dateObj.getFullYear()}`;
+                const isWork = isRainyDay(day.totalPrecip);
+                const cardClass = isWork ? 'work' : 'vacation';
+                const badge = isWork ? 'Töihin' : 'Lomaa!';
+                const icon = getWeatherIcon(day.totalPrecip, day.avgClouds, day.maxTemp);
+                const desc = getWeatherDescription(day.totalPrecip, day.avgClouds, day.avgTemp, day.avgWind);
+                const recommendation = getRecommendation(isWork, day.totalPrecip, day.maxTemp, day.avgWind);
+
+                html += `
+                    <div class="day-card ${cardClass}">
+                        <span class="badge">${badge}</span>
+                        <div class="day-date">${dateFormatted}</div>
+                        <div class="day-name">${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</div>
+                        <div class="weather-info">
+                            <span class="weather-icon">${icon}</span>
+                            <div class="weather-details">
+                                <div class="weather-desc">${desc}</div>
+                                <div class="weather-temp">${day.minTemp}° – ${day.maxTemp}° | Sade: ${day.totalPrecip} mm | Tuuli: ${day.avgWind} m/s</div>
+                            </div>
+                        </div>
+                        <div class="recommendation">${recommendation}</div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        async function loadForecast() {
+            const city = document.getElementById('citySelect').value;
+            const content = document.getElementById('content');
+
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Haetaan sääennustetta: ${city}...</p>
+                </div>
+            `;
+
+            try {
+                const data = await fetchFMIForecast(city);
+                if (data.length === 0) {
+                    throw new Error('Ennustedataa ei saatu');
+                }
+                content.innerHTML = renderResults(data, city);
+            } catch (err) {
+                console.error(err);
+                content.innerHTML = `
+                    <div class="error">
+                        <p><strong>Virhe haettaessa sääennustetta</strong></p>
+                        <p>${err.message}</p>
+                        <p style="margin-top:10px;font-size:0.85rem;color:#666;">
+                            Kokeile hetken kuluttua uudelleen. FMI:n rajapinta saattaa olla tilapäisesti ruuhkautunut.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('citySelect').addEventListener('change', loadForecast);
+        loadForecast();
+    </script>
+</body>
+</html>

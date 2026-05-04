@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SadeTutka-botti | Säätutkavaroitukset Telegramiin</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0e1621;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: #17212b;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #242f3d;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .app-header .bot-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .app-header .bot-info h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .app-header .bot-info span {
+            font-size: 12px;
+            color: #7e919e;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            height: calc(100vh - 65px);
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: 50vh 1fr;
+            }
+        }
+
+        .map-panel {
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #0e1621;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .map-controls button {
+            background: #17212b;
+            color: #fff;
+            border: 1px solid #242f3d;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .map-controls button:hover {
+            background: #242f3d;
+        }
+
+        .map-controls button.active {
+            background: #2196F3;
+            border-color: #2196F3;
+        }
+
+        .time-slider {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 500;
+            background: #17212bee;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .time-slider label {
+            font-size: 12px;
+            color: #7e919e;
+            white-space: nowrap;
+        }
+
+        .time-slider input[type="range"] {
+            width: 200px;
+            accent-color: #2196F3;
+        }
+
+        .time-slider .time-display {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2196F3;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .play-btn {
+            background: none;
+            border: 1px solid #2196F3;
+            color: #2196F3;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .play-btn:hover {
+            background: #2196F322;
+        }
+
+        .chat-panel {
+            background: #0e1621;
+            border-left: 1px solid #242f3d;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #17212b;
+            padding: 14px 16px;
+            border-bottom: 1px solid #242f3d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .chat-header .status {
+            font-size: 11px;
+            color: #4caf50;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chat-header .status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #4caf50;
+            border-radius: 50%;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #242f3d;
+            border-radius: 3px;
+        }
+
+        .msg {
+            max-width: 95%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            animation: msgIn 0.3s ease;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg.bot {
+            background: #182533;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .msg.alert {
+            background: #1a2733;
+            border-left: 3px solid #ff9800;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .msg.alert.danger {
+            border-left-color: #f44336;
+        }
+
+        .msg.alert.clear {
+            border-left-color: #4caf50;
+        }
+
+        .msg .msg-time {
+            font-size: 10px;
+            color: #7e919e;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .msg .msg-header {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .msg .rain-bar {
+            width: 100%;
+            height: 6px;
+            background: #242f3d;
+            border-radius: 3px;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+
+        .msg .rain-bar .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+
+        .config-panel {
+            background: #17212b;
+            padding: 12px 16px;
+            border-top: 1px solid #242f3d;
+        }
+
+        .config-panel h3 {
+            font-size: 12px;
+            color: #7e919e;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+
+        .config-row label {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .config-row select, .config-row input[type="number"] {
+            background: #242f3d;
+            border: 1px solid #3a4a5c;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .config-row input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+
+        .toggle {
+            width: 40px;
+            height: 22px;
+            background: #3a4a5c;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle.active {
+            background: #2196F3;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+        }
+
+        .toggle.active::after {
+            left: 20px;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 70px;
+            left: 10px;
+            z-index: 500;
+            background: #17212bee;
+            padding: 10px 14px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend h4 {
+            font-size: 11px;
+            color: #7e919e;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #ccc;
+            margin: 3px 0;
+        }
+
+        .legend-item .color-box {
+            width: 16px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .location-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #2196F3;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 400;
+        }
+
+        .location-marker::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border: 2px solid #2196F344;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .radar-canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 300;
+            pointer-events: none;
+        }
+
+        .info-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 500;
+            background: #17212bee;
+            padding: 8px 14px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            font-size: 12px;
+            color: #7e919e;
+        }
+
+        .info-badge strong {
+            color: #fff;
+        }
+
+        .rain-eta {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .rain-eta.danger { background: #f4433633; color: #f44336; }
+        .rain-eta.warning { background: #ff980033; color: #ff9800; }
+        .rain-eta.safe { background: #4caf5033; color: #4caf50; }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <div class="bot-avatar">🌧️</div>
+    <div class="bot-info">
+        <h1>SadeTutka-botti</h1>
+        <span>Säätutkavaroitukset — Helsinki</span>
+    </div>
+</div>
+
+<div class="main-layout">
+    <div class="map-panel">
+        <div id="map"></div>
+        <div class="info-badge">
+            <strong>Helsinki</strong> &mdash; Säätutkaseuranta aktiivinen
+        </div>
+        <div class="legend">
+            <h4>Sateen voimakkuus</h4>
+            <div class="legend-item"><span class="color-box" style="background:#00c853"></span> Heikko &lt;1 mm/h</div>
+            <div class="legend-item"><span class="color-box" style="background:#ffeb3b"></span> Kohtalainen 1-4 mm/h</div>
+            <div class="legend-item"><span class="color-box" style="background:#ff9800"></span> Voimakas 4-10 mm/h</div>
+            <div class="legend-item"><span class="color-box" style="background:#f44336"></span> Rankka &gt;10 mm/h</div>
+        </div>
+        <div class="time-slider">
+            <label>Aika:</label>
+            <button class="play-btn" id="playBtn" title="Toista animaatio">&#9654;</button>
+            <input type="range" id="timeSlider" min="0" max="11" value="0" />
+            <div class="time-display" id="timeDisplay">Nyt</div>
+        </div>
+    </div>
+
+    <div class="chat-panel">
+        <div class="chat-header">
+            <h2>Telegram-varoitukset</h2>
+            <div class="status">Aktiivinen</div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="config-panel">
+            <h3>Botin asetukset</h3>
+            <div class="config-row">
+                <label>Varoitusetäisyys</label>
+                <select id="alertRadius">
+                    <option value="10">10 km</option>
+                    <option value="20" selected>20 km</option>
+                    <option value="30">30 km</option>
+                    <option value="50">50 km</option>
+                </select>
+            </div>
+            <div class="config-row">
+                <label>Minimitaso</label>
+                <select id="alertLevel">
+                    <option value="light">Heikko sade</option>
+                    <option value="moderate" selected>Kohtalainen</option>
+                    <option value="heavy">Voimakas</option>
+                </select>
+            </div>
+            <div class="config-row">
+                <label>Ilmoitukset</label>
+                <div class="toggle active" id="toggleAlerts"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    const HELSINKI = [60.1699, 24.9384];
+    const FMI_WMS = 'https://openwms.fmi.fi/geoserver/wms';
+
+    const map = L.map('map', {
+        center: HELSINKI,
+        zoom: 8,
+        zoomControl: false
+    });
+
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    const locationMarker = L.circleMarker(HELSINKI, {
+        radius: 8,
+        color: '#2196F3',
+        fillColor: '#2196F3',
+        fillOpacity: 0.3,
+        weight: 3
+    }).addTo(map);
+
+    const radiusCircle = L.circle(HELSINKI, {
+        radius: 20000,
+        color: '#2196F344',
+        fillColor: '#2196F311',
+        weight: 1,
+        dashArray: '5,5'
+    }).addTo(map);
+
+    const alertRadiusSelect = document.getElementById('alertRadius');
+    alertRadiusSelect.addEventListener('change', function() {
+        radiusCircle.setRadius(parseInt(this.value) * 1000);
+    });
+
+    let radarLayer = null;
+
+    function getRadarTimestamps() {
+        const now = new Date();
+        const stamps = [];
+        for (let i = 0; i < 12; i++) {
+            const t = new Date(now.getTime() - (11 - i) * 5 * 60 * 1000);
+            t.setMinutes(Math.floor(t.getMinutes() / 5) * 5, 0, 0);
+            stamps.push(t);
+        }
+        return stamps;
+    }
+
+    const radarTimestamps = getRadarTimestamps();
+
+    function formatTime(date) {
+        return date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showRadarLayer(index) {
+        if (radarLayer) {
+            map.removeLayer(radarLayer);
+        }
+
+        const ts = radarTimestamps[index];
+        const isoTime = ts.toISOString().replace(/\.\d+Z/, 'Z');
+
+        radarLayer = L.tileLayer.wms(FMI_WMS, {
+            layers: 'Radar:suomi_rr_eureffin',
+            format: 'image/png',
+            transparent: true,
+            version: '1.3.0',
+            crs: L.CRS.EPSG3857,
+            opacity: 0.65,
+            time: isoTime
+        }).addTo(map);
+
+        const timeDisplay = document.getElementById('timeDisplay');
+        if (index === radarTimestamps.length - 1) {
+            timeDisplay.textContent = 'Nyt';
+        } else {
+            const diff = Math.round((radarTimestamps[radarTimestamps.length - 1] - ts) / 60000);
+            timeDisplay.textContent = `-${diff} min`;
+        }
+    }
+
+    showRadarLayer(11);
+
+    const timeSlider = document.getElementById('timeSlider');
+    timeSlider.addEventListener('input', function() {
+        showRadarLayer(parseInt(this.value));
+        if (isPlaying) stopAnimation();
+    });
+
+    let isPlaying = false;
+    let animInterval = null;
+    const playBtn = document.getElementById('playBtn');
+
+    function startAnimation() {
+        isPlaying = true;
+        playBtn.innerHTML = '&#9646;&#9646;';
+        let idx = 0;
+        timeSlider.value = 0;
+        showRadarLayer(0);
+
+        animInterval = setInterval(() => {
+            idx++;
+            if (idx > 11) {
+                idx = 0;
+            }
+            timeSlider.value = idx;
+            showRadarLayer(idx);
+        }, 800);
+    }
+
+    function stopAnimation() {
+        isPlaying = false;
+        playBtn.innerHTML = '&#9654;';
+        clearInterval(animInterval);
+    }
+
+    playBtn.addEventListener('click', function() {
+        if (isPlaying) stopAnimation();
+        else startAnimation();
+    });
+
+    const chatMessages = document.getElementById('chatMessages');
+
+    function addMessage(html, type = 'bot', time = null) {
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        const timeStr = time || formatTime(new Date());
+        div.innerHTML = html + `<div class="msg-time">${timeStr}</div>`;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function generateRainScenario() {
+        const scenarios = [
+            {
+                direction: 'lounaasta',
+                directionEn: 'SW',
+                distance: 35,
+                speed: 40,
+                intensity: 'kohtalainen',
+                mmh: 3.2,
+                type: 'vesisade',
+                color: '#ffeb3b'
+            },
+            {
+                direction: 'lännestä',
+                directionEn: 'W',
+                distance: 18,
+                speed: 35,
+                intensity: 'voimakas',
+                mmh: 7.5,
+                type: 'vesisade',
+                color: '#ff9800'
+            },
+            {
+                direction: 'luoteesta',
+                directionEn: 'NW',
+                distance: 45,
+                speed: 50,
+                intensity: 'heikko',
+                mmh: 0.5,
+                type: 'tihkusade',
+                color: '#00c853'
+            },
+            {
+                direction: 'etelästä',
+                directionEn: 'S',
+                distance: 12,
+                speed: 30,
+                intensity: 'rankka',
+                mmh: 14.2,
+                type: 'ukkosmyrsky',
+                color: '#f44336'
+            },
+            {
+                direction: 'kaakosta',
+                directionEn: 'SE',
+                distance: 25,
+                speed: 25,
+                intensity: 'kohtalainen',
+                mmh: 2.8,
+                type: 'vesisade',
+                color: '#ffeb3b'
+            }
+        ];
+        return scenarios[Math.floor(Math.random() * scenarios.length)];
+    }
+
+    function getAlertClass(mmh) {
+        if (mmh >= 7) return 'danger';
+        if (mmh >= 1) return '';
+        return 'clear';
+    }
+
+    function getEtaClass(minutes) {
+        if (minutes <= 15) return 'danger';
+        if (minutes <= 30) return 'warning';
+        return 'safe';
+    }
+
+    function intensityBar(mmh) {
+        const pct = Math.min(mmh / 15 * 100, 100);
+        let color = '#00c853';
+        if (mmh >= 10) color = '#f44336';
+        else if (mmh >= 4) color = '#ff9800';
+        else if (mmh >= 1) color = '#ffeb3b';
+        return `<div class="rain-bar"><div class="fill" style="width:${pct}%;background:${color}"></div></div>`;
+    }
+
+    const alertRadius = document.getElementById('alertRadius');
+    const alertLevel = document.getElementById('alertLevel');
+    const toggleAlerts = document.getElementById('toggleAlerts');
+    let alertsEnabled = true;
+
+    toggleAlerts.addEventListener('click', function() {
+        alertsEnabled = !alertsEnabled;
+        this.classList.toggle('active', alertsEnabled);
+        if (alertsEnabled) {
+            addMessage('Ilmoitukset <strong>käytössä</strong>. Seuraan säätilannetta.', 'bot');
+        } else {
+            addMessage('Ilmoitukset <strong>pois päältä</strong>.', 'bot');
+        }
+    });
+
+    addMessage(
+        '<div class="msg-header">🌧️ SadeTutka-botti käynnistynyt</div>' +
+        'Seuraan säätutkadataa Helsingin alueella.<br>' +
+        'Varoitan lähestyvistä sadealueista FMI:n tutkakomposiitin perusteella.<br><br>' +
+        '<strong>Asetukset:</strong><br>' +
+        '• Varoitusetäisyys: 20 km<br>' +
+        '• Minimitaso: kohtalainen sade<br>' +
+        '• Päivitysväli: 5 min (tutkan kierrosaika)',
+        'bot',
+        formatTime(new Date(Date.now() - 60000 * 30))
+    );
+
+    addMessage(
+        '<div class="msg-header">📡 Tutkadata päivitetty</div>' +
+        'Ei sadetta havaittu 50 km säteellä.<br>Seuraava tarkistus 5 min kuluttua.',
+        'bot',
+        formatTime(new Date(Date.now() - 60000 * 25))
+    );
+
+    function sendScenarioAlert() {
+        if (!alertsEnabled) return;
+
+        const s = generateRainScenario();
+        const radius = parseInt(alertRadius.value);
+        const level = alertLevel.value;
+
+        const levelThreshold = { light: 0, moderate: 1, heavy: 4 };
+        if (s.mmh < levelThreshold[level]) {
+            addMessage(
+                '<div class="msg-header">📡 Tutkadata päivitetty</div>' +
+                `Heikkoa sadetta havaittu ${s.direction} (${s.mmh} mm/h), ei ylitä varoituskynnystä.`,
+                'bot'
+            );
+            return;
+        }
+
+        if (s.distance > radius + 20) {
+            addMessage(
+                '<div class="msg-header">📡 Tutkadata päivitetty</div>' +
+                `Sadealue havaittu ${s.distance} km päässä ${s.direction}. Ei vielä varoitusalueella.`,
+                'bot'
+            );
+            return;
+        }
+
+        const eta = Math.round(s.distance / s.speed * 60);
+        const alertClass = getAlertClass(s.mmh);
+        const etaClass = getEtaClass(eta);
+
+        let emoji = '🌧️';
+        if (s.type === 'ukkosmyrsky') emoji = '⛈️';
+        if (s.intensity === 'heikko') emoji = '🌦️';
+        if (s.intensity === 'rankka') emoji = '🌊';
+
+        addMessage(
+            `<div class="msg-header">${emoji} SADEVAROITUS</div>` +
+            `<strong>${s.type.charAt(0).toUpperCase() + s.type.slice(1)}</strong> lähestyy ${s.direction}!<br><br>` +
+            `📏 Etäisyys: <strong>${s.distance} km</strong><br>` +
+            `🧭 Suunta: <strong>${s.directionEn}</strong><br>` +
+            `💨 Nopeus: <strong>${s.speed} km/h</strong><br>` +
+            `💧 Intensiteetti: <strong>${s.mmh} mm/h</strong> (${s.intensity})` +
+            intensityBar(s.mmh) +
+            `⏱️ Saapuu: <span class="rain-eta ${etaClass}">${eta} min</span><br><br>` +
+            (s.mmh >= 7
+                ? '⚠️ <strong>Suositus:</strong> Pysy sisätiloissa tai varaudu sateensuojalla.'
+                : '☂️ <strong>Suositus:</strong> Ota sateenvarjo mukaan.'),
+            `alert ${alertClass}`
+        );
+
+        if (s.distance < radius) {
+            setTimeout(() => {
+                if (!alertsEnabled) return;
+                const arrivalMins = Math.max(1, Math.round(eta * 0.3));
+                addMessage(
+                    `<div class="msg-header">🔴 SADEALUE SAAPUNUT</div>` +
+                    `${s.type.charAt(0).toUpperCase() + s.type.slice(1)} on nyt alueellasi.<br>` +
+                    `Arvioitu kesto: <strong>${15 + Math.floor(Math.random() * 45)} min</strong>`,
+                    'alert danger'
+                );
+            }, 8000 + Math.random() * 4000);
+        }
+    }
+
+    setTimeout(() => {
+        const s = generateRainScenario();
+        const eta = Math.round(s.distance / s.speed * 60);
+
+        addMessage(
+            `<div class="msg-header">⚠️ SADEVAROITUS</div>` +
+            `<strong>Sadealue</strong> havaittu ${s.direction} — lähestyy Helsinkiä.<br><br>` +
+            `📏 Etäisyys: <strong>${s.distance} km</strong><br>` +
+            `💨 Nopeus: <strong>${s.speed} km/h</strong><br>` +
+            `💧 Intensiteetti: <strong>${s.mmh} mm/h</strong> (${s.intensity})` +
+            intensityBar(s.mmh) +
+            `⏱️ Arvioitu saapuminen: <span class="rain-eta ${getEtaClass(eta)}">${eta} min</span>`,
+            `alert ${getAlertClass(s.mmh)}`
+        );
+    }, 3000);
+
+    setInterval(() => {
+        if (alertsEnabled) {
+            const rand = Math.random();
+            if (rand < 0.4) {
+                sendScenarioAlert();
+            } else if (rand < 0.6) {
+                addMessage(
+                    '<div class="msg-header">📡 Tutkadata päivitetty</div>' +
+                    'Ei merkittävää sadetta varoitusalueella. Seuraava tarkistus 5 min.',
+                    'bot'
+                );
+            } else if (rand < 0.7) {
+                addMessage(
+                    '<div class="msg-header">✅ Sade ohitettu</div>' +
+                    'Sadealue on siirtynyt pois varoitusalueelta.<br>' +
+                    'Seuraavat tunnit näyttävät poutaisilta.',
+                    'alert clear'
+                );
+            }
+        }
+    }, 15000);
+
+    setTimeout(() => {
+        addMessage(
+            '<div class="msg-header">ℹ️ Tietoa palvelusta</div>' +
+            'Tämä demo simuloi Telegram-bottia, joka käyttää FMI:n avoimen datan säätutkakuvia.<br><br>' +
+            '<strong>Oikea toteutus vaatisi:</strong><br>' +
+            '• Telegram Bot API -integraation<br>' +
+            '• FMI:n tutkadatan reaaliaikaisen analyysin<br>' +
+            '• Sadealueiden liikesuunnan laskemisen (optinen virtaus)<br>' +
+            '• Käyttäjäkohtaiset sijaintiasetukset',
+            'bot'
+        );
+    }, 6000);
+
+    showRadarLayer(11);
+
+})();
+</script>
+
+</body>
+</html>

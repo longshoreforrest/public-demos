@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kieku-kirjausten automatisointi</title>
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-light: #e1effe;
+            --primary-dark: #1e3a8a;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .app-header p {
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--gray-800);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        input, select, textarea {
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--gray-800);
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover { background: #047857; }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover { background: #b91c1c; }
+
+        .btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .info-box {
+            background: var(--primary-light);
+            border: 1px solid #93c5fd;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+
+        .warning-box {
+            background: var(--warning-light);
+            border: 1px solid #fbbf24;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+
+        .success-box {
+            background: var(--success-light);
+            border: 1px solid #6ee7b7;
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #065f46;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            background: var(--gray-50);
+            border-bottom: 2px solid var(--gray-200);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        td {
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.9rem;
+        }
+
+        tr:hover td {
+            background: var(--gray-50);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success { background: var(--success-light); color: #065f46; }
+        .badge-warning { background: var(--warning-light); color: #92400e; }
+        .badge-primary { background: var(--primary-light); color: var(--primary-dark); }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .week-nav h2 { margin-bottom: 0; }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .day-card {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-card:hover {
+            border-color: var(--primary);
+        }
+
+        .day-card.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .day-card.has-entries {
+            border-color: var(--success);
+        }
+
+        .day-card .day-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+        }
+
+        .day-card .day-date {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .day-card .day-hours {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .day-card .day-hours.complete {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .project-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .project-info { flex: 1; }
+
+        .project-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .project-code {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1rem 1.25rem;
+            text-align: center;
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .summary-card .label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .template-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+        }
+
+        .template-info { flex: 1; }
+
+        .template-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .template-desc {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .entry-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .entry-row:last-child { border-bottom: none; }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-top: 2px solid var(--gray-200);
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        .auth-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .auth-status.connected {
+            background: var(--success-light);
+            color: #065f46;
+        }
+
+        .auth-status.disconnected {
+            background: var(--danger-light);
+            color: #991b1b;
+        }
+
+        .step-list {
+            counter-reset: steps;
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            counter-increment: steps;
+            padding: 0.75rem 0 0.75rem 2.5rem;
+            position: relative;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .step-list li:last-child { border-bottom: none; }
+
+        .step-list li::before {
+            content: counter(steps);
+            position: absolute;
+            left: 0;
+            top: 0.75rem;
+            width: 1.75rem;
+            height: 1.75rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .export-card {
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .export-card:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .export-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .export-card .title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .export-card .desc {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .modal h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray-400);
+        }
+
+        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state p { font-size: 0.95rem; }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .week-grid { grid-template-columns: repeat(5, 1fr); font-size: 0.85rem; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .export-options { grid-template-columns: 1fr; }
+            .tabs { flex-wrap: wrap; }
+            .tab-btn { flex: none; }
+            .entry-row { grid-template-columns: 1fr; gap: 0.25rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <h1>Kieku-kirjausten automatisointi</h1>
+    <p>Hallitse ja automatisoi työaikakirjaukset &mdash; vie tiedot Kiekuun helposti</p>
+</div>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="kirjaus">Kirjaus</button>
+        <button class="tab-btn" data-tab="viikko">Viikkonäkymä</button>
+        <button class="tab-btn" data-tab="projektit">Projektit</button>
+        <button class="tab-btn" data-tab="mallit">Mallipohjat</button>
+        <button class="tab-btn" data-tab="vienti">Vienti</button>
+        <button class="tab-btn" data-tab="asetukset">Asetukset</button>
+    </div>
+
+    <!-- KIRJAUS-TAB -->
+    <div id="tab-kirjaus" class="tab-content active">
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value" id="today-hours">0:00</div>
+                <div class="label">Tänään kirjattu</div>
+            </div>
+            <div class="summary-card">
+                <div class="value" id="week-hours">0:00</div>
+                <div class="label">Tällä viikolla</div>
+            </div>
+            <div class="summary-card">
+                <div class="value" id="week-target">36:15</div>
+                <div class="label">Viikkotavoite</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2>Uusi kirjaus</h2>
+                <button class="btn btn-outline btn-sm" onclick="fillFromTemplate()">Täytä mallipohjasta</button>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="entry-date">Päivämäärä</label>
+                    <input type="date" id="entry-date">
+                </div>
+                <div class="form-group">
+                    <label for="entry-project">Projekti / WBS</label>
+                    <select id="entry-project">
+                        <option value="">Valitse projekti...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="entry-activity">Toimintolaji</label>
+                    <select id="entry-activity">
+                        <option value="">Valitse toimintolaji...</option>
+                        <option value="T010">T010 – Normaalityöaika</option>
+                        <option value="T020">T020 – Ylityö 50%</option>
+                        <option value="T030">T030 – Ylityö 100%</option>
+                        <option value="T100">T100 – Vuosiloma</option>
+                        <option value="T110">T110 – Sairausloma</option>
+                        <option value="T200">T200 – Koulutus</option>
+                        <option value="T300">T300 – Matka-aika</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="entry-hours">Tunnit</label>
+                    <input type="number" id="entry-hours" step="0.25" min="0" max="24" placeholder="7.25">
+                </div>
+                <div class="form-group">
+                    <label for="entry-start">Aloitus (vapaaehtoinen)</label>
+                    <input type="time" id="entry-start" placeholder="08:00">
+                </div>
+                <div class="form-group">
+                    <label for="entry-end">Lopetus (vapaaehtoinen)</label>
+                    <input type="time" id="entry-end" placeholder="16:15">
+                </div>
+                <div class="form-group full-width">
+                    <label for="entry-note">Lisätieto</label>
+                    <input type="text" id="entry-note" placeholder="Vapaaehtoinen kuvaus työstä...">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="addEntry()">Lisää kirjaus</button>
+                <button class="btn btn-outline" onclick="clearEntryForm()">Tyhjennä</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Päivän kirjaukset <span id="entries-date-label"></span></h2>
+            <div id="day-entries-list"></div>
+        </div>
+    </div>
+
+    <!-- VIIKKONÄKYMÄ -->
+    <div id="tab-viikko" class="tab-content">
+        <div class="week-nav">
+            <button class="btn btn-outline btn-sm" onclick="changeWeek(-1)">&larr; Edellinen</button>
+            <h2 id="week-label">Viikko</h2>
+            <button class="btn btn-outline btn-sm" onclick="changeWeek(1)">Seuraava &rarr;</button>
+        </div>
+
+        <div class="week-grid" id="week-grid"></div>
+
+        <div class="card">
+            <h2>Viikon kirjaukset</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Päivä</th>
+                        <th>Projekti</th>
+                        <th>Toimintolaji</th>
+                        <th>Tunnit</th>
+                        <th>Lisätieto</th>
+                    </tr>
+                </thead>
+                <tbody id="week-entries-body"></tbody>
+            </table>
+            <div class="total-row">
+                <span>Yhteensä</span>
+                <span id="week-total">0:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROJEKTIT -->
+    <div id="tab-projektit" class="tab-content">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2>Omat projektit ja WBS-elementit</h2>
+                <button class="btn btn-primary btn-sm" onclick="showProjectModal()">+ Uusi projekti</button>
+            </div>
+            <div class="info-box">
+                Lisää tänne Kieku-projektisi ja WBS-elementtien tunnisteet, niin ne ovat valittavissa kirjauksissa.
+            </div>
+            <div class="project-list" id="project-list"></div>
+        </div>
+    </div>
+
+    <!-- MALLIPOHJAT -->
+    <div id="tab-mallit" class="tab-content">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2>Mallipohjat (päiväkohtaiset)</h2>
+                <button class="btn btn-primary btn-sm" onclick="showTemplateModal()">+ Uusi mallipohja</button>
+            </div>
+            <div class="info-box">
+                Mallipohjilla voit tallentaa tyypillisen päivän kirjausrakenteen ja täyttää kokonaisen päivän yhdellä klikkauksella.
+                Esimerkiksi: "Normaali toimistopäivä" voi sisältää 7h 15min projektityötä + lounastauon.
+            </div>
+            <div class="template-list" id="template-list"></div>
+        </div>
+    </div>
+
+    <!-- VIENTI -->
+    <div id="tab-vienti" class="tab-content">
+        <div class="card">
+            <h2>Vie kirjaukset</h2>
+            <div class="form-grid" style="margin-bottom:1rem;">
+                <div class="form-group">
+                    <label for="export-start">Aikaväli alku</label>
+                    <input type="date" id="export-start">
+                </div>
+                <div class="form-group">
+                    <label for="export-end">Aikaväli loppu</label>
+                    <input type="date" id="export-end">
+                </div>
+            </div>
+            <div class="export-options">
+                <div class="export-card" onclick="exportCSV()">
+                    <div class="icon">📊</div>
+                    <div class="title">CSV-tiedosto</div>
+                    <div class="desc">Kieku-yhteensopiva CSV-tuontimuoto</div>
+                </div>
+                <div class="export-card" onclick="exportJSON()">
+                    <div class="icon">📋</div>
+                    <div class="title">JSON</div>
+                    <div class="desc">Rakenteellinen data jatkokäsittelyyn</div>
+                </div>
+                <div class="export-card" onclick="exportClipboard()">
+                    <div class="icon">📎</div>
+                    <div class="title">Leikepöydälle</div>
+                    <div class="desc">Kopioi taulukkomuodossa liitettäväksi</div>
+                </div>
+                <div class="export-card" onclick="exportSummary()">
+                    <div class="icon">📈</div>
+                    <div class="title">Yhteenveto</div>
+                    <div class="desc">Projektikohtainen tuntiraportti</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="export-preview-card" style="display:none;">
+            <h2>Esikatselu</h2>
+            <pre id="export-preview" style="background:var(--gray-50); padding:1rem; border-radius:6px; overflow-x:auto; font-size:0.85rem; max-height:400px; overflow-y:auto;"></pre>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="downloadExport()">Lataa tiedosto</button>
+                <button class="btn btn-outline" onclick="copyExport()">Kopioi leikepöydälle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASETUKSET -->
+    <div id="tab-asetukset" class="tab-content">
+        <div class="card">
+            <h2>Autentikointi ja yhteys</h2>
+            <div class="warning-box">
+                <strong>Kieku-järjestelmän suora integraatio</strong><br>
+                Kieku käyttää Valtion yhteistä tunnistautumista (Virtu/Suomi.fi). Suora API-yhteys vaatisi
+                organisaatiokohtaisen SAML-autentikoinnin. Tämä sovellus toimii tällä hetkellä itsenäisenä
+                kirjaustyökaluna, josta tiedot viedään Kiekuun manuaalisesti tai CSV-tuonnilla.
+            </div>
+
+            <h3>Tulevaisuuden autentikointivaihtoehdot</h3>
+            <ol class="step-list">
+                <li>
+                    <strong>CSV-tuonti (nyt käytössä)</strong><br>
+                    <span style="color:var(--gray-500);">Kirjaukset viedään CSV-muodossa ja tuodaan Kiekuun. Ei vaadi autentikointia.</span>
+                </li>
+                <li>
+                    <strong>Selainlaajennus (suunniteltu)</strong><br>
+                    <span style="color:var(--gray-500);">Chrome/Firefox-laajennus, joka hyödyntää olemassa olevaa Kieku-istuntoa. Käyttäjä kirjautuu Kiekuun normaalisti ja laajennus syöttää kirjaukset automaattisesti.</span>
+                </li>
+                <li>
+                    <strong>RPA-automaatio (suunniteltu)</strong><br>
+                    <span style="color:var(--gray-500);">Puppeteer/Playwright-pohjainen automaatio, joka simuloi käyttäjän toimintaa selaimessa. Käyttäjä antaa tunnukset kerran ja robotti hoitaa kirjaukset.</span>
+                </li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h2>Yleiset asetukset</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="setting-hours">Päivittäinen työaika (h)</label>
+                    <input type="number" id="setting-hours" step="0.25" value="7.25">
+                </div>
+                <div class="form-group">
+                    <label for="setting-week-hours">Viikkotyöaika (h)</label>
+                    <input type="number" id="setting-week-hours" step="0.25" value="36.25">
+                </div>
+                <div class="form-group">
+                    <label for="setting-default-activity">Oletustoimintolaji</label>
+                    <select id="setting-default-activity">
+                        <option value="T010">T010 – Normaalityöaika</option>
+                        <option value="T020">T020 – Ylityö 50%</option>
+                        <option value="T200">T200 – Koulutus</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="setting-default-start">Oletusaloitusaika</label>
+                    <input type="time" id="setting-default-start" value="08:00">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="saveSettings()">Tallenna asetukset</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Tietojen hallinta</h2>
+            <div class="btn-group">
+                <button class="btn btn-outline" onclick="exportAllData()">Varmuuskopioi kaikki tiedot</button>
+                <button class="btn btn-outline" onclick="importAllData()">Tuo varmuuskopio</button>
+                <button class="btn btn-danger" onclick="clearAllData()">Tyhjennä kaikki tiedot</button>
+            </div>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+        </div>
+    </div>
+</div>
+
+<!-- MODAALIT -->
+<div class="modal-overlay" id="project-modal">
+    <div class="modal">
+        <h2>Uusi projekti</h2>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Projektin nimi</label>
+                <input type="text" id="proj-name" placeholder="esim. Verkkopalvelun kehitys">
+            </div>
+            <div class="form-group">
+                <label>WBS-elementti / PSP</label>
+                <input type="text" id="proj-wbs" placeholder="esim. I-12345-001">
+            </div>
+            <div class="form-group">
+                <label>Väri</label>
+                <input type="color" id="proj-color" value="#1a56db">
+            </div>
+            <div class="form-group full-width">
+                <label>Kuvaus (vapaaehtoinen)</label>
+                <input type="text" id="proj-desc" placeholder="Lyhyt kuvaus projektista">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('project-modal')">Peruuta</button>
+            <button class="btn btn-primary" onclick="addProject()">Lisää</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="template-modal">
+    <div class="modal">
+        <h2>Uusi mallipohja</h2>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Mallipohjan nimi</label>
+                <input type="text" id="tpl-name" placeholder="esim. Normaali toimistopäivä">
+            </div>
+            <div class="form-group full-width">
+                <label>Kuvaus</label>
+                <input type="text" id="tpl-desc" placeholder="Lyhyt kuvaus mallipohjasta">
+            </div>
+        </div>
+        <div style="margin-top:1rem;">
+            <h3 style="margin-bottom:0.5rem;">Kirjaukset mallipohjassa</h3>
+            <div id="tpl-entries"></div>
+            <button class="btn btn-outline btn-sm" style="margin-top:0.5rem;" onclick="addTemplateEntry()">+ Lisää rivi</button>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('template-modal')">Peruuta</button>
+            <button class="btn btn-primary" onclick="saveTemplate()">Tallenna</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="template-select-modal">
+    <div class="modal">
+        <h2>Valitse mallipohja</h2>
+        <div id="template-select-list"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('template-select-modal')">Peruuta</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="summary-modal">
+    <div class="modal">
+        <h2>Tuntiraportti</h2>
+        <div id="summary-content"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('summary-modal')">Sulje</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'kieku-app';
+
+function loadData() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    return {
+        entries: [],
+        projects: [
+            { id: 'default-1', name: 'Yleishallinto', wbs: 'YH-001', color: '#6b7280', desc: 'Hallinnolliset tehtävät' },
+            { id: 'default-2', name: 'Projektityö', wbs: 'PT-001', color: '#1a56db', desc: 'Projektikohtainen työ' },
+        ],
+        templates: [],
+        settings: {
+            dailyHours: 7.25,
+            weeklyHours: 36.25,
+            defaultActivity: 'T010',
+            defaultStart: '08:00'
+        }
+    };
+}
+
+function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let data = loadData();
+let currentWeekStart = getMonday(new Date());
+let selectedDate = new Date().toISOString().split('T')[0];
+let currentExportContent = '';
+let currentExportFilename = '';
+
+function getMonday(d) {
+    d = new Date(d);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+}
+
+function formatDate(d) {
+    return d.toISOString().split('T')[0];
+}
+
+function formatDateFi(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fi-FI', { weekday: 'short', day: 'numeric', month: 'numeric' });
+}
+
+function hoursToHM(h) {
+    const hours = Math.floor(h);
+    const mins = Math.round((h - hours) * 60);
+    return `${hours}:${String(mins).padStart(2, '0')}`;
+}
+
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// TABS
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+        if (btn.dataset.tab === 'viikko') renderWeekView();
+        if (btn.dataset.tab === 'projektit') renderProjects();
+        if (btn.dataset.tab === 'mallit') renderTemplates();
+    });
+});
+
+// ENTRY FORM
+function initEntryForm() {
+    document.getElementById('entry-date').value = selectedDate;
+    updateProjectSelect();
+    renderDayEntries();
+    updateSummary();
+}
+
+function updateProjectSelect() {
+    const sel = document.getElementById('entry-project');
+    sel.innerHTML = '<option value="">Valitse projekti...</option>';
+    data.projects.forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.wbs} – ${p.name}</option>`;
+    });
+}
+
+function addEntry() {
+    const date = document.getElementById('entry-date').value;
+    const projectId = document.getElementById('entry-project').value;
+    const activity = document.getElementById('entry-activity').value;
+    const hours = parseFloat(document.getElementById('entry-hours').value);
+    const start = document.getElementById('entry-start').value;
+    const end = document.getElementById('entry-end').value;
+    const note = document.getElementById('entry-note').value;
+
+    if (!date || !projectId || !activity || isNaN(hours) || hours <= 0) {
+        alert('Täytä vähintään päivämäärä, projekti, toimintolaji ja tunnit.');
+        return;
+    }
+
+    const entry = {
+        id: generateId(),
+        date,
+        projectId,
+        activity,
+        hours,
+        start: start || null,
+        end: end || null,
+        note: note || '',
+        createdAt: new Date().toISOString()
+    };
+
+    data.entries.push(entry);
+    saveData(data);
+    clearEntryForm();
+    document.getElementById('entry-date').value = date;
+    selectedDate = date;
+    renderDayEntries();
+    updateSummary();
+}
+
+function clearEntryForm() {
+    document.getElementById('entry-project').value = '';
+    document.getElementById('entry-activity').value = '';
+    document.getElementById('entry-hours').value = '';
+    document.getElementById('entry-start').value = '';
+    document.getElementById('entry-end').value = '';
+    document.getElementById('entry-note').value = '';
+}
+
+function deleteEntry(id) {
+    if (!confirm('Poistetaanko kirjaus?')) return;
+    data.entries = data.entries.filter(e => e.id !== id);
+    saveData(data);
+    renderDayEntries();
+    updateSummary();
+}
+
+function renderDayEntries() {
+    const date = document.getElementById('entry-date').value || selectedDate;
+    selectedDate = date;
+    const entries = data.entries.filter(e => e.date === date);
+    const container = document.getElementById('day-entries-list');
+    document.getElementById('entries-date-label').textContent = `(${formatDateFi(date)})`;
+
+    if (entries.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>Ei kirjauksia tälle päivälle</p></div>';
+        return;
+    }
+
+    let totalHours = 0;
+    let html = '';
+    entries.forEach(e => {
+        const project = data.projects.find(p => p.id === e.projectId);
+        totalHours += e.hours;
+        html += `<div class="entry-row">
+            <div>
+                <strong>${project ? project.name : 'Tuntematon'}</strong>
+                ${e.note ? `<br><span style="color:var(--gray-500);font-size:0.85rem;">${e.note}</span>` : ''}
+            </div>
+            <div>${e.activity}</div>
+            <div><strong>${hoursToHM(e.hours)}</strong></div>
+            <div><button class="btn btn-outline btn-sm" onclick="deleteEntry('${e.id}')" title="Poista">✕</button></div>
+        </div>`;
+    });
+
+    html += `<div class="total-row">
+        <span>Päivän tunnit yhteensä</span>
+        <span>${hoursToHM(totalHours)} / ${hoursToHM(data.settings.dailyHours)}</span>
+    </div>`;
+
+    container.innerHTML = html;
+}
+
+function updateSummary() {
+    const today = new Date().toISOString().split('T')[0];
+    const todayEntries = data.entries.filter(e => e.date === today);
+    const todayTotal = todayEntries.reduce((s, e) => s + e.hours, 0);
+    document.getElementById('today-hours').textContent = hoursToHM(todayTotal);
+
+    const monday = getMonday(new Date());
+    const sunday = new Date(monday);
+    sunday.setDate(sunday.getDate() + 6);
+    const weekEntries = data.entries.filter(e => {
+        const d = new Date(e.date);
+        return d >= monday && d <= sunday;
+    });
+    const weekTotal = weekEntries.reduce((s, e) => s + e.hours, 0);
+    document.getElementById('week-hours').textContent = hoursToHM(weekTotal);
+    document.getElementById('week-target').textContent = hoursToHM(data.settings.weeklyHours);
+}
+
+// WEEK VIEW
+function renderWeekView() {
+    const grid = document.getElementById('week-grid');
+    const tbody = document.getElementById('week-entries-body');
+    const days = ['Ma', 'Ti', 'Ke', 'To', 'Pe'];
+    let weekTotal = 0;
+    let gridHtml = '';
+    let tableHtml = '';
+
+    const weekNum = getWeekNumber(currentWeekStart);
+    document.getElementById('week-label').textContent =
+        `Viikko ${weekNum} (${currentWeekStart.toLocaleDateString('fi-FI')} – ${(() => { const e = new Date(currentWeekStart); e.setDate(e.getDate() + 4); return e.toLocaleDateString('fi-FI'); })()})`;
+
+    for (let i = 0; i < 5; i++) {
+        const d = new Date(currentWeekStart);
+        d.setDate(d.getDate() + i);
+        const dateStr = formatDate(d);
+        const dayEntries = data.entries.filter(e => e.date === dateStr);
+        const dayTotal = dayEntries.reduce((s, e) => s + e.hours, 0);
+        weekTotal += dayTotal;
+
+        const isComplete = dayTotal >= data.settings.dailyHours;
+        const isToday = dateStr === new Date().toISOString().split('T')[0];
+
+        gridHtml += `<div class="day-card ${dayEntries.length > 0 ? 'has-entries' : ''} ${isToday ? 'selected' : ''}" onclick="selectDayFromWeek('${dateStr}')">
+            <div class="day-name">${days[i]}</div>
+            <div class="day-date">${d.getDate()}.${d.getMonth() + 1}.</div>
+            <div class="day-hours ${isComplete ? 'complete' : ''}">${hoursToHM(dayTotal)}</div>
+        </div>`;
+
+        dayEntries.forEach(e => {
+            const project = data.projects.find(p => p.id === e.projectId);
+            tableHtml += `<tr>
+                <td>${formatDateFi(dateStr)}</td>
+                <td>${project ? project.name : '–'}</td>
+                <td>${e.activity}</td>
+                <td>${hoursToHM(e.hours)}</td>
+                <td>${e.note || '–'}</td>
+            </tr>`;
+        });
+    }
+
+    grid.innerHTML = gridHtml;
+    tbody.innerHTML = tableHtml || '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:2rem;">Ei kirjauksia tällä viikolla</td></tr>';
+    document.getElementById('week-total').textContent = hoursToHM(weekTotal);
+}
+
+function selectDayFromWeek(dateStr) {
+    selectedDate = dateStr;
+    document.getElementById('entry-date').value = dateStr;
+    document.querySelectorAll('.tab-btn')[0].click();
+    renderDayEntries();
+}
+
+function changeWeek(dir) {
+    currentWeekStart.setDate(currentWeekStart.getDate() + dir * 7);
+    renderWeekView();
+}
+
+function getWeekNumber(d) {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// PROJECTS
+function renderProjects() {
+    const container = document.getElementById('project-list');
+    if (data.projects.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Ei projekteja. Lisää ensimmäinen!</p></div>';
+        return;
+    }
+    container.innerHTML = data.projects.map(p => `
+        <div class="project-item">
+            <div class="project-color" style="background:${p.color}"></div>
+            <div class="project-info">
+                <div class="project-name">${p.name}</div>
+                <div class="project-code">${p.wbs} ${p.desc ? '– ' + p.desc : ''}</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="deleteProject('${p.id}')">Poista</button>
+        </div>
+    `).join('');
+}
+
+function showProjectModal() {
+    document.getElementById('proj-name').value = '';
+    document.getElementById('proj-wbs').value = '';
+    document.getElementById('proj-color').value = '#1a56db';
+    document.getElementById('proj-desc').value = '';
+    document.getElementById('project-modal').classList.add('show');
+}
+
+function addProject() {
+    const name = document.getElementById('proj-name').value.trim();
+    const wbs = document.getElementById('proj-wbs').value.trim();
+    const color = document.getElementById('proj-color').value;
+    const desc = document.getElementById('proj-desc').value.trim();
+    if (!name || !wbs) { alert('Nimi ja WBS-elementti ovat pakollisia.'); return; }
+    data.projects.push({ id: generateId(), name, wbs, color, desc });
+    saveData(data);
+    closeModal('project-modal');
+    renderProjects();
+    updateProjectSelect();
+}
+
+function deleteProject(id) {
+    if (!confirm('Poistetaanko projekti?')) return;
+    data.projects = data.projects.filter(p => p.id !== id);
+    saveData(data);
+    renderProjects();
+    updateProjectSelect();
+}
+
+// TEMPLATES
+function renderTemplates() {
+    const container = document.getElementById('template-list');
+    if (data.templates.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Ei mallipohjia. Luo ensimmäinen!</p></div>';
+        return;
+    }
+    container.innerHTML = data.templates.map(t => `
+        <div class="template-item">
+            <div class="template-info">
+                <div class="template-name">${t.name}</div>
+                <div class="template-desc">${t.desc || ''} — ${t.entries.length} kirjausta, yht. ${hoursToHM(t.entries.reduce((s,e)=>s+e.hours,0))}</div>
+            </div>
+            <div style="display:flex;gap:0.25rem;">
+                <button class="btn btn-success btn-sm" onclick="applyTemplate('${t.id}')">Käytä</button>
+                <button class="btn btn-outline btn-sm" onclick="deleteTemplate('${t.id}')">Poista</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showTemplateModal() {
+    document.getElementById('tpl-name').value = '';
+    document.getElementById('tpl-desc').value = '';
+    document.getElementById('tpl-entries').innerHTML = '';
+    addTemplateEntry();
+    document.getElementById('template-modal').classList.add('show');
+}
+
+function addTemplateEntry() {
+    const container = document.getElementById('tpl-entries');
+    const idx = container.children.length;
+    const div = document.createElement('div');
+    div.className = 'form-grid';
+    div.style.marginBottom = '0.5rem';
+    div.innerHTML = `
+        <div class="form-group">
+            <label>Projekti</label>
+            <select class="tpl-project">
+                ${data.projects.map(p => `<option value="${p.id}">${p.wbs} – ${p.name}</option>`).join('')}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Toimintolaji</label>
+            <select class="tpl-activity">
+                <option value="T010">T010 – Normaalityöaika</option>
+                <option value="T020">T020 – Ylityö 50%</option>
+                <option value="T200">T200 – Koulutus</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tunnit</label>
+            <input type="number" class="tpl-hours" step="0.25" value="7.25">
+        </div>
+        <div class="form-group">
+            <label>Lisätieto</label>
+            <input type="text" class="tpl-note" placeholder="">
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function saveTemplate() {
+    const name = document.getElementById('tpl-name').value.trim();
+    const desc = document.getElementById('tpl-desc').value.trim();
+    if (!name) { alert('Anna mallipohjalle nimi.'); return; }
+
+    const entries = [];
+    const rows = document.getElementById('tpl-entries').children;
+    for (const row of rows) {
+        entries.push({
+            projectId: row.querySelector('.tpl-project').value,
+            activity: row.querySelector('.tpl-activity').value,
+            hours: parseFloat(row.querySelector('.tpl-hours').value) || 0,
+            note: row.querySelector('.tpl-note').value.trim()
+        });
+    }
+
+    data.templates.push({ id: generateId(), name, desc, entries });
+    saveData(data);
+    closeModal('template-modal');
+    renderTemplates();
+}
+
+function deleteTemplate(id) {
+    if (!confirm('Poistetaanko mallipohja?')) return;
+    data.templates = data.templates.filter(t => t.id !== id);
+    saveData(data);
+    renderTemplates();
+}
+
+function applyTemplate(id) {
+    const tpl = data.templates.find(t => t.id === id);
+    if (!tpl) return;
+    const date = selectedDate || new Date().toISOString().split('T')[0];
+    tpl.entries.forEach(te => {
+        data.entries.push({
+            id: generateId(),
+            date,
+            projectId: te.projectId,
+            activity: te.activity,
+            hours: te.hours,
+            start: null,
+            end: null,
+            note: te.note,
+            createdAt: new Date().toISOString()
+        });
+    });
+    saveData(data);
+    renderDayEntries();
+    updateSummary();
+    alert(`Mallipohja "${tpl.name}" lisätty päivälle ${formatDateFi(date)}.`);
+}
+
+function fillFromTemplate() {
+    if (data.templates.length === 0) {
+        alert('Ei mallipohjia. Luo ensin mallipohja Mallipohjat-välilehdellä.');
+        return;
+    }
+    const container = document.getElementById('template-select-list');
+    container.innerHTML = data.templates.map(t => `
+        <div class="template-item" style="cursor:pointer;" onclick="applyTemplate('${t.id}'); closeModal('template-select-modal');">
+            <div class="template-info">
+                <div class="template-name">${t.name}</div>
+                <div class="template-desc">${t.entries.length} kirjausta, yht. ${hoursToHM(t.entries.reduce((s,e)=>s+e.hours,0))}</div>
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('template-select-modal').classList.add('show');
+}
+
+// EXPORT
+function getExportEntries() {
+    const start = document.getElementById('export-start').value;
+    const end = document.getElementById('export-end').value;
+    return data.entries.filter(e => {
+        if (start && e.date < start) return false;
+        if (end && e.date > end) return false;
+        return true;
+    }).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function exportCSV() {
+    const entries = getExportEntries();
+    if (entries.length === 0) { alert('Ei kirjauksia valitulla aikavälillä.'); return; }
+    let csv = 'Päivämäärä;WBS-elementti;Projekti;Toimintolaji;Tunnit;Aloitus;Lopetus;Lisätieto\n';
+    entries.forEach(e => {
+        const project = data.projects.find(p => p.id === e.projectId);
+        csv += `${e.date};${project ? project.wbs : ''};${project ? project.name : ''};${e.activity};${e.hours.toFixed(2).replace('.', ',')};${e.start || ''};${e.end || ''};${e.note}\n`;
+    });
+    showExportPreview(csv, 'kieku-kirjaukset.csv');
+}
+
+function exportJSON() {
+    const entries = getExportEntries();
+    if (entries.length === 0) { alert('Ei kirjauksia valitulla aikavälillä.'); return; }
+    const output = entries.map(e => {
+        const project = data.projects.find(p => p.id === e.projectId);
+        return {
+            date: e.date,
+            wbs: project ? project.wbs : '',
+            project: project ? project.name : '',
+            activity: e.activity,
+            hours: e.hours,
+            start: e.start,
+            end: e.end,
+            note: e.note
+        };
+    });
+    showExportPreview(JSON.stringify(output, null, 2), 'kieku-kirjaukset.json');
+}
+
+function exportClipboard() {
+    const entries = getExportEntries();
+    if (entries.length === 0) { alert('Ei kirjauksia valitulla aikavälillä.'); return; }
+    let text = 'Pvm\tWBS\tProjekti\tToimintolaji\tTunnit\tLisätieto\n';
+    entries.forEach(e => {
+        const project = data.projects.find(p => p.id === e.projectId);
+        text += `${e.date}\t${project ? project.wbs : ''}\t${project ? project.name : ''}\t${e.activity}\t${e.hours}\t${e.note}\n`;
+    });
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Kirjaukset kopioitu leikepöydälle!');
+    });
+}
+
+function exportSummary() {
+    const entries = getExportEntries();
+    if (entries.length === 0) { alert('Ei kirjauksia valitulla aikavälillä.'); return; }
+
+    const byProject = {};
+    entries.forEach(e => {
+        const project = data.projects.find(p => p.id === e.projectId);
+        const key = project ? project.name : 'Tuntematon';
+        if (!byProject[key]) byProject[key] = { hours: 0, wbs: project ? project.wbs : '', days: new Set() };
+        byProject[key].hours += e.hours;
+        byProject[key].days.add(e.date);
+    });
+
+    const totalHours = entries.reduce((s, e) => s + e.hours, 0);
+    let html = '<table style="width:100%;"><thead><tr><th>Projekti</th><th>WBS</th><th>Tunnit</th><th>Päiviä</th><th>%</th></tr></thead><tbody>';
+    Object.entries(byProject).sort((a, b) => b[1].hours - a[1].hours).forEach(([name, info]) => {
+        html += `<tr><td>${name}</td><td>${info.wbs}</td><td>${hoursToHM(info.hours)}</td><td>${info.days.size}</td><td>${(info.hours / totalHours * 100).toFixed(1)}%</td></tr>`;
+    });
+    html += `</tbody></table><div class="total-row"><span>Yhteensä</span><span>${hoursToHM(totalHours)}</span></div>`;
+
+    document.getElementById('summary-content').innerHTML = html;
+    document.getElementById('summary-modal').classList.add('show');
+}
+
+function showExportPreview(content, filename) {
+    currentExportContent = content;
+    currentExportFilename = filename;
+    document.getElementById('export-preview').textContent = content;
+    document.getElementById('export-preview-card').style.display = 'block';
+}
+
+function downloadExport() {
+    const blob = new Blob([currentExportContent], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = currentExportFilename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function copyExport() {
+    navigator.clipboard.writeText(currentExportContent).then(() => alert('Kopioitu!'));
+}
+
+// SETTINGS
+function saveSettings() {
+    data.settings.dailyHours = parseFloat(document.getElementById('setting-hours').value) || 7.25;
+    data.settings.weeklyHours = parseFloat(document.getElementById('setting-week-hours').value) || 36.25;
+    data.settings.defaultActivity = document.getElementById('setting-default-activity').value;
+    data.settings.defaultStart = document.getElementById('setting-default-start').value;
+    saveData(data);
+    updateSummary();
+    alert('Asetukset tallennettu.');
+}
+
+function loadSettings() {
+    document.getElementById('setting-hours').value = data.settings.dailyHours;
+    document.getElementById('setting-week-hours').value = data.settings.weeklyHours;
+    document.getElementById('setting-default-activity').value = data.settings.defaultActivity;
+    document.getElementById('setting-default-start').value = data.settings.defaultStart;
+}
+
+// DATA MANAGEMENT
+function exportAllData() {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `kieku-varmuuskopio-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+function importAllData() {
+    document.getElementById('import-file').click();
+}
+
+function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            if (imported.entries && imported.projects) {
+                data = imported;
+                saveData(data);
+                location.reload();
+            } else {
+                alert('Virheellinen tiedostomuoto.');
+            }
+        } catch {
+            alert('Tiedoston lukeminen epäonnistui.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function clearAllData() {
+    if (!confirm('Haluatko varmasti tyhjentää kaikki tiedot? Tätä ei voi perua.')) return;
+    if (!confirm('Oletko aivan varma?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+}
+
+// MODALS
+function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('show');
+    });
+});
+
+// DATE CHANGE LISTENER
+document.getElementById('entry-date').addEventListener('change', function() {
+    selectedDate = this.value;
+    renderDayEntries();
+});
+
+// INIT
+initEntryForm();
+loadSettings();
+
+// Set export date range to current month
+const now = new Date();
+document.getElementById('export-start').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+document.getElementById('export-end').value = now.toISOString().split('T')[0];
+</script>
+
+</body>
+</html>
