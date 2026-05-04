@@ -619,23 +619,78 @@
             .tab-btn { flex: none; }
             .entry-row { grid-template-columns: 1fr; gap: 0.25rem; }
         }
+
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
 
 <div class="app-header">
-    <h1>📋 Kieku-kirjausten automatisointi</h1>
-    <p>Hallitse ja automatisoi työaikakirjaukset &mdash; vie tiedot Kiekuun helposti</p>
+    <h1 data-i18n="title">📋 Kieku-kirjausten automatisointi</h1>
+    <p data-i18n="subtitle">Hallitse ja automatisoi työaikakirjaukset — vie tiedot Kiekuun helposti</p>
 </div>
 
 <div class="container">
     <div class="tabs">
-        <button class="tab-btn active" data-tab="kirjaus">Kirjaus</button>
-        <button class="tab-btn" data-tab="viikko">Viikkonäkymä</button>
-        <button class="tab-btn" data-tab="projektit">Projektit</button>
-        <button class="tab-btn" data-tab="mallit">Mallipohjat</button>
-        <button class="tab-btn" data-tab="vienti">Vienti</button>
-        <button class="tab-btn" data-tab="asetukset">Asetukset</button>
+        <button class="tab-btn active" data-tab="kirjaus" data-i18n="tab_entry">Kirjaus</button>
+        <button class="tab-btn" data-tab="viikko" data-i18n="tab_week">Viikkonäkymä</button>
+        <button class="tab-btn" data-tab="projektit" data-i18n="tab_projects">Projektit</button>
+        <button class="tab-btn" data-tab="mallit" data-i18n="tab_templates">Mallipohjat</button>
+        <button class="tab-btn" data-tab="vienti" data-i18n="tab_export">Vienti</button>
+        <button class="tab-btn" data-tab="asetukset" data-i18n="tab_settings">Asetukset</button>
     </div>
 
     <!-- KIRJAUS-TAB -->
@@ -643,21 +698,21 @@
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="value" id="today-hours">0:00</div>
-                <div class="label">Tänään kirjattu</div>
+                <div class="label" data-i18n="label_today">Tänään kirjattu</div>
             </div>
             <div class="summary-card">
                 <div class="value" id="week-hours">0:00</div>
-                <div class="label">Tällä viikolla</div>
+                <div class="label" data-i18n="label_this_week">Tällä viikolla</div>
             </div>
             <div class="summary-card">
                 <div class="value" id="week-target">36:15</div>
-                <div class="label">Viikkotavoite</div>
+                <div class="label" data-i18n="label_week_target">Viikkotavoite</div>
             </div>
         </div>
 
         <div class="card" id="voice-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h2>Puhekirjaus</h2>
+                <h2 data-i18n="voice_title">Puhekirjaus</h2>
                 <span class="badge badge-primary" id="voice-support-badge"></span>
             </div>
             <div class="info-box" id="voice-info">
@@ -693,22 +748,22 @@
 
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h2>Uusi kirjaus</h2>
-                <button class="btn btn-outline btn-sm" onclick="fillFromTemplate()">Täytä mallipohjasta</button>
+                <h2 data-i18n="new_entry">Uusi kirjaus</h2>
+                <button class="btn btn-outline btn-sm" onclick="fillFromTemplate()" data-i18n="btn_fill_template">Täytä mallipohjasta</button>
             </div>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="entry-date">Päivämäärä</label>
+                    <label for="entry-date" data-i18n="label_date">Päivämäärä</label>
                     <input type="date" id="entry-date">
                 </div>
                 <div class="form-group">
-                    <label for="entry-project">Projekti / WBS</label>
+                    <label for="entry-project" data-i18n="label_project">Projekti / WBS</label>
                     <select id="entry-project">
                         <option value="">Valitse projekti...</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="entry-activity">Toimintolaji</label>
+                    <label for="entry-activity" data-i18n="label_activity">Toimintolaji</label>
                     <select id="entry-activity">
                         <option value="">Valitse toimintolaji...</option>
                         <option value="T010">T010 – Normaalityöaika</option>
@@ -721,30 +776,30 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="entry-hours">Tunnit</label>
+                    <label for="entry-hours" data-i18n="label_hours">Tunnit</label>
                     <input type="number" id="entry-hours" step="0.25" min="0" max="24" placeholder="7.25">
                 </div>
                 <div class="form-group">
-                    <label for="entry-start">Aloitus (vapaaehtoinen)</label>
+                    <label for="entry-start" data-i18n="label_start">Aloitus (vapaaehtoinen)</label>
                     <input type="time" id="entry-start" placeholder="08:00">
                 </div>
                 <div class="form-group">
-                    <label for="entry-end">Lopetus (vapaaehtoinen)</label>
+                    <label for="entry-end" data-i18n="label_end">Lopetus (vapaaehtoinen)</label>
                     <input type="time" id="entry-end" placeholder="16:15">
                 </div>
                 <div class="form-group full-width">
-                    <label for="entry-note">Lisätieto</label>
+                    <label for="entry-note" data-i18n="label_note">Lisätieto</label>
                     <input type="text" id="entry-note" placeholder="Vapaaehtoinen kuvaus työstä...">
                 </div>
             </div>
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="addEntry()">Lisää kirjaus</button>
-                <button class="btn btn-outline" onclick="clearEntryForm()">Tyhjennä</button>
+                <button class="btn btn-primary" onclick="addEntry()" data-i18n="btn_add_entry">Lisää kirjaus</button>
+                <button class="btn btn-outline" onclick="clearEntryForm()" data-i18n="btn_clear">Tyhjennä</button>
             </div>
         </div>
 
         <div class="card">
-            <h2>Päivän kirjaukset <span id="entries-date-label"></span></h2>
+            <h2><span data-i18n="day_entries">Päivän kirjaukset</span> <span id="entries-date-label"></span></h2>
             <div id="day-entries-list"></div>
         </div>
     </div>
@@ -760,7 +815,7 @@
         <div class="week-grid" id="week-grid"></div>
 
         <div class="card">
-            <h2>Viikon kirjaukset</h2>
+            <h2 data-i18n="week_entries">Viikon kirjaukset</h2>
             <table>
                 <thead>
                     <tr>
@@ -784,8 +839,8 @@
     <div id="tab-projektit" class="tab-content">
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h2>Omat projektit ja WBS-elementit</h2>
-                <button class="btn btn-primary btn-sm" onclick="showProjectModal()">+ Uusi projekti</button>
+                <h2 data-i18n="projects_title">Omat projektit ja WBS-elementit</h2>
+                <button class="btn btn-primary btn-sm" onclick="showProjectModal()" data-i18n="btn_new_project">+ Uusi projekti</button>
             </div>
             <div class="info-box">
                 Lisää tänne Kieku-projektisi ja WBS-elementtien tunnisteet, niin ne ovat valittavissa kirjauksissa.
@@ -798,8 +853,8 @@
     <div id="tab-mallit" class="tab-content">
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h2>Mallipohjat (päiväkohtaiset)</h2>
-                <button class="btn btn-primary btn-sm" onclick="showTemplateModal()">+ Uusi mallipohja</button>
+                <h2 data-i18n="templates_title">Mallipohjat (päiväkohtaiset)</h2>
+                <button class="btn btn-primary btn-sm" onclick="showTemplateModal()" data-i18n="btn_new_template">+ Uusi mallipohja</button>
             </div>
             <div class="info-box">
                 Mallipohjilla voit tallentaa tyypillisen päivän kirjausrakenteen ja täyttää kokonaisen päivän yhdellä klikkauksella.
@@ -812,37 +867,37 @@
     <!-- VIENTI -->
     <div id="tab-vienti" class="tab-content">
         <div class="card">
-            <h2>Vie kirjaukset</h2>
+            <h2 data-i18n="export_title">Vie kirjaukset</h2>
             <div class="form-grid" style="margin-bottom:1rem;">
                 <div class="form-group">
-                    <label for="export-start">Aikaväli alku</label>
+                    <label for="export-start" data-i18n="label_range_start">Aikaväli alku</label>
                     <input type="date" id="export-start">
                 </div>
                 <div class="form-group">
-                    <label for="export-end">Aikaväli loppu</label>
+                    <label for="export-end" data-i18n="label_range_end">Aikaväli loppu</label>
                     <input type="date" id="export-end">
                 </div>
             </div>
             <div class="export-options">
                 <div class="export-card" onclick="exportCSV()">
                     <div class="icon">📊</div>
-                    <div class="title">CSV-tiedosto</div>
-                    <div class="desc">Kieku-yhteensopiva CSV-tuontimuoto</div>
+                    <div class="title" data-i18n="export_csv">CSV-tiedosto</div>
+                    <div class="desc" data-i18n="export_csv_desc">Kieku-yhteensopiva CSV-tuontimuoto</div>
                 </div>
                 <div class="export-card" onclick="exportJSON()">
                     <div class="icon">📋</div>
                     <div class="title">JSON</div>
-                    <div class="desc">Rakenteellinen data jatkokäsittelyyn</div>
+                    <div class="desc" data-i18n="export_json_desc">Rakenteellinen data jatkokäsittelyyn</div>
                 </div>
                 <div class="export-card" onclick="exportClipboard()">
                     <div class="icon">📎</div>
-                    <div class="title">Leikepöydälle</div>
-                    <div class="desc">Kopioi taulukkomuodossa liitettäväksi</div>
+                    <div class="title" data-i18n="export_clipboard">Leikepöydälle</div>
+                    <div class="desc" data-i18n="export_clipboard_desc">Kopioi taulukkomuodossa liitettäväksi</div>
                 </div>
                 <div class="export-card" onclick="exportSummary()">
                     <div class="icon">📈</div>
-                    <div class="title">Yhteenveto</div>
-                    <div class="desc">Projektikohtainen tuntiraportti</div>
+                    <div class="title" data-i18n="export_summary">Yhteenveto</div>
+                    <div class="desc" data-i18n="export_summary_desc">Projektikohtainen tuntiraportti</div>
                 </div>
             </div>
         </div>
@@ -860,7 +915,7 @@
     <!-- ASETUKSET -->
     <div id="tab-asetukset" class="tab-content">
         <div class="card">
-            <h2>Autentikointi ja yhteys</h2>
+            <h2 data-i18n="settings_auth">Autentikointi ja yhteys</h2>
             <div class="warning-box">
                 <strong>Kieku-järjestelmän suora integraatio</strong><br>
                 Kieku käyttää Valtion yhteistä tunnistautumista (Virtu/Suomi.fi). Suora API-yhteys vaatisi
@@ -886,7 +941,7 @@
         </div>
 
         <div class="card">
-            <h2>Yleiset asetukset</h2>
+            <h2 data-i18n="settings_general">Yleiset asetukset</h2>
             <div class="form-grid">
                 <div class="form-group">
                     <label for="setting-hours">Päivittäinen työaika (h)</label>
@@ -910,12 +965,12 @@
                 </div>
             </div>
             <div class="btn-group">
-                <button class="btn btn-primary" onclick="saveSettings()">Tallenna asetukset</button>
+                <button class="btn btn-primary" onclick="saveSettings()" data-i18n="btn_save_settings">Tallenna asetukset</button>
             </div>
         </div>
 
         <div class="card">
-            <h2>Tietojen hallinta</h2>
+            <h2 data-i18n="settings_data">Tietojen hallinta</h2>
             <div class="btn-group">
                 <button class="btn btn-outline" onclick="exportAllData()">Varmuuskopioi kaikki tiedot</button>
                 <button class="btn btn-outline" onclick="importAllData()">Tuo varmuuskopio</button>
@@ -1923,6 +1978,111 @@ function editVoiceEntry() {
 }
 
 initVoice();
+
+const translations = {
+    fi: {
+        title: '📋 Kieku-kirjausten automatisointi',
+        subtitle: 'Hallitse ja automatisoi työaikakirjaukset — vie tiedot Kiekuun helposti',
+        tab_entry: 'Kirjaus',
+        tab_week: 'Viikkonäkymä',
+        tab_projects: 'Projektit',
+        tab_templates: 'Mallipohjat',
+        tab_export: 'Vienti',
+        tab_settings: 'Asetukset',
+        label_today: 'Tänään kirjattu',
+        label_this_week: 'Tällä viikolla',
+        label_week_target: 'Viikkotavoite',
+        voice_title: 'Puhekirjaus',
+        new_entry: 'Uusi kirjaus',
+        btn_fill_template: 'Täytä mallipohjasta',
+        label_date: 'Päivämäärä',
+        label_project: 'Projekti / WBS',
+        label_activity: 'Toimintolaji',
+        label_hours: 'Tunnit',
+        label_start: 'Aloitus (vapaaehtoinen)',
+        label_end: 'Lopetus (vapaaehtoinen)',
+        label_note: 'Lisätieto',
+        btn_add_entry: 'Lisää kirjaus',
+        btn_clear: 'Tyhjennä',
+        day_entries: 'Päivän kirjaukset',
+        week_entries: 'Viikon kirjaukset',
+        projects_title: 'Omat projektit ja WBS-elementit',
+        btn_new_project: '+ Uusi projekti',
+        templates_title: 'Mallipohjat (päiväkohtaiset)',
+        btn_new_template: '+ Uusi mallipohja',
+        export_title: 'Vie kirjaukset',
+        label_range_start: 'Aikaväli alku',
+        label_range_end: 'Aikaväli loppu',
+        export_csv: 'CSV-tiedosto',
+        export_csv_desc: 'Kieku-yhteensopiva CSV-tuontimuoto',
+        export_json_desc: 'Rakenteellinen data jatkokäsittelyyn',
+        export_clipboard: 'Leikepöydälle',
+        export_clipboard_desc: 'Kopioi taulukkomuodossa liitettäväksi',
+        export_summary: 'Yhteenveto',
+        export_summary_desc: 'Projektikohtainen tuntiraportti',
+        settings_auth: 'Autentikointi ja yhteys',
+        settings_general: 'Yleiset asetukset',
+        btn_save_settings: 'Tallenna asetukset',
+        settings_data: 'Tietojen hallinta'
+    },
+    en: {
+        title: '📋 Kieku Time Tracking Automation',
+        subtitle: 'Manage and automate time entries — export data to Kieku easily',
+        tab_entry: 'Entry',
+        tab_week: 'Week view',
+        tab_projects: 'Projects',
+        tab_templates: 'Templates',
+        tab_export: 'Export',
+        tab_settings: 'Settings',
+        label_today: 'Logged today',
+        label_this_week: 'This week',
+        label_week_target: 'Weekly target',
+        voice_title: 'Voice entry',
+        new_entry: 'New entry',
+        btn_fill_template: 'Fill from template',
+        label_date: 'Date',
+        label_project: 'Project / WBS',
+        label_activity: 'Activity type',
+        label_hours: 'Hours',
+        label_start: 'Start (optional)',
+        label_end: 'End (optional)',
+        label_note: 'Note',
+        btn_add_entry: 'Add entry',
+        btn_clear: 'Clear',
+        day_entries: "Day's entries",
+        week_entries: 'Week entries',
+        projects_title: 'My projects and WBS elements',
+        btn_new_project: '+ New project',
+        templates_title: 'Templates (daily)',
+        btn_new_template: '+ New template',
+        export_title: 'Export entries',
+        label_range_start: 'Date range start',
+        label_range_end: 'Date range end',
+        export_csv: 'CSV file',
+        export_csv_desc: 'Kieku-compatible CSV import format',
+        export_json_desc: 'Structured data for further processing',
+        export_clipboard: 'To clipboard',
+        export_clipboard_desc: 'Copy in table format for pasting',
+        export_summary: 'Summary',
+        export_summary_desc: 'Project-based hour report',
+        settings_auth: 'Authentication and connection',
+        settings_general: 'General settings',
+        btn_save_settings: 'Save settings',
+        settings_data: 'Data management'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
 </script>
 
 </body>

@@ -265,21 +265,77 @@
             .grid { grid-template-columns: 1fr; }
             .stats-bar { gap: 1.2rem; }
         }
+
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
 
+<div class="top-nav-bar">
+    <a href="#">🏠 Pääsivu / Home</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
+
 <header>
-    <h1>Ilmatieteen laitoksen sovelluskokoelma</h1>
-    <p>Avointa säädataa hyödyntäviä sovelluksia ja työkaluja — kaikki yhdessä paikassa</p>
+    <h1 data-i18n="main_title">Ilmatieteen laitoksen sovelluskokoelma</h1>
+    <p data-i18n="main_subtitle">Avointa säädataa hyödyntäviä sovelluksia ja työkaluja — kaikki yhdessä paikassa</p>
     <div class="stats-bar">
         <div class="stat">
             <div class="stat-number" id="app-count">19</div>
-            <div class="stat-label">Sovellusta</div>
+            <div class="stat-label" data-i18n="stat_apps">Sovellusta</div>
         </div>
         <div class="stat">
             <div class="stat-number" id="cat-count">5</div>
-            <div class="stat-label">Kategoriaa</div>
+            <div class="stat-label" data-i18n="stat_categories">Kategoriaa</div>
         </div>
     </div>
 </header>
@@ -287,7 +343,7 @@
 <div class="controls">
     <div class="search-box">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="search" placeholder="Hae sovelluksia nimellä tai kuvauksella…" autocomplete="off">
+        <input type="text" id="search" placeholder="Hae sovelluksia nimellä tai kuvauksella…" data-i18n-placeholder="search_placeholder" autocomplete="off">
         <span class="search-count" id="search-count"></span>
     </div>
 </div>
@@ -299,7 +355,7 @@
 </main>
 
 <footer>
-    Ilmatieteen laitoksen avointa dataa hyödyntävät demosovellukset &middot; 2026
+    <span data-i18n="footer_text">Ilmatieteen laitoksen avointa dataa hyödyntävät demosovellukset &middot; 2026</span>
 </footer>
 
 <script>
@@ -307,133 +363,171 @@ const apps = [
     {
         id: "FMI_20260504_0603_558",
         title: "Helsinki Säävertailu — Pyöräilijän sääpalvelu",
+        titleEn: "Helsinki Weather Comparison — Cyclist Weather Service",
         desc: "Vertaile Helsingin säätietoja reaaliajassa pyöräilyn näkökulmasta. Lämpötila, tuuli, sade ja pyöräilysuositukset.",
+        descEn: "Compare Helsinki weather data in real-time from a cycling perspective. Temperature, wind, rain, and cycling recommendations.",
         icon: "🚴",
         categories: ["saa", "ulkoilu"]
     },
     {
         id: "FMI_20260504_0942_144",
         title: "Sää tänään vs. eilen",
+        titleEn: "Weather Today vs. Yesterday",
         desc: "Vertaa Helsingin tämän päivän säätä eiliseen — lämpötila, tuuli, kosteus ja sademäärä vierekkäin.",
+        descEn: "Compare today's Helsinki weather with yesterday — temperature, wind, humidity, and rainfall side by side.",
         icon: "📊",
         categories: ["saa"]
     },
     {
         id: "FMI_20260504_0942_892",
         title: "Autoilijan Reittisää",
+        titleEn: "Driver's Route Weather",
         desc: "Näe sääennuste seuraavan 4 tunnin ajalle kahden kaupungin välisellä reitillä. Suunnittele matka sään mukaan.",
+        descEn: "See the weather forecast for the next 4 hours along a route between two cities. Plan your trip by weather.",
         icon: "🚗",
         categories: ["saa"]
     },
     {
         id: "FMI_20260504_0945_792",
         title: "Lomasuunnitelma sään mukaan",
+        titleEn: "Weather-Based Vacation Planner",
         desc: "Optimoi lomapäiväsi seuraavan 10 päivän sääennusteen perusteella — aurinkoiset päivät lomalle, sadepäivät töihin.",
+        descEn: "Optimize your vacation days based on the 10-day forecast — sunny days off, rainy days at work.",
         icon: "🏖️",
         categories: ["saa", "tyo"]
     },
     {
         id: "FMI_20260504_0946_698",
         title: "SadeTutka-botti",
+        titleEn: "Rain Radar Bot",
         desc: "Säätutkadataan perustuva Telegram-botti, joka varoittaa lähestyvästä sateesta reaaliajassa.",
+        descEn: "A Telegram bot based on weather radar data that warns about approaching rain in real-time.",
         icon: "🌧️",
         categories: ["saa", "data"]
     },
     {
         id: "FMI_20260504_0953_194",
         title: "Sähköhinta & Saunasuositus",
+        titleEn: "Electricity Price & Sauna Recommendation",
         desc: "Yhdistää sähkön spot-hinnat ja sääennusteen — suosittelee optimaalisen saunomisajan Helsingissä.",
+        descEn: "Combines electricity spot prices and weather forecast — recommends the optimal sauna time in Helsinki.",
         icon: "🧖",
         categories: ["saa", "koti"]
     },
     {
         id: "FMI_20260504_0956_145",
         title: "SääTutka — Pilvien liike & sateen ennuste",
+        titleEn: "Weather Radar — Cloud Movement & Rain Forecast",
         desc: "Cloud Optimized -tutkadata, pilvien liike-ennuste ja sateen todennäköisyys kartalla.",
+        descEn: "Cloud Optimized radar data, cloud movement forecast, and rain probability on a map.",
         icon: "🛰️",
         categories: ["saa", "data"]
     },
     {
         id: "FMI_20260504_0957_848",
         title: "Tuulioptimoidut pyöräilyreitit",
+        titleEn: "Wind-Optimized Cycling Routes",
         desc: "Laskee 20 km ympyräreitin Helsingissä siten, että vastatuuli minimoidaan FMI:n reaaliaikaisella tuulidatalla.",
+        descEn: "Calculates a 20 km loop route in Helsinki minimizing headwind using FMI real-time wind data.",
         icon: "🌬️",
         categories: ["saa", "ulkoilu"]
     },
     {
         id: "FMI_20260504_1003_601",
         title: "Terassin öljyämisoptimoija",
+        titleEn: "Deck Oiling Optimizer",
         desc: "Löydä paras ajankohta terassin tai kuistin öljyämiseen FMI-sääennusteen perusteella — kuivat ja lämpimät jaksot.",
+        descEn: "Find the best time to oil your deck or porch based on FMI weather forecast — dry and warm periods.",
         icon: "🏡",
         categories: ["saa", "koti"]
     },
     {
         id: "FMI_20260504_0942_428",
         title: "Puolimaratonharjoitusohjelma",
+        titleEn: "Half Marathon Training Program",
         desc: "12 viikon harjoitusohjelma tavoiteajalla alle 2 tuntia. Seuraa etenemistä ja viikkotavoitteita.",
+        descEn: "12-week training program targeting sub-2-hour finish. Track progress and weekly goals.",
         icon: "🏃",
         categories: ["ulkoilu"]
     },
     {
         id: "FMI_20260504_1023_346",
         title: "SoraReitti — Moottoripyöräilyn soratiereitit",
+        titleEn: "GravelRoute — Motorcycle Gravel Road Routes",
         desc: "Suunnittele moottoripyöräilyn soratiereittejä Suomessa. Reittisuunnittelu, karttanäkymä ja sääolosuhteet.",
+        descEn: "Plan motorcycle gravel road routes in Finland. Route planning, map view, and weather conditions.",
         icon: "🏍️",
         categories: ["ulkoilu"]
     },
     {
         id: "FMI_20260504_0941_538",
         title: "Työajanseuranta",
+        titleEn: "Time Tracking",
         desc: "Kirjaa saapuminen, lähtö ja projektitunnit. Näe historia ja yhteenveto päivittäisistä kirjauksista.",
+        descEn: "Log arrival, departure, and project hours. View history and daily summaries.",
         icon: "⏱️",
         categories: ["tyo"]
     },
     {
         id: "FMI_20260504_0943_305",
         title: "DokuApuri — Projektidokumentaatio",
+        titleEn: "DocHelper — Project Documentation",
         desc: "Luo ammattimaista projektidokumentaatiota hetkessä. Valitse projektityyppi ja täytä tiedot.",
+        descEn: "Create professional project documentation in seconds. Choose project type and fill in details.",
         icon: "📄",
         categories: ["tyo"]
     },
     {
         id: "FMI_20260504_0943_605",
         title: "Kieku-kirjausten automatisointi",
+        titleEn: "Kieku Time Entry Automation",
         desc: "Hallitse ja automatisoi työaikakirjaukset — vie tiedot Kieku-järjestelmään helposti.",
+        descEn: "Manage and automate time entries — export data to the Kieku system easily.",
         icon: "📋",
         categories: ["tyo"]
     },
     {
         id: "FMI_20260504_0959_240",
         title: "SDLC Guardrails — Laadunvarmistus",
+        titleEn: "SDLC Guardrails — Quality Assurance",
         desc: "Varmista ohjelmistokehityksen jokaisen vaiheen laatu. Aseta guardrailit ja seuraa validointia.",
+        descEn: "Ensure quality at every stage of software development. Set guardrails and track validation.",
         icon: "🛡️",
         categories: ["tyo"]
     },
     {
         id: "FMI_20260504_1007_709",
         title: "EsitysVahti — PowerPoint-analyysi",
+        titleEn: "PresentationGuard — PowerPoint Analysis",
         desc: "Lataa PowerPoint-esitys ja saa tekoälyanalyysi yleisön aktivoinnista ja osallistamisvinkeistä.",
+        descEn: "Upload a PowerPoint presentation and get AI analysis on audience engagement and participation tips.",
         icon: "📽️",
         categories: ["tyo"]
     },
     {
         id: "FMI_20260504_1013_919",
         title: "LyhenneSanakirja — Organisaation termistö",
+        titleEn: "Abbreviation Dictionary — Organization Terminology",
         desc: "Hallinnoi organisaation lyhenteitä ja termistöä. Hae, lisää ja jaa termejä tiimin kesken.",
+        descEn: "Manage organization abbreviations and terminology. Search, add, and share terms within your team.",
         icon: "📖",
         categories: ["tyo"]
     },
     {
         id: "FMI_20260504_1016_557",
         title: "AI-agenttien tuotantoanalytiikka",
+        titleEn: "AI Agent Production Analytics",
         desc: "Seuraa AI-agenttien suorituskykyä ja tuotantodataa reaaliajassa. Tilastot, trendit ja hälytysnäkymät.",
+        descEn: "Monitor AI agent performance and production data in real-time. Statistics, trends, and alert views.",
         icon: "🤖",
         categories: ["data", "tyo"]
     },
     {
         id: "FMI_20260504_0954_912",
         title: "Matemaattisten kaavojen todistaja",
+        titleEn: "Mathematical Formula Prover",
         desc: "Opi todistamaan matemaattisia kaavoja askel askeleelta — interaktiivinen työkalu välikysymyksineen.",
+        descEn: "Learn to prove mathematical formulas step by step — an interactive tool with intermediate questions.",
         icon: "🧮",
         categories: ["oppiminen"]
     }
@@ -537,6 +631,151 @@ function renderGrid() {
         grid.appendChild(card);
     });
 }
+
+const translations = {
+    fi: {
+        main_title: 'Ilmatieteen laitoksen sovelluskokoelma',
+        main_subtitle: 'Avointa säädataa hyödyntäviä sovelluksia ja työkaluja — kaikki yhdessä paikassa',
+        stat_apps: 'Sovellusta',
+        stat_categories: 'Kategoriaa',
+        search_placeholder: 'Hae sovelluksia nimellä tai kuvauksella…',
+        footer_text: 'Ilmatieteen laitoksen avointa dataa hyödyntävät demosovellukset · 2026',
+        filter_all: 'Kaikki',
+        no_results: 'Ei sovelluksia näillä hakuehdoilla',
+        open_app: 'Avaa sovellus'
+    },
+    en: {
+        main_title: 'FMI Application Collection',
+        main_subtitle: 'Applications and tools utilizing open weather data — all in one place',
+        stat_apps: 'Applications',
+        stat_categories: 'Categories',
+        search_placeholder: 'Search apps by name or description…',
+        footer_text: 'Demo applications utilizing open data from Finnish Meteorological Institute · 2026',
+        filter_all: 'All',
+        no_results: 'No applications match these search criteria',
+        open_app: 'Open app'
+    }
+};
+
+const categoryMetaEn = {
+    saa:       { label: "Weather & Data" },
+    ulkoilu:   { label: "Outdoors & Sports" },
+    tyo:       { label: "Work & Productivity" },
+    koti:      { label: "Home & Daily" },
+    oppiminen: { label: "Learning" },
+    data:      { label: "Real-time data" }
+};
+
+let currentLang = 'fi';
+
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[lang] && translations[lang][key]) {
+            el.placeholder = translations[lang][key];
+        }
+    });
+    // Re-render filters and grid for translated labels
+    document.getElementById('filters').innerHTML = '';
+    activeFilter = null;
+    renderFilters();
+    renderGrid();
+}
+
+// Override renderFilters to support i18n
+const _origRenderFilters = renderFilters;
+renderFilters = function() {
+    const counts = {};
+    apps.forEach(a => a.categories.forEach(c => { counts[c] = (counts[c] || 0) + 1; }));
+
+    const container = document.getElementById("filters");
+    container.innerHTML = '';
+    const allBtn = document.createElement("button");
+    allBtn.className = "filter-btn active";
+    allBtn.innerHTML = `${translations[currentLang].filter_all} <span class="count">${apps.length}</span>`;
+    allBtn.dataset.cat = "";
+    allBtn.addEventListener("click", () => { activeFilter = null; updateFilterUI(); renderGrid(); });
+    container.appendChild(allBtn);
+
+    Object.entries(categoryMeta).forEach(([key, meta]) => {
+        if (!counts[key]) return;
+        const btn = document.createElement("button");
+        btn.className = "filter-btn";
+        const label = currentLang === 'en' && categoryMetaEn[key] ? categoryMetaEn[key].label : meta.label;
+        btn.innerHTML = `${label} <span class="count">${counts[key]}</span>`;
+        btn.dataset.cat = key;
+        btn.addEventListener("click", () => {
+            activeFilter = activeFilter === key ? null : key;
+            updateFilterUI();
+            renderGrid();
+        });
+        container.appendChild(btn);
+    });
+};
+
+// Override renderGrid to support i18n link text
+const _origRenderGrid = renderGrid;
+renderGrid = function() {
+    const query = document.getElementById("search").value.toLowerCase().trim();
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    const filtered = apps.filter(app => {
+        if (activeFilter && !app.categories.includes(activeFilter)) return false;
+        if (query) {
+            const title = currentLang === 'en' && app.titleEn ? app.titleEn : app.title;
+            const desc = currentLang === 'en' && app.descEn ? app.descEn : app.desc;
+            const haystack = (app.title + " " + app.desc + " " + (app.titleEn||'') + " " + (app.descEn||'')).toLowerCase();
+            return query.split(/\s+/).every(word => haystack.includes(word));
+        }
+        return true;
+    });
+
+    document.getElementById("search-count").textContent =
+        query || activeFilter ? `${filtered.length} / ${apps.length}` : "";
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="no-results">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="8" x2="14" y2="14"/><line x1="14" y1="8" x2="8" y2="14"/></svg>
+                <p>${translations[currentLang].no_results}</p>
+            </div>`;
+        return;
+    }
+
+    filtered.forEach(app => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const title = currentLang === 'en' && app.titleEn ? app.titleEn : app.title;
+        const desc = currentLang === 'en' && app.descEn ? app.descEn : app.desc;
+        card.innerHTML = `
+            <div class="card-body">
+                <div class="card-icon">${app.icon}</div>
+                <div class="card-title">${title}</div>
+                <div class="card-desc">${desc}</div>
+                <div class="card-tags">
+                    ${app.categories.map(c => {
+                        const label = currentLang === 'en' && categoryMetaEn[c] ? categoryMetaEn[c].label : categoryMeta[c].label;
+                        return `<span class="tag ${categoryMeta[c].color}">${label}</span>`;
+                    }).join("")}
+                </div>
+                <a class="card-link" href="../${app.id}/">
+                    ${translations[currentLang].open_app}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>`;
+        grid.appendChild(card);
+    });
+};
 
 init();
 </script>

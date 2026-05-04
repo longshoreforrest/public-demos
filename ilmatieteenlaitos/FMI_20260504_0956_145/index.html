@@ -601,22 +601,76 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
 
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <div class="loading-text">Ladataan tutkadataa...</div>
-    <div class="loading-sub">Haetaan FMI:n avoimesta datasta</div>
+    <div class="loading-text" data-i18n="loading_text">Ladataan tutkadataa...</div>
+    <div class="loading-sub" data-i18n="loading_sub">Haetaan FMI:n avoimesta datasta</div>
 </div>
 
 <header>
     <div class="logo">
         <div class="logo-icon">🌧️</div>
         <div>
-            <h1>🛰️ SääTutka</h1>
-            <p>Tutkadata · Pilvien liike · Sateen ennuste</p>
+            <h1 data-i18n="title">🛰️ SääTutka</h1>
+            <p data-i18n="subtitle">Tutkadata · Pilvien liike · Sateen ennuste</p>
         </div>
     </div>
     <div class="header-controls">
@@ -630,7 +684,7 @@
             <option value="rovaniemi" data-lat="66.50" data-lon="25.73">Rovaniemi</option>
             <option value="lahti" data-lat="60.98" data-lon="25.66">Lahti</option>
         </select>
-        <button class="btn" id="refreshBtn" onclick="loadAllData()">↻ Päivitä</button>
+        <button class="btn" id="refreshBtn" onclick="loadAllData()" data-i18n="btn_refresh">↻ Päivitä</button>
         <div class="status-bar">
             <div class="live-dot"></div>
             <span id="updateTime">--:--</span>
@@ -644,16 +698,16 @@
         <div class="map-overlay">
             <div class="overlay-badge">
                 <div class="live-dot"></div>
-                <span>FMI Tutkakooste – Reaaliaikainen</span>
+                <span data-i18n="badge_realtime">FMI Tutkakooste – Reaaliaikainen</span>
             </div>
             <div class="overlay-badge">
                 <span class="method-tag">COG</span>
-                <span>Cloud Optimized -tutkadata</span>
+                <span data-i18n="badge_cog">Cloud Optimized -tutkadata</span>
             </div>
         </div>
 
         <div class="radar-legend">
-            <h4>Sateen voimakkuus (dBZ)</h4>
+            <h4 data-i18n="legend_intensity">Sateen voimakkuus (dBZ)</h4>
             <div class="radar-scale">
                 <div class="radar-scale-block" style="background: #00c8ff"></div>
                 <div class="radar-scale-block" style="background: #009ef0"></div>
@@ -691,7 +745,7 @@
 
     <div class="sidebar">
         <div class="card rain-probability">
-            <div class="card-title">🌧️ Sateen todennäköisyys</div>
+            <div class="card-title" data-i18n="card_rain_prob">🌧️ Sateen todennäköisyys</div>
             <div class="rain-gauge">
                 <svg viewBox="0 0 160 160">
                     <circle class="rain-gauge-bg" cx="80" cy="80" r="65" />
@@ -700,36 +754,36 @@
                 </svg>
                 <div class="rain-gauge-text">
                     <div class="rain-percent" id="rainPercent">--%</div>
-                    <div class="rain-label">seuraava 1h</div>
+                    <div class="rain-label" data-i18n="rain_next_1h">seuraava 1h</div>
                 </div>
             </div>
             <div class="rain-details">
                 <div class="rain-detail">
                     <div class="rain-detail-value" id="rain3h">--%</div>
-                    <div class="rain-detail-label">3 tunnin sisällä</div>
+                    <div class="rain-detail-label" data-i18n="rain_3h">3 tunnin sisällä</div>
                 </div>
                 <div class="rain-detail">
                     <div class="rain-detail-value" id="rain6h">--%</div>
-                    <div class="rain-detail-label">6 tunnin sisällä</div>
+                    <div class="rain-detail-label" data-i18n="rain_6h">6 tunnin sisällä</div>
                 </div>
                 <div class="rain-detail">
                     <div class="rain-detail-value" id="rain12h">--%</div>
-                    <div class="rain-detail-label">12 tunnin sisällä</div>
+                    <div class="rain-detail-label" data-i18n="rain_12h">12 tunnin sisällä</div>
                 </div>
                 <div class="rain-detail">
                     <div class="rain-detail-value" id="rain24h">--%</div>
-                    <div class="rain-detail-label">24 tunnin sisällä</div>
+                    <div class="rain-detail-label" data-i18n="rain_24h">24 tunnin sisällä</div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-title">📊 Tuntikohtainen ennuste</div>
+            <div class="card-title" data-i18n="card_hourly">📊 Tuntikohtainen ennuste</div>
             <div class="forecast-hours" id="forecastHours"></div>
         </div>
 
         <div class="card">
-            <div class="card-title">💨 Pilvien liike</div>
+            <div class="card-title" data-i18n="card_cloud_movement">💨 Pilvien liike</div>
             <div class="wind-display">
                 <div class="wind-compass">
                     <svg viewBox="0 0 120 120">
@@ -755,17 +809,16 @@
         </div>
 
         <div class="card">
-            <div class="card-title">📡 Tutkan tilanne</div>
+            <div class="card-title" data-i18n="card_radar_status">📡 Tutkan tilanne</div>
             <div class="legend">
-                <div class="legend-item"><div class="legend-color" style="background: #00c8ff"></div>Heikko tihku</div>
-                <div class="legend-item"><div class="legend-color" style="background: #00e000"></div>Heikko sade</div>
-                <div class="legend-item"><div class="legend-color" style="background: #f0e000"></div>Kohtalainen</div>
-                <div class="legend-item"><div class="legend-color" style="background: #f04000"></div>Voimakas</div>
-                <div class="legend-item"><div class="legend-color" style="background: #800080"></div>Raju</div>
+                <div class="legend-item"><div class="legend-color" style="background: #00c8ff"></div><span data-i18n="legend_drizzle">Heikko tihku</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #00e000"></div><span data-i18n="legend_light_rain">Heikko sade</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #f0e000"></div><span data-i18n="legend_moderate">Kohtalainen</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #f04000"></div><span data-i18n="legend_heavy">Voimakas</span></div>
+                <div class="legend-item"><div class="legend-color" style="background: #800080"></div><span data-i18n="legend_severe">Raju</span></div>
             </div>
-            <div class="data-source">
-                Lähde: Ilmatieteen laitos – Avoin data (CC BY 4.0)<br>
-                Tutkakooste · Cloud Optimized GeoTIFF (COG)
+            <div class="data-source" data-i18n="data_source">
+                Lähde: Ilmatieteen laitos – Avoin data (CC BY 4.0) · Tutkakooste · Cloud Optimized GeoTIFF (COG)
             </div>
         </div>
     </div>
@@ -1307,6 +1360,71 @@
     });
 
 })();
+
+const translations = {
+    fi: {
+        title: '🛰️ SääTutka',
+        subtitle: 'Tutkadata · Pilvien liike · Sateen ennuste',
+        loading_text: 'Ladataan tutkadataa...',
+        loading_sub: 'Haetaan FMI:n avoimesta datasta',
+        btn_refresh: '↻ Päivitä',
+        badge_realtime: 'FMI Tutkakooste – Reaaliaikainen',
+        badge_cog: 'Cloud Optimized -tutkadata',
+        legend_intensity: 'Sateen voimakkuus (dBZ)',
+        card_rain_prob: '🌧️ Sateen todennäköisyys',
+        rain_next_1h: 'seuraava 1h',
+        rain_3h: '3 tunnin sisällä',
+        rain_6h: '6 tunnin sisällä',
+        rain_12h: '12 tunnin sisällä',
+        rain_24h: '24 tunnin sisällä',
+        card_hourly: '📊 Tuntikohtainen ennuste',
+        card_cloud_movement: '💨 Pilvien liike',
+        card_radar_status: '📡 Tutkan tilanne',
+        legend_drizzle: 'Heikko tihku',
+        legend_light_rain: 'Heikko sade',
+        legend_moderate: 'Kohtalainen',
+        legend_heavy: 'Voimakas',
+        legend_severe: 'Raju',
+        data_source: 'Lähde: Ilmatieteen laitos – Avoin data (CC BY 4.0) · Tutkakooste · Cloud Optimized GeoTIFF (COG)'
+    },
+    en: {
+        title: '🛰️ WeatherRadar',
+        subtitle: 'Radar data · Cloud movement · Rain forecast',
+        loading_text: 'Loading radar data...',
+        loading_sub: 'Fetching from FMI open data',
+        btn_refresh: '↻ Refresh',
+        badge_realtime: 'FMI Radar Composite – Real-time',
+        badge_cog: 'Cloud Optimized radar data',
+        legend_intensity: 'Rain intensity (dBZ)',
+        card_rain_prob: '🌧️ Rain probability',
+        rain_next_1h: 'next 1h',
+        rain_3h: 'Within 3 hours',
+        rain_6h: 'Within 6 hours',
+        rain_12h: 'Within 12 hours',
+        rain_24h: 'Within 24 hours',
+        card_hourly: '📊 Hourly forecast',
+        card_cloud_movement: '💨 Cloud movement',
+        card_radar_status: '📡 Radar status',
+        legend_drizzle: 'Light drizzle',
+        legend_light_rain: 'Light rain',
+        legend_moderate: 'Moderate',
+        legend_heavy: 'Heavy',
+        legend_severe: 'Severe',
+        data_source: 'Source: Finnish Meteorological Institute – Open data (CC BY 4.0) · Radar composite · Cloud Optimized GeoTIFF (COG)'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
 </script>
 </body>
 </html>

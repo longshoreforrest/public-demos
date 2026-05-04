@@ -298,38 +298,93 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+    <div class="top-nav-bar">
+        <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+        <div class="top-nav-lang">
+            <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+            <button onclick="setAppLang('en')" id="lang-en">EN</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>🏃 Puolimaratonharjoitusohjelma</h1>
-            <p>Tavoite: alle 2:00:00 — 12 viikon ohjelma</p>
+            <h1 data-i18n="title">🏃 Puolimaratonharjoitusohjelma</h1>
+            <p data-i18n="subtitle">Tavoite: alle 2:00:00 — 12 viikon ohjelma</p>
         </header>
 
         <div class="goal-card">
             <div class="goal-item">
-                <div class="label">Tavoiteaika</div>
+                <div class="label" data-i18n="goal_time">Tavoiteaika</div>
                 <div class="value">1:59:59</div>
             </div>
             <div class="goal-item">
-                <div class="label">Tavoitevauhti</div>
+                <div class="label" data-i18n="goal_pace">Tavoitevauhti</div>
                 <div class="value">5:41 /km</div>
             </div>
             <div class="goal-item">
-                <div class="label">Lähtötaso</div>
+                <div class="label" data-i18n="start_level">Lähtötaso</div>
                 <div class="value">5:50 /km</div>
             </div>
             <div class="goal-item">
-                <div class="label">Kilpailu</div>
+                <div class="label" data-i18n="race">Kilpailu</div>
                 <div class="value" id="raceDate"></div>
             </div>
         </div>
 
         <div class="week-selector">
-            <button id="prevWeek" onclick="changeWeek(-1)">&#9664; Edellinen</button>
+            <button id="prevWeek" onclick="changeWeek(-1)">&#9664; <span data-i18n="prev">Edellinen</span></button>
             <div class="week-label" id="weekLabel">Viikko 1 / 12</div>
-            <button id="nextWeek" onclick="changeWeek(1)">Seuraava &#9654;</button>
+            <button id="nextWeek" onclick="changeWeek(1)"><span data-i18n="next">Seuraava</span> &#9654;</button>
         </div>
 
         <div id="phaseInfo"></div>
@@ -338,14 +393,14 @@
         <div class="totals" id="totals"></div>
 
         <div class="progress-section">
-            <h3>Ohjelman eteneminen</h3>
+            <h3 data-i18n="progress">Ohjelman eteneminen</h3>
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressBar"></div>
             </div>
             <div class="progress-labels">
-                <span>Viikko 1</span>
+                <span data-i18n="week_1">Viikko 1</span>
                 <span id="progressText"></span>
-                <span>Kilpailu</span>
+                <span data-i18n="race">Kilpailu</span>
             </div>
         </div>
 
@@ -579,14 +634,16 @@
         function render() {
             const week = trainingPlan[currentWeek];
 
-            document.getElementById('weekLabel').textContent = `Viikko ${week.week} / 12`;
+            document.getElementById('weekLabel').textContent = `${T('week')} ${week.week} / 12`;
             document.getElementById('prevWeek').disabled = currentWeek === 0;
             document.getElementById('nextWeek').disabled = currentWeek === 11;
 
             const phaseClass = `phase-${week.phase}`;
-            document.getElementById('phaseInfo').innerHTML = `<span class="phase-badge ${phaseClass}">${week.phaseLabel}</span>`;
+            const phaseLabel = currentLang === 'en' ? (trainingPlanEN.phaseLabels[week.phaseLabel] || week.phaseLabel) : week.phaseLabel;
+            document.getElementById('phaseInfo').innerHTML = `<span class="phase-badge ${phaseClass}">${phaseLabel}</span>`;
 
-            document.getElementById('weekSummary').innerHTML = `<h3>Viikon tavoite</h3><p>${week.summary}</p>`;
+            const summary = currentLang === 'en' ? trainingPlanEN.summaries[currentWeek] : week.summary;
+            document.getElementById('weekSummary').innerHTML = `<h3>${T('week_goal')}</h3><p>${summary}</p>`;
 
             let totalDist = 0;
             let runDays = 0;
@@ -597,15 +654,16 @@
                 if (d.distance > 0) runDays++;
 
                 const isRest = d.distance === 0;
+                const dayName = currentLang === 'en' ? (translations.en.days[d.day] || d.day) : d.day;
                 scheduleHtml += `
                     <div class="day-card ${isRest ? 'rest' : ''}">
-                        <div class="day-name">${d.day}</div>
+                        <div class="day-name">${dayName}</div>
                         <div class="day-workout">
                             <div class="type">${d.type}</div>
                             <div class="details">${d.details}</div>
                         </div>
                         <div class="day-stats">
-                            <div class="distance">${d.distance > 0 ? d.distance + ' km' : 'Lepo'}</div>
+                            <div class="distance">${d.distance > 0 ? d.distance + ' km' : T('rest')}</div>
                             <div class="pace">${d.pace}</div>
                         </div>
                     </div>
@@ -617,27 +675,142 @@
             document.getElementById('totals').innerHTML = `
                 <div class="total-item">
                     <div class="num">${totalDist.toFixed(1)}</div>
-                    <div class="desc">km viikossa</div>
+                    <div class="desc">${T('km_week')}</div>
                 </div>
                 <div class="total-item">
                     <div class="num">${runDays}</div>
-                    <div class="desc">juoksupäivää</div>
+                    <div class="desc">${T('run_days')}</div>
                 </div>
                 <div class="total-item">
                     <div class="num">${(7 - runDays)}</div>
-                    <div class="desc">lepopäivää</div>
+                    <div class="desc">${T('rest_days')}</div>
                 </div>
                 <div class="total-item">
                     <div class="num">${Math.round(totalDist / runDays * 10) / 10}</div>
-                    <div class="desc">km / juoksupäivä</div>
+                    <div class="desc">${T('km_per_day')}</div>
                 </div>
             `;
 
             const progress = ((currentWeek + 1) / 12) * 100;
             document.getElementById('progressBar').style.width = progress + '%';
-            document.getElementById('progressText').textContent = `${Math.round(progress)}% ohjelmasta`;
+            document.getElementById('progressText').textContent = `${Math.round(progress)}% ${T('of_program')}`;
 
-            document.getElementById('tipBox').innerHTML = `<h4>Viikon vinkki</h4><p>${week.tip}</p>`;
+            const tip = currentLang === 'en' ? trainingPlanEN.tips[currentWeek] : week.tip;
+            document.getElementById('tipBox').innerHTML = `<h4>${T('weekly_tip')}</h4><p>${tip}</p>`;
+        }
+
+        const translations = {
+            fi: {
+                title: '🏃 Puolimaratonharjoitusohjelma',
+                subtitle: 'Tavoite: alle 2:00:00 — 12 viikon ohjelma',
+                goal_time: 'Tavoiteaika',
+                goal_pace: 'Tavoitevauhti',
+                start_level: 'Lähtötaso',
+                race: 'Kilpailu',
+                prev: 'Edellinen',
+                next: 'Seuraava',
+                week: 'Viikko',
+                week_1: 'Viikko 1',
+                progress: 'Ohjelman eteneminen',
+                of_program: 'ohjelmasta',
+                week_goal: 'Viikon tavoite',
+                weekly_tip: 'Viikon vinkki',
+                km_week: 'km viikossa',
+                run_days: 'juoksupäivää',
+                rest_days: 'lepopäivää',
+                km_per_day: 'km / juoksupäivä',
+                rest: 'Lepo',
+                phase_base: 'Peruskunto',
+                phase_build: 'Rakentaminen',
+                phase_peak: 'Huippuvaihe',
+                phase_taper: 'Kevennys (Taper)',
+                days: { 'Maanantai': 'Maanantai', 'Tiistai': 'Tiistai', 'Keskiviikko': 'Keskiviikko', 'Torstai': 'Torstai', 'Perjantai': 'Perjantai', 'Lauantai': 'Lauantai', 'Sunnuntai': 'Sunnuntai' }
+            },
+            en: {
+                title: '🏃 Half Marathon Training Plan',
+                subtitle: 'Goal: under 2:00:00 — 12-week program',
+                goal_time: 'Goal time',
+                goal_pace: 'Goal pace',
+                start_level: 'Starting level',
+                race: 'Race',
+                prev: 'Previous',
+                next: 'Next',
+                week: 'Week',
+                week_1: 'Week 1',
+                progress: 'Program progress',
+                of_program: 'of program',
+                week_goal: 'Week goal',
+                weekly_tip: 'Weekly tip',
+                km_week: 'km per week',
+                run_days: 'run days',
+                rest_days: 'rest days',
+                km_per_day: 'km / run day',
+                rest: 'Rest',
+                phase_base: 'Base building',
+                phase_build: 'Build phase',
+                phase_peak: 'Peak phase',
+                phase_taper: 'Taper',
+                days: { 'Maanantai': 'Monday', 'Tiistai': 'Tuesday', 'Keskiviikko': 'Wednesday', 'Torstai': 'Thursday', 'Perjantai': 'Friday', 'Lauantai': 'Saturday', 'Sunnuntai': 'Sunday' }
+            }
+        };
+
+        const trainingPlanEN = {
+            summaries: [
+                "Base fitness — get used to regular training. All runs at easy aerobic pace.",
+                "Continue building the base — small volume increases.",
+                "Last week of base phase — find rhythm before build phase.",
+                "Build phase begins — intensity rises, long run gets longer. Tempo sections approach race pace.",
+                "Volume and intensity continue to grow. Long run 16 km.",
+                "Final build week — recovery week approaching, but one more hard week.",
+                "Recovery week — volume drops 30% but intensity remains. Let the body adapt.",
+                "Peak phase begins — this is the hardest training block. Long runs close to half marathon distance.",
+                "Hardest week of the program — longest run 20 km. After this, tapering towards race.",
+                "Second recovery week — body needs to recover after the long run and hard block.",
+                "Taper begins — volume drops significantly but sharpness remains. Body charges for race.",
+                "Race week! Minimal training — fresh legs on race day. Focus on rest and nutrition."
+            ],
+            tips: [
+                "Start easy! First weeks' goal is to create routine and let the body adapt. Run so you can speak full sentences.",
+                "Listen to your body. Small muscle soreness is normal, but sharp pain means you need rest.",
+                "Ensure enough sleep (7-9h) and good nutrition. Carbohydrates are a runner's fuel!",
+                "From this week, tempo sections are near race pace (5:41/km). Learn to feel this pace in your body.",
+                "Practice drinking during runs. On long runs, take water or sports drink every 15-20 min.",
+                "If you feel tired, it's normal. Next week has a recovery that lets the body adapt.",
+                "Recovery week is as important as hard training! The body strengthens during rest. Don't do extra.",
+                "Test race day routines on long run: breakfast, drink, clothing. Don't try anything new on race day!",
+                "20 km run is a big mental achievement. Remember: on race day, adrenaline carries the last distance!",
+                "Trust your training! Fitness doesn't disappear during recovery week, the body adapts and strengthens.",
+                "You may feel restless with fewer workouts — that's normal! The body is gathering strength.",
+                "Fill glycogen stores 2-3 days before race (pasta, rice, potato). Avoid new foods. Sleep well especially 2 nights before."
+            ],
+            phaseLabels: {
+                'Peruskunto': 'Base building',
+                'Rakentaminen': 'Build phase',
+                'Rakentaminen (kevennys)': 'Build (recovery)',
+                'Huippuvaihe': 'Peak phase',
+                'Huippuvaihe (kevennys)': 'Peak (recovery)',
+                'Kevennys (Taper)': 'Taper',
+                'Kisaviikko': 'Race week'
+            }
+        };
+
+        let currentLang = 'fi';
+
+        function T(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function setAppLang(lang) {
+            currentLang = lang;
+            document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            render();
         }
 
         document.getElementById('raceDate').textContent = formatDate(getRaceDate());

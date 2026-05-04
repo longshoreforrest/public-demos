@@ -214,36 +214,91 @@
             .weather-card .temp { text-align: left; }
             .controls { flex-direction: column; }
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+    <div class="top-nav-bar">
+        <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+        <div class="top-nav-lang">
+            <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+            <button onclick="setAppLang('en')" id="lang-en">EN</button>
+        </div>
+    </div>
+
     <div class="header">
-        <h1>🚗 Autoilijan Reittisää</h1>
-        <p>Sää seuraavan 4 tunnin ajaksi kahden kaupungin välillä</p>
+        <h1 data-i18n="title">🚗 Autoilijan Reittisää</h1>
+        <p data-i18n="subtitle">Sää seuraavan 4 tunnin ajaksi kahden kaupungin välillä</p>
     </div>
 
     <div class="controls">
         <div class="input-group">
-            <label>Lähtökaupunki</label>
+            <label data-i18n="start_city">Lähtökaupunki</label>
             <div class="input-wrapper">
-                <input type="text" id="startCity" placeholder="esim. Helsinki" autocomplete="off">
+                <input type="text" id="startCity" placeholder="esim. Helsinki" data-i18n-placeholder="placeholder_start" autocomplete="off">
                 <div class="suggestions" id="startSuggestions"></div>
             </div>
         </div>
         <div class="input-group">
-            <label>Kohdekaupunki</label>
+            <label data-i18n="end_city">Kohdekaupunki</label>
             <div class="input-wrapper">
-                <input type="text" id="endCity" placeholder="esim. Tampere" autocomplete="off">
+                <input type="text" id="endCity" placeholder="esim. Tampere" data-i18n-placeholder="placeholder_end" autocomplete="off">
                 <div class="suggestions" id="endSuggestions"></div>
             </div>
         </div>
-        <button class="btn" id="searchBtn" onclick="fetchRouteWeather()">Hae reittisää</button>
+        <button class="btn" id="searchBtn" onclick="fetchRouteWeather()" data-i18n="btn_search">Hae reittisää</button>
     </div>
 
     <div class="content">
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <p>Haetaan reittitietoja ja säädataa...</p>
+            <p data-i18n="loading">Haetaan reittitietoja ja säädataa...</p>
         </div>
         <div class="error-msg" id="error"></div>
         <div id="map"></div>
@@ -252,7 +307,7 @@
             <p class="meta" id="routeMeta"></p>
         </div>
         <div class="warning-box" id="warnings">
-            <h4>Varoitukset autoilijalle</h4>
+            <h4 data-i18n="warnings_title">Varoitukset autoilijalle</h4>
             <ul id="warningList"></ul>
         </div>
         <div class="weather-timeline" id="timeline"></div>
@@ -260,6 +315,87 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+    const appTranslations = {
+        fi: {
+            title: '🚗 Autoilijan Reittisää',
+            subtitle: 'Sää seuraavan 4 tunnin ajaksi kahden kaupungin välillä',
+            start_city: 'Lähtökaupunki',
+            end_city: 'Kohdekaupunki',
+            placeholder_start: 'esim. Helsinki',
+            placeholder_end: 'esim. Tampere',
+            btn_search: 'Hae reittisää',
+            loading: 'Haetaan reittitietoja ja säädataa...',
+            warnings_title: 'Varoitukset autoilijalle',
+            error_not_found: 'Kaupunkia ei tunnistettu. Valitse kaupunki listalta.',
+            error_same_city: 'Valitse kaksi eri kaupunkia.',
+            error_fetch: 'Säätietojen haku epäonnistui: ',
+            distance: 'Etäisyys',
+            drive_time: 'Arvioitu ajoaika',
+            weather_next_4h: 'Sää seuraavalle 4 tunnille',
+            warn_temp: 'Lämpötila {temp}°C – tien pinta voi olla liukas',
+            warn_rain: 'Voimakasta sadetta {rain} mm/h',
+            warn_wind: 'Kova tuuli {wind} m/s – sivutuuli voi yllättää',
+            warn_visibility: 'Heikko näkyvyys – lumisade/sumu'
+        },
+        en: {
+            title: '🚗 Route Weather for Drivers',
+            subtitle: 'Weather for the next 4 hours between two cities',
+            start_city: 'Start city',
+            end_city: 'Destination city',
+            placeholder_start: 'e.g. Helsinki',
+            placeholder_end: 'e.g. Tampere',
+            btn_search: 'Get route weather',
+            loading: 'Fetching route info and weather data...',
+            warnings_title: 'Driver warnings',
+            error_not_found: 'City not recognized. Select a city from the list.',
+            error_same_city: 'Select two different cities.',
+            error_fetch: 'Weather fetch failed: ',
+            distance: 'Distance',
+            drive_time: 'Estimated drive time',
+            weather_next_4h: 'Weather for next 4 hours',
+            warn_temp: 'Temperature {temp}°C – road surface may be slippery',
+            warn_rain: 'Heavy rain {rain} mm/h',
+            warn_wind: 'Strong wind {wind} m/s – crosswind may surprise',
+            warn_visibility: 'Poor visibility – snow/fog'
+        }
+    };
+
+    const weatherDescriptions_en = {
+        1: 'Clear', 2: 'Partly cloudy', 3: 'Cloudy',
+        21: 'Light showers', 22: 'Showers', 23: 'Heavy showers',
+        31: 'Light rain', 32: 'Rain', 33: 'Heavy rain',
+        41: 'Light snow showers', 42: 'Snow showers', 43: 'Heavy snow showers',
+        51: 'Light snowfall', 52: 'Snowfall', 53: 'Heavy snowfall',
+        61: 'Thundershowers', 62: 'Heavy thundershowers', 63: 'Thunder',
+        64: 'Heavy thunder',
+        71: 'Light drizzle', 72: 'Drizzle', 73: 'Heavy drizzle',
+        81: 'Light sleet', 82: 'Sleet', 83: 'Heavy sleet'
+    };
+
+    let currentLang = 'fi';
+
+    function T(key) {
+        return appTranslations[currentLang][key] || key;
+    }
+
+    function setAppLang(lang) {
+        currentLang = lang;
+        document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (appTranslations[lang] && appTranslations[lang][key]) {
+                el.textContent = appTranslations[lang][key];
+            }
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (appTranslations[lang] && appTranslations[lang][key]) {
+                el.placeholder = appTranslations[lang][key];
+            }
+        });
+    }
+
     const FINNISH_CITIES = {
         'Helsinki': { lat: 60.1699, lon: 24.9384 },
         'Espoo': { lat: 60.2055, lon: 24.6559 },
@@ -419,7 +555,7 @@
     }
 
     function getWeatherDescription(symbol) {
-        const descriptions = {
+        const descriptions_fi = {
             1: 'Selkeää', 2: 'Puolipilvistä', 3: 'Pilvistä',
             21: 'Heikkoja sadekuuroja', 22: 'Sadekuuroja', 23: 'Voimakkaita sadekuuroja',
             31: 'Heikkoa vesisadetta', 32: 'Vesisadetta', 33: 'Voimakasta vesisadetta',
@@ -430,7 +566,9 @@
             71: 'Heikkoa tihkusadetta', 72: 'Tihkusadetta', 73: 'Voimakasta tihkusadetta',
             81: 'Heikkoa räntäsadetta', 82: 'Räntäsadetta', 83: 'Voimakasta räntäsadetta'
         };
-        return descriptions[Math.round(symbol)] || 'Vaihtelevaa';
+        const descriptions = currentLang === 'en' ? weatherDescriptions_en : descriptions_fi;
+        const fallback = currentLang === 'en' ? 'Variable' : 'Vaihtelevaa';
+        return descriptions[Math.round(symbol)] || fallback;
     }
 
     function getWeatherIcon(symbol) {
@@ -450,16 +588,16 @@
         const warnings = [];
         for (const wp of weatherPoints) {
             if (wp.temp !== null && wp.temp <= 0) {
-                warnings.push(`${wp.timeStr}: Lämpötila ${wp.temp.toFixed(0)}°C – tien pinta voi olla liukas (${wp.locationName})`);
+                warnings.push(`${wp.timeStr}: ${T('warn_temp').replace('{temp}', wp.temp.toFixed(0))} (${wp.locationName})`);
             }
             if (wp.precipitation > 2) {
-                warnings.push(`${wp.timeStr}: Voimakasta sadetta ${wp.precipitation.toFixed(1)} mm/h (${wp.locationName})`);
+                warnings.push(`${wp.timeStr}: ${T('warn_rain').replace('{rain}', wp.precipitation.toFixed(1))} (${wp.locationName})`);
             }
             if (wp.wind > 12) {
-                warnings.push(`${wp.timeStr}: Kova tuuli ${wp.wind.toFixed(0)} m/s – sivutuuli voi yllättää (${wp.locationName})`);
+                warnings.push(`${wp.timeStr}: ${T('warn_wind').replace('{wind}', wp.wind.toFixed(0))} (${wp.locationName})`);
             }
             if (wp.visibility === 'poor') {
-                warnings.push(`${wp.timeStr}: Heikko näkyvyys – lumisade/sumu (${wp.locationName})`);
+                warnings.push(`${wp.timeStr}: ${T('warn_visibility')} (${wp.locationName})`);
             }
         }
         return [...new Set(warnings)];
@@ -493,11 +631,11 @@
         const end = getCity(endName);
 
         if (!start || !end) {
-            showError('Kaupunkia ei tunnistettu. Valitse kaupunki listalta.');
+            showError(T('error_not_found'));
             return;
         }
         if (start.name === end.name) {
-            showError('Valitse kaksi eri kaupunkia.');
+            showError(T('error_same_city'));
             return;
         }
 
@@ -559,7 +697,7 @@
             document.getElementById('routeInfo').style.display = 'block';
             document.getElementById('routeTitle').textContent = `${start.name} → ${end.name}`;
             document.getElementById('routeMeta').textContent =
-                `Etäisyys: ~${Math.round(roadDistance)} km | Arvioitu ajoaika: ${Math.floor(driveHours)}h ${Math.round((driveHours % 1) * 60)}min | Sää seuraavalle 4 tunnille`;
+                `${T('distance')}: ~${Math.round(roadDistance)} km | ${T('drive_time')}: ${Math.floor(driveHours)}h ${Math.round((driveHours % 1) * 60)}min | ${T('weather_next_4h')}`;
 
             const warnings = generateWarnings(weatherPoints);
             const warningBox = document.getElementById('warnings');
@@ -593,7 +731,7 @@
             }).join('');
 
         } catch (err) {
-            showError('Säätietojen haku epäonnistui: ' + err.message);
+            showError(T('error_fetch') + err.message);
         } finally {
             showLoading(false);
         }

@@ -293,30 +293,84 @@
     .slot-card { flex-wrap: wrap; }
     .slot-time { min-width: 100%; }
   }
+  .top-nav-bar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 36px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 16px;
+      gap: 12px;
+      z-index: 99999;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .top-nav-bar a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: color 0.2s;
+  }
+  .top-nav-bar a:hover { color: #fff; }
+  .top-nav-lang {
+      display: flex;
+      gap: 2px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+  }
+  .top-nav-lang button {
+      padding: 3px 8px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+  }
+  .top-nav-lang button.active {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+  }
+  body { padding-top: 36px !important; }
 </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
 <div class="container">
   <header>
-    <h1>🏡 Terassin öljyämisoptimoija</h1>
-    <p>Löydä paras ajankohta terassin tai mökin kuistin öljyämiseen FMI-sääennusteen perusteella</p>
+    <h1 data-i18n="title">🏡 Terassin öljyämisoptimoija</h1>
+    <p data-i18n="subtitle">Löydä paras ajankohta terassin tai mökin kuistin öljyämiseen FMI-sääennusteen perusteella</p>
   </header>
 
   <div class="input-section">
-    <h2>Sijainti</h2>
+    <h2 data-i18n="location_heading">Sijainti</h2>
     <div class="form-row">
       <div class="form-group">
-        <label>Paikan nimi tai koordinaatit</label>
+        <label data-i18n="label_location">Paikan nimi tai koordinaatit</label>
         <input type="text" id="location" placeholder="esim. Jyväskylä tai 62.24,25.74">
       </div>
       <div class="form-group" style="flex: 0.5; min-width: 120px;">
-        <label>Ennuste (pv)</label>
+        <label data-i18n="label_forecast_days">Ennuste (pv)</label>
         <select id="days">
           <option value="3">3 päivää</option>
           <option value="5" selected>5 päivää</option>
         </select>
       </div>
-      <button class="btn" id="searchBtn" onclick="fetchForecast()">Hae suositus</button>
+      <button class="btn" id="searchBtn" onclick="fetchForecast()" data-i18n="btn_search">Hae suositus</button>
     </div>
     <div class="presets">
       <button class="preset-btn" onclick="setPreset('Helsinki', 60.17, 24.94)">Helsinki</button>
@@ -332,14 +386,14 @@
   <div id="results"></div>
 
   <div class="info-box">
-    <h3>Optimaaliset olosuhteet terassin öljyämiseen</h3>
+    <h3 data-i18n="info_title">Optimaaliset olosuhteet terassin öljyämiseen</h3>
     <ul>
-      <li><strong>Ilmankosteus:</strong> 40–70 % — liian kostea hidastaa kuivumista, liian kuiva öljy ei imeydy kunnolla</li>
-      <li><strong>Lämpötila:</strong> +15–25 °C — öljy levittyy ja imeytyy tasaisesti</li>
-      <li><strong>Ei sadetta:</strong> vähintään 12 h sateeton jakso öljyämisen jälkeen</li>
-      <li><strong>Ei suoraa auringonpaistetta:</strong> pilvinen tai puolipilvinen sää estää öljyn liian nopean kuivumisen ja läikikkyyden</li>
-      <li><strong>Tuuli:</strong> heikko tai kohtalainen (alle 5 m/s) — vähentää pölyn tarttumista</li>
-      <li><strong>Kastepiste:</strong> pintakosteuden riski huomioitava aamulla ja illalla</li>
+      <li data-i18n="info_humidity"><strong>Ilmankosteus:</strong> 40–70 % — liian kostea hidastaa kuivumista, liian kuiva öljy ei imeydy kunnolla</li>
+      <li data-i18n="info_temperature"><strong>Lämpötila:</strong> +15–25 °C — öljy levittyy ja imeytyy tasaisesti</li>
+      <li data-i18n="info_rain"><strong>Ei sadetta:</strong> vähintään 12 h sateeton jakso öljyämisen jälkeen</li>
+      <li data-i18n="info_sun"><strong>Ei suoraa auringonpaistetta:</strong> pilvinen tai puolipilvinen sää estää öljyn liian nopean kuivumisen ja läikikkyyden</li>
+      <li data-i18n="info_wind"><strong>Tuuli:</strong> heikko tai kohtalainen (alle 5 m/s) — vähentää pölyn tarttumista</li>
+      <li data-i18n="info_dew"><strong>Kastepiste:</strong> pintakosteuden riski huomioitava aamulla ja illalla</li>
     </ul>
   </div>
 
@@ -660,6 +714,51 @@ function renderResults(slots, locationName) {
 document.getElementById('location').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') fetchForecast();
 });
+
+const translations = {
+    fi: {
+        title: '🏡 Terassin öljyämisoptimoija',
+        subtitle: 'Löydä paras ajankohta terassin tai mökin kuistin öljyämiseen FMI-sääennusteen perusteella',
+        location_heading: 'Sijainti',
+        label_location: 'Paikan nimi tai koordinaatit',
+        label_forecast_days: 'Ennuste (pv)',
+        btn_search: 'Hae suositus',
+        info_title: 'Optimaaliset olosuhteet terassin öljyämiseen',
+        info_humidity: 'Ilmankosteus: 40–70 % — liian kostea hidastaa kuivumista, liian kuiva öljy ei imeydy kunnolla',
+        info_temperature: 'Lämpötila: +15–25 °C — öljy levittyy ja imeytyy tasaisesti',
+        info_rain: 'Ei sadetta: vähintään 12 h sateeton jakso öljyämisen jälkeen',
+        info_sun: 'Ei suoraa auringonpaistetta: pilvinen tai puolipilvinen sää estää öljyn liian nopean kuivumisen ja läikikkyyden',
+        info_wind: 'Tuuli: heikko tai kohtalainen (alle 5 m/s) — vähentää pölyn tarttumista',
+        info_dew: 'Kastepiste: pintakosteuden riski huomioitava aamulla ja illalla'
+    },
+    en: {
+        title: '🏡 Deck Oiling Optimizer',
+        subtitle: 'Find the best time to oil your terrace or cabin porch based on FMI weather forecast',
+        location_heading: 'Location',
+        label_location: 'Place name or coordinates',
+        label_forecast_days: 'Forecast (days)',
+        btn_search: 'Get recommendation',
+        info_title: 'Optimal conditions for deck oiling',
+        info_humidity: 'Humidity: 40–70% — too moist slows drying, too dry prevents proper absorption',
+        info_temperature: 'Temperature: +15–25 °C — oil spreads and absorbs evenly',
+        info_rain: 'No rain: at least 12h dry period after oiling',
+        info_sun: 'No direct sunlight: cloudy or partly cloudy weather prevents too rapid drying and blotchiness',
+        info_wind: 'Wind: light or moderate (under 5 m/s) — reduces dust adhesion',
+        info_dew: 'Dew point: surface moisture risk to consider in morning and evening'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
 </script>
 </body>
 </html>

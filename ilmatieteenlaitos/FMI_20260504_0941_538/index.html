@@ -362,13 +362,68 @@
                 width: 100%;
             }
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+    <div class="top-nav-bar">
+        <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+        <div class="top-nav-lang">
+            <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+            <button onclick="setAppLang('en')" id="lang-en">EN</button>
+        </div>
+    </div>
+
     <div class="app">
         <header>
-            <h1>⏱️ Työajanseuranta</h1>
-            <p>Kirjaa saapuminen, lähtö ja projektitunnit</p>
+            <h1 data-i18n="title">⏱️ Työajanseuranta</h1>
+            <p data-i18n="subtitle">Kirjaa saapuminen, lähtö ja projektitunnit</p>
         </header>
 
         <div class="clock-section">
@@ -377,31 +432,31 @@
             <div id="statusBadge"></div>
             <div class="elapsed-time" id="elapsedTime"></div>
             <div class="clock-buttons">
-                <button class="btn btn-arrive" id="btnArrive" onclick="clockIn()">Saavuin töihin</button>
-                <button class="btn btn-leave" id="btnLeave" onclick="clockOut()" disabled>Lähden töistä</button>
+                <button class="btn btn-arrive" id="btnArrive" onclick="clockIn()" data-i18n="btn_arrive">Saavuin töihin</button>
+                <button class="btn btn-leave" id="btnLeave" onclick="clockOut()" disabled data-i18n="btn_leave">Lähden töistä</button>
             </div>
         </div>
 
         <div class="section">
-            <h2>Projektitunnit tänään</h2>
+            <h2 data-i18n="project_hours_today">Projektitunnit tänään</h2>
             <div class="project-form">
                 <select id="projectSelect">
-                    <option value="">Valitse projekti...</option>
+                    <option value="" data-i18n="select_project">Valitse projekti...</option>
                 </select>
-                <input type="text" id="newProjectName" placeholder="Tai lisää uusi projekti">
-                <input type="number" id="projectHours" placeholder="Tunnit" step="0.25" min="0" max="24">
-                <button class="btn btn-add" onclick="addProjectHours()">Lisää</button>
+                <input type="text" id="newProjectName" placeholder="Tai lisää uusi projekti" data-i18n-placeholder="placeholder_new_project">
+                <input type="number" id="projectHours" placeholder="Tunnit" step="0.25" min="0" max="24" data-i18n-placeholder="placeholder_hours">
+                <button class="btn btn-add" onclick="addProjectHours()" data-i18n="btn_add">Lisää</button>
             </div>
             <ul class="project-list" id="projectList"></ul>
             <div class="total-hours" id="totalHours"></div>
         </div>
 
         <div class="section">
-            <h2>Historia ja yhteenveto</h2>
+            <h2 data-i18n="history_summary">Historia ja yhteenveto</h2>
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('today')">Tänään</button>
-                <button class="tab" onclick="switchTab('week')">Viikko</button>
-                <button class="tab" onclick="switchTab('history')">Historia</button>
+                <button class="tab active" onclick="switchTab('today')" data-i18n="tab_today">Tänään</button>
+                <button class="tab" onclick="switchTab('week')" data-i18n="tab_week">Viikko</button>
+                <button class="tab" onclick="switchTab('history')" data-i18n="tab_history">Historia</button>
             </div>
 
             <div class="tab-content active" id="tab-today">
@@ -416,7 +471,7 @@
             <div class="tab-content" id="tab-history">
                 <table class="history-table" id="historyTable"></table>
                 <div style="margin-top: 12px; text-align: right;">
-                    <button class="btn btn-clear" onclick="clearHistory()">Tyhjennä historia</button>
+                    <button class="btn btn-clear" onclick="clearHistory()" data-i18n="btn_clear">Tyhjennä historia</button>
                 </div>
             </div>
         </div>
@@ -482,7 +537,7 @@
             const elapsed = document.getElementById('elapsedTime');
 
             if (working) {
-                badge.innerHTML = '<span class="status-badge working">Töissä</span>';
+                badge.innerHTML = `<span class="status-badge working">${T('status_working')}</span>`;
                 document.getElementById('btnArrive').disabled = true;
                 document.getElementById('btnLeave').disabled = false;
 
@@ -491,16 +546,16 @@
                 const last = day.arrivals[day.arrivals.length - 1];
                 const start = new Date(last.arrived);
                 const diff = (new Date() - start) / 1000 / 60 / 60;
-                elapsed.innerHTML = `Tänään paikalla: <span>${formatHours(getTotalWorkHours(day))}</span>`;
+                elapsed.innerHTML = `${T('today_present')} <span>${formatHours(getTotalWorkHours(day))}</span>`;
             } else {
-                badge.innerHTML = '<span class="status-badge off">Ei töissä</span>';
+                badge.innerHTML = `<span class="status-badge off">${T('status_off')}</span>`;
                 document.getElementById('btnArrive').disabled = false;
                 document.getElementById('btnLeave').disabled = true;
 
                 const data = getData();
                 const day = data.days[today()];
                 if (day && day.arrivals && day.arrivals.length > 0) {
-                    elapsed.innerHTML = `Tänään yhteensä: <span>${formatHours(getTotalWorkHours(day))}</span>`;
+                    elapsed.innerHTML = `${T('today_total')} <span>${formatHours(getTotalWorkHours(day))}</span>`;
                 } else {
                     elapsed.innerHTML = '';
                 }
@@ -543,8 +598,8 @@
             const hours = parseFloat(document.getElementById('projectHours').value);
 
             let project = select.value || newName;
-            if (!project) return alert('Valitse tai kirjoita projektin nimi');
-            if (!hours || hours <= 0) return alert('Syötä tunnit');
+            if (!project) return alert(T('alert_project'));
+            if (!hours || hours <= 0) return alert(T('alert_hours'));
 
             const data = getData();
             const day = getDay(data, today());
@@ -578,7 +633,7 @@
         function renderProjectSelect() {
             const data = getData();
             const select = document.getElementById('projectSelect');
-            select.innerHTML = '<option value="">Valitse projekti...</option>';
+            select.innerHTML = `<option value="">${T('select_project')}</option>`;
             for (const p of data.projects) {
                 const opt = document.createElement('option');
                 opt.value = p;
@@ -594,7 +649,7 @@
             const totalEl = document.getElementById('totalHours');
 
             if (!day || !day.projectHours || Object.keys(day.projectHours).length === 0) {
-                list.innerHTML = '<li class="no-data">Ei vielä kirjattuja tunteja tänään</li>';
+                list.innerHTML = `<li class="no-data">${T('no_hours')}</li>`;
                 totalEl.innerHTML = '';
                 return;
             }
@@ -606,11 +661,11 @@
                 html += `<li class="project-item">
                     <span class="name">${escapeHtml(name)}</span>
                     <span class="hours">${formatHours(hours)}</span>
-                    <button class="delete-btn" onclick="removeProjectHours('${escapeHtml(name)}')" title="Poista">&times;</button>
+                    <button class="delete-btn" onclick="removeProjectHours('${escapeHtml(name)}')" title="&#x2715;">&times;</button>
                 </li>`;
             }
             list.innerHTML = html;
-            totalEl.innerHTML = `Yhteensä kirjattu: <span>${formatHours(total)}</span>`;
+            totalEl.innerHTML = `${T('total_logged')} <span>${formatHours(total)}</span>`;
         }
 
         function renderTodaySummary() {
@@ -626,10 +681,10 @@
                 : '-';
 
             document.getElementById('todaySummary').innerHTML = `
-                <div class="summary-card"><div class="value">${formatHours(workHours)}</div><div class="label">Työaika</div></div>
-                <div class="summary-card"><div class="value">${formatHours(projectTotal)}</div><div class="label">Kirjattu</div></div>
-                <div class="summary-card"><div class="value">${firstArrival}</div><div class="label">Saapuminen</div></div>
-                <div class="summary-card"><div class="value">${arrivals}</div><div class="label">Leimauksia</div></div>
+                <div class="summary-card"><div class="value">${formatHours(workHours)}</div><div class="label">${T('work_time')}</div></div>
+                <div class="summary-card"><div class="value">${formatHours(projectTotal)}</div><div class="label">${T('logged')}</div></div>
+                <div class="summary-card"><div class="value">${firstArrival}</div><div class="label">${T('arrival')}</div></div>
+                <div class="summary-card"><div class="value">${arrivals}</div><div class="label">${T('stamps')}</div></div>
             `;
         }
 
@@ -664,14 +719,14 @@
             }
 
             document.getElementById('weekSummary').innerHTML = `
-                <div class="summary-card"><div class="value">${formatHours(totalWork)}</div><div class="label">Viikon tunnit</div></div>
-                <div class="summary-card"><div class="value">${formatHours(totalProject)}</div><div class="label">Kirjattu</div></div>
-                <div class="summary-card"><div class="value">${daysWorked}</div><div class="label">Työpäiviä</div></div>
+                <div class="summary-card"><div class="value">${formatHours(totalWork)}</div><div class="label">${T('week_hours')}</div></div>
+                <div class="summary-card"><div class="value">${formatHours(totalProject)}</div><div class="label">${T('logged')}</div></div>
+                <div class="summary-card"><div class="value">${daysWorked}</div><div class="label">${T('work_days')}</div></div>
             `;
 
             document.getElementById('weekTable').innerHTML = rows
-                ? `<thead><tr><th>Päivä</th><th>Työaika</th><th>Kirjattu</th></tr></thead><tbody>${rows}</tbody>`
-                : '<tr><td class="no-data" colspan="3">Ei tietoja tälle viikolle</td></tr>';
+                ? `<thead><tr><th>${T('day')}</th><th>${T('work_time')}</th><th>${T('logged')}</th></tr></thead><tbody>${rows}</tbody>`
+                : `<tr><td class="no-data" colspan="3">${T('no_week_data')}</td></tr>`;
         }
 
         function renderHistory() {
@@ -681,7 +736,7 @@
             const sortedDays = Object.keys(data.days).sort().reverse().slice(0, 14);
 
             if (sortedDays.length === 0) {
-                table.innerHTML = '<tr><td class="no-data">Ei historiaa</td></tr>';
+                table.innerHTML = `<tr><td class="no-data">${T('no_history')}</td></tr>`;
                 return;
             }
 
@@ -709,7 +764,7 @@
                 </tr>`;
             }
 
-            table.innerHTML = `<thead><tr><th>Päivä</th><th>Saapui</th><th>Lähti</th><th>Työaika</th><th>Kirjattu</th></tr></thead><tbody>${rows}</tbody>`;
+            table.innerHTML = `<thead><tr><th>${T('day')}</th><th>${T('arrived')}</th><th>${T('left')}</th><th>${T('work_time')}</th><th>${T('logged')}</th></tr></thead><tbody>${rows}</tbody>`;
         }
 
         function switchTab(tab) {
@@ -720,7 +775,7 @@
         }
 
         function clearHistory() {
-            if (confirm('Haluatko varmasti tyhjentää kaiken historian?')) {
+            if (confirm(T('confirm_clear'))) {
                 const data = getData();
                 data.days = {};
                 saveData(data);
@@ -741,6 +796,107 @@
             renderTodaySummary();
             renderWeekSummary();
             renderHistory();
+        }
+
+        const translations = {
+            fi: {
+                title: '⏱️ Työajanseuranta',
+                subtitle: 'Kirjaa saapuminen, lähtö ja projektitunnit',
+                btn_arrive: 'Saavuin töihin',
+                btn_leave: 'Lähden töistä',
+                project_hours_today: 'Projektitunnit tänään',
+                select_project: 'Valitse projekti...',
+                placeholder_new_project: 'Tai lisää uusi projekti',
+                placeholder_hours: 'Tunnit',
+                btn_add: 'Lisää',
+                history_summary: 'Historia ja yhteenveto',
+                tab_today: 'Tänään',
+                tab_week: 'Viikko',
+                tab_history: 'Historia',
+                btn_clear: 'Tyhjennä historia',
+                status_working: 'Töissä',
+                status_off: 'Ei töissä',
+                today_present: 'Tänään paikalla:',
+                today_total: 'Tänään yhteensä:',
+                no_hours: 'Ei vielä kirjattuja tunteja tänään',
+                total_logged: 'Yhteensä kirjattu:',
+                work_time: 'Työaika',
+                logged: 'Kirjattu',
+                arrival: 'Saapuminen',
+                stamps: 'Leimauksia',
+                week_hours: 'Viikon tunnit',
+                work_days: 'Työpäiviä',
+                day: 'Päivä',
+                arrived: 'Saapui',
+                left: 'Lähti',
+                no_week_data: 'Ei tietoja tälle viikolle',
+                no_history: 'Ei historiaa',
+                confirm_clear: 'Haluatko varmasti tyhjentää kaiken historian?',
+                alert_project: 'Valitse tai kirjoita projektin nimi',
+                alert_hours: 'Syötä tunnit'
+            },
+            en: {
+                title: '⏱️ Time Tracking',
+                subtitle: 'Log arrival, departure and project hours',
+                btn_arrive: 'Clock in',
+                btn_leave: 'Clock out',
+                project_hours_today: 'Project hours today',
+                select_project: 'Select project...',
+                placeholder_new_project: 'Or add new project',
+                placeholder_hours: 'Hours',
+                btn_add: 'Add',
+                history_summary: 'History and summary',
+                tab_today: 'Today',
+                tab_week: 'Week',
+                tab_history: 'History',
+                btn_clear: 'Clear history',
+                status_working: 'Working',
+                status_off: 'Not working',
+                today_present: 'Present today:',
+                today_total: 'Total today:',
+                no_hours: 'No hours logged today yet',
+                total_logged: 'Total logged:',
+                work_time: 'Work time',
+                logged: 'Logged',
+                arrival: 'Arrival',
+                stamps: 'Stamps',
+                week_hours: 'Week hours',
+                work_days: 'Work days',
+                day: 'Day',
+                arrived: 'Arrived',
+                left: 'Left',
+                no_week_data: 'No data for this week',
+                no_history: 'No history',
+                confirm_clear: 'Are you sure you want to clear all history?',
+                alert_project: 'Select or type a project name',
+                alert_hours: 'Enter hours'
+            }
+        };
+
+        let currentLang = 'fi';
+
+        function T(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function setAppLang(lang) {
+            currentLang = lang;
+            document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+            renderAll();
+            updateStatus();
         }
 
         updateClock();

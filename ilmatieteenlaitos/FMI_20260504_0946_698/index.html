@@ -446,15 +446,70 @@
         .rain-eta.danger { background: #f4433633; color: #f44336; }
         .rain-eta.warning { background: #ff980033; color: #ff9800; }
         .rain-eta.safe { background: #4caf5033; color: #4caf50; }
+
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
 
 <div class="app-header">
     <div class="bot-avatar">🌧️</div>
     <div class="bot-info">
-        <h1>🌧️ SadeTutka-botti</h1>
-        <span>Säätutkavaroitukset — Helsinki</span>
+        <h1 data-i18n="title">🌧️ SadeTutka-botti</h1>
+        <span data-i18n="header_subtitle">Säätutkavaroitukset — Helsinki</span>
     </div>
 </div>
 
@@ -462,17 +517,17 @@
     <div class="map-panel">
         <div id="map"></div>
         <div class="info-badge">
-            <strong>Helsinki</strong> &mdash; Säätutkaseuranta aktiivinen
+            <strong>Helsinki</strong> &mdash; <span data-i18n="radar_active">Säätutkaseuranta aktiivinen</span>
         </div>
         <div class="legend">
-            <h4>Sateen voimakkuus</h4>
-            <div class="legend-item"><span class="color-box" style="background:#00c853"></span> Heikko &lt;1 mm/h</div>
-            <div class="legend-item"><span class="color-box" style="background:#ffeb3b"></span> Kohtalainen 1-4 mm/h</div>
-            <div class="legend-item"><span class="color-box" style="background:#ff9800"></span> Voimakas 4-10 mm/h</div>
-            <div class="legend-item"><span class="color-box" style="background:#f44336"></span> Rankka &gt;10 mm/h</div>
+            <h4 data-i18n="legend_title">Sateen voimakkuus</h4>
+            <div class="legend-item"><span class="color-box" style="background:#00c853"></span> <span data-i18n="legend_light">Heikko &lt;1 mm/h</span></div>
+            <div class="legend-item"><span class="color-box" style="background:#ffeb3b"></span> <span data-i18n="legend_moderate">Kohtalainen 1-4 mm/h</span></div>
+            <div class="legend-item"><span class="color-box" style="background:#ff9800"></span> <span data-i18n="legend_heavy">Voimakas 4-10 mm/h</span></div>
+            <div class="legend-item"><span class="color-box" style="background:#f44336"></span> <span data-i18n="legend_extreme">Rankka >10 mm/h</span></div>
         </div>
         <div class="time-slider">
-            <label>Aika:</label>
+            <label data-i18n="time_label">Aika:</label>
             <button class="play-btn" id="playBtn" title="Toista animaatio">&#9654;</button>
             <input type="range" id="timeSlider" min="0" max="11" value="0" />
             <div class="time-display" id="timeDisplay">Nyt</div>
@@ -481,14 +536,14 @@
 
     <div class="chat-panel">
         <div class="chat-header">
-            <h2>Telegram-varoitukset</h2>
-            <div class="status">Aktiivinen</div>
+            <h2 data-i18n="chat_title">Telegram-varoitukset</h2>
+            <div class="status" data-i18n="status_active">Aktiivinen</div>
         </div>
         <div class="chat-messages" id="chatMessages"></div>
         <div class="config-panel">
-            <h3>Botin asetukset</h3>
+            <h3 data-i18n="config_title">Botin asetukset</h3>
             <div class="config-row">
-                <label>Varoitusetäisyys</label>
+                <label data-i18n="config_radius">Varoitusetäisyys</label>
                 <select id="alertRadius">
                     <option value="10">10 km</option>
                     <option value="20" selected>20 km</option>
@@ -497,7 +552,7 @@
                 </select>
             </div>
             <div class="config-row">
-                <label>Minimitaso</label>
+                <label data-i18n="config_level">Minimitaso</label>
                 <select id="alertLevel">
                     <option value="light">Heikko sade</option>
                     <option value="moderate" selected>Kohtalainen</option>
@@ -505,7 +560,7 @@
                 </select>
             </div>
             <div class="config-row">
-                <label>Ilmoitukset</label>
+                <label data-i18n="config_notifications">Ilmoitukset</label>
                 <div class="toggle active" id="toggleAlerts"></div>
             </div>
         </div>
@@ -881,6 +936,55 @@
     showRadarLayer(11);
 
 })();
+
+const translations = {
+    fi: {
+        title: '🌧��� SadeTutka-botti',
+        header_subtitle: 'Säätutkavaroitukset — Helsinki',
+        radar_active: 'Säätutkaseuranta aktiivinen',
+        legend_title: 'Sateen voimakkuus',
+        legend_light: 'Heikko <1 mm/h',
+        legend_moderate: 'Kohtalainen 1-4 mm/h',
+        legend_heavy: 'Voimakas 4-10 mm/h',
+        legend_extreme: 'Rankka >10 mm/h',
+        time_label: 'Aika:',
+        chat_title: 'Telegram-varoitukset',
+        status_active: 'Aktiivinen',
+        config_title: 'Botin asetukset',
+        config_radius: 'Varoitusetäisyys',
+        config_level: 'Minimitaso',
+        config_notifications: 'Ilmoitukset'
+    },
+    en: {
+        title: '🌧️ RainRadar Bot',
+        header_subtitle: 'Weather radar alerts — Helsinki',
+        radar_active: 'Weather radar monitoring active',
+        legend_title: 'Rain intensity',
+        legend_light: 'Light <1 mm/h',
+        legend_moderate: 'Moderate 1-4 mm/h',
+        legend_heavy: 'Heavy 4-10 mm/h',
+        legend_extreme: 'Extreme >10 mm/h',
+        time_label: 'Time:',
+        chat_title: 'Telegram alerts',
+        status_active: 'Active',
+        config_title: 'Bot settings',
+        config_radius: 'Alert radius',
+        config_level: 'Minimum level',
+        config_notifications: 'Notifications'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
 </script>
 
 </body>

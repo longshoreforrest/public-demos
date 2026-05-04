@@ -220,28 +220,183 @@
             color: #60a5fa;
             text-decoration: none;
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+    <div class="top-nav-bar">
+        <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+        <div class="top-nav-lang">
+            <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+            <button onclick="setAppLang('en')" id="lang-en">EN</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>📊 Helsinki — Sää tänään vs. eilen</h1>
+            <h1 data-i18n="title">📊 Helsinki — Sää tänään vs. eilen</h1>
             <p id="dateInfo"></p>
         </header>
 
         <div id="content">
             <div class="loading">
                 <div class="spinner"></div>
-                <p>Haetaan säätietoja Ilmatieteen laitokselta...</p>
+                <p data-i18n="loading">Haetaan säätietoja Ilmatieteen laitokselta...</p>
             </div>
         </div>
 
         <footer>
-            Lähde: <a href="https://www.ilmatieteenlaitos.fi/" target="_blank" rel="noopener">Ilmatieteen laitos</a> — avoin data (CC 4.0)
+            <span data-i18n="footer">Lähde: Ilmatieteen laitos — avoin data (CC 4.0)</span> | <a href="https://www.ilmatieteenlaitos.fi/" target="_blank" rel="noopener">ilmatieteenlaitos.fi</a>
         </footer>
     </div>
 
     <script>
+        const translations = {
+            fi: {
+                title: '📊 Helsinki — Sää tänään vs. eilen',
+                loading: 'Haetaan säätietoja Ilmatieteen laitokselta...',
+                footer: 'Lähde: Ilmatieteen laitos — avoin data (CC 4.0)',
+                comparison: 'Vertailu:',
+                vs: 'vs.',
+                temp_avg: 'Lämpötila (keskiarvo)',
+                wind_avg: 'Tuuli (keskiarvo)',
+                temp_range: 'Lämpötilaväli',
+                rain_humidity: 'Sade & kosteus',
+                yesterday: 'Eilen',
+                today: 'Tänään',
+                same: 'Sama',
+                yesterday_min_max: 'Eilen min / max',
+                today_min_max: 'Tänään min / max',
+                rain_yesterday: 'Sade eilen',
+                rain_today: 'Sade tänään',
+                humidity_today: 'Kosteus tänään',
+                observations: 'Havaintojen lukumäärä',
+                obs_yesterday: 'Eilen (tuntihavainnot)',
+                obs_today: 'Tänään (tuntihavainnot)',
+                obs_note: 'Tänään-tiedot päivittyvät tunnin välein reaaliajassa',
+                pcs: 'kpl',
+                error_title: 'Virhe haettaessa säätietoja',
+                error_retry: 'Yritä ladata sivu uudelleen. Jos ongelma jatkuu, FMI:n rajapinta voi olla tilapäisesti poissa käytöstä.',
+                same_temp: 'Tänään on käytännössä yhtä lämmintä kuin eilen.',
+                avg_temp_is: 'Keskilämpötila on noin',
+                much_warmer: 'Tänään on selvästi lämpimämpää kuin eilen!',
+                avg_temp: 'Keskilämpötila on',
+                degrees_more: 'astetta enemmän.',
+                slightly_warmer: 'Tänään on hieman lämpimämpää kuin eilen.',
+                much_colder: 'Tänään on selvästi kylmempää kuin eilen!',
+                degrees_less: 'astetta vähemmän.',
+                slightly_colder: 'Tänään on hieman kylmempää kuin eilen.',
+                wind_stronger: 'Tuuli on voimistunut.',
+                wind_weaker: 'Tuuli on heikentynyt.',
+                rain_today_no_yesterday: 'Tänään sataa, eilen ei satanut.',
+                no_rain_today_rain_yesterday: 'Eilen satoi, mutta tänään on poutaa.'
+            },
+            en: {
+                title: '📊 Helsinki — Weather today vs. yesterday',
+                loading: 'Fetching weather data from FMI...',
+                footer: 'Source: Finnish Meteorological Institute — open data (CC 4.0)',
+                comparison: 'Comparison:',
+                vs: 'vs.',
+                temp_avg: 'Temperature (average)',
+                wind_avg: 'Wind (average)',
+                temp_range: 'Temperature range',
+                rain_humidity: 'Rain & humidity',
+                yesterday: 'Yesterday',
+                today: 'Today',
+                same: 'Same',
+                yesterday_min_max: 'Yesterday min / max',
+                today_min_max: 'Today min / max',
+                rain_yesterday: 'Rain yesterday',
+                rain_today: 'Rain today',
+                humidity_today: 'Humidity today',
+                observations: 'Number of observations',
+                obs_yesterday: 'Yesterday (hourly obs.)',
+                obs_today: 'Today (hourly obs.)',
+                obs_note: 'Today data updates in real time every hour',
+                pcs: 'pcs',
+                error_title: 'Error fetching weather data',
+                error_retry: 'Try reloading the page. If the problem persists, the FMI API may be temporarily unavailable.',
+                same_temp: 'Today is practically the same temperature as yesterday.',
+                avg_temp_is: 'Average temperature is about',
+                much_warmer: 'Today is significantly warmer than yesterday!',
+                avg_temp: 'Average temperature is',
+                degrees_more: 'degrees more.',
+                slightly_warmer: 'Today is slightly warmer than yesterday.',
+                much_colder: 'Today is significantly colder than yesterday!',
+                degrees_less: 'degrees less.',
+                slightly_colder: 'Today is slightly colder than yesterday.',
+                wind_stronger: 'Wind has strengthened.',
+                wind_weaker: 'Wind has weakened.',
+                rain_today_no_yesterday: 'It is raining today, no rain yesterday.',
+                no_rain_today_rain_yesterday: 'It rained yesterday, but today is dry.'
+            }
+        };
+
+        let currentLang = 'fi';
+
+        function T(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function setAppLang(lang) {
+            currentLang = lang;
+            document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            fetchWeatherData();
+        }
+
         const FMI_BASE = 'https://opendata.fmi.fi/wfs';
         const HELSINKI_FMISID = '100971';
 
@@ -327,11 +482,11 @@
 
         function getDiffText(diff, unit, type) {
             if (type === 'temp') {
-                if (Math.abs(diff) < 0.5) return 'Sama';
+                if (Math.abs(diff) < 0.5) return T('same');
                 const arrow = diff > 0 ? '↑' : '↓';
                 return `${arrow} ${Math.abs(diff).toFixed(1)}${unit}`;
             }
-            if (Math.abs(diff) < 0.1) return 'Sama';
+            if (Math.abs(diff) < 0.1) return T('same');
             const arrow = diff > 0 ? '↑' : '↓';
             return `${arrow} ${Math.abs(diff).toFixed(1)}${unit}`;
         }
@@ -345,29 +500,29 @@
 
             if (Math.abs(tempDiff) < 0.5) {
                 emoji = '😐';
-                text = `Tänään on käytännössä yhtä lämmintä kuin eilen. Keskilämpötila on noin ${todayStats.tempAvg.toFixed(1)} °C.`;
+                text = `${T('same_temp')} ${T('avg_temp_is')} ${todayStats.tempAvg.toFixed(1)} °C.`;
             } else if (tempDiff > 3) {
                 emoji = '🌡️';
-                text = `Tänään on selvästi lämpimämpää kuin eilen! Keskilämpötila on ${todayStats.tempAvg.toFixed(1)} °C, mikä on ${tempDiff.toFixed(1)} astetta enemmän.`;
+                text = `${T('much_warmer')} ${T('avg_temp')} ${todayStats.tempAvg.toFixed(1)} °C, ${tempDiff.toFixed(1)} ${T('degrees_more')}`;
             } else if (tempDiff > 0) {
                 emoji = '☀️';
-                text = `Tänään on hieman lämpimämpää kuin eilen. Keskilämpötila on ${todayStats.tempAvg.toFixed(1)} °C (+${tempDiff.toFixed(1)} °C).`;
+                text = `${T('slightly_warmer')} ${T('avg_temp')} ${todayStats.tempAvg.toFixed(1)} °C (+${tempDiff.toFixed(1)} °C).`;
             } else if (tempDiff < -3) {
                 emoji = '🥶';
-                text = `Tänään on selvästi kylmempää kuin eilen! Keskilämpötila on ${todayStats.tempAvg.toFixed(1)} °C, mikä on ${Math.abs(tempDiff).toFixed(1)} astetta vähemmän.`;
+                text = `${T('much_colder')} ${T('avg_temp')} ${todayStats.tempAvg.toFixed(1)} °C, ${Math.abs(tempDiff).toFixed(1)} ${T('degrees_less')}`;
             } else {
                 emoji = '❄️';
-                text = `Tänään on hieman kylmempää kuin eilen. Keskilämpötila on ${todayStats.tempAvg.toFixed(1)} °C (${tempDiff.toFixed(1)} °C).`;
+                text = `${T('slightly_colder')} ${T('avg_temp')} ${todayStats.tempAvg.toFixed(1)} °C (${tempDiff.toFixed(1)} °C).`;
             }
 
             if (Math.abs(windDiff) > 2) {
-                text += windDiff > 0 ? ' Tuuli on voimistunut.' : ' Tuuli on heikentynyt.';
+                text += ' ' + (windDiff > 0 ? T('wind_stronger') : T('wind_weaker'));
             }
 
             if (todayStats.rain > 0.5 && yesterdayStats.rain < 0.1) {
-                text += ' Tänään sataa, eilen ei satanut.';
+                text += ' ' + T('rain_today_no_yesterday');
             } else if (todayStats.rain < 0.1 && yesterdayStats.rain > 0.5) {
-                text += ' Eilen satoi, mutta tänään on poutaa.';
+                text += ' ' + T('no_rain_today_rain_yesterday');
             }
 
             return { emoji, text };
@@ -388,13 +543,13 @@
 
                 <div class="grid">
                     <div class="comparison-card">
-                        <h2>Lämpötila (keskiarvo)</h2>
+                        <h2>${T('temp_avg')}</h2>
                         <div class="value-row">
-                            <span class="day-label">Eilen</span>
+                            <span class="day-label">${T('yesterday')}</span>
                             <span class="value">${yesterdayStats.tempAvg.toFixed(1)}°</span>
                         </div>
                         <div class="value-row">
-                            <span class="day-label">Tänään</span>
+                            <span class="day-label">${T('today')}</span>
                             <span class="value">${todayStats.tempAvg.toFixed(1)}°</span>
                         </div>
                         <div class="value-row" style="justify-content:center; margin-top: 8px;">
@@ -405,13 +560,13 @@
                     </div>
 
                     <div class="comparison-card">
-                        <h2>Tuuli (keskiarvo)</h2>
+                        <h2>${T('wind_avg')}</h2>
                         <div class="value-row">
-                            <span class="day-label">Eilen</span>
+                            <span class="day-label">${T('yesterday')}</span>
                             <span class="value">${yesterdayStats.windAvg !== null ? yesterdayStats.windAvg.toFixed(1) : '-'} m/s</span>
                         </div>
                         <div class="value-row">
-                            <span class="day-label">Tänään</span>
+                            <span class="day-label">${T('today')}</span>
                             <span class="value">${todayStats.windAvg !== null ? todayStats.windAvg.toFixed(1) : '-'} m/s</span>
                         </div>
                         <div class="value-row" style="justify-content:center; margin-top: 8px;">
@@ -422,47 +577,47 @@
                     </div>
 
                     <div class="comparison-card">
-                        <h2>Lämpötilaväli</h2>
+                        <h2>${T('temp_range')}</h2>
                         <div class="detail-row">
-                            <span class="detail-label">Eilen min / max</span>
+                            <span class="detail-label">${T('yesterday_min_max')}</span>
                             <span class="detail-value">${yesterdayStats.tempMin.toFixed(1)}° / ${yesterdayStats.tempMax.toFixed(1)}°</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Tänään min / max</span>
+                            <span class="detail-label">${T('today_min_max')}</span>
                             <span class="detail-value">${todayStats.tempMin.toFixed(1)}° / ${todayStats.tempMax.toFixed(1)}°</span>
                         </div>
                     </div>
 
                     <div class="comparison-card">
-                        <h2>Sade & kosteus</h2>
+                        <h2>${T('rain_humidity')}</h2>
                         <div class="detail-row">
-                            <span class="detail-label">Sade eilen</span>
+                            <span class="detail-label">${T('rain_yesterday')}</span>
                             <span class="detail-value">${yesterdayStats.rain.toFixed(1)} mm</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Sade tänään</span>
+                            <span class="detail-label">${T('rain_today')}</span>
                             <span class="detail-value">${todayStats.rain.toFixed(1)} mm</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Kosteus tänään</span>
+                            <span class="detail-label">${T('humidity_today')}</span>
                             <span class="detail-value">${todayStats.humidityAvg !== null ? todayStats.humidityAvg.toFixed(0) + ' %' : '-'}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="comparison-card" style="margin-top: 20px;">
-                    <h2>Havaintojen lukumäärä</h2>
+                    <h2>${T('observations')}</h2>
                     <div class="detail-row">
-                        <span class="detail-label">Eilen (tuntihavainnot)</span>
-                        <span class="detail-value">${yesterdayStats.count} kpl</span>
+                        <span class="detail-label">${T('obs_yesterday')}</span>
+                        <span class="detail-value">${yesterdayStats.count} ${T('pcs')}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Tänään (tuntihavainnot)</span>
-                        <span class="detail-value">${todayStats.count} kpl</span>
+                        <span class="detail-label">${T('obs_today')}</span>
+                        <span class="detail-value">${todayStats.count} ${T('pcs')}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label" style="font-style:italic; color: #475569;">
-                            Tänään-tiedot päivittyvät tunnin välein reaaliajassa
+                            ${T('obs_note')}
                         </span>
                     </div>
                 </div>
@@ -483,8 +638,9 @@
             const yesterdayStr = formatDate(yesterday);
             const nowStr = now.toISOString();
 
+            const locale = currentLang === 'fi' ? 'fi-FI' : 'en-GB';
             document.getElementById('dateInfo').textContent =
-                `Vertailu: ${yesterday.toLocaleDateString('fi-FI', { weekday: 'long', day: 'numeric', month: 'long' })} vs. ${today.toLocaleDateString('fi-FI', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+                `${T('comparison')} ${yesterday.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })} ${T('vs')} ${today.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })}`;
 
             try {
                 const yesterdayUrl = buildFmiUrl(
@@ -529,10 +685,10 @@
             } catch (err) {
                 document.getElementById('content').innerHTML = `
                     <div class="error">
-                        <p><strong>Virhe haettaessa säätietoja</strong></p>
+                        <p><strong>${T('error_title')}</strong></p>
                         <p>${err.message}</p>
                         <p style="margin-top: 12px; font-size: 0.85rem; color: #94a3b8;">
-                            Yritä ladata sivu uudelleen. Jos ongelma jatkuu, FMI:n rajapinta voi olla tilapäisesti poissa käytöstä.
+                            ${T('error_retry')}
                         </p>
                     </div>
                 `;

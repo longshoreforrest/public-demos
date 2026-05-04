@@ -614,12 +614,66 @@
             .top-bar { flex-direction: column; }
             .score-card { min-width: 100%; }
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
     <header>
-        <h1>🛡️ SDLC Guardrails</h1>
-        <p>Varmista ohjelmistokehityksen jokaisen vaiheen laatu. Aseta guardrailit, seuraa validointia ja tunnista puutteet ennen kuin koodi etenee tuotantoon.</p>
+        <h1 data-i18n="title">🛡️ SDLC Guardrails</h1>
+        <p data-i18n="subtitle">Varmista ohjelmistokehityksen jokaisen vaiheen laatu. Aseta guardrailit, seuraa validointia ja tunnista puutteet ennen kuin koodi etenee tuotantoon.</p>
     </header>
 
     <div class="app-container">
@@ -634,15 +688,15 @@
                     <span class="score-text" id="scoreText">0%</span>
                 </div>
                 <div class="score-info">
-                    <h3>Kokonaisvalmius</h3>
+                    <h3 data-i18n="score_title">Kokonaisvalmius</h3>
                     <p id="scoreLabel">Ei arvioitu</p>
                 </div>
             </div>
 
             <div class="actions-bar">
-                <button class="btn btn-primary" onclick="openProjectModal()">+ Uusi projekti</button>
-                <button class="btn btn-outline" onclick="runAnalysis()">Analysoi puutteet</button>
-                <button class="btn btn-outline" onclick="exportReport()">Vie raportti</button>
+                <button class="btn btn-primary" onclick="openProjectModal()" data-i18n="btn_new_project">+ Uusi projekti</button>
+                <button class="btn btn-outline" onclick="runAnalysis()" data-i18n="btn_analyze">Analysoi puutteet</button>
+                <button class="btn btn-outline" onclick="exportReport()" data-i18n="btn_export">Vie raportti</button>
             </div>
         </div>
 
@@ -651,18 +705,18 @@
         <div class="detail-panel" id="detailPanel">
             <div class="empty-state">
                 <div class="icon">&#9881;</div>
-                <p>Valitse vaihe yläpuolelta nähdäksesi sen guardrailit ja validoinnit</p>
+                <p data-i18n="empty_state">Valitse vaihe yläpuolelta nähdäksesi sen guardrailit ja validoinnit</p>
             </div>
         </div>
 
         <div class="findings-section" id="findingsSection" style="display:none">
-            <h3 style="margin-bottom: 1rem;">Puuteanalyysi</h3>
+            <h3 style="margin-bottom: 1rem;" data-i18n="findings_title">Puuteanalyysi</h3>
             <div id="findingsList"></div>
         </div>
 
         <div class="report-section" id="reportSection" style="display:none">
             <div class="report-card">
-                <h3>Projektin tila</h3>
+                <h3 data-i18n="report_title">Projektin tila</h3>
                 <div class="report-grid" id="reportGrid"></div>
                 <div class="timeline" id="timeline"></div>
             </div>
@@ -672,20 +726,20 @@
     <div class="modal-overlay" id="projectModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>Uusi projekti</h3>
+                <h3 data-i18n="modal_new_project">Uusi projekti</h3>
                 <button class="icon-btn" onclick="closeProjectModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Projektin nimi</label>
+                    <label data-i18n="label_project_name">Projektin nimi</label>
                     <input type="text" id="projectName" placeholder="esim. Sääsovellus v2.0">
                 </div>
                 <div class="form-group">
-                    <label>Kuvaus</label>
+                    <label data-i18n="label_description">Kuvaus</label>
                     <textarea id="projectDesc" placeholder="Lyhyt kuvaus projektin tavoitteista"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Guardrail-taso</label>
+                    <label data-i18n="label_guardrail_level">Guardrail-taso</label>
                     <select id="guardrailLevel">
                         <option value="strict">Tiukka — kaikki pakolliset vaaditaan</option>
                         <option value="standard" selected>Standardi — suositellut mukana</option>
@@ -693,7 +747,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Teknologiapino</label>
+                    <label data-i18n="label_tech_stack">Teknologiapino</label>
                     <select id="techStack">
                         <option value="web">Web (HTML/CSS/JS)</option>
                         <option value="fullstack">Full Stack (React + Node)</option>
@@ -704,8 +758,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeProjectModal()">Peruuta</button>
-                <button class="btn btn-primary" onclick="createProject()">Luo projekti</button>
+                <button class="btn btn-outline" onclick="closeProjectModal()" data-i18n="btn_cancel">Peruuta</button>
+                <button class="btn btn-primary" onclick="createProject()" data-i18n="btn_create_project">Luo projekti</button>
             </div>
         </div>
     </div>
@@ -713,20 +767,20 @@
     <div class="modal-overlay" id="guardrailModal">
         <div class="modal">
             <div class="modal-header">
-                <h3 id="guardrailModalTitle">Muokkaa guardrail</h3>
+                <h3 id="guardrailModalTitle" data-i18n="modal_edit_guardrail">Muokkaa guardrail</h3>
                 <button class="icon-btn" onclick="closeGuardrailModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nimi</label>
+                    <label data-i18n="label_name">Nimi</label>
                     <input type="text" id="grName">
                 </div>
                 <div class="form-group">
-                    <label>Kuvaus</label>
+                    <label data-i18n="label_gr_desc">Kuvaus</label>
                     <textarea id="grDesc"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Taso</label>
+                    <label data-i18n="label_level">Taso</label>
                     <select id="grLevel">
                         <option value="required">Pakollinen</option>
                         <option value="recommended">Suositeltu</option>
@@ -734,7 +788,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Validointityyppi</label>
+                    <label data-i18n="label_validation_type">Validointityyppi</label>
                     <select id="grValidation">
                         <option value="manual">Manuaalinen tarkistus</option>
                         <option value="checklist">Tarkistuslista</option>
@@ -743,13 +797,13 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Muistiinpanot</label>
+                    <label data-i18n="label_notes">Muistiinpanot</label>
                     <textarea id="grNotes" placeholder="Vapaamuotoisia huomioita..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeGuardrailModal()">Peruuta</button>
-                <button class="btn btn-primary" onclick="saveGuardrail()">Tallenna</button>
+                <button class="btn btn-outline" onclick="closeGuardrailModal()" data-i18n="btn_cancel2">Peruuta</button>
+                <button class="btn btn-primary" onclick="saveGuardrail()" data-i18n="btn_save">Tallenna</button>
             </div>
         </div>
     </div>
@@ -1324,6 +1378,73 @@
     }
 
     init();
+
+const translations = {
+    fi: {
+        title: '🛡️ SDLC Guardrails',
+        subtitle: 'Varmista ohjelmistokehityksen jokaisen vaiheen laatu. Aseta guardrailit, seuraa validointia ja tunnista puutteet ennen kuin koodi etenee tuotantoon.',
+        score_title: 'Kokonaisvalmius',
+        btn_new_project: '+ Uusi projekti',
+        btn_analyze: 'Analysoi puutteet',
+        btn_export: 'Vie raportti',
+        empty_state: 'Valitse vaihe yläpuolelta nähdäksesi sen guardrailit ja validoinnit',
+        findings_title: 'Puuteanalyysi',
+        report_title: 'Projektin tila',
+        modal_new_project: 'Uusi projekti',
+        label_project_name: 'Projektin nimi',
+        label_description: 'Kuvaus',
+        label_guardrail_level: 'Guardrail-taso',
+        label_tech_stack: 'Teknologiapino',
+        btn_cancel: 'Peruuta',
+        btn_cancel2: 'Peruuta',
+        btn_create_project: 'Luo projekti',
+        modal_edit_guardrail: 'Muokkaa guardrail',
+        label_name: 'Nimi',
+        label_gr_desc: 'Kuvaus',
+        label_level: 'Taso',
+        label_validation_type: 'Validointityyppi',
+        label_notes: 'Muistiinpanot',
+        btn_save: 'Tallenna'
+    },
+    en: {
+        title: '🛡️ SDLC Guardrails',
+        subtitle: 'Ensure quality at every stage of software development. Set guardrails, track validation, and identify gaps before code reaches production.',
+        score_title: 'Overall Readiness',
+        btn_new_project: '+ New Project',
+        btn_analyze: 'Analyze Gaps',
+        btn_export: 'Export Report',
+        empty_state: 'Select a phase above to see its guardrails and validations',
+        findings_title: 'Gap Analysis',
+        report_title: 'Project Status',
+        modal_new_project: 'New Project',
+        label_project_name: 'Project name',
+        label_description: 'Description',
+        label_guardrail_level: 'Guardrail level',
+        label_tech_stack: 'Technology stack',
+        btn_cancel: 'Cancel',
+        btn_cancel2: 'Cancel',
+        btn_create_project: 'Create project',
+        modal_edit_guardrail: 'Edit guardrail',
+        label_name: 'Name',
+        label_gr_desc: 'Description',
+        label_level: 'Level',
+        label_validation_type: 'Validation type',
+        label_notes: 'Notes',
+        btn_save: 'Save'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
     </script>
 </body>
 </html>

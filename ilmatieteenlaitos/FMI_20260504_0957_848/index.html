@@ -273,87 +273,139 @@
                 grid-template-columns: repeat(4, 1fr);
             }
         }
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
     <header>
         <div class="icon">&#x1F6B4;</div>
         <div>
-            <h1>🌬️ Tuulioptimoidut pyöräreitit</h1>
-            <p>Ympyräreitti, jossa vastatuuli on minimoitu &mdash; FMI:n reaaliaikainen tuulidata</p>
+            <h1 data-i18n="title">🌬️ Tuulioptimoidut pyöräreitit</h1>
+            <p data-i18n="subtitle">Ympyräreitti, jossa vastatuuli on minimoitu — FMI:n reaaliaikainen tuulidata</p>
         </div>
     </header>
 
     <div class="main">
         <aside class="sidebar">
             <div class="panel">
-                <div class="panel-title">Tuulitiedot</div>
+                <div class="panel-title" data-i18n="panel_wind">Tuulitiedot</div>
                 <div class="compass-wrap">
                     <canvas id="compass" width="440" height="440"></canvas>
                 </div>
                 <div class="wind-info">
                     <div class="wind-speed" id="windSpeedDisplay">-- <span>m/s</span></div>
-                    <div class="wind-dir-text" id="windDirText">Haetaan tuulitietoja&hellip;</div>
+                    <div class="wind-dir-text" id="windDirText" data-i18n="wind_loading">Haetaan tuulitietoja...</div>
                 </div>
                 <div class="error-msg" id="windError"></div>
             </div>
 
             <div class="panel">
-                <div class="panel-title">Reittitiedot</div>
+                <div class="panel-title" data-i18n="panel_route">Reittitiedot</div>
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-card">
                         <div class="stat-value stat-neutral" id="statDistance">--</div>
-                        <div class="stat-label">Matka (km)</div>
+                        <div class="stat-label" data-i18n="stat_distance">Matka (km)</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value stat-neutral" id="statTime">--</div>
-                        <div class="stat-label">Aika (min)</div>
+                        <div class="stat-label" data-i18n="stat_time">Aika (min)</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value stat-good" id="statTailwind">--</div>
-                        <div class="stat-label">Myötätuuli-%</div>
+                        <div class="stat-label" data-i18n="stat_tailwind">Myötätuuli-%</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value stat-warn" id="statHeadwind">--</div>
-                        <div class="stat-label">Vastatuuli-%</div>
+                        <div class="stat-label" data-i18n="stat_headwind">Vastatuuli-%</div>
                     </div>
                 </div>
                 <div class="legend">
-                    <div class="legend-item"><div class="legend-color" style="background:#22c55e"></div>Myötätuuli</div>
-                    <div class="legend-item"><div class="legend-color" style="background:#86efac"></div>Lievä myötä</div>
-                    <div class="legend-item"><div class="legend-color" style="background:#fde047"></div>Sivutuuli</div>
-                    <div class="legend-item"><div class="legend-color" style="background:#fb923c"></div>Lievä vasta</div>
-                    <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div>Vastatuuli</div>
+                    <div class="legend-item"><div class="legend-color" style="background:#22c55e"></div><span data-i18n="legend_tailwind">Myötätuuli</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#86efac"></div><span data-i18n="legend_slight_tail">Lievä myötä</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#fde047"></div><span data-i18n="legend_crosswind">Sivutuuli</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#fb923c"></div><span data-i18n="legend_slight_head">Lievä vasta</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div><span data-i18n="legend_headwind">Vastatuuli</span></div>
                 </div>
             </div>
 
             <div class="panel">
-                <div class="panel-title">Asetukset</div>
+                <div class="panel-title" data-i18n="panel_settings">Asetukset</div>
                 <div class="controls">
-                    <label>Reitin pituus</label>
+                    <label data-i18n="label_route_length">Reitin pituus</label>
                     <div class="slider-wrap">
                         <input type="range" id="distanceSlider" min="10" max="50" step="1" value="20">
                         <div class="slider-value" id="distanceValue">20 km</div>
                     </div>
 
-                    <label style="margin-top:0.75rem">Lähtöpaikka</label>
+                    <label style="margin-top:0.75rem" data-i18n="label_start_point">Lähtöpaikka</label>
                     <div class="presets" id="presetButtons"></div>
 
-                    <button class="btn-generate" id="btnGenerate">Luo optimoitu reitti</button>
+                    <button class="btn-generate" id="btnGenerate" data-i18n="btn_generate">Luo optimoitu reitti</button>
                 </div>
             </div>
 
             <div class="panel">
-                <div class="tip" id="tipBox">
+                <div class="tip" id="tipBox" data-i18n="tip_default">
                     Klikkaa karttaa valitaksesi vapaa lähtöpiste, tai valitse esiasetus yllä.
                 </div>
             </div>
 
             <div class="panel">
-                <div class="attribution">
-                    Tuulitiedot: Ilmatieteen laitos, avoin data &middot;
-                    Reititys: OSRM &middot;
-                    Kartta: OpenStreetMap
+                <div class="attribution" data-i18n="attribution">
+                    Tuulitiedot: Ilmatieteen laitos, avoin data · Reititys: OSRM · Kartta: OpenStreetMap
                 </div>
             </div>
         </aside>
@@ -363,7 +415,7 @@
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">Haetaan tuulitietoja&hellip;</div>
+        <div class="loading-text" id="loadingText" data-i18n="loading_wind">Haetaan tuulitietoja...</div>
     </div>
 
     <script>
@@ -903,6 +955,67 @@
 
         init();
     })();
+
+const translations = {
+    fi: {
+        title: '🌬️ Tuulioptimoidut pyöräreitit',
+        subtitle: 'Ympyräreitti, jossa vastatuuli on minimoitu — FMI:n reaaliaikainen tuulidata',
+        panel_wind: 'Tuulitiedot',
+        wind_loading: 'Haetaan tuulitietoja...',
+        panel_route: 'Reittitiedot',
+        stat_distance: 'Matka (km)',
+        stat_time: 'Aika (min)',
+        stat_tailwind: 'Myötätuuli-%',
+        stat_headwind: 'Vastatuuli-%',
+        legend_tailwind: 'Myötätuuli',
+        legend_slight_tail: 'Lievä myötä',
+        legend_crosswind: 'Sivutuuli',
+        legend_slight_head: 'Lievä vasta',
+        legend_headwind: 'Vastatuuli',
+        panel_settings: 'Asetukset',
+        label_route_length: 'Reitin pituus',
+        label_start_point: 'Lähtöpaikka',
+        btn_generate: 'Luo optimoitu reitti',
+        tip_default: 'Klikkaa karttaa valitaksesi vapaa lähtöpiste, tai valitse esiasetus yllä.',
+        attribution: 'Tuulitiedot: Ilmatieteen laitos, avoin data · Reititys: OSRM · Kartta: OpenStreetMap',
+        loading_wind: 'Haetaan tuulitietoja...'
+    },
+    en: {
+        title: '🌬️ Wind-Optimized Cycling Routes',
+        subtitle: 'Loop route with minimized headwind — FMI real-time wind data',
+        panel_wind: 'Wind Data',
+        wind_loading: 'Fetching wind data...',
+        panel_route: 'Route Info',
+        stat_distance: 'Distance (km)',
+        stat_time: 'Time (min)',
+        stat_tailwind: 'Tailwind %',
+        stat_headwind: 'Headwind %',
+        legend_tailwind: 'Tailwind',
+        legend_slight_tail: 'Slight tail',
+        legend_crosswind: 'Crosswind',
+        legend_slight_head: 'Slight head',
+        legend_headwind: 'Headwind',
+        panel_settings: 'Settings',
+        label_route_length: 'Route length',
+        label_start_point: 'Starting point',
+        btn_generate: 'Generate optimized route',
+        tip_default: 'Click the map to choose a starting point, or select a preset above.',
+        attribution: 'Wind data: Finnish Meteorological Institute, open data · Routing: OSRM · Map: OpenStreetMap',
+        loading_wind: 'Fetching wind data...'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
     </script>
 </body>
 </html>

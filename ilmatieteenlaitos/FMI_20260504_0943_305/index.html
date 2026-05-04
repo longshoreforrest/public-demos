@@ -394,58 +394,113 @@
             color: var(--text-secondary);
             font-size: 0.85rem;
         }
+
+        .top-nav-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 36px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .top-nav-bar a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .top-nav-bar a:hover { color: #fff; }
+        .top-nav-lang {
+            display: flex;
+            gap: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .top-nav-lang button {
+            padding: 3px 8px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .top-nav-lang button.active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        body { padding-top: 36px !important; }
     </style>
 </head>
 <body>
+<div class="top-nav-bar">
+    <a href="../FMI_20260504_1019_883/">🏠 Pääsivu</a>
+    <div class="top-nav-lang">
+        <button onclick="setAppLang('fi')" id="lang-fi" class="active">FI</button>
+        <button onclick="setAppLang('en')" id="lang-en">EN</button>
+    </div>
+</div>
 
 <header>
-    <h1>📄 DokuApuri</h1>
-    <p>Luo ammattimaista dokumentaatiota projekteillesi hetkessä</p>
+    <h1 data-i18n="title">📄 DokuApuri</h1>
+    <p data-i18n="subtitle">Luo ammattimaista dokumentaatiota projekteillesi hetkessä</p>
 </header>
 
 <div class="container">
     <div class="layout">
         <aside>
             <div class="panel" style="margin-bottom: 1rem;">
-                <h2>Projektityyppi</h2>
+                <h2 data-i18n="project_type">Projektityyppi</h2>
                 <div class="template-grid" id="templateGrid">
                     <button class="template-btn active" data-template="web" onclick="selectTemplate('web')">
-                        <span class="icon">🌐</span> Web-sovellus
+                        <span class="icon">🌐</span> <span data-i18n="tpl_web">Web-sovellus</span>
                     </button>
                     <button class="template-btn" data-template="api" onclick="selectTemplate('api')">
-                        <span class="icon">🔌</span> API / Backend
+                        <span class="icon">🔌</span> <span data-i18n="tpl_api">API / Backend</span>
                     </button>
                     <button class="template-btn" data-template="library" onclick="selectTemplate('library')">
-                        <span class="icon">📦</span> Kirjasto
+                        <span class="icon">📦</span> <span data-i18n="tpl_library">Kirjasto</span>
                     </button>
                     <button class="template-btn" data-template="mobile" onclick="selectTemplate('mobile')">
-                        <span class="icon">📱</span> Mobiilisovellus
+                        <span class="icon">📱</span> <span data-i18n="tpl_mobile">Mobiilisovellus</span>
                     </button>
                     <button class="template-btn" data-template="data" onclick="selectTemplate('data')">
-                        <span class="icon">📊</span> Data-projekti
+                        <span class="icon">📊</span> <span data-i18n="tpl_data">Data-projekti</span>
                     </button>
                     <button class="template-btn" data-template="devops" onclick="selectTemplate('devops')">
-                        <span class="icon">⚙️</span> DevOps / Infra
+                        <span class="icon">⚙️</span> <span data-i18n="tpl_devops">DevOps / Infra</span>
                     </button>
                 </div>
             </div>
 
             <div class="panel" style="margin-bottom: 1rem;">
-                <h2>Projektin tiedot</h2>
+                <h2 data-i18n="project_details">Projektin tiedot</h2>
                 <div class="form-group">
-                    <label>Projektin nimi</label>
+                    <label data-i18n="label_name">Projektin nimi</label>
                     <input type="text" id="projectName" placeholder="esim. SääApuri" oninput="generateDocs()">
                 </div>
                 <div class="form-group">
-                    <label>Lyhyt kuvaus</label>
+                    <label data-i18n="label_desc">Lyhyt kuvaus</label>
                     <textarea id="projectDesc" rows="2" placeholder="Mitä projekti tekee?" oninput="generateDocs()"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Teknologiat</label>
+                    <label data-i18n="label_tech">Teknologiat</label>
                     <input type="text" id="projectTech" placeholder="esim. React, Node.js, PostgreSQL" oninput="generateDocs()">
                 </div>
                 <div class="form-group">
-                    <label>Lisenssi</label>
+                    <label data-i18n="label_license">Lisenssi</label>
                     <select id="projectLicense" onchange="generateDocs()">
                         <option value="MIT">MIT</option>
                         <option value="Apache-2.0">Apache 2.0</option>
@@ -456,18 +511,18 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Tekijä / tiimi</label>
+                    <label data-i18n="label_author">Tekijä / tiimi</label>
                     <input type="text" id="projectAuthor" placeholder="esim. Tiimi Alfa" oninput="generateDocs()">
                 </div>
             </div>
 
             <div class="panel">
-                <h2>Dokumentin osiot</h2>
-                <div class="tip">Valitse osiot ja järjestä ne vetämällä. Osiot vaihtelevat projektityypin mukaan.</div>
+                <h2 data-i18n="doc_sections">Dokumentin osiot</h2>
+                <div class="tip" data-i18n="tip_sections">Valitse osiot ja järjestä ne vetämällä. Osiot vaihtelevat projektityypin mukaan.</div>
                 <ul class="section-list" id="sectionList"></ul>
                 <div class="custom-section-add">
                     <input type="text" id="customSectionInput" placeholder="Oma osio...">
-                    <button onclick="addCustomSection()">+ Lisää</button>
+                    <button onclick="addCustomSection()" data-i18n="btn_add_section">+ Lisää</button>
                 </div>
             </div>
         </aside>
@@ -476,12 +531,12 @@
             <div class="panel output-area">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                     <div class="tabs">
-                        <button class="tab active" onclick="switchTab('preview', this)">Esikatselu</button>
-                        <button class="tab" onclick="switchTab('markdown', this)">Markdown</button>
+                        <button class="tab active" onclick="switchTab('preview', this)" data-i18n="tab_preview">Esikatselu</button>
+                        <button class="tab" onclick="switchTab('markdown', this)" data-i18n="tab_markdown">Markdown</button>
                     </div>
                     <div class="btn-group" style="margin-top: 0;">
-                        <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="copyMarkdown()">Kopioi</button>
-                        <button class="btn btn-success" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="downloadMarkdown()">Lataa .md</button>
+                        <button class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="copyMarkdown()" data-i18n="btn_copy">Kopioi</button>
+                        <button class="btn btn-success" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="downloadMarkdown()" data-i18n="btn_download">Lataa .md</button>
                     </div>
                 </div>
                 <div id="previewTab" class="preview-content"></div>
@@ -491,9 +546,9 @@
     </div>
 </div>
 
-<div class="copied-toast" id="toast">Kopioitu leikepöydälle!</div>
+<div class="copied-toast" id="toast" data-i18n="toast_copied">Kopioitu leikepöydälle!</div>
 
-<footer>
+<footer data-i18n="footer">
     DokuApuri — Anniina Kokkosen idea &bull; Toteutettu Ilmatieteen laitoksen avoin data -kategoriassa
 </footer>
 
@@ -866,6 +921,73 @@ document.getElementById('customSectionInput').addEventListener('keydown', (e) =>
 });
 
 selectTemplate('web');
+
+const translations = {
+    fi: {
+        title: '📄 DokuApuri',
+        subtitle: 'Luo ammattimaista dokumentaatiota projekteillesi hetkessä',
+        project_type: 'Projektityyppi',
+        tpl_web: 'Web-sovellus',
+        tpl_api: 'API / Backend',
+        tpl_library: 'Kirjasto',
+        tpl_mobile: 'Mobiilisovellus',
+        tpl_data: 'Data-projekti',
+        tpl_devops: 'DevOps / Infra',
+        project_details: 'Projektin tiedot',
+        label_name: 'Projektin nimi',
+        label_desc: 'Lyhyt kuvaus',
+        label_tech: 'Teknologiat',
+        label_license: 'Lisenssi',
+        label_author: 'Tekijä / tiimi',
+        doc_sections: 'Dokumentin osiot',
+        tip_sections: 'Valitse osiot ja järjestä ne vetämällä. Osiot vaihtelevat projektityypin mukaan.',
+        btn_add_section: '+ Lisää',
+        tab_preview: 'Esikatselu',
+        tab_markdown: 'Markdown',
+        btn_copy: 'Kopioi',
+        btn_download: 'Lataa .md',
+        toast_copied: 'Kopioitu leikepöydälle!',
+        footer: 'DokuApuri — Anniina Kokkosen idea • Toteutettu Ilmatieteen laitoksen avoin data -kategoriassa'
+    },
+    en: {
+        title: '📄 DokuApuri',
+        subtitle: 'Create professional documentation for your projects in an instant',
+        project_type: 'Project type',
+        tpl_web: 'Web app',
+        tpl_api: 'API / Backend',
+        tpl_library: 'Library',
+        tpl_mobile: 'Mobile app',
+        tpl_data: 'Data project',
+        tpl_devops: 'DevOps / Infra',
+        project_details: 'Project details',
+        label_name: 'Project name',
+        label_desc: 'Short description',
+        label_tech: 'Technologies',
+        label_license: 'License',
+        label_author: 'Author / team',
+        doc_sections: 'Document sections',
+        tip_sections: 'Select sections and reorder them by dragging. Sections vary by project type.',
+        btn_add_section: '+ Add',
+        tab_preview: 'Preview',
+        tab_markdown: 'Markdown',
+        btn_copy: 'Copy',
+        btn_download: 'Download .md',
+        toast_copied: 'Copied to clipboard!',
+        footer: 'DokuApuri — Idea by Anniina Kokkonen • Built in the FMI open data category'
+    }
+};
+let currentLang = 'fi';
+function setAppLang(lang) {
+    currentLang = lang;
+    document.getElementById('lang-fi').classList.toggle('active', lang === 'fi');
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+        }
+    });
+}
 </script>
 
 </body>
