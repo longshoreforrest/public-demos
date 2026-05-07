@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oma Prisma — Henkilökohtaiset tarjoukset</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --s-green: #00AA46;
+            --s-green-dark: #008A38;
+            --s-green-light: #E8F7EE;
+            --s-orange: #FF6900;
+            --s-orange-light: #FFF3EB;
+            --s-blue: #0072C6;
+            --s-red: #E30613;
+            --s-red-light: #FDECED;
+            --s-gray-100: #F5F5F5;
+            --s-gray-200: #E8E8E8;
+            --s-gray-300: #D0D0D0;
+            --s-gray-600: #666;
+            --s-gray-800: #333;
+            --s-white: #FFFFFF;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--s-gray-100);
+            color: var(--s-gray-800);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--s-green) 0%, var(--s-green-dark) 100%);
+            color: white;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .header-logo h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .store-info {
+            background: rgba(0,0,0,0.15);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .store-info svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .store-distance {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(0,0,0,0.1);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: max-content;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .tab.active {
+            color: white;
+            border-bottom-color: white;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .tab:hover:not(.active) {
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--s-orange);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            padding: 0 5px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 24px 0 12px;
+        }
+
+        .section-header:first-child {
+            margin-top: 8px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--s-gray-800);
+        }
+
+        .section-subtitle {
+            font-size: 0.75rem;
+            color: var(--s-gray-600);
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #FF6900 0%, #FF8C33 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+
+        .hero-desc {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 14px;
+        }
+
+        .hero-price {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .hero-price .current {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .hero-price .unit {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .hero-price .original {
+            font-size: 0.9rem;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .hero-validity {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 6px;
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 600px) {
+            .offers-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .offer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .offer-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            background: var(--s-gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .offer-tag {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .tag-seasonal {
+            background: var(--s-green);
+            color: white;
+        }
+
+        .tag-clearance {
+            background: var(--s-red);
+            color: white;
+        }
+
+        .tag-new {
+            background: var(--s-blue);
+            color: white;
+        }
+
+        .tag-bonus {
+            background: var(--s-orange);
+            color: white;
+        }
+
+        .tag-personal {
+            background: #7B2D8E;
+            color: white;
+        }
+
+        .offer-body {
+            padding: 12px;
+        }
+
+        .offer-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .offer-reason {
+            font-size: 0.7rem;
+            color: var(--s-gray-600);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .offer-reason svg {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+
+        .offer-pricing {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .offer-current-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--s-green-dark);
+        }
+
+        .offer-original-price {
+            font-size: 0.75rem;
+            color: var(--s-gray-600);
+            text-decoration: line-through;
+        }
+
+        .offer-discount {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--s-red);
+            margin-left: auto;
+        }
+
+        .offer-validity {
+            font-size: 0.65rem;
+            color: var(--s-gray-600);
+            margin-top: 6px;
+        }
+
+        .section-panel {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .purchase-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--s-gray-200);
+        }
+
+        .purchase-item:last-child {
+            border-bottom: none;
+        }
+
+        .purchase-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--s-gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .purchase-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .purchase-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .purchase-date {
+            font-size: 0.7rem;
+            color: var(--s-gray-600);
+        }
+
+        .purchase-arrow {
+            color: var(--s-gray-300);
+            font-size: 0.9rem;
+        }
+
+        .profile-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .profile-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--s-green-light);
+            color: var(--s-green-dark);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .savings-card {
+            background: linear-gradient(135deg, var(--s-green-light) 0%, #D4F0DD 100%);
+            border: 1px solid var(--s-green);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .savings-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--s-green-dark);
+        }
+
+        .savings-label {
+            font-size: 0.8rem;
+            color: var(--s-gray-600);
+            margin-top: 4px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 10px;
+            font-size: 0.65rem;
+            color: var(--s-gray-600);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--s-green);
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 3px;
+        }
+
+        .spacer-bottom {
+            height: 70px;
+        }
+
+        .hidden { display: none !important; }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 0.65rem;
+            color: var(--s-gray-600);
+            padding: 16px 20px;
+            line-height: 1.5;
+        }
+
+        .notification-bar {
+            background: var(--s-orange-light);
+            border-left: 4px solid var(--s-orange);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .notification-bar svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: var(--s-orange);
+            margin-top: 1px;
+        }
+
+        .notification-text {
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .notification-text strong {
+            color: var(--s-orange);
+        }
+
+        .swipe-hint {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--s-gray-600);
+            padding: 8px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            margin-bottom: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1.5px solid var(--s-gray-300);
+            background: white;
+            color: var(--s-gray-800);
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            border-color: var(--s-green);
+            background: var(--s-green-light);
+            color: var(--s-green-dark);
+        }
+
+        .filter-chip:hover {
+            border-color: var(--s-green);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-top">
+        <div class="header-logo">
+            <svg viewBox="0 0 36 36" fill="none">
+                <rect width="36" height="36" rx="8" fill="white" fill-opacity="0.2"/>
+                <text x="18" y="24" text-anchor="middle" fill="white" font-size="16" font-weight="700" font-family="Inter, sans-serif">S</text>
+            </svg>
+            <h1>Oma Prisma</h1>
+        </div>
+        <div class="header-user">
+            <span>Tapio</span>
+            <div class="avatar">TP</div>
+        </div>
+    </div>
+    <div class="store-info">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C5.24 1 3 3.24 3 6c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5zm0 7.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>
+        <span><strong>Prisma Jumbo Tammisto</strong> — Vantaa</span>
+        <span class="store-distance">1,1 km</span>
+    </div>
+    <div class="tabs">
+        <div class="tab active" data-tab="sinulle">Sinulle <span class="tab-badge">8</span></div>
+        <div class="tab" data-tab="kausituotteet">Kausituotteet</div>
+        <div class="tab" data-tab="loppuunmyynti">Loppuunmyynti</div>
+        <div class="tab" data-tab="uutuudet">Uutuudet</div>
+    </div>
+</header>
+
+<main>
+    <!-- Sinulle -välilehti -->
+    <div id="tab-sinulle" class="tab-content fade-in">
+        <div class="notification-bar">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zm0 16a2 2 0 01-2-2h4a2 2 0 01-2 2z"/></svg>
+            <div class="notification-text">
+                <strong>3 uutta tarjousta</strong> ostohistoriasi perusteella! Mansikat ovat nyt kaudessa ja grillikausituotteita on saatavilla.
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-top: 0;">
+            <div>
+                <div class="section-title">Suositeltu sinulle</div>
+                <div class="section-subtitle">Ostohistoriaasi perustuen</div>
+            </div>
+        </div>
+
+        <div class="hero-banner">
+            <div class="hero-badge">Kauden hitti</div>
+            <div class="hero-title">Suomalaiset mansikat 500g</div>
+            <div class="hero-desc">Olet ostanut marjoja 12 kertaa viime kesänä — nyt kauden ensimmäiset!</div>
+            <div class="hero-price">
+                <span class="current">4,99€</span>
+                <span class="unit">/ 500g</span>
+                <span class="original">6,49€</span>
+            </div>
+            <div class="hero-validity">Voimassa 7.–13.5.2026 · S-Etukorttihinta</div>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-chip active" data-filter="all">Kaikki</div>
+            <div class="filter-chip" data-filter="seasonal">🍓 Kausituotteet</div>
+            <div class="filter-chip" data-filter="clearance">🏷️ Loppuunmyynti</div>
+            <div class="filter-chip" data-filter="new">✨ Uutuudet</div>
+            <div class="filter-chip" data-filter="bonus">⭐ Bonustarjoukset</div>
+        </div>
+
+        <div class="offers-grid" id="offers-sinulle"></div>
+
+        <div class="savings-card">
+            <div class="savings-amount">127,40 €</div>
+            <div class="savings-label">Säästösi tänä vuonna henkilökohtaisilla tarjouksilla</div>
+        </div>
+    </div>
+
+    <!-- Kausituotteet -välilehti -->
+    <div id="tab-kausituotteet" class="tab-content hidden">
+        <div class="section-header" style="margin-top: 8px;">
+            <div>
+                <div class="section-title">Kesän kausituotteet</div>
+                <div class="section-subtitle">Tuoreita ja ajankohtaisia</div>
+            </div>
+        </div>
+        <div class="offers-grid" id="offers-kausituotteet"></div>
+    </div>
+
+    <!-- Loppuunmyynti -välilehti -->
+    <div id="tab-loppuunmyynti" class="tab-content hidden">
+        <div class="section-header" style="margin-top: 8px;">
+            <div>
+                <div class="section-title">Loppuunmyynti</div>
+                <div class="section-subtitle">Rajoitettu erä — kun on mennyt, on mennyt!</div>
+            </div>
+        </div>
+        <div class="offers-grid" id="offers-loppuunmyynti"></div>
+    </div>
+
+    <!-- Uutuudet -välilehti -->
+    <div id="tab-uutuudet" class="tab-content hidden">
+        <div class="section-header" style="margin-top: 8px;">
+            <div>
+                <div class="section-title">Uutuudet perheellesi</div>
+                <div class="section-subtitle">Uusia tuotteita jotka voisivat kiinnostaa</div>
+            </div>
+        </div>
+        <div class="offers-grid" id="offers-uutuudet"></div>
+    </div>
+
+    <div class="disclaimer">
+        Tämä on konseptiprototyyppi. Hinnat ja tarjoukset ovat esimerkkidataa.<br>
+        Henkilökohtaiset suositukset perustuvat simuloituun ostohistoriaan.
+    </div>
+
+    <div class="spacer-bottom"></div>
+</main>
+
+<nav class="bottom-nav">
+    <div class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l-8 7.5V21h6v-6h4v6h6V10.5L12 3z"/></svg>
+        <span>Tarjoukset</span>
+    </div>
+    <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        <span>Ostoslista</span>
+    </div>
+    <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span>Historia</span>
+    </div>
+    <div class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        <span>Profiili</span>
+    </div>
+</nav>
+
+<script>
+const offers = [
+    {
+        name: "Suomalaiset mansikat 500g",
+        emoji: "🍓",
+        tag: "seasonal",
+        tagLabel: "Kausituote",
+        currentPrice: "4,99€",
+        originalPrice: "6,49€",
+        discount: "-23%",
+        reason: "Ostit marjoja 12× viime kesänä",
+        validity: "7.–13.5.",
+        category: ["sinulle", "kausituotteet"]
+    },
+    {
+        name: "Grillimakkara Hk Sininen Lenkki 580g",
+        emoji: "🌭",
+        tag: "seasonal",
+        tagLabel: "Kausituote",
+        currentPrice: "2,89€",
+        originalPrice: "3,79€",
+        discount: "-24%",
+        reason: "Grillituotteet kiinnostavat sinua",
+        validity: "7.–13.5.",
+        category: ["sinulle", "kausituotteet"]
+    },
+    {
+        name: "Weber grillimauste Classic BBQ",
+        emoji: "🧂",
+        tag: "new",
+        tagLabel: "Uutuus",
+        currentPrice: "3,49€",
+        originalPrice: "",
+        discount: "",
+        reason: "Grillauskausi alkaa — sopii ostoksiisi",
+        validity: "Uutuus!",
+        category: ["sinulle", "uutuudet"]
+    },
+    {
+        name: "Lasten uimapuku Lindex 110–140",
+        emoji: "👙",
+        tag: "clearance",
+        tagLabel: "Loppuunmyynti",
+        currentPrice: "9,90€",
+        originalPrice: "24,90€",
+        discount: "-60%",
+        reason: "Ostit lasten vaatteita hiljattain",
+        validity: "Niin kauan kuin tavaraa riittää",
+        category: ["sinulle", "loppuunmyynti"]
+    },
+    {
+        name: "Valio Oltermanni 900g",
+        emoji: "🧀",
+        tag: "bonus",
+        tagLabel: "Bonushinta",
+        currentPrice: "5,99€",
+        originalPrice: "8,15€",
+        discount: "-27%",
+        reason: "Vakio-ostoksesi — aina edullisesti",
+        validity: "7.–20.5.",
+        category: ["sinulle"]
+    },
+    {
+        name: "Paulig Presidentti 500g",
+        emoji: "☕",
+        tag: "personal",
+        tagLabel: "Sinulle",
+        currentPrice: "5,49€",
+        originalPrice: "7,29€",
+        discount: "-25%",
+        reason: "Henkilökohtainen tarjous",
+        validity: "7.–13.5.",
+        category: ["sinulle"]
+    },
+    {
+        name: "Fazer Domino 525g",
+        emoji: "🍪",
+        tag: "bonus",
+        tagLabel: "Bonushinta",
+        currentPrice: "2,99€",
+        originalPrice: "4,39€",
+        discount: "-32%",
+        reason: "Perheesi suosikki",
+        validity: "7.–13.5.",
+        category: ["sinulle"]
+    },
+    {
+        name: "Rainbow LED-kasvivalo",
+        emoji: "💡",
+        tag: "clearance",
+        tagLabel: "Loppuunmyynti",
+        currentPrice: "12,90€",
+        originalPrice: "29,90€",
+        discount: "-57%",
+        reason: "Kodintarvikkeet kiinnostavat sinua",
+        validity: "Rajoitettu erä",
+        category: ["sinulle", "loppuunmyynti"]
+    },
+    {
+        name: "Tuoreet tomaatit Suomi 500g",
+        emoji: "🍅",
+        tag: "seasonal",
+        tagLabel: "Kausituote",
+        currentPrice: "2,29€",
+        originalPrice: "3,49€",
+        discount: "-34%",
+        reason: "Kotimainen kasviksia",
+        validity: "7.–13.5.",
+        category: ["kausituotteet"]
+    },
+    {
+        name: "Kotijäätelö Aino Vanilja 850ml",
+        emoji: "🍦",
+        tag: "seasonal",
+        tagLabel: "Kausituote",
+        currentPrice: "3,29€",
+        originalPrice: "4,89€",
+        discount: "-33%",
+        reason: "Kesäherkkua perheelle",
+        validity: "7.–20.5.",
+        category: ["kausituotteet"]
+    },
+    {
+        name: "Grilliritilä pyöreä Ø57cm",
+        emoji: "♨️",
+        tag: "seasonal",
+        tagLabel: "Kausituote",
+        currentPrice: "14,90€",
+        originalPrice: "22,90€",
+        discount: "-35%",
+        reason: "Grillikausi alkaa",
+        validity: "7.–13.5.",
+        category: ["kausituotteet"]
+    },
+    {
+        name: "Aurinkovoide SPF30 200ml",
+        emoji: "🧴",
+        tag: "seasonal",
+        tagLabel: "Kausituote",
+        currentPrice: "8,90€",
+        originalPrice: "12,90€",
+        discount: "-31%",
+        reason: "Kesän must-have",
+        validity: "7.–20.5.",
+        category: ["kausituotteet"]
+    },
+    {
+        name: "Trampoliini 305cm",
+        emoji: "🤸",
+        tag: "clearance",
+        tagLabel: "Loppuunmyynti",
+        currentPrice: "149€",
+        originalPrice: "299€",
+        discount: "-50%",
+        reason: "Viimeiset kappaleet",
+        validity: "Niin kauan kuin tavaraa riittää",
+        category: ["loppuunmyynti"]
+    },
+    {
+        name: "Sähköpolkupyörä Winora Sinus",
+        emoji: "🚲",
+        tag: "clearance",
+        tagLabel: "Loppuunmyynti",
+        currentPrice: "1 299€",
+        originalPrice: "1 999€",
+        discount: "-35%",
+        reason: "Viime vuoden malli",
+        validity: "Rajoitettu erä",
+        category: ["loppuunmyynti"]
+    },
+    {
+        name: "Garden talvitakki naisten XS–XL",
+        emoji: "🧥",
+        tag: "clearance",
+        tagLabel: "Loppuunmyynti",
+        currentPrice: "29,90€",
+        originalPrice: "89,90€",
+        discount: "-67%",
+        reason: "Kauden vaihto",
+        validity: "Rajoitettu erä",
+        category: ["loppuunmyynti"]
+    },
+    {
+        name: "Koti SPA -kasvohoitosetti",
+        emoji: "🧖",
+        tag: "clearance",
+        tagLabel: "Loppuunmyynti",
+        currentPrice: "7,90€",
+        originalPrice: "19,90€",
+        discount: "-60%",
+        reason: "Valikoimasta poistuva",
+        validity: "Rajoitettu erä",
+        category: ["loppuunmyynti"]
+    },
+    {
+        name: "Beyond Meat Plant Burger 2×113g",
+        emoji: "🌱",
+        tag: "new",
+        tagLabel: "Uutuus",
+        currentPrice: "4,99€",
+        originalPrice: "",
+        discount: "",
+        reason: "Uusi valikoimassa — kokeile!",
+        validity: "Uutuus!",
+        category: ["uutuudet"]
+    },
+    {
+        name: "Oatly Jäätelö Suklaa 500ml",
+        emoji: "🍫",
+        tag: "new",
+        tagLabel: "Uutuus",
+        currentPrice: "5,49€",
+        originalPrice: "",
+        discount: "",
+        reason: "Uusi maku — kaurasta tehty",
+        validity: "Uutuus!",
+        category: ["uutuudet"]
+    },
+    {
+        name: "Samsung Galaxy Tab A9 WiFi",
+        emoji: "📱",
+        tag: "new",
+        tagLabel: "Uutuus",
+        currentPrice: "179€",
+        originalPrice: "",
+        discount: "",
+        reason: "Uusi taulutietokone perheelle",
+        validity: "Uutuus!",
+        category: ["uutuudet"]
+    },
+    {
+        name: "Fiskars Xact puutarhasakset",
+        emoji: "✂️",
+        tag: "new",
+        tagLabel: "Uutuus",
+        currentPrice: "24,90€",
+        originalPrice: "",
+        discount: "",
+        reason: "Puutarhakausi alkaa",
+        validity: "Uutuus!",
+        category: ["uutuudet"]
+    }
+];
+
+function createOfferCard(offer) {
+    const tagClass = {
+        seasonal: 'tag-seasonal',
+        clearance: 'tag-clearance',
+        new: 'tag-new',
+        bonus: 'tag-bonus',
+        personal: 'tag-personal'
+    }[offer.tag];
+
+    return `
+        <div class="offer-card" data-filter="${offer.tag}">
+            <div class="offer-image">
+                ${offer.emoji}
+                <span class="offer-tag ${tagClass}">${offer.tagLabel}</span>
+            </div>
+            <div class="offer-body">
+                <div class="offer-name">${offer.name}</div>
+                <div class="offer-reason">
+                    <svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zm0 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM6 9c-1.3 0-2.5-.7-3-1.8.03-.99 2-1.52 3-1.52s2.97.53 3 1.52A3.5 3.5 0 016 9z"/></svg>
+                    ${offer.reason}
+                </div>
+                <div class="offer-pricing">
+                    <span class="offer-current-price">${offer.currentPrice}</span>
+                    ${offer.originalPrice ? `<span class="offer-original-price">${offer.originalPrice}</span>` : ''}
+                    ${offer.discount ? `<span class="offer-discount">${offer.discount}</span>` : ''}
+                </div>
+                <div class="offer-validity">${offer.validity}</div>
+            </div>
+        </div>
+    `;
+}
+
+function renderOffers(containerId, category) {
+    const container = document.getElementById(containerId);
+    const filtered = offers.filter(o => o.category.includes(category));
+    container.innerHTML = filtered.map(createOfferCard).join('');
+}
+
+renderOffers('offers-sinulle', 'sinulle');
+renderOffers('offers-kausituotteet', 'kausituotteet');
+renderOffers('offers-loppuunmyynti', 'loppuunmyynti');
+renderOffers('offers-uutuudet', 'uutuudet');
+
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const tabId = tab.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        const target = document.getElementById('tab-' + tabId);
+        target.classList.remove('hidden');
+        target.classList.add('fade-in');
+    });
+});
+
+document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const filter = chip.dataset.filter;
+        const grid = document.getElementById('offers-sinulle');
+        const cards = grid.querySelectorAll('.offer-card');
+        cards.forEach(card => {
+            if (filter === 'all' || card.dataset.filter === filter) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>
